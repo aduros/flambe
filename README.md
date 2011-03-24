@@ -1,9 +1,9 @@
 Flambe
 ======
 
-Flambe will be an engine and for cross-platform multiplayer games.
+Flambe will be an engine for cross-platform multiplayer games.
 
-Written in haXe, games are compiled to Flash and mobile (Android and iPhone via Amity).
+Written in haXe, games are compiled to Flash and mobile (Android and iOS via Amity).
 
 High level overview
 -------------------

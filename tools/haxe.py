@@ -1,0 +1,81 @@
+"""
+Basic haXe compiler support for Waf
+"""
+
+import os, re
+from waflib.Configure import conf
+from waflib import TaskGen, Task, Utils, Options, Build, Errors, Node
+from waflib.TaskGen import feature, before_method, after_method
+
+from waflib.Tools import ccroot
+
+def configure(self):
+    # If HAXE_HOME is set, we prepend it to the path list
+    path = self.environ["PATH"].split(os.pathsep)
+
+    if "HAXE_HOME" in self.environ:
+        path = [self.environ["HAXE_HOME"]] + path
+        self.env["HAXE_HOME"] = [self.environ["HAXE_HOME"]]
+
+    self.find_program("haxe", var="HAXE", path_list=path)
+
+    if not self.env["HAXE"]: self.fatal("haXe compiler not found!")
+
+# Borrowed from the scalac task
+class haxe(Task.Task):
+    color = "BLUE"
+    def runnable_status(self):
+        """
+        Wait for dependent tasks to be complete, then read the file system to find the input nodes.
+        """
+        for t in self.run_after:
+            if not t.hasrun:
+                return Task.ASK_LATER
+
+        if not self.inputs:
+            self.inputs  = []
+            for cp in self.classpath:
+                self.inputs.extend(cp.ant_glob('**/*.hx', remove=False))
+        return super(Task.Task, self).runnable_status()
+
+    def run(self):
+        """
+        Execute the haxe compiler
+        """
+        env = self.env
+        gen = self.generator
+        bld = gen.bld
+        wd = bld.bldnode.abspath()
+        def to_list(xx):
+            if isinstance(xx, str): return [xx]
+            return xx
+        self.last_cmd = lst = []
+        lst.extend(to_list(env['HAXE']))
+        for cp in self.classpath:
+            lst.extend(['-cp', cp.abspath()])
+        lst.extend(self.flags)
+        try:
+            self.out = self.generator.bld.cmd_and_log(lst, cwd=wd, env=env.env or None, output=0, quiet=0)[1]
+        except:
+            self.generator.bld.cmd_and_log(lst, cwd=wd, env=env.env or None)
+
+    def __str__(self):
+        env=self.env
+        tgt_str=' '.join([a.nice_path(env)for a in self.outputs])
+        return'%s: %s\n'%(self.__class__.__name__.replace('_task',''),tgt_str)
+
+@feature("haxe")
+def apply_haxe(self):
+    target = self.path.get_bld().make_node(self.target)
+    classpath = Utils.to_list(self.classpath)
+    flags = Utils.to_list(self.flags)
+
+    if str(target).endswith(".swf"):
+        flags += ["-swf", str(target), "--flash-strict", "-swf-version", "10"]
+    else:
+        flags += ["-js", str(target)]
+
+    task = self.create_task("haxe", None, target)
+    task.classpath = [self.path.find_node(cp) for cp in classpath]
+    task.flags = flags
+    self.haxe_task = task

@@ -66,16 +66,32 @@ class haxe(Task.Task):
 
 @feature("haxe")
 def apply_haxe(self):
-    target = self.path.get_bld().make_node(self.target)
+    Utils.def_attrs(self,
+        target="", classpath="", flags="", libs="", swflib=None);
+
     classpath = Utils.to_list(self.classpath)
     flags = Utils.to_list(self.flags)
+    target = self.target;
 
-    if str(target).endswith(".swf"):
-        flags += ["-swf", str(target), "--flash-strict", "-swf-version", "10"]
+    inputs = []
+
+    if target.endswith(".swf"):
+        flags += ["-swf", target, "--flash-strict", "-swf-version", "10"]
+        if (self.swflib is not None):
+            swflib = self.path.get_bld().make_node(self.swflib)
+            inputs += [swflib]
+            flags += ["-swf-lib", str(swflib)]
+    elif target.endswith(".js"):
+        flags += ["-js", target]
+    elif target.endswith(".n"):
+        flags += ["-neko", target]
     else:
-        flags += ["-js", str(target)]
+        raise "Unsupported target file type!"
 
-    task = self.create_task("haxe", None, target)
+    for lib in Utils.to_list(self.libs):
+        flags += ["-lib", lib]
+
+    task = self.create_task("haxe", inputs, self.path.get_bld().make_node(target))
     task.classpath = [self.path.find_node(cp) for cp in classpath]
     task.flags = flags
     self.haxe_task = task

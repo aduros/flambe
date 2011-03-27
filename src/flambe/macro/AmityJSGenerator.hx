@@ -15,15 +15,15 @@ class AmityJSGenerator extends DefaultJSGenerator
 
     override public function generate ()
     {
+        // document and window (even if they're undefined) must exist for haXe's generated JS to run
+        // in Amity. A better solution in the future will be to scrub all code that assumes a web
+        // browser from haXe's JS library.
+        print("var document,window;");
         super.generate();
     }
 
     public static function use ()
     {
-        /*Compiler.removeField("js.Lib", "document", true);*/
-        /*Compiler.removeField("js.Lib", "window", true);*/
-        /*Compiler.removeField("js.Lib", "isOpera", true);*/
-        /*Compiler.removeField("js.Lib", "isIE", true);*/
         Compiler.setCustomJSGenerator(function (api) new AmityJSGenerator(api).generate());
         return null; // What's the correct haxe flag to avoid this? Not --macro
     }

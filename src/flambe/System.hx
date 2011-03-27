@@ -27,6 +27,11 @@ class System
         driver.init(root);
     }
 
+    inline public static function loadAssetPack (url)
+    {
+        return driver.loadAssetPack(url);
+    }
+
     private static function onMouseDown (event :MouseEvent)
     {
         for (sprite in Sprite.INTERACTIVE_SPRITES) {

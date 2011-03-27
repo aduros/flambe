@@ -9,8 +9,9 @@ import flash.display.Sprite;
 import flash.display.Stage;
 import flash.display.StageScaleMode;
 
-import flambe.Entity;
+import flambe.asset.AssetPackLoader;
 import flambe.display.Texture;
+import flambe.Entity;
 import flambe.FrameVisitor;
 import flambe.platform.AppDriver;
 import flambe.System;
@@ -69,6 +70,11 @@ class FlashAppDriver
     public function createTexture (assetName :String) :Texture
     {
         return new BitmapData(cast Math.random()*20+20, cast Math.random()*20+20, false, cast Math.random()*0xffffff);
+    }
+
+    public function loadAssetPack (url :String) :AssetPackLoader
+    {
+        return new FlashAssetPackLoader(url);
     }
 
     private var _screen :BitmapData;

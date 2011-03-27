@@ -1,5 +1,6 @@
 package flambe.platform.amity;
 
+import flambe.asset.AssetPackLoader;
 import flambe.display.Texture;
 import flambe.Entity;
 import flambe.FrameVisitor;
@@ -28,5 +29,10 @@ class AmityAppDriver
     public function createTexture (assetName :String) :Texture
     {
         return (untyped __amity).createTexture(assetName);
+    }
+
+    public function loadAssetPack (url :String) :AssetPackLoader
+    {
+        return null; // TODO
     }
 }

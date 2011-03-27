@@ -18,8 +18,8 @@ class FlashAssetPack
 
     public function createTexture (file :String) :Texture
     {
-         return Type.createInstance(
-             _loaderInfo.applicationDomain.getDefinition(file.replace(".", "$")), []);
+        return Type.createInstance(
+            _loaderInfo.applicationDomain.getDefinition(file.replace(".", "$")), []);
     }
 
     private var _loaderInfo :LoaderInfo;

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os;
+import os
 
 def options(ctx):
     ctx.add_option("--debug", action="store_true", default=False, help="Build a development version")
@@ -36,3 +36,13 @@ def build(ctx):
         target="packager.n")
     ctx(rule="neko -interp ${SRC} ../res .", # -interp because neko JIT segfaults
         source="packager.n", target= "bootstrap.swf" if hasBootstrap else None, always=True)
+
+def android_test(ctx):
+    os.system("adb push res/bootstrap /sdcard/amity-dev")
+    os.system("adb push build/app.js /sdcard/amity-dev")
+    # TODO: Close the app if it's already running
+    os.system("adb shell am start -a android.intent.action.MAIN " +
+        "-n com.threerings.amity/.AmityActivity")
+
+def android_log(ctx):
+    os.system("adb logcat -v tag amity:V SDL:V *:W")

@@ -38,7 +38,7 @@ def build(ctx):
         source="packager.n", target= "bootstrap.swf" if hasBootstrap else None, always=True)
 
 def android_test(ctx):
-    os.system("adb push res/bootstrap /sdcard/amity-dev")
+    os.system("adb push res /sdcard/amity-dev")
     os.system("adb push build/app.js /sdcard/amity-dev")
     # TODO: Close the app if it's already running
     os.system("adb shell am start -a android.intent.action.MAIN " +

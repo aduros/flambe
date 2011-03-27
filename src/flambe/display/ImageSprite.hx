@@ -7,7 +7,6 @@ class ImageSprite extends Sprite
     private function new ()
     {
         super();
-        texture = flambe.System.driver.createTexture("/sdcard/data/man.png"); // Temporary
     }
 
     override public function draw (ctx)

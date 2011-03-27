@@ -33,6 +33,6 @@ class AmityAppDriver
 
     public function loadAssetPack (url :String) :AssetPackLoader
     {
-        return null; // TODO
+        return new AmityAssetPackLoader(url);
     }
 }

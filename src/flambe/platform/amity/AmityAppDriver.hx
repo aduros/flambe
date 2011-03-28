@@ -15,15 +15,21 @@ class AmityAppDriver
 
     public function init (root :Entity)
     {
-        var frameVisitor = new FrameVisitor(new AmityDrawingContext());
-        (untyped __amity).onEnterFrame = function (dt :Int) {
-            frameVisitor.init(dt);
-            root.visit(frameVisitor);
-        };
 #if debug
         // Redirect traces to Amity
         haxe.Log.trace = (untyped __amity).log;
 #end
+        var frameVisitor = new FrameVisitor(new AmityDrawingContext());
+        (untyped __amity.events).onEnterFrame = function (dt :Int) {
+            frameVisitor.init(dt);
+            root.visit(frameVisitor);
+        };
+        (untyped __amity.events).onMouseDown = function (event) {
+            var fevent = new flambe.display.MouseEvent();
+            fevent.viewX = event.x;
+            fevent.viewY = event.y;
+            System.mouseDown.emit(fevent);
+        }
     }
 
     public function createTexture (assetName :String) :Texture

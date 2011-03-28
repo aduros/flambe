@@ -32,11 +32,6 @@ class AmityAppDriver
         }
     }
 
-    public function createTexture (assetName :String) :Texture
-    {
-        return (untyped __amity).createTexture(assetName);
-    }
-
     public function loadAssetPack (url :String) :AssetPackLoader
     {
         return new AmityAssetPackLoader(url);

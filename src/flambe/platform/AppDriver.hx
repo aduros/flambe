@@ -8,7 +8,5 @@ interface AppDriver
 {
     function init (root :Entity) :Void;
 
-    function createTexture (assetName :String) :Texture;
-
     function loadAssetPack (url :String) :AssetPackLoader;
 }

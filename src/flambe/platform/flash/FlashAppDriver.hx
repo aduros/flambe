@@ -67,11 +67,6 @@ class FlashAppDriver
         _screen.unlock();
     }
 
-    public function createTexture (assetName :String) :Texture
-    {
-        return new BitmapData(cast Math.random()*20+20, cast Math.random()*20+20, false, cast Math.random()*0xffffff);
-    }
-
     public function loadAssetPack (url :String) :AssetPackLoader
     {
         return new FlashAssetPackLoader(url);

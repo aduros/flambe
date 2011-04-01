@@ -45,5 +45,8 @@ def android_test(ctx):
     os.system("adb shell am start -a android.intent.action.MAIN " +
         "-n com.threerings.amity/.AmityActivity")
 
+def flash_test(ctx):
+    os.system("flashplayer build/app.swf")
+
 def android_log(ctx):
     os.system("adb logcat -v tag amity:V SDL:V *:W")

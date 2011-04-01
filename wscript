@@ -21,7 +21,6 @@ def build(ctx):
 
     ctx(features="haxe", classpath="src",
         flags=flags,
-        libs="format",
         swflib="bootstrap.swf" if hasBootstrap else None,
         target="app.swf")
 

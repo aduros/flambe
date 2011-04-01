@@ -1,6 +1,7 @@
 package flambe.animation;
 
 import flambe.animation.Binding;
+import flambe.animation.Easing;
 import flambe.util.Signal1;
 
 typedef PFloat = Property<Float>;
@@ -44,14 +45,14 @@ class Property<A>
         }
     }
 
-    inline public function animateTo (to :A, duration :Int)
+    public function animateTo (to :A, duration :Int, ?easing :EasingFunction)
     {
-        setBehavior(cast new Tween(cast _value, cast to, duration));
+        setBehavior(cast new Tween(cast _value, cast to, duration, easing));
     }
 
-    inline public function animateBy (by :A, duration :Int)
+    public function animateBy (by :A, duration :Int, ?easing :EasingFunction)
     {
-        setBehavior(cast new Tween(cast _value, (cast _value) + (cast by), duration));
+        setBehavior(cast new Tween(cast _value, (cast _value) + (cast by), duration, easing));
     }
 
     inline public function bindTo (to :Property<A>, ?fn :BindingFunction<A>)

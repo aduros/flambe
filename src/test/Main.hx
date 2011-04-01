@@ -1,6 +1,7 @@
 package test;
 
 import flambe.animation.Property;
+import flambe.animation.Easing;
 import flambe.Entity;
 import flambe.LogVisitor;
 import flambe.Component;
@@ -27,10 +28,11 @@ class Main
             dude.getImageSprite().texture = loader.pack.createTexture("subdir/man.png");
             System.mouseDown.add(function (event) {
                 var xform = dude.getTransform();
-                xform.x.animateTo(event.viewX, 1000);
-                xform.y.animateTo(event.viewY, 1000);
-                // TODO: animateBy
-                xform.rotation.animateTo(dude.getTransform().rotation.get() + 360, 1000);
+                xform.x.animateTo(event.viewX, 1000, Easing.quadIn);
+                xform.y.animateTo(event.viewY, 1000, Easing.quadOut);
+                /*xform.rotation.animateBy(360, 1000);*/
+                /*xform.scaleX.animateBy(1.1, 1000, Easing.quadIn);*/
+                /*xform.scaleY.animateBy(1.1, 1000);*/
             });
             System.root.addChild(dude);
         });

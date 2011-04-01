@@ -1,14 +1,17 @@
 package flambe.animation;
 
+import flambe.animation.Easing;
+
 class Tween
     implements Behavior<Float>
 {
-    public function new (from :Float, to :Float, duration :Int)
+    public function new (from :Float, to :Float, duration :Int, ?easing :EasingFunction)
     {
         _from = from;
         _to = to;
         _duration = duration;
         _elapsed = 0;
+        _easing = (easing != null) ? easing : Easing.linear;
     }
 
     public function update (dt :Int) :Float
@@ -18,7 +21,7 @@ class Tween
         if (_elapsed >= _duration) {
             return _to;
         } else {
-            return _from + (_to - _from) * (_elapsed/_duration);
+            return _from + (_to - _from)*_easing(_elapsed/_duration);
         }
     }
 
@@ -31,4 +34,5 @@ class Tween
     private var _to :Float;
     private var _elapsed :Int;
     private var _duration :Int;
+    private var _easing :EasingFunction;
 }

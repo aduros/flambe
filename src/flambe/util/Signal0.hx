@@ -4,27 +4,30 @@ typedef Listener0 = Void -> Void;
 
 class Signal0
 {
-    public function new ()
+    public function new (?listener :Listener0)
     {
-        _slots = [];
+        _listeners = [];
+        if (listener != null) {
+            add(listener);
+        }
     }
 
-    public function add (slot :Listener0)
+    public function add (listener :Listener0)
     {
-        _slots.push(slot);
+        _listeners.push(listener);
     }
 
-    public function remove (slot :Listener0)
+    public function remove (listener :Listener0)
     {
-        _slots.remove(slot);
+        _listeners.remove(listener);
     }
 
     public function emit ()
     {
-        for (slot in _slots) {
-            slot();
+        for (listener in _listeners) {
+            listener();
         }
     }
 
-    private var _slots :Array<Listener0>;
+    private var _listeners :Array<Listener0>;
 }

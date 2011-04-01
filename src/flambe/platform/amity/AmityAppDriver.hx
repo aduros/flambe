@@ -1,6 +1,7 @@
 package flambe.platform.amity;
 
 import flambe.asset.AssetPackLoader;
+import flambe.display.MouseEvent;
 import flambe.display.Texture;
 import flambe.Entity;
 import flambe.FrameVisitor;
@@ -25,7 +26,7 @@ class AmityAppDriver
             root.visit(frameVisitor);
         };
         (untyped __amity.events).onMouseDown = function (event) {
-            var fevent = new flambe.display.MouseEvent();
+            var fevent = new MouseEvent();
             fevent.viewX = event.x;
             fevent.viewY = event.y;
             System.mouseDown.emit(fevent);

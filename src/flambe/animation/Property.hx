@@ -49,6 +49,11 @@ class Property<A>
         setBehavior(cast new Tween(cast _value, cast to, duration));
     }
 
+    inline public function animateBy (by :A, duration :Int)
+    {
+        setBehavior(cast new Tween(cast _value, (cast _value) + (cast by), duration));
+    }
+
     inline public function bindTo (to :Property<A>, ?fn :BindingFunction<A>)
     {
         setBehavior(new Binding(to, fn));

@@ -9,4 +9,7 @@ interface AppDriver
     function init (root :Entity) :Void;
 
     function loadAssetPack (url :String) :AssetPackLoader;
+
+    function getStageWidth () :Int;
+    function getStageHeight () :Int;
 }

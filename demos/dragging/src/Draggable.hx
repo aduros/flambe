@@ -1,8 +1,11 @@
 import flambe.Entity;
 import flambe.display.MouseEvent;
 import flambe.Component;
+import flambe.math.Point;
+import flambe.Input;
 
 using flambe.display.Sprite;
+using flambe.display.Transform;
 
 class Draggable extends Component
 {
@@ -13,12 +16,17 @@ class Draggable extends Component
     private function onMouseDown (event :MouseEvent)
     {
         _dragging = true;
+        _offset = owner.getSprite().getViewMatrix().inverseTransformPoint(
+            event.viewX, event.viewY);
     }
 
     override public function update (dt :Int)
     {
-        if (_dragging) {
-            trace("(TODO)");
+        if (Input.isMouseDown && _dragging) {
+            var xform = owner.getTransform();
+            xform.x.set(Input.mouseX - _offset.x);
+            xform.y.set(Input.mouseY - _offset.y);
+        } else {
             _dragging = false;
         }
     }
@@ -36,4 +44,5 @@ class Draggable extends Component
     }
 
     private var _dragging :Bool;
+    private var _offset :Point;
 }

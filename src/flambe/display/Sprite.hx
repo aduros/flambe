@@ -7,6 +7,7 @@ import flambe.util.Signal1;
 
 using flambe.display.Transform;
 using flambe.display.Sprite;
+using flambe.util.Arrays;
 
 class Sprite extends Component
 {
@@ -14,12 +15,16 @@ class Sprite extends Component
     public var visible (default, null) :PBool;
 
     public var mouseDown (default, null) :Signal1<MouseEvent>;
+    public var mouseMove (default, null) :Signal1<MouseEvent>;
+    public var mouseUp (default, null) :Signal1<MouseEvent>;
 
     private function new ()
     {
         this.alpha = new PFloat(1);
         this.visible = new PBool(true);
         this.mouseDown = new NotifyingSignal1(this);
+        this.mouseMove = new NotifyingSignal1(this);
+        this.mouseUp = new NotifyingSignal1(this);
         _viewMatrix = new Matrix();
     }
 
@@ -130,7 +135,7 @@ class Sprite extends Component
         }
     }
 
-    private function getViewMatrix ()
+    public function getViewMatrix ()
     {
     	updateViewMatrix();
     	return _viewMatrix;
@@ -139,7 +144,8 @@ class Sprite extends Component
     private function onListenerAdded ()
     {
         if (_listenerCount++ == 0) {
-            INTERACTIVE_SPRITES.push(this);
+            // TODO: Insert in screen depth order
+            INTERACTIVE_SPRITES.sortedInsert(this, function (a, b) return -1);
         }
     }
 
@@ -150,13 +156,8 @@ class Sprite extends Component
         }
     }
 
-    inline public function hasMouseListeners ()
-    {
-        return _listenerCount > 0;
-    }
-
     private static var IDENTITY = new Matrix();
-    public static var INTERACTIVE_SPRITES = [];
+    public static var INTERACTIVE_SPRITES :Array<Sprite> = [];
 
     private var _viewMatrix :Matrix;
     private var _localMatrixDirty :Bool;

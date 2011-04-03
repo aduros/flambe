@@ -26,10 +26,17 @@ class Main
 
     private static function onSuccess ()
     {
-        var tentacle = new Entity().withImageSprite().withDraggable();
-        var sprite = tentacle.getImageSprite();
-        sprite.texture = _loader.pack.createTexture("tentacle.png");
-        System.root.addChild(tentacle);
+        trace("Loading complete!");
+
+        for (ii in 0...10) {
+            var tentacle = new Entity().withImageSprite().withDraggable();
+            var sprite = tentacle.getImageSprite();
+            sprite.texture = _loader.pack.createTexture("tentacle.png");
+            var xform = tentacle.getTransform();
+            xform.x.set(Math.random() * (System.stageWidth-sprite.getNaturalWidth()));
+            xform.y.set(Math.random() * (System.stageHeight-sprite.getNaturalHeight()));
+            System.root.addChild(tentacle);
+        }
     }
 
     private static var _loader;

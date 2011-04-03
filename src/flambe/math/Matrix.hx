@@ -90,4 +90,9 @@ class Matrix
         }
         return (y*m00 - x*m10) / det;
     }
+
+    public function inverseTransformPoint (x :Float, y :Float) :Point
+    {
+        return new Point(inverseTransformX(x, y), inverseTransformY(x, y));
+    }
 }

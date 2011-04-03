@@ -13,6 +13,7 @@ import flambe.asset.AssetPackLoader;
 import flambe.display.Texture;
 import flambe.Entity;
 import flambe.FrameVisitor;
+import flambe.Input;
 import flambe.platform.AppDriver;
 import flambe.System;
 
@@ -35,6 +36,8 @@ class FlashAppDriver
 
         stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
         stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
+        stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
+        stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
         stage.scaleMode = NO_SCALE;
 
         _lastUpdate = Lib.getTimer();
@@ -48,10 +51,25 @@ class FlashAppDriver
 
     private function onMouseDown (event :MouseEvent)
     {
-        var fevent = new flambe.display.MouseEvent();
-        fevent.viewX = event.stageX;
-        fevent.viewY = event.stageY;
-        System.mouseDown.emit(fevent);
+        Input.mouseDown.emit(createFlambeMouseEvent(event));
+    }
+
+    private function onMouseMove (event :MouseEvent)
+    {
+        Input.mouseMove.emit(createFlambeMouseEvent(event));
+    }
+
+    private function onMouseUp (event :MouseEvent)
+    {
+        Input.mouseUp.emit(createFlambeMouseEvent(event));
+    }
+
+    private function createFlambeMouseEvent (event :MouseEvent) :flambe.display.MouseEvent
+    {
+        var f = new flambe.display.MouseEvent();
+        f.viewX = event.stageX;
+        f.viewY = event.stageY;
+        return f;
     }
 
     private function onEnterFrame (_)
@@ -70,6 +88,16 @@ class FlashAppDriver
     public function loadAssetPack (url :String) :AssetPackLoader
     {
         return new FlashAssetPackLoader(url);
+    }
+
+    public function getStageWidth () :Int
+    {
+        return _screen.width;
+    }
+
+    public function getStageHeight () :Int
+    {
+        return _screen.height;
     }
 
     private var _screen :BitmapData;

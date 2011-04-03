@@ -45,7 +45,6 @@ def apply_flambe(ctx):
         ctx.bld(rule="neko -interp ${SRC} " + res.abspath() + " .",
             source="packager.n", target= "bootstrap.swf" if hasBootstrap else None, always=True)
 
-# TODO: How can we expose these handy commands to the main wscript?
 def android_test(ctx):
     os.system("adb push res /sdcard/amity-dev")
     os.system("adb push build/app.js /sdcard/amity-dev")
@@ -53,9 +52,12 @@ def android_test(ctx):
         "-c android.intent.category.HOME")
     os.system("adb shell am start -a android.intent.action.MAIN " +
         "-n com.threerings.amity/.AmityActivity")
-
-def flash_test(ctx):
-    os.system("flashplayer build/app.swf")
+Context.g_module.__dict__["android_test"] = android_test
 
 def android_log(ctx):
     os.system("adb logcat -v tag amity:V SDL:V *:W")
+Context.g_module.__dict__["android_log"] = android_log
+
+def flash_test(ctx):
+    os.system("flashplayer build/app.swf")
+Context.g_module.__dict__["flash_test"] = flash_test

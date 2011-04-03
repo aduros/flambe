@@ -86,7 +86,7 @@ class FlashDrawingContext
         } else {
             state.matrix.tx += x;
             state.matrix.ty += y;
-            _buffer.draw(texture, state.matrix, state.color);
+            _buffer.draw(texture, state.matrix, state.color, null, null, true);
             state.matrix.tx -= x;
             state.matrix.ty -= y;
         }

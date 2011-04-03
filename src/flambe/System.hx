@@ -11,7 +11,7 @@ class System
     public static var driver (default, null) :AppDriver;
 
     public static var mouseDown (default, null) :Signal1<MouseEvent>;
-    
+
     public static function init ()
     {
         root = new Entity();

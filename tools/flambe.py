@@ -19,19 +19,24 @@ def apply_flambe(ctx):
     flags = ["-main", ctx.main]
     hasBootstrap = ctx.path.find_dir("res/bootstrap")
 
+    flash_flags = []
+    amity_flags = "-D amity --macro flambe.macro.AmityJSGenerator.use()".split()
+
     if ctx.env.debug:
-        flags += "-debug --no-opt --no-inline".split()
+        flags += "-D debug --no-opt --no-inline".split()
+        # Only generate line numbers for Flash. The stack -debug creates for JS is unused in Amity
+        flash_flags += ["-debug"]
     else:
         #flags += "--dead-code-elimination --no-traces".split()
         flags += "--no-traces".split()
 
     ctx.bld(features="haxe", classpath=["src", FLAMBE_ROOT+"/src"],
-        flags=flags,
+        flags=flags + flash_flags,
         swflib="bootstrap.swf" if hasBootstrap else None,
         target="app.swf")
 
     ctx.bld(features="haxe", classpath=["src", FLAMBE_ROOT+"/src"],
-        flags=flags + "-D amity --macro flambe.macro.AmityJSGenerator.use()".split(),
+        flags=flags + amity_flags,
         target="app.js")
 
     res = ctx.path.find_dir("res")

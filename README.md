@@ -13,7 +13,7 @@ TODO!
 Building
 --------
 
-Pick up [Waf](https://code.google.com/p/waf/) and:
+Pick up [Waf](https://code.google.com/p/waf/), cd into one of the demos, and:
 
         waf configure --debug
         waf

@@ -16,6 +16,7 @@ import haxe.io.BytesInput;
 
 import flambe.asset.AssetPack;
 import flambe.asset.AssetPackLoader;
+import flambe.asset.CachingAssetPack;
 import flambe.util.Signal0;
 import flambe.util.Signal1;
 
@@ -75,7 +76,7 @@ class FlashAssetPackLoader
     private function onComplete (_)
     {
         freeListeners();
-        pack = new FlashAssetPack(_loaderInfo);
+        pack = new CachingAssetPack(new FlashAssetPack(_loaderInfo));
         success.emit();
     }
 

@@ -2,6 +2,7 @@ package flambe.platform.amity;
 
 import flambe.asset.AssetPack;
 import flambe.asset.AssetPackLoader;
+import flambe.asset.CachingAssetPack;
 import flambe.util.Signal0;
 import flambe.util.Signal1;
 
@@ -27,7 +28,7 @@ class AmityAssetPackLoader
 
     public function start ()
     {
-        pack = new AmityAssetPack(url);
+        pack = new CachingAssetPack(new AmityAssetPack(url));
         success.emit();
     }
 

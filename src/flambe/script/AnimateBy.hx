@@ -25,7 +25,7 @@ class AnimateBy
         if (!_didStart) {
             _tween = new Tween(property.get(), property.get()+by, duration, easing);
             property.setBehavior(_tween);
-            property.update(dt); // Fake an update by account for this frame
+            property.update(dt); // Fake an update to account for this frame
             _didStart = true;
         }
         if (property.getBehavior() != _tween) {

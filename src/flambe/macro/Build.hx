@@ -21,20 +21,20 @@ class Build
         var code =
             "var static__inline__NAME :String = '" + getComponentName(cl) + "';" +
 
-            "function static__inline__get" + name + " (entity :flambe.Entity) :" + name + " {" +
+            "function public__static__inline__get" + name + " (entity :flambe.Entity) :" + name + " {" +
                 "return cast entity.getComponent(NAME);" +
             "}" +
 
-            "function static__inline__with" + name + " (entity :flambe.Entity) :flambe.Entity {" +
+            "function public__static__inline__with" + name + " (entity :flambe.Entity) :flambe.Entity {" +
                 "entity.addComponent(new " + name + "());" +
                 "return entity;" +
             "}" +
 
-            "function static__inline__has" + name + " (entity :flambe.Entity) :Bool {" +
+            "function public__static__inline__has" + name + " (entity :flambe.Entity) :Bool {" +
                 "return (entity.getComponent(NAME) != null);" +
             "}" +
 
-            "function static__require" + name + " (entity :flambe.Entity) :" + name + " {" +
+            "function public__static__require" + name + " (entity :flambe.Entity) :" + name + " {" +
                 "var comp :" + name + " = get" + name + "(entity);" +
                 "if (comp == null) {" +
                     "comp = new " + name + "();" +
@@ -43,7 +43,7 @@ class Build
                 "return comp;" +
             "}" +
 
-            "function override__getName () :String {" +
+            "function override__public__getName () :String {" +
                 "return NAME;" +
             "}";
 

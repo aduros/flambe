@@ -56,7 +56,7 @@ class Entity
         return this;
     }
 
-    public function removeComponent (comp :Component)
+    public function remove (comp :Component)
     {
         var name = comp.getName();
         if (comp.owner == this) {

@@ -12,6 +12,8 @@ using flambe.util.Arrays;
 class Sprite extends Component
 {
     public var alpha (default, null) :PFloat;
+    public var anchorX (default, null) :PFloat;
+    public var anchorY (default, null) :PFloat;
     public var visible (default, null) :PBool;
 
     public var mouseDown (default, null) :Signal1<MouseEvent>;
@@ -21,6 +23,8 @@ class Sprite extends Component
     public function new ()
     {
         this.alpha = new PFloat(1);
+        this.anchorX = new PFloat(0, dirtyMatrix);
+        this.anchorY = new PFloat(0, dirtyMatrix);
         this.visible = new PBool(true);
         this.mouseDown = new NotifyingSignal1(this);
         this.mouseMove = new NotifyingSignal1(this);
@@ -31,6 +35,8 @@ class Sprite extends Component
     override public function update (dt :Int)
     {
         this.alpha.update(dt);
+        this.anchorX.update(dt);
+        this.anchorY.update(dt);
         this.visible.update(dt);
     }
 
@@ -126,6 +132,7 @@ class Sprite extends Component
             _viewMatrix.translate(transform.x.get(), transform.y.get());
             _viewMatrix.rotate(FMath.toRadians(transform.rotation.get()));
             _viewMatrix.scale(transform.scaleX.get(), transform.scaleY.get());
+            _viewMatrix.translate(-anchorX.get(), -anchorY.get());
 
             _localMatrixDirty = false;
             if (parentSprite != null) {
@@ -139,6 +146,12 @@ class Sprite extends Component
     {
     	updateViewMatrix();
     	return _viewMatrix;
+    }
+
+    public function centerAnchor ()
+    {
+        anchorX.set(getNaturalWidth()/2);
+        anchorY.set(getNaturalHeight()/2);
     }
 
     private function onListenerAdded ()

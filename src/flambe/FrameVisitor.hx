@@ -64,6 +64,7 @@ class FrameVisitor
             _drawCtx.translate(transform.x.get(), transform.y.get());
             _drawCtx.rotate(transform.rotation.get());
             _drawCtx.scale(transform.scaleX.get(), transform.scaleY.get());
+            _drawCtx.translate(-sprite.anchorX.get(), -sprite.anchorY.get());
             _drawCtx.multiplyAlpha(alpha);
             sprite.draw(_drawCtx);
 

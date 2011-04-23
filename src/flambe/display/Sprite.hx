@@ -54,11 +54,11 @@ class Sprite extends Component
         if (transform == null) {
             entity.add(transform = new Transform());
         }
-        transform.x.onUpdate.add(dirtyMatrix);
-        transform.y.onUpdate.add(dirtyMatrix);
-        transform.scaleX.onUpdate.add(dirtyMatrix);
-        transform.scaleY.onUpdate.add(dirtyMatrix);
-        transform.rotation.onUpdate.add(dirtyMatrix);
+        transform.x.updated.add(dirtyMatrix);
+        transform.y.updated.add(dirtyMatrix);
+        transform.scaleX.updated.add(dirtyMatrix);
+        transform.scaleY.updated.add(dirtyMatrix);
+        transform.rotation.updated.add(dirtyMatrix);
         _localMatrixDirty = true;
         super.onAttach(entity);
     }

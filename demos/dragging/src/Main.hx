@@ -28,10 +28,9 @@ class Main
 
         for (ii in 0...10) {
             var tentacle = new Entity()
-                .add(new ImageSprite())
+                .add(new ImageSprite(_loader.pack.createTexture("tentacle.png")))
                 .add(new Draggable());
             var sprite = tentacle.get(ImageSprite);
-            sprite.texture = _loader.pack.createTexture("tentacle.png");
             var xform = tentacle.get(Transform);
             xform.x.set(Math.random() * (System.stageWidth-sprite.getNaturalWidth()));
             xform.y.set(Math.random() * (System.stageHeight-sprite.getNaturalHeight()));

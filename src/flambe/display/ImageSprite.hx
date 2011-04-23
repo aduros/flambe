@@ -4,9 +4,10 @@ class ImageSprite extends Sprite
 {
     public var texture :Texture;
 
-    public function new ()
+    public function new (texture :Texture)
     {
         super();
+        this.texture = texture;
     }
 
     override public function draw (ctx)

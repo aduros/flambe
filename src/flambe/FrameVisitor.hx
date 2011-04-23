@@ -54,18 +54,41 @@ class FrameVisitor
         }
 
         var entity = sprite.owner;
-        var alpha = sprite.alpha.get();
+        var n1 = sprite.alpha.get();
 
-        if (sprite.visible.get() && alpha > 0) {
+        if (sprite.visible.get() && n1 > 0) {
             ++_spriteDepth;
 
             var transform = entity.get(Transform);
             _drawCtx.save();
-            _drawCtx.translate(transform.x.get(), transform.y.get());
-            _drawCtx.rotate(transform.rotation.get());
-            _drawCtx.scale(transform.scaleX.get(), transform.scaleY.get());
-            _drawCtx.translate(-sprite.anchorX.get(), -sprite.anchorY.get());
-            _drawCtx.multiplyAlpha(alpha);
+
+            if (n1 < 1) {
+                _drawCtx.multiplyAlpha(n1);
+            }
+
+            n1 = transform.x.get();
+            var n2 = transform.y.get();
+            if (n1 != 0 || n2 != 0) {
+                _drawCtx.translate(n1, n2);
+            }
+
+            n1 = transform.rotation.get();
+            if (n1 != 0) {
+                _drawCtx.rotate(n1);
+            }
+
+            n1 = transform.scaleX.get();
+            n2 = transform.scaleY.get();
+            if (n1 != 1 || n2 != 1) {
+                _drawCtx.scale(n1, n2);
+            }
+
+            n1 = sprite.anchorX.get();
+            n2 = sprite.anchorY.get();
+            if (n1 != 0 || n2 != 0) {
+                _drawCtx.translate(-n1, -n2);
+            }
+
             sprite.draw(_drawCtx);
 
         } else {

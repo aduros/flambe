@@ -94,13 +94,11 @@ class FlashDrawingContext
 
     public function multiplyAlpha (alpha :Float)
     {
-        if (alpha < 1) {
-            var state = getTopState();
-            if (state.color == null) {
-                state.color = new ColorTransform(1, 1, 1, alpha);
-            } else {
-                state.color.alphaMultiplier *= alpha;
-            }
+        var state = getTopState();
+        if (state.color == null) {
+            state.color = new ColorTransform(1, 1, 1, alpha);
+        } else {
+            state.color.alphaMultiplier *= alpha;
         }
     }
 

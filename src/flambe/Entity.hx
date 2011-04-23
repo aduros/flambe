@@ -44,7 +44,7 @@ class Entity
         _children = [];
     }
 
-    public function addComponent (comp :Component) :Entity
+    public function add (comp :Component) :Entity
     {
         var name = comp.getName();
         if (getComponent(name) == null) {

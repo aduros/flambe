@@ -52,7 +52,7 @@ class Sprite extends Component
     {
         var transform = entity.get(Transform);
         if (transform == null) {
-            entity.addComponent(transform = new Transform());
+            entity.add(transform = new Transform());
         }
         transform.x.onUpdate.add(dirtyMatrix);
         transform.y.onUpdate.add(dirtyMatrix);

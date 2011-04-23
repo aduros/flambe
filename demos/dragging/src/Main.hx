@@ -28,8 +28,8 @@ class Main
 
         for (ii in 0...10) {
             var tentacle = new Entity()
-                .addComponent(new ImageSprite())
-                .addComponent(new Draggable());
+                .add(new ImageSprite())
+                .add(new Draggable());
             var sprite = tentacle.get(ImageSprite);
             sprite.texture = _loader.pack.createTexture("tentacle.png");
             var xform = tentacle.get(Transform);

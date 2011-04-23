@@ -4,8 +4,6 @@ import flambe.display.MouseEvent;
 import flambe.display.Sprite;
 import flambe.util.Signal1;
 
-using flambe.display.Sprite;
-
 class Input
 {
     public static var mouseDown (default, null) :Signal1<MouseEvent>;
@@ -26,7 +24,7 @@ class Input
 
         var entity = getEntityUnderPoint(event.viewX, event.viewY);
         while (entity != null) {
-            var sprite = entity.getSprite();
+            var sprite = entity.get(Sprite);
             if (sprite != null) {
                 sprite.mouseDown.emit(event);
             }
@@ -41,7 +39,7 @@ class Input
 
         var entity = getEntityUnderPoint(event.viewX, event.viewY);
         while (entity != null) {
-            var sprite = entity.getSprite();
+            var sprite = entity.get(Sprite);
             if (sprite != null) {
                 sprite.mouseMove.emit(event);
             }
@@ -57,7 +55,7 @@ class Input
 
         var entity = getEntityUnderPoint(event.viewX, event.viewY);
         while (entity != null) {
-            var sprite = entity.getSprite();
+            var sprite = entity.get(Sprite);
             if (sprite != null) {
                 sprite.mouseUp.emit(event);
             }
@@ -84,7 +82,7 @@ class Input
     private static function isVisible (entity :Entity) :Bool
     {
         while (entity != null) {
-            var sprite = entity.getSprite();
+            var sprite = entity.get(Sprite);
             if (sprite != null && !sprite.visible.get()) {
                 return false;
             }

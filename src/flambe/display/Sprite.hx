@@ -1,12 +1,12 @@
 package flambe.display;
 
 import flambe.animation.Property;
+import flambe.display.Transform;
+import flambe.display.Sprite;
 import flambe.math.Matrix;
 import flambe.math.FMath;
 import flambe.util.Signal1;
 
-using flambe.display.Transform;
-using flambe.display.Sprite;
 using flambe.util.Arrays;
 
 class Sprite extends Component
@@ -18,7 +18,7 @@ class Sprite extends Component
     public var mouseMove (default, null) :Signal1<MouseEvent>;
     public var mouseUp (default, null) :Signal1<MouseEvent>;
 
-    private function new ()
+    public function new ()
     {
         this.alpha = new PFloat(1);
         this.visible = new PBool(true);
@@ -50,7 +50,10 @@ class Sprite extends Component
 
     override public function onAttach (entity :Entity)
     {
-        var transform = entity.requireTransform();
+        var transform = entity.get(Transform);
+        if (transform == null) {
+            entity.addComponent(transform = new Transform());
+        }
         transform.x.onUpdate.add(dirtyMatrix);
         transform.y.onUpdate.add(dirtyMatrix);
         transform.scaleX.onUpdate.add(dirtyMatrix);
@@ -62,7 +65,7 @@ class Sprite extends Component
 
     override public function onDetach ()
     {
-        var transform = owner.getTransform();
+        var transform = owner.get(Transform);
         // TODO: Remove listeners
 
         if (_listenerCount > 0) {
@@ -109,10 +112,7 @@ class Sprite extends Component
 
     private function getParentSprite ()
     {
-        if (owner.parent == null) {
-            return null;
-        }
-        return owner.parent.getSprite();
+        return (owner.parent == null) ? null : owner.parent.get(Sprite);
     }
 
     private function updateViewMatrix ()
@@ -121,7 +121,7 @@ class Sprite extends Component
             var parentSprite = getParentSprite();
             var parentViewMatrix = if (parentSprite != null)
                 parentSprite.getViewMatrix() else IDENTITY;
-            var transform = owner.getTransform();
+            var transform = owner.get(Transform);
             _viewMatrix.copyFrom(parentViewMatrix);
             _viewMatrix.translate(transform.x.get(), transform.y.get());
             _viewMatrix.rotate(FMath.toRadians(transform.rotation.get()));

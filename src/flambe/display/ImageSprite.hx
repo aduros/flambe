@@ -4,7 +4,7 @@ class ImageSprite extends Sprite
 {
     public var texture :Texture;
 
-    private function new ()
+    public function new ()
     {
         super();
     }

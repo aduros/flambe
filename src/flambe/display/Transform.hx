@@ -10,7 +10,7 @@ class Transform extends Component
     public var scaleX (default, null) :PFloat;
     public var scaleY (default, null) :PFloat;
 
-    private function new ()
+    public function new ()
     {
         x = new PFloat(0);
         y = new PFloat(0);

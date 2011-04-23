@@ -1,9 +1,7 @@
 import flambe.Entity;
+import flambe.display.ImageSprite;
+import flambe.display.Transform;
 import flambe.System;
-
-using flambe.display.ImageSprite;
-using flambe.display.Transform;
-using Draggable;
 
 class Main
 {
@@ -29,10 +27,12 @@ class Main
         trace("Loading complete!");
 
         for (ii in 0...10) {
-            var tentacle = new Entity().withImageSprite().withDraggable();
-            var sprite = tentacle.getImageSprite();
+            var tentacle = new Entity()
+                .addComponent(new ImageSprite())
+                .addComponent(new Draggable());
+            var sprite = tentacle.get(ImageSprite);
             sprite.texture = _loader.pack.createTexture("tentacle.png");
-            var xform = tentacle.getTransform();
+            var xform = tentacle.get(Transform);
             xform.x.set(Math.random() * (System.stageWidth-sprite.getNaturalWidth()));
             xform.y.set(Math.random() * (System.stageHeight-sprite.getNaturalHeight()));
             System.root.addChild(tentacle);

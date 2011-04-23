@@ -1,11 +1,10 @@
-import flambe.Entity;
-import flambe.display.MouseEvent;
 import flambe.Component;
-import flambe.math.Point;
+import flambe.display.MouseEvent;
+import flambe.display.Sprite;
+import flambe.display.Transform;
+import flambe.Entity;
 import flambe.Input;
-
-using flambe.display.Sprite;
-using flambe.display.Transform;
+import flambe.math.Point;
 
 class Draggable extends Component
 {
@@ -16,14 +15,14 @@ class Draggable extends Component
     private function onMouseDown (event :MouseEvent)
     {
         _dragging = true;
-        _offset = owner.getSprite().getViewMatrix().inverseTransformPoint(
+        _offset = owner.get(Sprite).getViewMatrix().inverseTransformPoint(
             event.viewX, event.viewY);
     }
 
     override public function update (dt :Int)
     {
         if (Input.isMouseDown && _dragging) {
-            var xform = owner.getTransform();
+            var xform = owner.get(Transform);
             xform.x.set(Input.mouseX - _offset.x);
             xform.y.set(Input.mouseY - _offset.y);
         } else {
@@ -34,12 +33,12 @@ class Draggable extends Component
     override public function onAttach (entity :Entity)
     {
         super.onAttach(entity);
-        owner.getSprite().mouseDown.add(onMouseDown);
+        owner.get(Sprite).mouseDown.add(onMouseDown);
     }
 
     override public function onDetach ()
     {
-        owner.getSprite().mouseDown.remove(onMouseDown); // FIXME
+        owner.get(Sprite).mouseDown.remove(onMouseDown); // FIXME
         super.onDetach();
     }
 

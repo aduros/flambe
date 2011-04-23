@@ -15,32 +15,17 @@ class Build
     {
         var pos = Context.currentPos();
         var cl = Context.getLocalClass().get();
-        var name = cl.name;
 
         // TODO: Putting this in a file and using haxe.Template would be sweet
         var code =
             "var static__inline__NAME :String = '" + getComponentName(cl) + "';" +
 
-            "function public__static__inline__get" + name + " (entity :flambe.Entity) :" + name + " {" +
+            "function public__static__inline__getFrom (entity :flambe.Entity) :" + cl.name + " {" +
                 "return cast entity.getComponent(NAME);" +
             "}" +
 
-            "function public__static__inline__with" + name + " (entity :flambe.Entity) :flambe.Entity {" +
-                "entity.addComponent(new " + name + "());" +
-                "return entity;" +
-            "}" +
-
-            "function public__static__inline__has" + name + " (entity :flambe.Entity) :Bool {" +
+            "function public__static__inline__hasIn (entity :flambe.Entity) :Bool {" +
                 "return (entity.getComponent(NAME) != null);" +
-            "}" +
-
-            "function public__static__require" + name + " (entity :flambe.Entity) :" + name + " {" +
-                "var comp :" + name + " = get" + name + "(entity);" +
-                "if (comp == null) {" +
-                    "comp = new " + name + "();" +
-                    "entity.addComponent(comp);" +
-                "}" +
-                "return comp;" +
             "}" +
 
             "function override__public__getName () :String {" +

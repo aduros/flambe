@@ -59,7 +59,7 @@ class FrameVisitor
         if (sprite.visible.get() && alpha > 0) {
             ++_spriteDepth;
 
-            var transform = entity.getTransform();
+            var transform = entity.get(Transform);
             _drawCtx.save();
             _drawCtx.translate(transform.x.get(), transform.y.get());
             _drawCtx.rotate(transform.rotation.get());

@@ -1,7 +1,36 @@
 package flambe;
 
+import haxe.macro.Expr;
+
 class Entity
 {
+    @:macro
+    public function get (self :Expr, componentType :Expr)
+    {
+        // self.get(componentType) --> componentType.getFrom(self)
+        return {
+            expr: ECall({
+                expr: EType(componentType, "getFrom"),
+                pos: self.pos
+            }, [ self ]),
+            pos: self.pos
+        };
+    }
+
+    @:macro
+    public function has (self :Expr, componentType :Expr)
+    {
+        // self.has(componentType) --> componentType.hasIn(self)
+        return {
+            expr: ECall({
+                expr: EType(componentType, "hasIn"),
+                pos: self.pos
+            }, [ self ]),
+            pos: self.pos
+        };
+    }
+
+#if !macro
     public var parent (default, null) :Entity;
 
     public function new ()
@@ -15,7 +44,7 @@ class Entity
         _children = [];
     }
 
-    public function addComponent (comp :Component)
+    public function addComponent (comp :Component) :Entity
     {
         var name = comp.getName();
         if (getComponent(name) == null) {
@@ -24,6 +53,7 @@ class Entity
 
             comp.onAttach(this);
         }
+        return this;
     }
 
     public function removeComponent (comp :Component)
@@ -84,4 +114,5 @@ class Entity
 
     private var _parent :Entity;
     private var _children :Array<Entity>;
+#end // if !macro
 }

@@ -5,6 +5,7 @@ import flambe.display.Transform;
 import flambe.display.Sprite;
 import flambe.math.Matrix;
 import flambe.math.FMath;
+import flambe.platform.DrawingContext;
 import flambe.util.Signal1;
 
 using flambe.util.Arrays;
@@ -40,7 +41,7 @@ class Sprite extends Component
         this.visible.update(dt);
     }
 
-    public function draw (ctx)
+    public function draw (ctx :DrawingContext)
     {
     }
 

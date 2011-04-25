@@ -1,5 +1,7 @@
 package flambe.display;
 
+import flambe.platform.DrawingContext;
+
 class ImageSprite extends Sprite
 {
     public var texture :Texture;
@@ -10,9 +12,9 @@ class ImageSprite extends Sprite
         this.texture = texture;
     }
 
-    override public function draw (ctx)
+    override public function draw (ctx :DrawingContext)
     {
-        ctx.drawTexture(texture, 0, 0);
+        ctx.drawImage(texture, 0, 0);
     }
 
     override public function getNaturalWidth () :Int

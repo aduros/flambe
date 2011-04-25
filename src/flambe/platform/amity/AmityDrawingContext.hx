@@ -34,9 +34,14 @@ class AmityDrawingContext
         canvas().restore();
     }
 
-    public function drawTexture (texture :Texture, x :Int, y :Int)
+    public function drawImage (texture :Texture, x :Int, y :Int)
     {
-        canvas().drawTexture(texture, x, y);
+        canvas().drawImage(texture, x, y);
+    }
+
+    public function drawPattern (texture :Texture, x :Int, y :Int, width :Float, height :Float)
+    {
+        canvas().drawPattern(texture, x, y, width, height);
     }
 
     public function multiplyAlpha (alpha :Float)

@@ -1,11 +1,13 @@
 package flambe.platform.flash;
 
-import flash.display.BitmapData;
 import flash.display.Bitmap;
-import flash.geom.Matrix;
+import flash.display.BitmapData;
+import flash.display.Graphics;
+import flash.display.Shape;
 import flash.geom.ColorTransform;
-import flash.geom.Rectangle;
+import flash.geom.Matrix;
 import flash.geom.Point;
+import flash.geom.Rectangle;
 
 import haxe.FastList;
 
@@ -19,6 +21,7 @@ class FlashDrawingContext
     {
         _buffer = buffer;
         _stack = new FastList<DrawingState>();
+        _shape = new Shape();
     }
 
     public function save ()
@@ -38,6 +41,8 @@ class FlashDrawingContext
 
     public function translate (x :Float, y :Float)
     {
+        flushGraphics();
+
         // TODO: Optimize
         var matrix = getTopState().matrix;
         var copy = matrix.clone();
@@ -48,6 +53,8 @@ class FlashDrawingContext
 
     public function scale (x :Float, y :Float)
     {
+        flushGraphics();
+
         // TODO: Optimize
         var matrix = getTopState().matrix;
         var copy = matrix.clone();
@@ -58,6 +65,8 @@ class FlashDrawingContext
 
     public function rotate (rotation :Float)
     {
+        flushGraphics();
+
         // TODO: Optimize
         var matrix = getTopState().matrix;
         var copy = matrix.clone();
@@ -68,11 +77,14 @@ class FlashDrawingContext
 
     public function restore ()
     {
+        flushGraphics();
         _stack.pop();
     }
 
-    public function drawTexture (texture :Texture, x :Int, y :Int)
+    public function drawImage (texture :Texture, x :Int, y :Int)
     {
+        flushGraphics();
+
         var state = getTopState();
         var matrix = state.matrix;
 
@@ -92,8 +104,24 @@ class FlashDrawingContext
         }
     }
 
+    public function drawPattern (texture :Texture, x :Int, y :Int, width :Float, height :Float)
+    {
+        beginGraphics();
+
+        _graphics.beginBitmapFill(texture);
+        _graphics.drawRect(x, y, width, height);
+
+        /*throw "up";*/
+        //_graphics.endFill();
+
+        /*flushGraphics();*/
+        /*throw 0;*/
+    }
+
     public function multiplyAlpha (alpha :Float)
     {
+        flushGraphics();
+
         var state = getTopState();
         if (state.color == null) {
             state.color = new ColorTransform(1, 1, 1, alpha);
@@ -107,8 +135,30 @@ class FlashDrawingContext
         return _stack.head.elt;
     }
 
+    private function flushGraphics ()
+    {
+        // If we're in vector graphics mode, push it out to the screen buffer
+        if (_graphics != null) {
+            var state = getTopState();
+            _buffer.draw(_shape, state.matrix, state.color, null, null, true);
+            _graphics.clear();
+            _graphics = null;
+        }
+    }
+
+    inline private function beginGraphics ()
+    {
+        if (_graphics == null) {
+            _graphics = _shape.graphics;
+        }
+    }
+
     private var _stack :FastList<DrawingState>;
     private var _buffer :BitmapData;
+
+    private var _shape :Shape;
+    // The vector graphic commands pending drawing, or null if we're not in vector graphics mode
+    private var _graphics :Graphics;
 }
 
 private class DrawingState

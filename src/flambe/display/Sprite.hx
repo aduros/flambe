@@ -45,12 +45,12 @@ class Sprite extends Component
     {
     }
 
-    public function getNaturalWidth () :Int
+    public function getNaturalWidth () :Float
     {
         return 0;
     }
 
-    public function getNaturalHeight () :Int
+    public function getNaturalHeight () :Float
     {
         return 0;
     }

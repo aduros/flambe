@@ -22,14 +22,14 @@ class PatternSprite extends Sprite
         ctx.drawPattern(texture, 0, 0, width.get(), height.get());
     }
 
-    override public function getNaturalWidth () :Int
+    override public function getNaturalWidth () :Float
     {
-        return Std.int(width.get());
+        return width.get();
     }
 
-    override public function getNaturalHeight () :Int
+    override public function getNaturalHeight () :Float
     {
-        return Std.int(height.get());
+        return height.get();
     }
 
     override public function update (dt :Int)

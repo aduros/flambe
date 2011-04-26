@@ -17,12 +17,12 @@ class ImageSprite extends Sprite
         ctx.drawImage(texture, 0, 0);
     }
 
-    override public function getNaturalWidth () :Int
+    override public function getNaturalWidth () :Float
     {
         return texture.width;
     }
 
-    override public function getNaturalHeight () :Int
+    override public function getNaturalHeight () :Float
     {
         return texture.height;
     }

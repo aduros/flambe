@@ -110,12 +110,6 @@ class FlashDrawingContext
 
         _graphics.beginBitmapFill(texture);
         _graphics.drawRect(x, y, width, height);
-
-        /*throw "up";*/
-        //_graphics.endFill();
-
-        /*flushGraphics();*/
-        /*throw 0;*/
     }
 
     public function multiplyAlpha (factor :Float)

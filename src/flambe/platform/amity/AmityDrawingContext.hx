@@ -44,9 +44,9 @@ class AmityDrawingContext
         canvas().drawPattern(texture, x, y, width, height);
     }
 
-    public function multiplyAlpha (alpha :Float)
+    public function multiplyAlpha (factor :Float)
     {
-        canvas().alpha *= alpha;
+        canvas().multiplyAlpha(factor);
     }
 
     inline public static function canvas () :Dynamic

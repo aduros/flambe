@@ -11,5 +11,5 @@ interface DrawingContext
     function restore () :Void;
     function drawImage (texture :Texture, x :Int, y :Int) :Void;
     function drawPattern (texture :Texture, x :Int, y :Int, width :Float, height :Float) :Void;
-    function multiplyAlpha (alpha :Float) :Void;
+    function multiplyAlpha (factor :Float) :Void;
 }

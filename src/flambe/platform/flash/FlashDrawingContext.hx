@@ -118,15 +118,15 @@ class FlashDrawingContext
         /*throw 0;*/
     }
 
-    public function multiplyAlpha (alpha :Float)
+    public function multiplyAlpha (factor :Float)
     {
         flushGraphics();
 
         var state = getTopState();
         if (state.color == null) {
-            state.color = new ColorTransform(1, 1, 1, alpha);
+            state.color = new ColorTransform(1, 1, 1, factor);
         } else {
-            state.color.alphaMultiplier *= alpha;
+            state.color.alphaMultiplier *= factor;
         }
     }
 

@@ -81,27 +81,15 @@ class FlashDrawingContext
         _stack.pop();
     }
 
-    public function drawImage (texture :Texture, x :Int, y :Int)
+    public function drawImage (texture :Texture, destX :Int, destY :Int)
     {
-        flushGraphics();
+        blit(texture, destX, destY, null);
+    }
 
-        var state = getTopState();
-        var matrix = state.matrix;
-
-        // Use the faster copyPixels() if possible
-        // TODO: Use approximately equals?
-        if (matrix.a == 1 && matrix.b == 0 && matrix.c == 0 && matrix.d == 1
-                && state.color == null) {
-            _buffer.copyPixels(texture, new Rectangle(0, 0, texture.width, texture.height),
-                new Point(matrix.tx + x, matrix.ty + y));
-
-        } else {
-            state.matrix.tx += x;
-            state.matrix.ty += y;
-            _buffer.draw(texture, state.matrix, state.color, null, null, true);
-            state.matrix.tx -= x;
-            state.matrix.ty -= y;
-        }
+    public function drawSubImage (texture :Texture, destX :Int, destY :Int,
+        sourceX :Int, sourceY :Int, sourceW :Int, sourceH :Int)
+    {
+        blit(texture, destX, destY, new Rectangle(sourceX, sourceY, sourceW, sourceH));
     }
 
     public function drawPattern (texture :Texture, x :Int, y :Int, width :Float, height :Float)
@@ -121,6 +109,43 @@ class FlashDrawingContext
             state.color = new ColorTransform(1, 1, 1, factor);
         } else {
             state.color.alphaMultiplier *= factor;
+        }
+    }
+
+    private function blit (texture :Texture, destX :Int, destY :Int, sourceRect :Rectangle)
+    {
+        flushGraphics();
+
+        var state = getTopState();
+        var matrix = state.matrix;
+
+        // Use the faster copyPixels() if possible
+        // TODO: Use approximately equals?
+        if (matrix.a == 1 && matrix.b == 0 && matrix.c == 0 && matrix.d == 1
+                && state.color == null) {
+
+            if (sourceRect == null) {
+                sourceRect = new Rectangle(0, 0, texture.width, texture.height);
+            }
+            _buffer.copyPixels(texture,
+                sourceRect, new Point(matrix.tx + destX, matrix.ty + destY));
+
+        } else {
+            matrix.tx += destX;
+            matrix.ty += destY;
+            if (sourceRect != null) {
+                // BitmapData.draw() doesn't support a source rect, so we have to use a temp
+                // (contrary to the docs, clipRect is relative to the target, not the source)
+                var scratch = new BitmapData(
+                    Std.int(sourceRect.width), Std.int(sourceRect.height), texture.transparent);
+                scratch.copyPixels(texture, sourceRect, new Point(0, 0));
+                _buffer.draw(scratch, matrix, state.color, null, null, true);
+                scratch.dispose();
+            } else {
+                _buffer.draw(texture, matrix, state.color, null, null, true);
+            }
+            matrix.tx -= destX;
+            matrix.ty -= destY;
         }
     }
 

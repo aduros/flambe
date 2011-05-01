@@ -9,7 +9,9 @@ interface DrawingContext
     function scale (x :Float, y :Float) :Void;
     function rotate (rotation :Float) :Void;
     function restore () :Void;
-    function drawImage (texture :Texture, x :Int, y :Int) :Void;
-    function drawPattern (texture :Texture, x :Int, y :Int, width :Float, height :Float) :Void;
+    function drawImage (texture :Texture, destX :Int, destY :Int) :Void;
+    function drawSubImage (texture :Texture, destX :Int, destY :Int,
+        sourceX :Int, sourceY :Int, sourceW :Int, sourceH :Int) :Void;
+    function drawPattern (texture :Texture, destX :Int, destY :Int, width :Float, height :Float) :Void;
     function multiplyAlpha (factor :Float) :Void;
 }

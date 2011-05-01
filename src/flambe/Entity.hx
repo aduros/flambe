@@ -2,6 +2,8 @@ package flambe;
 
 import haxe.macro.Expr;
 
+using Lambda;
+
 class Entity
 {
     @:macro
@@ -65,7 +67,10 @@ class Entity
 #elseif js
 	    untyped __js__("delete")(_compMap.name);
 #end
-            _comps.remove(comp);
+            var idx = _comps.indexOf(comp);
+            if (idx >= 0) {
+                _comps[idx] = null;
+            }
             comp.onDetach();
         }
     }
@@ -78,12 +83,26 @@ class Entity
     public function visit (visitor :Visitor)
     {
         visitor.enterEntity(this);
-        for (comp in _comps) {
-            visitor.acceptComponent(comp);
-            comp.visit(visitor);
+        var ii = 0;
+        while (ii < _comps.length) {
+            var comp = _comps[ii];
+            if (comp == null) {
+                _comps.splice(ii, 1);
+            } else {
+                visitor.acceptComponent(comp);
+                comp.visit(visitor);
+                ++ii;
+            }
         }
-        for (child in _children) {
-            child.visit(visitor);
+        ii = 0;
+        while (ii < _children.length) {
+            var child = _children[ii];
+            if (child == null) {
+                _children.splice(ii, 1);
+            } else {
+                child.visit(visitor);
+                ++ii;
+            }
         }
         visitor.leaveEntity(this);
     }
@@ -99,9 +118,19 @@ class Entity
 
     public function removeChild (entity :Entity)
     {
-        if (_children.remove(entity)) {
+        var idx = _children.indexOf(entity);
+        if (idx >= 0) {
+            _children[idx] = null;
             entity.parent = null;
         }
+    }
+
+    public function destroy ()
+    {
+        if (parent != null) {
+            parent.removeChild(this);
+        }
+        // TODO: Notify components/children
     }
 
     /**

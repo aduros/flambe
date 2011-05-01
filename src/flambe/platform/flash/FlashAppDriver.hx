@@ -29,7 +29,7 @@ class FlashAppDriver
         var stage = Lib.current.stage;
 
         _root = root;
-        _screen = new BitmapData(stage.stageHeight, stage.stageHeight, false);
+        _screen = new BitmapData(stage.stageWidth, stage.stageHeight, false);
         _frameVisitor = new FrameVisitor(new FlashDrawingContext(_screen));
 
         Lib.current.addChild(new Bitmap(_screen));
@@ -75,7 +75,6 @@ class FlashAppDriver
     private function onEnterFrame (_)
     {
         _screen.lock();
-        _screen.fillRect(new flash.geom.Rectangle(0, 0, _screen.width, _screen.height), 0xc0c0c0);
 
         var now = Lib.getTimer();
         _frameVisitor.init(now - _lastUpdate);

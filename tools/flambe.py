@@ -19,7 +19,7 @@ def apply_flambe(ctx):
     flags = ["-main", ctx.main]
     hasBootstrap = ctx.path.find_dir("res/bootstrap")
 
-    flash_flags = []
+    flash_flags = "-swf-header 640:480:30:ffffff".split()
     amity_flags = "-D amity --macro flambe.macro.AmityJSGenerator.use()".split()
 
     if ctx.env.debug:
@@ -50,6 +50,7 @@ def apply_flambe(ctx):
         ctx.bld(rule="neko -interp ${SRC} " + res.abspath() + " .",
             source="packager.n", target= "bootstrap.swf" if hasBootstrap else None, always=True)
 
+# Upload and run the app on Android
 def android_test(ctx):
     os.system("adb push res /sdcard/amity-dev")
     os.system("adb push build/app.js /sdcard/amity-dev")
@@ -59,10 +60,47 @@ def android_test(ctx):
         "-n com.threerings.amity/.AmityActivity")
 Context.g_module.__dict__["android_test"] = android_test
 
+# View the app's log on Android
 def android_log(ctx):
     os.system("adb logcat -v tag amity:V SDL:V *:W")
 Context.g_module.__dict__["android_log"] = android_log
 
+# Run the app in a Flash player
 def flash_test(ctx):
     os.system("flashplayer build/app.swf")
 Context.g_module.__dict__["flash_test"] = flash_test
+
+# View the app's log in Flash
+def flash_log(ctx):
+    os.system("tail -F $HOME/.macromedia/Flash_Player/Logs/flashlog.txt")
+Context.g_module.__dict__["flash_log"] = flash_log
+
+# Upload and run the app on webOS
+def webos_test(ctx):
+    # If the process documented at https://developer.palm.com/content/resources/develop/pdk_app_debugging.html
+    # worked on Linux, this would be less hacky (we would just use scp). Until Linux is officially
+    # supported by the PDK, a zip is instead created and pushed, then unzipped on the device.
+    from zipfile import ZipFile
+    assets = ZipFile("build/assets.zip", "w")
+    res = ctx.path.find_node("res")
+    for node in res.ant_glob("**"):
+        relpath = str(node.abspath())[len(res.abspath())+1:]
+        assets.write(node.abspath(), relpath)
+    assets.write("build/app.js", "app.js")
+    assets.close()
+
+    staging = "/tmp/amity-dev"
+    os.system("novacom run 'file:///bin/rm -rf " + staging + "'")
+    os.system("novacom run 'file:///bin/mkdir -p " + staging + "'")
+    os.system("novacom put 'file:///tmp/assets.zip' < build/assets.zip")
+    os.system("novacom run 'file:///usr/bin/unzip /tmp/assets.zip -d " + staging + "'")
+    os.system("novacom run 'file:///bin/rm -rf /tmp/assets.zip'")
+
+    os.system("novacom run 'file:///usr/bin/killall amity'")
+    os.system("palm-launch com.threerings.amity")
+Context.g_module.__dict__["webos_test"] = webos_test
+
+# View the app's log on webOS
+def webos_log(ctx):
+    os.system("novacom run 'file:///usr/bin/tail -f /var/log/messages' | grep com.threerings.amity")
+Context.g_module.__dict__["webos_log"] = webos_log

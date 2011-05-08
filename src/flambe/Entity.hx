@@ -1,6 +1,8 @@
 package flambe;
 
+#if macro
 import haxe.macro.Expr;
+#end
 
 using Lambda;
 

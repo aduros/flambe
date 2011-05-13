@@ -24,19 +24,12 @@ def configure(self):
 # Borrowed from the scalac task
 class haxe(Task.Task):
     color = "BLUE"
-    def runnable_status(self):
-        """
-        Wait for dependent tasks to be complete, then read the file system to find the input nodes.
-        """
-        for t in self.run_after:
-            if not t.hasrun:
-                return Task.ASK_LATER
 
-        if not self.inputs:
-            self.inputs  = []
-            for cp in self.classpath:
-                self.inputs.extend(cp.ant_glob('**/*.hx', remove=False))
-        return super(Task.Task, self).runnable_status()
+    def scan(self):
+        sources = []
+        for cp in self.classpath:
+            sources += cp.ant_glob("**/*.hx")
+        return (sources, [])
 
     def run(self):
         """
@@ -50,19 +43,16 @@ class haxe(Task.Task):
             if isinstance(xx, str): return [xx]
             return xx
         self.last_cmd = lst = []
-        lst.extend(to_list(env['HAXE']))
+        lst.extend(to_list(env["HAXE"]))
         for cp in self.classpath:
-            lst.extend(['-cp', cp.abspath()])
+            lst.extend(["-cp", cp.abspath()])
         lst.extend(self.flags)
-        try:
-            self.out = self.generator.bld.cmd_and_log(lst, cwd=wd, env=env.env or None, output=0, quiet=0)[1]
-        except:
-            self.generator.bld.cmd_and_log(lst, cwd=wd, env=env.env or None)
+        return self.generator.bld.exec_command(lst, cwd=wd, env=env.env or None)
 
     def __str__(self):
-        env=self.env
-        tgt_str=' '.join([a.nice_path(env)for a in self.outputs])
-        return'%s: %s\n'%(self.__class__.__name__.replace('_task',''),tgt_str)
+        env = self.env
+        tgt_str = " ".join([a.nice_path(env) for a in self.outputs])
+        return "%s: %s\n" % (self.__class__.__name__.replace("_task", ""), tgt_str)
 
 @feature("haxe")
 def apply_haxe(self):

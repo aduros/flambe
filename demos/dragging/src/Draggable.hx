@@ -19,7 +19,7 @@ class Draggable extends Component
             event.viewX, event.viewY);
     }
 
-    override public function update (dt :Int)
+    override public function onUpdate (dt :Int)
     {
         if (Input.isMouseDown && _dragging) {
             var xform = owner.get(Transform);
@@ -30,16 +30,14 @@ class Draggable extends Component
         }
     }
 
-    override public function onAttach (entity :Entity)
+    override public function onAdded ()
     {
-        super.onAttach(entity);
         owner.get(Sprite).mouseDown.add(onMouseDown);
     }
 
-    override public function onDetach ()
+    override public function onRemoved ()
     {
         owner.get(Sprite).mouseDown.remove(onMouseDown); // FIXME
-        super.onDetach();
     }
 
     private var _dragging :Bool;

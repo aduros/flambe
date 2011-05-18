@@ -2,31 +2,41 @@ package flambe;
 
 @:autoBuild(flambe.macro.Build.buildComponent())
 class Component
+    implements Disposable
 {
     public var owner (default, null) :Entity;
 
     public function getName () :String
     {
-        return null; // Is this really required?
+        return null; // Subclasses will automagically implement this
     }
 
-    public function onAttach (owner :Entity)
+    public function onAdded ()
     {
-        this.owner = owner;
     }
 
-    public function onDetach ()
+    public function onRemoved ()
     {
-        owner = null;
     }
 
-    public function update (dt :Int)
+    public function onDispose ()
     {
-        // Nothing
     }
 
-    public function visit (visitor :Visitor)
+    public function onUpdate (dt :Int)
     {
-        // Nothing
+    }
+
+    public function dispose ()
+    {
+        onDispose();
+        if (owner != null) {
+            owner.remove(this);
+        }
+    }
+
+    inline public function _internal_setOwner (entity :Entity)
+    {
+        owner = entity;
     }
 }

@@ -15,7 +15,7 @@ class System
 
     public static function init ()
     {
-        root = new Entity();
+        root = new Entity().add(new Sprite());
 
 #if flash
         driver = new flambe.platform.flash.FlashAppDriver();

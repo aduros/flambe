@@ -33,7 +33,7 @@ class Sprite extends Component
         _viewMatrix = new Matrix();
     }
 
-    override public function update (dt :Int)
+    override public function onUpdate (dt :Int)
     {
         this.alpha.update(dt);
         this.anchorX.update(dt);
@@ -55,11 +55,11 @@ class Sprite extends Component
         return 0;
     }
 
-    override public function onAttach (entity :Entity)
+    override public function onAdded ()
     {
-        var transform = entity.get(Transform);
+        var transform = owner.get(Transform);
         if (transform == null) {
-            entity.add(transform = new Transform());
+            owner.add(transform = new Transform());
         }
         transform.x.updated.add(dirtyMatrix);
         transform.y.updated.add(dirtyMatrix);
@@ -67,10 +67,9 @@ class Sprite extends Component
         transform.scaleY.updated.add(dirtyMatrix);
         transform.rotation.updated.add(dirtyMatrix);
         _localMatrixDirty = true;
-        super.onAttach(entity);
     }
 
-    override public function onDetach ()
+    override public function onRemoved ()
     {
         var transform = owner.get(Transform);
         // TODO: Remove listeners
@@ -78,17 +77,11 @@ class Sprite extends Component
         if (_listenerCount > 0) {
             INTERACTIVE_SPRITES.remove(this);
         }
-        super.onDetach();
     }
 
     private function dirtyMatrix (_)
     {
         _localMatrixDirty = true;
-    }
-
-    override public function visit (visitor :Visitor)
-    {
-        visitor.acceptSprite(this);
     }
 
     public function contains (viewX :Float, viewY :Float) :Bool
@@ -117,7 +110,7 @@ class Sprite extends Component
             || parentSprite.isMatrixDirty();
     }
 
-    private function getParentSprite ()
+    private function getParentSprite () :Sprite
     {
         return (owner.parent == null) ? null : owner.parent.get(Sprite);
     }
@@ -143,7 +136,7 @@ class Sprite extends Component
         }
     }
 
-    public function getViewMatrix ()
+    public function getViewMatrix () :Matrix
     {
     	updateViewMatrix();
     	return _viewMatrix;

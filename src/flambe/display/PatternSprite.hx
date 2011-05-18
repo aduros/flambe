@@ -32,9 +32,9 @@ class PatternSprite extends Sprite
         return height.get();
     }
 
-    override public function update (dt :Int)
+    override public function onUpdate (dt :Int)
     {
-        super.update(dt);
+        super.onUpdate(dt);
         width.update(dt);
         height.update(dt);
     }

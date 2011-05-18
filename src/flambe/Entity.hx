@@ -7,6 +7,9 @@ import haxe.macro.Expr;
 using Lambda;
 
 class Entity
+#if !macro
+    implements Disposable
+#end
 {
     @:macro
     public function get (self :Expr, componentType :Expr)
@@ -55,7 +58,8 @@ class Entity
             untyped _compMap[name] = comp;
             _comps.push(comp);
 
-            comp.onAttach(this);
+            comp._internal_setOwner(this);
+            comp.onAdded();
         }
         return this;
     }
@@ -73,7 +77,8 @@ class Entity
             if (idx >= 0) {
                 _comps[idx] = null;
             }
-            comp.onDetach();
+            comp.onRemoved();
+            comp._internal_setOwner(null);
         }
     }
 
@@ -82,30 +87,37 @@ class Entity
         return untyped _compMap[name];
     }
 
-    public function visit (visitor :Visitor)
+    public function visit (visitor :Visitor, visitComponents :Bool, visitChildren :Bool)
     {
-        visitor.enterEntity(this);
-        var ii = 0;
-        while (ii < _comps.length) {
-            var comp = _comps[ii];
-            if (comp == null) {
-                _comps.splice(ii, 1);
-            } else {
-                visitor.acceptComponent(comp);
-                comp.visit(visitor);
-                ++ii;
+        if (!visitor.enterEntity(this)) {
+            return;
+        }
+
+        if (visitComponents) {
+            var ii = 0;
+            while (ii < _comps.length) {
+                var comp = _comps[ii];
+                if (comp == null) {
+                    _comps.splice(ii, 1);
+                } else {
+                    visitor.acceptComponent(comp);
+                    ++ii;
+                }
             }
         }
-        ii = 0;
-        while (ii < _children.length) {
-            var child = _children[ii];
-            if (child == null) {
-                _children.splice(ii, 1);
-            } else {
-                child.visit(visitor);
-                ++ii;
+        if (visitChildren) {
+            var ii = 0;
+            while (ii < _children.length) {
+                var child = _children[ii];
+                if (child == null) {
+                    _children.splice(ii, 1);
+                } else {
+                    child.visit(visitor, visitComponents, visitChildren);
+                    ++ii;
+                }
             }
         }
+
         visitor.leaveEntity(this);
     }
 
@@ -127,12 +139,18 @@ class Entity
         }
     }
 
-    public function destroy ()
+    public function dispose ()
     {
         if (parent != null) {
             parent.removeChild(this);
         }
-        // TODO: Notify components/children
+        for (comp in _comps) {
+            comp.onDispose();
+        }
+        for (child in _children) {
+            child.parent = null;
+            child.dispose();
+        }
     }
 
     /**

@@ -4,9 +4,9 @@ import flambe.asset.AssetPackLoader;
 import flambe.display.MouseEvent;
 import flambe.display.Texture;
 import flambe.Entity;
-import flambe.FrameVisitor;
 import flambe.Input;
 import flambe.platform.AppDriver;
+import flambe.platform.MainLoop;
 
 class AmityAppDriver
     implements AppDriver
@@ -21,10 +21,9 @@ class AmityAppDriver
         // Redirect traces to Amity
         haxe.Log.trace = (untyped __amity).log;
 #end
-        var frameVisitor = new FrameVisitor(new AmityDrawingContext());
+        var loop = new MainLoop(new AmityDrawingContext());
         (untyped __amity).events.onEnterFrame = function (dt :Int) {
-            frameVisitor.init(dt);
-            root.visit(frameVisitor);
+            loop.runFrame(dt);
         };
 
         var createMouseEvent = function (data) {

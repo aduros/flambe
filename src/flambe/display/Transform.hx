@@ -19,7 +19,7 @@ class Transform extends Component
         scaleY = new PFloat(1);
     }
 
-    override public function update (dt :Int)
+    override public function onUpdate (dt :Int)
     {
         x.update(dt);
         y.update(dt);

@@ -23,7 +23,7 @@ class Script extends Component
         _actions = [];
     }
 
-    override public function update (dt :Int)
+    override public function onUpdate (dt :Int)
     {
         var ii = 0;
         while (ii < _actions.length) {

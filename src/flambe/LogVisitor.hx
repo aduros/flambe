@@ -15,11 +15,12 @@ class LogVisitor
         _depth = -1;
     }
 
-    public function enterEntity (entity :Entity)
+    public function enterEntity (entity :Entity) :Bool
     {
         ++_depth;
         trace(tabs() + "( " + _comps.join(", ") + " )");
         _comps = [];
+        return true;
     }
 
     public function leaveEntity (entity :Entity)
@@ -32,12 +33,7 @@ class LogVisitor
         _comps.push(comp.getName());
     }
 
-    public function acceptSprite (comp :Sprite)
-    {
-        // Nothing
-    }
-
-    public function tabs ()
+    private function tabs ()
     {
         var n = "";
         for (ii in 0..._depth) {

@@ -12,9 +12,9 @@ import flash.display.StageScaleMode;
 import flambe.asset.AssetPackLoader;
 import flambe.display.Texture;
 import flambe.Entity;
-import flambe.FrameVisitor;
 import flambe.Input;
 import flambe.platform.AppDriver;
+import flambe.platform.MainLoop;
 import flambe.System;
 
 class FlashAppDriver
@@ -28,9 +28,8 @@ class FlashAppDriver
     {
         var stage = Lib.current.stage;
 
-        _root = root;
         _screen = new BitmapData(stage.stageWidth, stage.stageHeight, false);
-        _frameVisitor = new FrameVisitor(new FlashDrawingContext(_screen));
+        _loop = new MainLoop(new FlashDrawingContext(_screen));
 
         Lib.current.addChild(new Bitmap(_screen));
 
@@ -64,7 +63,7 @@ class FlashAppDriver
         Input.mouseUp.emit(createFlambeMouseEvent(event));
     }
 
-    private function createFlambeMouseEvent (event :MouseEvent) :flambe.display.MouseEvent
+    private static function createFlambeMouseEvent (event :MouseEvent) :flambe.display.MouseEvent
     {
         var f = new flambe.display.MouseEvent();
         f.viewX = event.stageX;
@@ -74,13 +73,13 @@ class FlashAppDriver
 
     private function onEnterFrame (_)
     {
-        _screen.lock();
-
         var now = Lib.getTimer();
-        _frameVisitor.init(now - _lastUpdate);
-        _lastUpdate = now;
-        _root.visit(_frameVisitor);
+        var dt = now - _lastUpdate;
 
+        _lastUpdate = now;
+
+        _screen.lock();
+        _loop.runFrame(dt);
         _screen.unlock();
     }
 
@@ -100,7 +99,6 @@ class FlashAppDriver
     }
 
     private var _screen :BitmapData;
-    private var _root :Entity;
-    private var _frameVisitor :FrameVisitor;
+    private var _loop :MainLoop;
     private var _lastUpdate :Int;
 }

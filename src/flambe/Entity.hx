@@ -145,6 +145,8 @@ class Entity
             parent.removeChild(this);
         }
         for (comp in _comps) {
+            comp.onRemoved();
+            comp._internal_setOwner(null);
             comp.onDispose();
         }
         for (child in _children) {

@@ -29,10 +29,10 @@ class Component
 
     public function dispose ()
     {
-        onDispose();
         if (owner != null) {
             owner.remove(this);
         }
+        onDispose();
     }
 
     inline public function _internal_setOwner (entity :Entity)

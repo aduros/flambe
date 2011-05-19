@@ -11,11 +11,11 @@ class Main
 
         _loader = System.loadAssetPack("bootstrap");
         // Add listeners
-        _loader.success.add(onSuccess);
-        _loader.error.add(function (message) {
+        _loader.success.connect(onSuccess);
+        _loader.error.connect(function (message) {
             trace("Load error: " + message);
         });
-        _loader.progress.add(function () {
+        _loader.progress.connect(function () {
             trace("Loading progress... " + _loader.bytesLoaded + " of " + _loader.bytesTotal);
         });
         // Go!

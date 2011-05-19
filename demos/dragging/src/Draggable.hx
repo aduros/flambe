@@ -6,6 +6,8 @@ import flambe.Entity;
 import flambe.Input;
 import flambe.math.Point;
 
+import flambe.util.SignalConnection;
+
 class Draggable extends Component
 {
     public function new ()
@@ -32,14 +34,15 @@ class Draggable extends Component
 
     override public function onAdded ()
     {
-        owner.get(Sprite).mouseDown.add(onMouseDown);
+        _connection = owner.get(Sprite).mouseDown.connect(onMouseDown);
     }
 
     override public function onRemoved ()
     {
-        owner.get(Sprite).mouseDown.remove(onMouseDown); // FIXME
+        _connection.dispose();
     }
 
+    private var _connection :SignalConnection;
     private var _dragging :Bool;
     private var _offset :Point;
 }

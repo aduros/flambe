@@ -6,28 +6,37 @@ class Signal0
 {
     public function new (?listener :Listener0)
     {
-        _listeners = [];
         if (listener != null) {
-            add(listener);
+            connect(listener);
         }
     }
 
-    public function add (listener :Listener0)
+    public function connect (listener :Listener0, prioritize :Bool = false) :SignalConnection
     {
-        _listeners.push(listener);
+        if (_impl == null) {
+            _impl = createImpl();
+        }
+        return _impl.connect(listener, prioritize);
     }
 
-    public function remove (listener :Listener0)
+    public function disconnectAll ()
     {
-        _listeners.remove(listener);
+        if (_impl != null) {
+            _impl.disconnectAll();
+        }
     }
 
     public function emit ()
     {
-        for (listener in _listeners) {
-            listener();
+        if (_impl != null) {
+            _impl.emit([]);
         }
     }
 
-    private var _listeners :Array<Listener0>;
+    private function createImpl () :SignalImpl
+    {
+        return new SignalImpl();
+    }
+
+    private var _impl :SignalImpl;
 }

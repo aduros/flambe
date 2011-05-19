@@ -61,22 +61,29 @@ class Sprite extends Component
         if (transform == null) {
             owner.add(transform = new Transform());
         }
-        transform.x.updated.add(dirtyMatrix);
-        transform.y.updated.add(dirtyMatrix);
-        transform.scaleX.updated.add(dirtyMatrix);
-        transform.scaleY.updated.add(dirtyMatrix);
-        transform.rotation.updated.add(dirtyMatrix);
+        transform.x.updated.connect(dirtyMatrix);
+        transform.y.updated.connect(dirtyMatrix);
+        transform.scaleX.updated.connect(dirtyMatrix);
+        transform.scaleY.updated.connect(dirtyMatrix);
+        transform.rotation.updated.connect(dirtyMatrix);
         _localMatrixDirty = true;
     }
 
     override public function onRemoved ()
     {
         var transform = owner.get(Transform);
-        // TODO: Remove listeners
 
         if (_listenerCount > 0) {
             INTERACTIVE_SPRITES.remove(this);
         }
+    }
+
+    override public function onDispose ()
+    {
+        // Should this be standard practice?
+        mouseDown.disconnectAll();
+        mouseMove.disconnectAll();
+        mouseUp.disconnectAll();
     }
 
     private function dirtyMatrix (_)
@@ -148,17 +155,19 @@ class Sprite extends Component
         anchorY.set(getNaturalHeight()/2);
     }
 
-    private function onListenerAdded ()
+    public function _internal_onListenersAdded (count :Int)
     {
-        if (_listenerCount++ == 0) {
+        if (_listenerCount == 0) {
             // TODO: Insert in screen depth order
             INTERACTIVE_SPRITES.sortedInsert(this, function (a, b) return -1);
         }
+        _listenerCount += count;
     }
 
-    private function onListenerRemoved ()
+    public function _internal_onListenersRemoved (count :Int)
     {
-        if (--_listenerCount == 0) {
+        _listenerCount -= count;
+        if (_listenerCount == 0) {
             INTERACTIVE_SPRITES.remove(this);
         }
     }
@@ -174,6 +183,10 @@ class Sprite extends Component
     private var _listenerCount :Int;
 }
 
+import flambe.util.Signal1;
+import flambe.util.SignalConnection;
+import flambe.util.SignalImpl;
+
 private class NotifyingSignal1<A> extends Signal1<A>
 {
     public function new (sprite :Sprite)
@@ -182,19 +195,41 @@ private class NotifyingSignal1<A> extends Signal1<A>
         _sprite = sprite;
     }
 
-    override public function add (listener :Listener1<A>)
+    override private function createImpl () :SignalImpl
     {
-        super.add(listener);
-        (cast _sprite).onListenerAdded();
+        return new NotifyingSignalImpl(_sprite);
     }
 
-    override public function remove (listener :Listener1<A>)
+    private var _sprite :Sprite;
+}
+
+private class NotifyingSignalImpl extends SignalImpl
+{
+    public function new (sprite :Sprite)
     {
-        var count = _listeners.length;
-        super.remove(listener);
-        if (_listeners.length < count) {
-            (cast _sprite).onListenerRemoved();
+        super();
+        _sprite = sprite;
+    }
+
+    override public function connect (listener :Dynamic, prioritize :Bool) :SignalConnection
+    {
+        _sprite._internal_onListenersAdded(1);
+        return super.connect(listener, prioritize);
+    }
+
+    override public function disconnect (connection :SignalConnection) :Bool
+    {
+        if (super.disconnect(connection)) {
+            _sprite._internal_onListenersRemoved(1);
+            return true;
         }
+        return false;
+    }
+
+    override public function disconnectAll ()
+    {
+        _sprite._internal_onListenersRemoved(_connections.length);
+        super.disconnectAll();
     }
 
     private var _sprite :Sprite;

@@ -1,7 +1,5 @@
 package flambe.util;
 
-import flambe.Disposable;
-
 class SignalConnection
     implements Disposable
 {

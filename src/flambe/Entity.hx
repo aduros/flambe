@@ -4,10 +4,12 @@ package flambe;
 import haxe.macro.Expr;
 #end
 
+import flambe.util.Disposable;
+
 using Lambda;
 
 class Entity
-#if !macro
+#if !macro // Don't require us to implement these interfaces when running in the macro emulator
     implements Disposable
 #end
 {

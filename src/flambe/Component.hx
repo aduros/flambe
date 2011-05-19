@@ -1,5 +1,7 @@
 package flambe;
 
+import flambe.util.Disposable;
+
 @:autoBuild(flambe.macro.Build.buildComponent())
 class Component
     implements Disposable

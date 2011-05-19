@@ -1,4 +1,4 @@
-package flambe;
+package flambe.util;
 
 interface Disposable
 {

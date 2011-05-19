@@ -66,8 +66,8 @@ class Entity
 
     public function remove (comp :Component)
     {
-        var name = comp.getName();
         if (comp.owner == this) {
+            var name = comp.getName();
 #if flash
             untyped __delete__(_compMap, name);
 #elseif js
@@ -144,14 +144,26 @@ class Entity
         if (parent != null) {
             parent.removeChild(this);
         }
-        for (comp in _comps) {
-            comp.onRemoved();
-            comp._internal_setOwner(null);
-            comp.onDispose();
+
+        var ii = 0;
+        while (ii < _comps.length) {
+            var comp = _comps[ii];
+            if (comp != null) {
+                _comps[ii] = null;
+                comp.onRemoved();
+                comp._internal_setOwner(null);
+                comp.onDispose();
+            }
+            ++ii;
         }
-        for (child in _children) {
-            child.parent = null;
-            child.dispose();
+        var ii = 0;
+        while (ii < _children.length) {
+            var child = _children[ii];
+            if (child != null) {
+                _children[ii] = null;
+                child.parent = null;
+                child.dispose();
+            }
         }
     }
 

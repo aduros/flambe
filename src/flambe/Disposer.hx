@@ -3,6 +3,7 @@ package flambe;
 import flambe.util.Disposable;
 import flambe.util.Signal0;
 import flambe.util.Signal1;
+import flambe.util.Signal2;
 
 class Disposer extends Component
 {
@@ -30,7 +31,7 @@ class Disposer extends Component
         add(signal.connect(listener));
     }
 
-    public function connect2<A> (signal :Signal2<A>, listener :Listener1<A>)
+    public function connect2<A,B> (signal :Signal2<A,B>, listener :Listener2<A,B>)
     {
         add(signal.connect(listener));
     }

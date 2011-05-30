@@ -11,6 +11,8 @@ typedef PBool = Property<Bool>;
 class Property<A>
     implements haxe.rtti.Generic // Generate typed templates in Flash
 {
+    public var _ (get, set) :A;
+
     public var updated (default, null) :Signal1<Property<A>>;
 
     public function new (value :A, ?listener :Listener1<Property<A>>)
@@ -24,11 +26,12 @@ class Property<A>
         return _value;
     }
 
-    public function set (value :A)
+    public function set (value :A) :A
     {
         _value = value;
         _behavior = null;
         updated.emit(this);
+        return value;
     }
 
     public function update (dt :Int)

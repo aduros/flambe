@@ -50,6 +50,11 @@ class AmityDrawingContext
         canvas().drawPattern(texture, x, y, width, height);
     }
 
+    public function fillRect (color :Int, x :Float, y :Float, width :Float, height :Float)
+    {
+        canvas().fillRect(color, x, y, width, height);
+    }
+
     public function multiplyAlpha (factor :Float)
     {
         canvas().multiplyAlpha(factor);

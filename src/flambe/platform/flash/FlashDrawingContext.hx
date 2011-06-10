@@ -22,6 +22,7 @@ class FlashDrawingContext
         _buffer = buffer;
         _stack = new FastList<DrawingState>();
         _shape = new Shape();
+        _pixel = new BitmapData(1, 1, false);
     }
 
     public function save ()
@@ -100,6 +101,46 @@ class FlashDrawingContext
         _graphics.drawRect(x, y, width, height);
     }
 
+    public function fillRect (color :Int, x :Float, y :Float, width :Float, height :Float)
+    {
+        flushGraphics();
+
+        var state = getTopState();
+        var matrix = state.matrix;
+
+        // Does this matrix not involve rotation?
+        if (matrix.b == 0 && matrix.c == 0) {
+            var scaleX = matrix.a;
+            var scaleY = matrix.d;
+            var rect = new Rectangle(matrix.tx + x*scaleX, matrix.ty + y*scaleY,
+                width*scaleX, height*scaleY);
+
+            // If we don't need to alpha blend, use fillRect(), otherwise colorTransform()
+            if (state.color == null) {
+                _buffer.fillRect(rect, color);
+
+            } else {
+                var red = 0xff & (color >> 16);
+                var green = 0xff & (color >> 8);
+                var blue = 0xff & (color);
+                var alpha = state.color.alphaMultiplier;
+                var invAlpha = 1-alpha;
+                var transform = new ColorTransform(invAlpha, invAlpha, invAlpha, 1,
+                    alpha*red, alpha*green, alpha*blue);
+                _buffer.colorTransform(rect, transform);
+            }
+
+        } else {
+            // Fall back to slowpoke draw()
+            var localMatrix = new Matrix();
+            localMatrix.scale(width, height);
+            localMatrix.translate(x, y);
+            localMatrix.concat(matrix);
+            _pixel.setPixel(0, 0, color);
+            _buffer.draw(_pixel, localMatrix, state.color);
+        }
+    }
+
     public function multiplyAlpha (factor :Float)
     {
         flushGraphics();
@@ -175,9 +216,14 @@ class FlashDrawingContext
     private var _stack :FastList<DrawingState>;
     private var _buffer :BitmapData;
 
+    // The shape used for all rendering that can't be done with a BitmapData
     private var _shape :Shape;
+
     // The vector graphic commands pending drawing, or null if we're not in vector graphics mode
     private var _graphics :Graphics;
+
+    // A 1x1 BitmapData used to optimize fillRect's worst-case
+    private var _pixel :BitmapData;
 }
 
 private class DrawingState

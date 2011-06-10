@@ -8,6 +8,9 @@ typedef PFloat = Property<Float>;
 typedef PInt = Property<Int>;
 typedef PBool = Property<Bool>;
 
+// TODO(bruno): Figure out a way to animate this intelligently
+typedef PColor = Property<Int>;
+
 class Property<A>
     implements haxe.rtti.Generic // Generate typed templates in Flash
 {

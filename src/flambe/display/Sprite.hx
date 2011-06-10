@@ -74,7 +74,7 @@ class Sprite extends Component
         var transform = owner.get(Transform);
 
         if (_listenerCount > 0) {
-            INTERACTIVE_SPRITES.remove(this);
+            _internal_interactiveSprites.remove(this);
         }
     }
 
@@ -159,7 +159,7 @@ class Sprite extends Component
     {
         if (_listenerCount == 0) {
             // TODO: Insert in screen depth order
-            INTERACTIVE_SPRITES.sortedInsert(this, function (a, b) return -1);
+            _internal_interactiveSprites.sortedInsert(this, function (a, b) return -1);
         }
         _listenerCount += count;
     }
@@ -168,12 +168,15 @@ class Sprite extends Component
     {
         _listenerCount -= count;
         if (_listenerCount == 0) {
-            INTERACTIVE_SPRITES.remove(this);
+            _internal_interactiveSprites.remove(this);
         }
     }
 
     private static var IDENTITY = new Matrix();
-    public static var INTERACTIVE_SPRITES :Array<Sprite> = [];
+
+    // All sprites that have mouse listeners attached, in screen depth order.
+    // Used to optimize mouse picking.
+    public static var _internal_interactiveSprites :Array<Sprite> = [];
 
     private var _viewMatrix :Matrix;
     private var _localMatrixDirty :Bool;

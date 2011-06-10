@@ -68,7 +68,7 @@ class Input
      */
     private static function getEntityUnderPoint (x :Float, y :Float) :Entity
     {
-        for (sprite in Sprite.INTERACTIVE_SPRITES) {
+        for (sprite in Sprite._internal_interactiveSprites) {
             if (sprite.contains(x, y) && isVisible(sprite.owner)) {
                 return sprite.owner;
             }

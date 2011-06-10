@@ -11,9 +11,9 @@ interface DrawingContext
     function multiplyAlpha (factor :Float) :Void;
     function restore () :Void;
 
-    function drawImage (texture :Texture, destX :Int, destY :Int) :Void;
-    function drawSubImage (texture :Texture, destX :Int, destY :Int,
-        sourceX :Int, sourceY :Int, sourceW :Int, sourceH :Int) :Void;
-    function drawPattern (texture :Texture, destX :Int, destY :Int, width :Float, height :Float) :Void;
+    function drawImage (texture :Texture, destX :Float, destY :Float) :Void;
+    function drawSubImage (texture :Texture, destX :Float, destY :Float,
+        sourceX :Float, sourceY :Float, sourceW :Float, sourceH :Float) :Void;
+    function drawPattern (texture :Texture, destX :Float, destY :Float, width :Float, height :Float) :Void;
     function fillRect (color :Int, x :Float, y :Float, width :Float, height :Float) :Void;
 }

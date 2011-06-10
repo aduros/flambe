@@ -34,18 +34,18 @@ class AmityDrawingContext
         canvas().restore();
     }
 
-    public function drawImage (texture :Texture, x :Int, y :Int)
+    public function drawImage (texture :Texture, x :Float, y :Float)
     {
         canvas().drawImage(texture, x, y);
     }
 
-    public function drawSubImage (texture :Texture, destX :Int, destY :Int,
-        sourceX :Int, sourceY :Int, sourceW :Int, sourceH :Int)
+    public function drawSubImage (texture :Texture, destX :Float, destY :Float,
+        sourceX :Float, sourceY :Float, sourceW :Float, sourceH :Float)
     {
         canvas().drawImage(texture, destX, destY, sourceX, sourceY, sourceW, sourceH);
     }
 
-    public function drawPattern (texture :Texture, x :Int, y :Int, width :Float, height :Float)
+    public function drawPattern (texture :Texture, x :Float, y :Float, width :Float, height :Float)
     {
         canvas().drawPattern(texture, x, y, width, height);
     }

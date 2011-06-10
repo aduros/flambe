@@ -82,18 +82,18 @@ class FlashDrawingContext
         _stack.pop();
     }
 
-    public function drawImage (texture :Texture, destX :Int, destY :Int)
+    public function drawImage (texture :Texture, destX :Float, destY :Float)
     {
         blit(texture, destX, destY, null);
     }
 
-    public function drawSubImage (texture :Texture, destX :Int, destY :Int,
-        sourceX :Int, sourceY :Int, sourceW :Int, sourceH :Int)
+    public function drawSubImage (texture :Texture, destX :Float, destY :Float,
+        sourceX :Float, sourceY :Float, sourceW :Float, sourceH :Float)
     {
         blit(texture, destX, destY, new Rectangle(sourceX, sourceY, sourceW, sourceH));
     }
 
-    public function drawPattern (texture :Texture, x :Int, y :Int, width :Float, height :Float)
+    public function drawPattern (texture :Texture, x :Float, y :Float, width :Float, height :Float)
     {
         beginGraphics();
 
@@ -153,7 +153,7 @@ class FlashDrawingContext
         }
     }
 
-    private function blit (texture :Texture, destX :Int, destY :Int, sourceRect :Rectangle)
+    private function blit (texture :Texture, destX :Float, destY :Float, sourceRect :Rectangle)
     {
         flushGraphics();
 

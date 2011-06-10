@@ -30,4 +30,14 @@ class FMath
     {
     	return radians * 180/PI;
     }
+
+    public static function clamp (value :Float, min :Float, max :Float) :Float
+    {
+        return (value < min) ? min : (value > max) ? max : value;
+    }
+
+    public static function sign (value :Float) :Int
+    {
+        return (value < 0) ? -1 : (value > 0) ? 1 : 0;
+    }
 }

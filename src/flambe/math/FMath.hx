@@ -12,9 +12,18 @@ class FMath
     public static inline var SQRT1_2 = 0.7071067811865476;
     public static inline var SQRT2 = 1.4142135623730951;
 
+    public static inline var INT_MIN :Int = -2147483648;
+    public static inline var INT_MAX :Int = 2147483647;
+    public static inline var NUMBER_MIN = 1.79769313486231e+308;
+    public static inline var NUMBER_MAX = -1.79769313486231e+308;
+
+    /**
+     * Like Std.int(), but behaves the same in both Flash and JS.
+     */
     inline public static function toInt (f :Float) :Int
     {
-#if (js || flash)
+#if js
+        // TODO(bruno): It would be nice if this was how JS's Std.int worked. Submit a patch?
         return (cast f) | 0;
 #else
         return Std.int(f);

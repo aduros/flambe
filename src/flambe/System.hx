@@ -32,12 +32,12 @@ class System
         return driver.loadAssetPack(url);
     }
 
-    private static function getStageWidth () :Int
+    inline private static function getStageWidth () :Int
     {
         return driver.getStageWidth();
     }
 
-    private static function getStageHeight () :Int
+    inline private static function getStageHeight () :Int
     {
         return driver.getStageHeight();
     }

@@ -50,6 +50,21 @@ def apply_flambe(ctx):
         ctx.bld(rule="neko -interp ${SRC} " + res.abspath() + " .",
             source="packager.n", target= "bootstrap.swf" if hasBootstrap else None, always=True)
 
+@feature("flambe-server")
+def apply_flambe_server(ctx):
+    flags = ["-main", ctx.main]
+    # TODO(bruno): Use the node externs in haxelib
+    flags += "-D server --macro flambe.macro.AmityJSGenerator.use()".split()
+
+    if ctx.env.debug:
+        flags += "-D debug --no-opt --no-inline".split()
+    else:
+        #flags += "--dead-code-elimination --no-traces".split()
+        flags += "--no-traces".split()
+
+    ctx.bld(features="haxe", classpath=["src", FLAMBE_ROOT+"/src"],
+        flags=flags, target="server.js")
+
 # Upload and run the app on Android
 def android_test(ctx):
     os.system("adb push res /sdcard/amity-dev")
@@ -104,3 +119,24 @@ Context.g_module.__dict__["webos_test"] = webos_test
 def webos_log(ctx):
     os.system("novacom run 'file:///usr/bin/tail -f /var/log/messages' | grep com.threerings.amity")
 Context.g_module.__dict__["webos_log"] = webos_log
+
+SERVER_PID = "/tmp/flambe-server.pid"
+
+# Spawns a development server for testing
+def server(ctx):
+    from subprocess import Popen
+    print("Restart the server using 'waf restart_server' or 'kill `cat %s`." % SERVER_PID);
+    while True:
+        p = Popen(["node", "build/server.js"]);
+        with open(SERVER_PID, "w") as file:
+            file.write(str(p.pid))
+        p.wait()
+        os.remove(SERVER_PID)
+Context.g_module.__dict__["server"] = server
+
+# Restart the local dev server
+def restart_server(ctx):
+    import signal
+    with open(SERVER_PID, "r") as file:
+        os.kill(int(file.read()), signal.SIGTERM)
+Context.g_module.__dict__["restart_server"] = restart_server

@@ -42,7 +42,7 @@ def apply_flambe(ctx):
     res = ctx.path.find_dir("res")
     if res is not None:
         # Create asset swfs from the directories in /res
-        ctx.bld(features="haxe", classpath=FLAMBE_ROOT+"/tools",
+        ctx.bld(features="haxe", classpath=FLAMBE_ROOT+"/tools/packager/src",
             flags="-main AssetPackager",
             libs="format",
             target="packager.n")

@@ -35,7 +35,7 @@ def apply_flambe(ctx):
         swflib="bootstrap.swf" if hasBootstrap else None,
         target="app.swf")
 
-    ctx.bld(features="haxe", classpath=["src", FLAMBE_ROOT+"/src"],
+    ctx.bld(features="haxe", classpath=["src", FLAMBE_ROOT+"/src", FLAMBE_ROOT+"/tools/amity/src"],
         flags=flags + amity_flags,
         target="app.js")
 

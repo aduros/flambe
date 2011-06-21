@@ -1,5 +1,8 @@
 package flambe.platform.amity;
 
+import amity.Canvas;
+import amity.Events;
+
 import flambe.asset.AssetPackLoader;
 import flambe.display.MouseEvent;
 import flambe.display.Texture;
@@ -22,7 +25,7 @@ class AmityAppDriver
         haxe.Log.trace = (untyped __amity).log;
 #end
         var loop = new MainLoop(new AmityDrawingContext());
-        (untyped __amity).events.onEnterFrame = function (dt :Int) {
+        Events.onEnterFrame = function (dt) {
             loop.runFrame(dt);
         };
 
@@ -32,13 +35,13 @@ class AmityAppDriver
             event.viewY = data.y;
             return event;
         };
-        (untyped __amity).events.onMouseDown = function (event) {
+        Events.onMouseDown = function (event) {
             Input.mouseDown.emit(createMouseEvent(event));
         };
-        (untyped __amity).events.onMouseMove = function (event) {
+        Events.onMouseMove = function (event) {
             Input.mouseMove.emit(createMouseEvent(event));
         };
-        (untyped __amity).events.onMouseUp = function (event) {
+        Events.onMouseUp = function (event) {
             Input.mouseUp.emit(createMouseEvent(event));
         };
     }
@@ -50,11 +53,11 @@ class AmityAppDriver
 
     public function getStageWidth () :Int
     {
-        return (untyped __amity).canvas.WIDTH;
+        return Canvas.WIDTH;
     }
 
     public function getStageHeight () :Int
     {
-        return (untyped __amity).canvas.HEIGHT;
+        return Canvas.HEIGHT;
     }
 }

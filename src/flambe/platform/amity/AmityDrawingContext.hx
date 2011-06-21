@@ -1,5 +1,7 @@
 package flambe.platform.amity;
 
+import amity.Canvas;
+
 import flambe.display.Texture;
 
 class AmityDrawingContext
@@ -11,57 +13,52 @@ class AmityDrawingContext
 
     public function save ()
     {
-        canvas().save();
+        Canvas.save();
     }
 
     public function translate (x :Float, y :Float)
     {
-        canvas().translate(x, y);
+        Canvas.translate(x, y);
     }
 
     public function scale (x :Float, y :Float)
     {
-        canvas().scale(x, y);
+        Canvas.scale(x, y);
     }
 
     public function rotate (rotation :Float)
     {
-        canvas().rotate(rotation);
+        Canvas.rotate(rotation);
     }
 
     public function restore ()
     {
-        canvas().restore();
+        Canvas.restore();
     }
 
     public function drawImage (texture :Texture, x :Float, y :Float)
     {
-        canvas().drawImage(texture, x, y);
+        Canvas.drawImage(texture, x, y);
     }
 
     public function drawSubImage (texture :Texture, destX :Float, destY :Float,
         sourceX :Float, sourceY :Float, sourceW :Float, sourceH :Float)
     {
-        canvas().drawImage(texture, destX, destY, sourceX, sourceY, sourceW, sourceH);
+        Canvas.drawImage(texture, destX, destY, sourceX, sourceY, sourceW, sourceH);
     }
 
     public function drawPattern (texture :Texture, x :Float, y :Float, width :Float, height :Float)
     {
-        canvas().drawPattern(texture, x, y, width, height);
+        Canvas.drawPattern(texture, x, y, width, height);
     }
 
     public function fillRect (color :Int, x :Float, y :Float, width :Float, height :Float)
     {
-        canvas().fillRect(color, x, y, width, height);
+        Canvas.fillRect(color, x, y, width, height);
     }
 
     public function multiplyAlpha (factor :Float)
     {
-        canvas().multiplyAlpha(factor);
-    }
-
-    inline public static function canvas () :Dynamic
-    {
-    	return (untyped __amity).canvas;
+        Canvas.multiplyAlpha(factor);
     }
 }

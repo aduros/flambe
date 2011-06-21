@@ -1,3 +1,7 @@
+//
+// Flambe - Rapid game development
+// https://github.com/aduros/amity/blob/master/LICENSE.txt
+
 import neko.FileSystem;
 import neko.io.File;
 import neko.Sys;

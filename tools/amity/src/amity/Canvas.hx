@@ -1,3 +1,7 @@
+//
+// Flambe - Rapid game development
+// https://github.com/aduros/amity/blob/master/LICENSE.txt
+
 package amity;
 
 @:native("__amity.canvas")

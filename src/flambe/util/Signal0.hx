@@ -1,3 +1,7 @@
+//
+// Flambe - Rapid game development
+// https://github.com/aduros/amity/blob/master/LICENSE.txt
+
 package flambe.util;
 
 typedef Listener0 = Void -> Void;

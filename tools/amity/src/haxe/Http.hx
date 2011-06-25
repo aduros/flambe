@@ -28,7 +28,7 @@ class Http
     public function request (post :Bool) :Void
     {
         var self = this;
-        var req = amity.Net.createHttpRequest();
+        var req = amity.Net.createHttpRequest(url);
         req.onStatus = function (status) {
             self.onStatus(status);
         };
@@ -41,8 +41,20 @@ class Http
         for (header in _headers.keys()) {
             req.setHeader(header, _headers.get(header));
         }
-        // TODO(bruno): Encode _params into url?
-        req.start(url, post);
+
+        var postData = null;
+        if (post) {
+            for (param in _params.keys()) {
+                if (postData != null) {
+                    postData += "&";
+                } else {
+                    postData = "";
+                }
+                postData += StringTools.urlEncode(param) +
+                    "=" + StringTools.urlEncode(_params.get(param));
+            }
+        }
+        req.send(postData);
     }
 
     public dynamic function onData (data :String) {

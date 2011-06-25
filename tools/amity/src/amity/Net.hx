@@ -11,11 +11,11 @@ typedef HttpRequest = {
 
     function setHeader (header :String, value :String) :Void;
 
-    function start (url :String, post :Bool) :Void;
+    function send (postData :String) :Void;
 }
 
 @:native("__amity.net")
 extern class Net
 {
-    public static function createHttpRequest () :HttpRequest;
+    public static function createHttpRequest (url :String) :HttpRequest;
 }

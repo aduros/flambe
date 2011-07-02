@@ -1,4 +1,5 @@
 import flambe.animation.Easing;
+import flambe.asset.AssetPackLoader;
 import flambe.display.Sprite;
 import flambe.display.FillSprite;
 import flambe.display.Transform;
@@ -24,12 +25,11 @@ class Main
             .add(new AnimatedSprite(_loader.pack.createTexture("avatar.png"), 6, 8))
             .add(new Script());
 
-        sprite.play(IDLE);
-
         // Put the anchor near his feet
         var sprite = character.get(AnimatedSprite);
         sprite.anchorX._ = sprite.getNaturalWidth()/2;
         sprite.anchorY._ = sprite.getNaturalHeight();
+        sprite.play(IDLE);
 
         // Put it in the middle of the stage
         var transform = character.get(Transform);
@@ -80,5 +80,5 @@ class Main
         _loader.start();
     }
 
-    private static var _loader;
+    private static var _loader :AssetPackLoader;
 }

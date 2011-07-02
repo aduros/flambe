@@ -31,4 +31,11 @@ class Transform extends Component
         scaleX.update(dt);
         scaleY.update(dt);
     }
+
+    public function distanceTo (x :Float, y :Float) :Float
+    {
+        var dx = x - this.x._;
+        var dy = y - this.y._;
+        return Math.sqrt(dx*dx + dy*dy);
+    }
 }

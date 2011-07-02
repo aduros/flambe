@@ -73,7 +73,7 @@ class AnimatedSprite extends Sprite
                         play(_defaultAnim);
                     } else {
                         // Stop on the last frame
-                        setFrameAndStop(animation.frames[animation.frames.length]);
+                        setFrameAndStop(animation.frames[animation.frames.length-1]);
                     }
                     return;
                 }

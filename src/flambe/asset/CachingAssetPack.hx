@@ -29,6 +29,12 @@ class CachingAssetPack
         return texture;
     }
 
+    public function loadFile (file :String) :String
+    {
+        // TODO: Should this be cached too?
+        return _source.loadFile(file);
+    }
+
     private var _source :AssetPack;
     private var _textureCache :Hash<Texture>;
 }

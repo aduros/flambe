@@ -20,5 +20,10 @@ class AmityAssetPack
         return (untyped __amity).createTexture(_packName + "/" + file);
     }
 
+    public function loadFile (file :String) :String
+    {
+        return (untyped __amity).loadFile(_packName + "/" + file);
+    }
+
     private var _packName :String;
 }

@@ -65,7 +65,8 @@ class PackSwfWriter
 
     private function writeByteArray (bytes)
     {
-        return null; // TODO
+        _swf.writeTag(TBinaryData(++_id, bytes));
+        return "flash.utils.ByteArray";
     }
 
     private function writeClass (className, baseClass)
@@ -76,7 +77,10 @@ class PackSwfWriter
         var f = ctx.beginConstructor([]);
         f.maxStack = 3;
         f.maxScope = 1;
-        ctx.ops([OThis,OScope,OThis,OInt(0),OInt(0),OConstructSuper(2),ORetVoid]);
+        var superArgs = (baseClass == "flash.display.BitmapData") ? [ OInt(0), OInt(0) ] : [];
+        ctx.ops([ OThis, OScope, OThis ]
+            .concat(superArgs)
+            .concat([ OConstructSuper(superArgs.length), ORetVoid ]));
         ctx.finalize();
 
         var abcBytes = new BytesOutput();

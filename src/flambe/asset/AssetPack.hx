@@ -10,6 +10,8 @@ interface AssetPack
 {
     public function createTexture (file :String) :Texture;
 
+    public function loadFile (file :String) :String;
+
     //public function createXml (file :String) :Xml;
     //public function createBytes (file :String) :haxe.io.Bytes;
 }

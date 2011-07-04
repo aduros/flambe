@@ -6,6 +6,7 @@ package flambe.platform.flash;
 
 import flash.display.Loader;
 import flash.display.LoaderInfo;
+import flash.utils.ByteArray;
 
 import flambe.asset.AssetPack;
 import flambe.display.Texture;
@@ -22,8 +23,18 @@ class FlashAssetPack
 
     public function createTexture (file :String) :Texture
     {
-        return Type.createInstance(
-            _loaderInfo.applicationDomain.getDefinition(file.replace(".", "$")), []);
+        return Type.createInstance(getDefinition(file), []);
+    }
+
+    public function loadFile (file :String) :String
+    {
+        var byteArray :ByteArray = Type.createInstance(getDefinition(file), []);
+        return byteArray.readUTFBytes(byteArray.length);
+    }
+
+    private function getDefinition<A> (file :String) :Class<A>
+    {
+        return _loaderInfo.applicationDomain.getDefinition(file.replace(".", "$"));
     }
 
     private var _loaderInfo :LoaderInfo;

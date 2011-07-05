@@ -4,6 +4,8 @@
 
 package flambe.script;
 
+using Lambda;
+
 class Script extends Component
 {
     public function new ()
@@ -18,8 +20,12 @@ class Script extends Component
 
     public function stop (action :Action) :Bool
     {
-        throw "TODO";
-        return false;
+        var idx = _actions.indexOf(action);
+        if (idx < 0) {
+            return false;
+        }
+        _actions[idx] = null;
+        return true;
     }
 
     public function stopAll ()

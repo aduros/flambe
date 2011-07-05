@@ -22,8 +22,12 @@ class Sequence
 
     public function remove (action :Action) :Bool
     {
-        throw "TODO";
-        return false;
+        var idx = _actions.indexOf(action);
+        if (idx < 0) {
+            return false;
+        }
+        _actions[idx] = null;
+        return true;
     }
 
     public function removeAll ()

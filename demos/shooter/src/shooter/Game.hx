@@ -32,7 +32,7 @@ class Game extends Component
     override public function onAdded ()
     {
         var water = new Entity()
-            .add(new PatternSprite(ShooterCtx.pack.createTexture("water.png")))
+            .add(new PatternSprite(ShooterCtx.pack.loadTexture("water.png")))
             .add(new WaterScroller(0.1/4));
         water.get(PatternSprite).width.set(System.stageWidth);
         water.get(PatternSprite).height.set(System.stageHeight+32);
@@ -43,7 +43,7 @@ class Game extends Component
         cloudLayer.get(Script).run(new Repeat(new Sequence([
             new Delay(4*0.8),
             new CallFunction(function () {
-                var texture = ShooterCtx.pack.createTexture("cloud.png");
+                var texture = ShooterCtx.pack.loadTexture("cloud.png");
                 var cloud = new Entity().add(new ImageSprite(texture));
                 var t = cloud.get(Transform);
                 t.x.set(Math.random()*(System.stageWidth+texture.width) - texture.width);
@@ -59,7 +59,7 @@ class Game extends Component
         owner.addChild(cloudLayer);
 
         player = new Entity()
-            .add(new ImageSprite(ShooterCtx.pack.createTexture("player.png")))
+            .add(new ImageSprite(ShooterCtx.pack.loadTexture("player.png")))
             .add(new Script());
         var sprite = player.get(ImageSprite);
         sprite.centerAnchor();
@@ -67,7 +67,7 @@ class Game extends Component
            new Delay(0.2),
            new CallFunction(function () {
                var bullet = new Entity()
-                   .add(new ImageSprite(ShooterCtx.pack.createTexture("bullet.png")))
+                   .add(new ImageSprite(ShooterCtx.pack.loadTexture("bullet.png")))
                    .add(new Bullet());
                bullet.get(Sprite).centerAnchor();
                bullet.get(Transform).x.set(player.get(Transform).x.get());
@@ -101,7 +101,7 @@ class Game extends Component
     public static function buildSwarmer () :Entity
     {
         var enemy = new Entity()
-            .add(new ImageSprite(ShooterCtx.pack.createTexture("enemy0.png")))
+            .add(new ImageSprite(ShooterCtx.pack.loadTexture("enemy0.png")))
             .add(new Hull(20, 1))
             .add(new SwarmerAI());
         enemy.get(Sprite).centerAnchor();
@@ -111,7 +111,7 @@ class Game extends Component
     public static function buildBomber () :Entity
     {
         var enemy = new Entity()
-            .add(new ImageSprite(ShooterCtx.pack.createTexture("enemy1.png")))
+            .add(new ImageSprite(ShooterCtx.pack.loadTexture("enemy1.png")))
             .add(new Hull(40, 5))
             .add(new BomberAI());
         enemy.get(Sprite).centerAnchor();

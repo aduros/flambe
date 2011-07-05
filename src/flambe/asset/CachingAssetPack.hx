@@ -19,11 +19,11 @@ class CachingAssetPack
         _textureCache = new Hash();
     }
 
-    public function createTexture (file :String) :Texture
+    public function loadTexture (file :String) :Texture
     {
         var texture = _textureCache.get(file);
         if (texture == null) {
-            texture = _source.createTexture(file);
+            texture = _source.loadTexture(file);
             _textureCache.set(file, texture);
         }
         return texture;

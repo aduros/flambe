@@ -21,7 +21,7 @@ class FlashAssetPack
         _loaderInfo = loaderInfo;
     }
 
-    public function createTexture (file :String) :Texture
+    public function loadTexture (file :String) :Texture
     {
         return Type.createInstance(getDefinition(file), []);
     }

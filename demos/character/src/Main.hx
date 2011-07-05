@@ -22,7 +22,7 @@ class Main
     private static function onSuccess ()
     {
         var character = new Entity()
-            .add(new AnimatedSprite(_loader.pack.createTexture("avatar.png"), 6, 8))
+            .add(new AnimatedSprite(_loader.pack.loadTexture("avatar.png"), 6, 8))
             .add(new Script());
 
         // Put the anchor near his feet

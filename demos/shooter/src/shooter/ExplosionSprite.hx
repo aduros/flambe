@@ -13,7 +13,7 @@ class ExplosionSprite extends Sprite
     public function new ()
     {
         super();
-        _texture = ShooterCtx.pack.createTexture("explosion.png");
+        _texture = ShooterCtx.pack.loadTexture("explosion.png");
         _elapsed = 0;
         centerAnchor();
     }

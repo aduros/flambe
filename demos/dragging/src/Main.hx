@@ -1,6 +1,7 @@
-import flambe.Entity;
+import flambe.display.FillSprite;
 import flambe.display.ImageSprite;
 import flambe.display.Transform;
+import flambe.Entity;
 import flambe.System;
 
 class Main
@@ -26,14 +27,18 @@ class Main
     {
         trace("Loading complete!");
 
+        // Add a filled background color
+        System.root.addChild(new Entity()
+            .add(new FillSprite(0x303030, System.stageWidth, System.stageHeight)));
+
         for (ii in 0...10) {
             var tentacle = new Entity()
                 .add(new ImageSprite(_loader.pack.createTexture("tentacle.png")))
                 .add(new Draggable());
             var sprite = tentacle.get(ImageSprite);
             var xform = tentacle.get(Transform);
-            xform.x.set(Math.random() * (System.stageWidth-sprite.getNaturalWidth()));
-            xform.y.set(Math.random() * (System.stageHeight-sprite.getNaturalHeight()));
+            xform.x._ = Math.random() * (System.stageWidth-sprite.getNaturalWidth());
+            xform.y._ = Math.random() * (System.stageHeight-sprite.getNaturalHeight());
             System.root.addChild(tentacle);
         }
     }

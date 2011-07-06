@@ -176,21 +176,27 @@ class FlashDrawingContext
                 sourceRect, new Point(matrix.tx + destX, matrix.ty + destY));
 
         } else {
-            matrix.tx += destX;
-            matrix.ty += destY;
+            var copy = null;
+            if (destX != 0 || destY != 0) {
+                copy = matrix.clone();
+                translate(destX, destY);
+            }
             if (sourceRect != null) {
                 // BitmapData.draw() doesn't support a source rect, so we have to use a temp
                 // (contrary to the docs, clipRect is relative to the target, not the source)
-                var scratch = new BitmapData(
-                    Std.int(sourceRect.width), Std.int(sourceRect.height), texture.transparent);
-                scratch.copyPixels(texture, sourceRect, new Point(0, 0));
-                _buffer.draw(scratch, matrix, state.color, null, null, true);
-                scratch.dispose();
+                if (sourceRect.width > 0 && sourceRect.height > 0) {
+                    var scratch = new BitmapData(
+                        Std.int(sourceRect.width), Std.int(sourceRect.height), texture.transparent);
+                    scratch.copyPixels(texture, sourceRect, new Point(0, 0));
+                    _buffer.draw(scratch, matrix, state.color, null, null, true);
+                    scratch.dispose();
+                }
             } else {
                 _buffer.draw(texture, matrix, state.color, null, null, true);
             }
-            matrix.tx -= destX;
-            matrix.ty -= destY;
+            if (copy != null) {
+                state.matrix = copy;
+            }
         }
     }
 

@@ -7,6 +7,7 @@ package flambe;
 import flambe.display.MouseEvent;
 import flambe.display.Sprite;
 import flambe.platform.AppDriver;
+import flambe.platform.Storage;
 import flambe.util.Signal1;
 
 class System
@@ -16,6 +17,8 @@ class System
 
     public static var stageWidth (getStageWidth, null) :Int;
     public static var stageHeight (getStageHeight, null) :Int;
+
+    public static var storage (getStorage, null) :Storage;
 
     public static function init ()
     {
@@ -44,5 +47,10 @@ class System
     inline private static function getStageHeight () :Int
     {
         return driver.getStageHeight();
+    }
+
+    inline private static function getStorage () :Storage
+    {
+        return driver.getStorage();
     }
 }

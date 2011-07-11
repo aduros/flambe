@@ -4,14 +4,15 @@
 
 package flambe.platform.flash;
 
-import flash.Lib;
-import flash.events.Event;
-import flash.events.MouseEvent;
 import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.Sprite;
 import flash.display.Stage;
 import flash.display.StageScaleMode;
+import flash.events.Event;
+import flash.events.MouseEvent;
+import flash.Lib;
+import flash.net.SharedObject;
 
 import flambe.asset.AssetPackLoader;
 import flambe.display.Texture;
@@ -102,7 +103,21 @@ class FlashAppDriver
         return _screen.height;
     }
 
+    public function getStorage () :Storage
+    {
+        if (_storage == null) {
+            try {
+                _storage = new FlashStorage(SharedObject.getLocal("flambe"));
+            } catch (err :Dynamic) {
+                // SharedObject.getLocal may throw an error, fall back to temporary storage
+                _storage = new DummyStorage();
+            }
+        }
+        return _storage;
+    }
+
     private var _screen :BitmapData;
     private var _loop :MainLoop;
     private var _lastUpdate :Int;
+    private var _storage :Storage;
 }

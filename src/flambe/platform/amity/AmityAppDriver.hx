@@ -13,6 +13,7 @@ import flambe.display.Texture;
 import flambe.Entity;
 import flambe.Input;
 import flambe.platform.AppDriver;
+import flambe.platform.DummyStorage;
 import flambe.platform.MainLoop;
 
 class AmityAppDriver
@@ -64,4 +65,15 @@ class AmityAppDriver
     {
         return Canvas.HEIGHT;
     }
+
+    public function getStorage () :Storage
+    {
+        if (_storage == null) {
+            // TODO: AmityStorage
+            _storage = new DummyStorage();
+        }
+        return _storage;
+    }
+
+    private var _storage :Storage;
 }

@@ -16,4 +16,6 @@ interface AppDriver
 
     function getStageWidth () :Int;
     function getStageHeight () :Int;
+
+    function getStorage () :Storage;
 }

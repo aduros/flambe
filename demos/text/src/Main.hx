@@ -1,3 +1,7 @@
+//
+// Flambe - Rapid game development
+// https://github.com/aduros/flambe/blob/master/LICENSE.txt
+
 import flambe.animation.Easing;
 import flambe.asset.AssetPack;
 import flambe.display.FillSprite;

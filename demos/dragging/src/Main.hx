@@ -1,3 +1,7 @@
+//
+// Flambe - Rapid game development
+// https://github.com/aduros/flambe/blob/master/LICENSE.txt
+
 import flambe.display.FillSprite;
 import flambe.display.ImageSprite;
 import flambe.display.Transform;

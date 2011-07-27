@@ -1,3 +1,7 @@
+//
+// Flambe - Rapid game development
+// https://github.com/aduros/flambe/blob/master/LICENSE.txt
+
 import flambe.Component;
 import flambe.display.MouseEvent;
 import flambe.display.Sprite;

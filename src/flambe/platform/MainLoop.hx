@@ -7,6 +7,7 @@ package flambe.platform;
 import flambe.Component;
 import flambe.display.Sprite;
 import flambe.display.Transform;
+import flambe.scene.Director;
 import flambe.Entity;
 import flambe.System;
 import flambe.Visitor;
@@ -68,9 +69,16 @@ private class DrawVisitor
 
     public function enterEntity (entity :Entity) :Bool
     {
+        var director = entity.get(Director);
+        if (director != null) {
+            for (scene in director.scenes) {
+                scene.visit(this, false, true);
+            }
+        }
+
         var sprite = entity.get(Sprite);
         if (sprite == null) {
-            return false;
+            return true;
         }
 
         var n1 = sprite.alpha.get();

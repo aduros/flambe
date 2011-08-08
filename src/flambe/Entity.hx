@@ -106,7 +106,7 @@ class Entity
                 if (comp == null) {
                     _comps.splice(ii, 1);
                 } else {
-                    visitor.acceptComponent(comp);
+                    comp.visit(visitor);
                     ++ii;
                 }
             }
@@ -170,6 +170,7 @@ class Entity
                 child.parent = null;
                 child.dispose();
             }
+            ++ii;
         }
     }
 

@@ -5,6 +5,7 @@
 package flambe;
 
 import flambe.util.Disposable;
+import flambe.Visitor;
 
 @:autoBuild(flambe.macro.Build.buildComponent())
 class Component
@@ -39,6 +40,11 @@ class Component
             owner.remove(this);
         }
         onDispose();
+    }
+
+    public function visit (visitor :Visitor)
+    {
+        visitor.acceptComponent(this);
     }
 
     inline public function _internal_setOwner (entity :Entity)

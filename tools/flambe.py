@@ -19,7 +19,7 @@ def apply_flambe(ctx):
     flags = ["-main", ctx.main]
     hasBootstrap = ctx.path.find_dir("res/bootstrap")
 
-    flash_flags = "-swf-header 640:480:30:ffffff".split()
+    flash_flags = "-swf-header 640:480:60:ffffff".split()
     amity_flags = "-D amity --macro flambe.macro.AmityJSGenerator.use()".split()
 
     if ctx.env.debug:

@@ -81,8 +81,16 @@ class HtmlAppDriver
     public function getStorage () :Storage
     {
         if (_storage == null) {
-            // TODO: HtmlStorage
-            _storage = new DummyStorage();
+            var localStorage = null;
+            try {
+                localStorage = (untyped Lib.window).localStorage;
+            } catch (error :Dynamic) {
+                // Browser may throw a exception on accessing localStorage:
+                // http://dev.w3.org/html5/webstorage/#dom-localstorage
+            }
+            // TODO: Why is a cast necessary here? Compiler bug? Try without it in a release version
+            _storage = (localStorage != null) ?
+                new HtmlStorage(localStorage) : cast new DummyStorage();
         }
         return _storage;
     }

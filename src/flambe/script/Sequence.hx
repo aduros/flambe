@@ -22,11 +22,11 @@ class Sequence
 
     public function remove (action :Action) :Bool
     {
-        var idx = _actions.indexOf(action);
+        var idx = _runningActions.indexOf(action);
         if (idx < 0) {
             return false;
         }
-        _actions[idx] = null;
+        _runningActions[idx] = null;
         return true;
     }
 
@@ -38,10 +38,13 @@ class Sequence
 
     public function update (dt :Int) :Bool
     {
-        if (_idx >= _runningActions.length ||
-            (_runningActions[_idx].update(dt) && ++_idx >= _runningActions.length)) {
-            _idx = 0;
-            return true;
+        var action = _runningActions[_idx];
+        if (action == null || action.update(dt)) {
+            ++_idx;
+            if (_idx >= _runningActions.length) {
+                _idx = 0;
+                return true;
+            }
         }
         return false;
     }

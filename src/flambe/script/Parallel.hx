@@ -4,7 +4,7 @@
 
 package flambe.script;
 
-import Lambda;
+using Lambda;
 
 class Parallel
     implements Action
@@ -22,11 +22,11 @@ class Parallel
 
     public function remove (action :Action) :Bool
     {
-        var idx = _actions.indexOf(action);
+        var idx = _runningActions.indexOf(action);
         if (idx < 0) {
             return false;
         }
-        _actions[idx] = null;
+        _runningActions[idx] = null;
         return true;
     }
 
@@ -38,15 +38,20 @@ class Parallel
 
     public function update (dt :Int)
     {
+        var done = true;
         for (ii in 0..._runningActions.length) {
             var action = _runningActions[ii];
-            if (action != null && action.update(dt)) {
-                _runningActions[ii] = null;
-                _completedActions.push(action);
+            if (action != null) {
+                if (action.update(dt)) {
+                    _runningActions[ii] = null;
+                    _completedActions.push(action);
+                } else {
+                    done = false;
+                }
             }
         }
 
-        if (_completedActions.length == _runningActions.length) {
+        if (done) {
             _runningActions = _completedActions;
             _completedActions = [];
             return true;

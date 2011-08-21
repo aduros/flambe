@@ -20,11 +20,11 @@ def apply_flambe(ctx):
     hasBootstrap = ctx.path.find_dir("res/bootstrap")
 
     flash_flags = "-swf-header 640:480:60:ffffff".split()
-    amity_flags = "-D amity --macro flambe.macro.AmityJSGenerator.use()".split()
+    html_flags = "-D html --macro flambe.macro.BrowserJSGenerator.use()".split()
 
     if ctx.env.debug:
         flags += "-D debug --no-opt --no-inline".split()
-        # Only generate line numbers for Flash. The stack -debug creates for JS is unused in Amity
+        # Only generate line numbers for Flash. The stack -debug creates for JS isn't too useful
         flash_flags += ["-debug"]
     else:
         #flags += "--dead-code-elimination --no-traces".split()
@@ -34,10 +34,12 @@ def apply_flambe(ctx):
         flags=flags + flash_flags,
         swflib="bootstrap.swf" if hasBootstrap else None,
         target="app.swf")
+    ctx.bld.install_files("deploy/web", "app.swf");
 
-    ctx.bld(features="haxe", classpath=["src", FLAMBE_ROOT+"/src", FLAMBE_ROOT+"/tools/amity/src"],
-        flags=flags + amity_flags,
-        target="app.js")
+    ctx.bld(features="haxe", classpath=["src", FLAMBE_ROOT+"/src"],
+        flags=flags + html_flags,
+        target="app-html.js")
+    ctx.bld.install_files("deploy/web", "app-html.js");
 
     res = ctx.path.find_dir("res")
     if res is not None:
@@ -48,7 +50,33 @@ def apply_flambe(ctx):
             target="packager.n")
         # -interp because neko JIT is unstable...
         ctx.bld(rule="neko -interp ${SRC} " + res.abspath() + " .",
-            source="packager.n", target= "bootstrap.swf" if hasBootstrap else None, always=True)
+            source="packager.n", target= "bootstrap.swf" if hasBootstrap else None)
+
+        # Force a rebuild when anything in res/ has been updated
+        assets = res.ant_glob("**/*")
+        for asset in assets:
+            ctx.bld.add_manual_dependency("app-html.js", asset)
+            ctx.bld.add_manual_dependency("bootstrap.swf", asset)
+
+        ctx.bld.install_files("deploy/web", assets, cwd=res, relative_trick=True)
+
+    # Compile the embedder script
+    closure = ctx.bld.path.find_resource(FLAMBE_ROOT+"/tools/closure.jar");
+    scripts = ctx.bld.path.find_dir(FLAMBE_ROOT+"/tools/embedder").ant_glob("*.js")
+    ctx.bld(rule="java -jar '" + closure.abspath() + "' " +
+        " ".join(["--js '" + script.abspath() + "'" for script in scripts]) +
+        " --js_output_file ${TGT}", target="flambe.js");
+    for script in scripts:
+        ctx.bld.add_manual_dependency("flambe.js", script)
+    ctx.bld.install_files("deploy/web", "flambe.js")
+
+    # Install the default index.html if necessary
+    if ctx.bld.path.find_resource("web/index.html") == None:
+        ctx.bld.install_files("deploy/web",
+            ctx.bld.path.find_resource(FLAMBE_ROOT+"/tools/embedder/index.html"))
+
+    # Also install any other files in /web
+    ctx.bld.install_files("deploy", ctx.path.ant_glob("web/**/*"), relative_trick=True);
 
 @feature("flambe-server")
 def apply_flambe_server(ctx):
@@ -64,61 +92,19 @@ def apply_flambe_server(ctx):
 
     ctx.bld(features="haxe", classpath=["src", FLAMBE_ROOT+"/src"],
         flags=flags, target="server.js")
-
-# Upload and run the app on Android
-def android_test(ctx):
-    os.system("adb push res /sdcard/amity-dev")
-    os.system("adb push build/app.js /sdcard/amity-dev")
-    os.system("adb shell am start -a android.intent.action.MAIN " +
-        "-c android.intent.category.HOME")
-    os.system("adb shell am start -a android.intent.action.MAIN " +
-        "-n com.threerings.amity/.AmityActivity")
-Context.g_module.__dict__["android_test"] = android_test
-
-# View the app's log on Android
-def android_log(ctx):
-    os.system("adb logcat -v tag amity:V SDL:V *:W")
-Context.g_module.__dict__["android_log"] = android_log
+    ctx.bld.install_files("deploy", "server.js");
+    ctx.bld.install_files("deploy", ctx.path.ant_glob("etc/**/*"), relative_trick=True);
+    ctx.bld.add_post_fun(restart_server);
 
 # Run the app in a Flash player
 def flash_test(ctx):
-    os.system("flashplayer build/app.swf")
+    os.system("flashplayer deploy/web/app.swf")
 Context.g_module.__dict__["flash_test"] = flash_test
 
 # View the app's log in Flash
 def flash_log(ctx):
     os.system("tail -F $HOME/.macromedia/Flash_Player/Logs/flashlog.txt")
 Context.g_module.__dict__["flash_log"] = flash_log
-
-# Upload and run the app on webOS
-def webos_test(ctx):
-    # If the process documented at https://developer.palm.com/content/resources/develop/pdk_app_debugging.html
-    # worked on Linux, this would be less hacky (we would just use scp). Until Linux is officially
-    # supported by the PDK, a zip is instead created and pushed, then unzipped on the device.
-    from zipfile import ZipFile
-    assets = ZipFile("build/assets.zip", "w")
-    res = ctx.path.find_node("res")
-    for node in res.ant_glob("**"):
-        relpath = str(node.abspath())[len(res.abspath())+1:]
-        assets.write(node.abspath(), relpath)
-    assets.write("build/app.js", "app.js")
-    assets.close()
-
-    staging = "/tmp/amity-dev"
-    os.system("novacom run 'file:///bin/rm -rf " + staging + "'")
-    os.system("novacom run 'file:///bin/mkdir -p " + staging + "'")
-    os.system("novacom put 'file:///tmp/assets.zip' < build/assets.zip")
-    os.system("novacom run 'file:///usr/bin/unzip /tmp/assets.zip -d " + staging + "'")
-    os.system("novacom run 'file:///bin/rm -rf /tmp/assets.zip'")
-
-    os.system("novacom run 'file:///usr/bin/killall amity'")
-    os.system("palm-launch com.threerings.amity")
-Context.g_module.__dict__["webos_test"] = webos_test
-
-# View the app's log on webOS
-def webos_log(ctx):
-    os.system("novacom run 'file:///usr/bin/tail -f /var/log/messages' | grep com.threerings.amity")
-Context.g_module.__dict__["webos_log"] = webos_log
 
 SERVER_PID = "/tmp/flambe-server.pid"
 
@@ -127,7 +113,7 @@ def server(ctx):
     from subprocess import Popen
     print("Restart the server using 'waf restart_server' or 'kill `cat %s`." % SERVER_PID);
     while True:
-        p = Popen(["node", "build/server.js"]);
+        p = Popen(["node", "deploy/server.js"]);
         with open(SERVER_PID, "w") as file:
             file.write(str(p.pid))
         p.wait()
@@ -137,6 +123,9 @@ Context.g_module.__dict__["server"] = server
 # Restart the local dev server
 def restart_server(ctx):
     import signal
-    with open(SERVER_PID, "r") as file:
-        os.kill(int(file.read()), signal.SIGTERM)
+    try:
+        with open(SERVER_PID, "r") as file:
+            os.kill(int(file.read()), signal.SIGTERM)
+    except IOError as e:
+        pass
 Context.g_module.__dict__["restart_server"] = restart_server

@@ -26,6 +26,8 @@ class System
 
 #if flash
         driver = new flambe.platform.flash.FlashAppDriver();
+#elseif html
+        driver = new flambe.platform.html.HtmlAppDriver();
 #elseif amity
         driver = new flambe.platform.amity.AmityAppDriver();
 #else

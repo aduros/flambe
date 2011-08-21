@@ -12,8 +12,6 @@ import flambe.math.FMath;
 import flambe.platform.DrawingContext;
 import flambe.util.Signal1;
 
-using flambe.util.Arrays;
-
 class Sprite extends Component
 {
     public var alpha (default, null) :PFloat;
@@ -35,6 +33,7 @@ class Sprite extends Component
         this.mouseMove = new NotifyingSignal1(this);
         this.mouseUp = new NotifyingSignal1(this);
         _viewMatrix = new Matrix();
+        _listenerCount = 0;
     }
 
     override public function onUpdate (dt :Int)
@@ -163,7 +162,7 @@ class Sprite extends Component
     {
         if (_listenerCount == 0) {
             // TODO: Insert in screen depth order
-            _internal_interactiveSprites.sortedInsert(this, function (a, b) return -1);
+            _internal_interactiveSprites.unshift(this);
         }
         _listenerCount += count;
     }

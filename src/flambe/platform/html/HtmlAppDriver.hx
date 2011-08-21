@@ -28,11 +28,17 @@ class HtmlAppDriver
         haxe.Firebug.redirectTraces();
 #end
 
-        // The canvas provided by the flambe.js embedder
-        _canvas = untyped Lib.window.flambe.canvas;
+        try {
+            // Use the canvas assigned to us by the flambe.js embedder
+            _canvas = (untyped Lib.window).flambe.canvas;
+        } catch (error :Dynamic) {
+        }
         if (_canvas == null) {
-            // The app is being embedded directly
-            _canvas = Lib.document.createElement("canvas");
+            // We weren't loaded with the embedder... try to locate a #flambe-canvas
+            _canvas = Lib.document.getElementById("flambe-canvas");
+        }
+        if (_canvas == null) {
+            throw "Could not find a Flambe canvas! Are you not embedding with flambe.js?";
         }
 
         var loop = new MainLoop(new HtmlDrawingContext(_canvas));

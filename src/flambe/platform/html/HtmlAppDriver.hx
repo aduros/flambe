@@ -14,6 +14,7 @@ import flambe.Input;
 import flambe.platform.AppDriver;
 import flambe.platform.MainLoop;
 import flambe.System;
+import flambe.util.Signal1;
 
 class HtmlAppDriver
     implements AppDriver
@@ -67,6 +68,39 @@ class HtmlAppDriver
         _canvas.addEventListener("mouseup", function (event) {
             Input.mouseUp.emit(createMouseEvent(event));
         }, false);
+
+        var touchId = -1;
+        var maybeEmit = function (signal :Signal1<MouseEvent>, event) :Bool {
+            var changedTouches :Array<Dynamic> = event.changedTouches;
+            for (touch in changedTouches) {
+                if (touch.identifier == touchId) {
+                    signal.emit(createMouseEvent(touch));
+                    return true;
+                }
+            }
+            return false;
+        };
+        var onTouchEnd = function (event) {
+            if (maybeEmit(Input.mouseUp, event)) {
+                touchId = -1;
+            }
+        };
+        _canvas.addEventListener("touchstart", function (event) {
+            event.preventDefault();
+            if (touchId >= 0) {
+                // We're already handling a finger
+                return;
+            }
+            var touch = event.changedTouches[0];
+            touchId = touch.identifier;
+            Input.mouseDown.emit(createMouseEvent(touch));
+        }, false);
+        _canvas.addEventListener("touchmove", function (event) {
+            maybeEmit(Input.mouseMove, event);
+            // preventDefault necessary here too?
+        }, false);
+        _canvas.addEventListener("touchend", onTouchEnd, false);
+        _canvas.addEventListener("touchcancel", onTouchEnd, false);
     }
 
     public function loadAssetPack (url :String) :AssetPackLoader

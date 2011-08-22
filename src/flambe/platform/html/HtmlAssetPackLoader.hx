@@ -5,6 +5,7 @@
 package flambe.platform.html;
 
 import js.Dom;
+import js.Lib;
 
 import haxe.Http;
 
@@ -64,8 +65,19 @@ class HtmlAssetPackLoader
         switch (file.type) {
             case Image:
                 var image :Image = untyped __js__ ("new Image()");
+                // TODO(bruno): Uncomment this if content hashing is ever added
+                // image.validate = "never";
                 image.onload = function (_) {
-                    self.handleLoad(file, image);
+                    if (CANVAS_TEXTURES) {
+                        var canvas :Dynamic = Lib.document.createElement("canvas");
+                        canvas.width = image.width;
+                        canvas.height = image.height;
+                        canvas.getContext("2d").drawImage(image, 0, 0);
+                        image = null; // Free it up
+                        self.handleLoad(file, canvas);
+                    } else {
+                        self.handleLoad(file, image);
+                    }
                 };
                 image.onerror = function (_) {
                     self.handleError(file);
@@ -108,10 +120,24 @@ class HtmlAssetPackLoader
 
     private static function createManifest ()
     {
+        // On iOS < 5, canvas textures are way faster
+        // http://jsperf.com/drawimage-vs-canvaspattern/5
+        var pattern = ~/(iPhone|iPod|iPad).*OS (\d+)/;
+        if (pattern.match(Lib.window.navigator.userAgent)) {
+            var version = Std.parseInt(pattern.matched(2));
+            CANVAS_TEXTURES = (version < 5);
+        } else {
+            CANVAS_TEXTURES = false;
+        }
+
+        // Populate the manifest hash with the files in /res using macro magic
         var manifest = new Manifest();
         flambe.macro.ManifestBuilder.populateManifest(manifest);
         return manifest;
     }
+
+    /** If true, blit loaded images to a canvas and use that as the texture. */
+    private static var CANVAS_TEXTURES :Bool;
 
     private static var MANIFEST = createManifest();
 

@@ -21,7 +21,6 @@ var flambe = (function () {
             var pref = args["flambe-platform"];
             var flashVersion = "10";
 
-            // :)
             if ((pref == null || pref == "flash")
                     && swfobject.hasFlashPlayerVersion(flashVersion)) {
                 swfobject.embedSWF(appName + ".swf", elementId,
@@ -34,6 +33,12 @@ var flambe = (function () {
                 if ("getContext" in canvas) {
                     canvas.width = width;
                     canvas.height = height;
+
+                    // Browser optimization hints
+                    canvas.setAttribute("moz-opaque", "true");
+                    // canvas.style.webkitTransform = "translateZ(0)";
+                    // canvas.style.backgroundColor = "#000";
+
                     var content = document.getElementById(elementId);
                     content.appendChild(canvas);
 

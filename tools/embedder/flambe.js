@@ -8,9 +8,6 @@
 var flambe = (function () {
     return {
         embed: function (appName, elementId, width, height) {
-            width = Math.min(window.innerWidth, width);
-            height = Math.min(window.innerHeight, height);
-
             var args = {};
             var pairs = window.location.search.substr(1).split("&");
             for (var ii = 0; ii < pairs.length; ++ii) {
@@ -24,7 +21,10 @@ var flambe = (function () {
             if ((pref == null || pref == "flash")
                     && swfobject.hasFlashPlayerVersion(flashVersion)) {
                 swfobject.embedSWF(appName + ".swf", elementId,
-                    width, height, flashVersion, null, {}, {
+                    Math.min(window.innerWidth, width),
+                    Math.min(window.innerHeight, height),
+                    flashVersion, null, {}, {
+                        allowFullScreen: "true",
                         fullscreenOnSelection: "true"
                     });
 
@@ -53,12 +53,17 @@ var flambe = (function () {
                     content.appendChild(script);
                 }
 
+                var repack = function () {
+                    window.scrollTo(0, 0);
+                    canvas.width = Math.min(window.innerWidth, width);
+                    canvas.height = Math.min(window.innerHeight, height);
+                };
+                window.addEventListener("orientationchange", repack, true);
+                repack();
+
             } else {
                 throw new Error("Unrecognized platform: " + pref);
             }
-
-            // Hide the chrome on mobile browsers. Sometimes.
-            window.scrollTo(0, 1);
         }
     };
 })();

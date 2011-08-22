@@ -91,6 +91,8 @@ class HtmlAppDriver
                 // We're already handling a finger
                 return;
             }
+            Lib.window.scrollTo(0, 0);
+
             var touch = event.changedTouches[0];
             touchId = touch.identifier;
             Input.mouseDown.emit(createMouseEvent(touch));
@@ -101,6 +103,9 @@ class HtmlAppDriver
         }, false);
         _canvas.addEventListener("touchend", onTouchEnd, false);
         _canvas.addEventListener("touchcancel", onTouchEnd, false);
+
+        // Hide the status bar on Mobile Safari
+        Lib.window.scrollTo(0, 0);
     }
 
     public function loadAssetPack (url :String) :AssetPackLoader

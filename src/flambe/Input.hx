@@ -16,9 +16,9 @@ class Input
 
     // TODO: These fields are temporary. While it would be handy to record the mouse state for
     // polling, we want a system that works similarly with touch events too.
-    public static var isMouseDown :Bool;
-    public static var mouseX :Float;
-    public static var mouseY :Float;
+    public static var isMouseDown (default, null) :Bool;
+    public static var mouseX (default, null) :Float;
+    public static var mouseY (default, null) :Float;
 
     private static function onMouseDown (event :MouseEvent)
     {

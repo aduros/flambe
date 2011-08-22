@@ -115,7 +115,10 @@ class Glyph
 
     public function draw (ctx :DrawingContext, destX :Float, destY :Float)
     {
-        ctx.drawSubImage(page, destX + xOffset, destY + yOffset, x, y, width, height);
+        // Avoid drawing whitespace
+        if (width > 0) {
+            ctx.drawSubImage(page, destX + xOffset, destY + yOffset, x, y, width, height);
+        }
     }
 }
 

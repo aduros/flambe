@@ -15,12 +15,12 @@ using flambe.util.Iterables;
 
 class Build
 {
-    @:macro public static function buildComponent ()
+    @:macro
+    public static function buildComponent () :Array<Field>
     {
         var pos = Context.currentPos();
         var cl = Context.getLocalClass().get();
 
-        // TODO: Putting this in a file and using haxe.Template would be sweet
         var code =
             "var static__inline__NAME :String = '" + getComponentName(cl) + "';" +
 
@@ -36,7 +36,8 @@ class Build
                 "return NAME;" +
             "}";
 
-        return Context.parse("{" + code + "}", pos);
+        var fields = Macros.buildFields(code);
+        return Context.getBuildFields().concat(fields);
     }
 
 #if macro

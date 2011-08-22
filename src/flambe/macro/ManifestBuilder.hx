@@ -16,6 +16,9 @@ using Lambda;
 using StringTools;
 #end
 
+/**
+ * Creates the asset manifest from the files in /res
+ */
 class ManifestBuilder
 {
     @:macro
@@ -53,6 +56,7 @@ class ManifestBuilder
     }
 
 #if macro
+    // TODO: Use Context.makeExpr in haxe 2.08
     public static function string (str :String) :Expr
     {
         return exprOf(EConst(CString(str)));

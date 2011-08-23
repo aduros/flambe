@@ -12,6 +12,7 @@ import flash.geom.ColorTransform;
 import flash.geom.Matrix;
 import flash.geom.Point;
 import flash.geom.Rectangle;
+import flash.Lib;
 
 import haxe.FastList;
 
@@ -101,7 +102,8 @@ class FlashDrawingContext
     {
         beginGraphics();
 
-        _graphics.beginBitmapFill(texture);
+        var flashTexture = Lib.as(texture, FlashTexture);
+        _graphics.beginBitmapFill(flashTexture.bitmapData);
         _graphics.drawRect(x, y, width, height);
     }
 
@@ -161,6 +163,7 @@ class FlashDrawingContext
     {
         flushGraphics();
 
+        var flashTexture = Lib.as(texture, FlashTexture);
         var state = getTopState();
         var matrix = state.matrix;
 
@@ -170,9 +173,9 @@ class FlashDrawingContext
                 && state.color == null) {
 
             if (sourceRect == null) {
-                sourceRect = new Rectangle(0, 0, texture.width, texture.height);
+                sourceRect = new Rectangle(0, 0, flashTexture.width, flashTexture.height);
             }
-            _buffer.copyPixels(texture,
+            _buffer.copyPixels(flashTexture.bitmapData,
                 sourceRect, new Point(matrix.tx + destX, matrix.ty + destY));
 
         } else {
@@ -186,13 +189,14 @@ class FlashDrawingContext
                 // (contrary to the docs, clipRect is relative to the target, not the source)
                 if (sourceRect.width > 0 && sourceRect.height > 0) {
                     var scratch = new BitmapData(
-                        Std.int(sourceRect.width), Std.int(sourceRect.height), texture.transparent);
-                    scratch.copyPixels(texture, sourceRect, new Point(0, 0));
+                        Std.int(sourceRect.width), Std.int(sourceRect.height),
+                        flashTexture.bitmapData.transparent);
+                    scratch.copyPixels(flashTexture.bitmapData, sourceRect, new Point(0, 0));
                     _buffer.draw(scratch, matrix, state.color, null, null, true);
                     scratch.dispose();
                 }
             } else {
-                _buffer.draw(texture, matrix, state.color, null, null, true);
+                _buffer.draw(flashTexture.bitmapData, matrix, state.color, null, null, true);
             }
             if (copy != null) {
                 state.matrix = copy;

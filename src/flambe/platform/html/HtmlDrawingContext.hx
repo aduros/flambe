@@ -43,21 +43,27 @@ class HtmlDrawingContext
 
     public function drawImage (texture :Texture, x :Float, y :Float)
     {
-        _canvasCtx.drawImage(texture, x, y);
+        var htmlTexture :HtmlTexture = cast texture;
+        _canvasCtx.drawImage(htmlTexture.image, x, y);
     }
 
     public function drawSubImage (texture :Texture, destX :Float, destY :Float,
         sourceX :Float, sourceY :Float, sourceW :Float, sourceH :Float)
     {
-        _canvasCtx.drawImage(texture, FMath.toInt(sourceX), FMath.toInt(sourceY),
+        var htmlTexture :HtmlTexture = cast texture;
+        _canvasCtx.drawImage(htmlTexture.image, FMath.toInt(sourceX), FMath.toInt(sourceY),
             FMath.toInt(sourceW), FMath.toInt(sourceH),
             FMath.toInt(destX), FMath.toInt(destY), FMath.toInt(sourceW), FMath.toInt(sourceH));
     }
 
     public function drawPattern (texture :Texture, x :Float, y :Float, width :Float, height :Float)
     {
-        // TODO(bruno): CanvasPattern support
-        _canvasCtx.fillStyle = "#660000";
+        var htmlTexture :HtmlTexture = cast texture;
+
+        if (htmlTexture.pattern == null) {
+            htmlTexture.pattern = _canvasCtx.createPattern(htmlTexture.image, "repeat");
+        }
+        _canvasCtx.fillStyle = htmlTexture.pattern;
         _canvasCtx.fillRect(FMath.toInt(x), FMath.toInt(y),
             FMath.toInt(width), FMath.toInt(height));
     }

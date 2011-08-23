@@ -68,16 +68,18 @@ class HtmlAssetPackLoader
                 // TODO(bruno): Uncomment this if content hashing is ever added
                 // image.validate = "never";
                 image.onload = function (_) {
+                    var texture = new HtmlTexture();
                     if (CANVAS_TEXTURES) {
                         var canvas :Dynamic = Lib.document.createElement("canvas");
                         canvas.width = image.width;
                         canvas.height = image.height;
                         canvas.getContext("2d").drawImage(image, 0, 0);
                         image = null; // Free it up
-                        self.handleLoad(file, canvas);
+                        texture.image = canvas;
                     } else {
-                        self.handleLoad(file, image);
+                        texture.image = image;
                     }
+                    self.handleLoad(file, texture);
                 };
                 image.onerror = function (_) {
                     self.handleError(file);

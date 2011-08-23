@@ -23,7 +23,9 @@ class FlashAssetPack
 
     public function loadTexture (file :String) :Texture
     {
-        return Type.createInstance(getDefinition(file), []);
+        var texture = new FlashTexture();
+        texture.bitmapData = Type.createInstance(getDefinition(file), []);
+        return texture;
     }
 
     public function loadFile (file :String) :String

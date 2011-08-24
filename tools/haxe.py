@@ -19,11 +19,10 @@ def configure(self):
 
     self.find_program("haxe", var="HAXE", path_list=path)
 
-    if not self.env["HAXE"]: self.fatal("haXe compiler not found!")
-
 # Borrowed from the scalac task
 class haxe(Task.Task):
     color = "BLUE"
+    vars = [ "flags" ] # Depend on these env var as inputs
 
     def scan(self):
         sources = []
@@ -43,10 +42,10 @@ class haxe(Task.Task):
             if isinstance(xx, str): return [xx]
             return xx
         self.last_cmd = lst = []
-        lst.extend(to_list(env["HAXE"]))
+        lst.extend(to_list(env.HAXE))
         for cp in self.classpath:
             lst.extend(["-cp", cp.abspath()])
-        lst.extend(self.flags)
+        lst.extend(self.env.flags)
         return self.generator.bld.exec_command(lst, cwd=wd, env=env.env or None)
 
     def __str__(self):
@@ -83,5 +82,5 @@ def apply_haxe(self):
 
     task = self.create_task("haxe", inputs, self.path.get_bld().make_node(target))
     task.classpath = [self.path.find_node(cp) for cp in classpath]
-    task.flags = flags
+    task.env.flags = flags
     self.haxe_task = task

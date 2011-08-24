@@ -12,17 +12,21 @@ def options(ctx):
 
 def configure(ctx):
     ctx.load("haxe", tooldir=FLAMBE_ROOT+"/tools")
+    ctx.find_program("java", var="JAVA")
+    ctx.find_program("neko", var="NEKO")
     ctx.env.debug = ctx.options.debug
 
 @feature("flambe")
 def apply_flambe(ctx):
     flags = ["-main", ctx.main]
+    debug = ctx.env.debug
     hasBootstrap = ctx.path.find_dir("res/bootstrap")
+    closure = ctx.bld.path.find_resource(FLAMBE_ROOT+"/tools/closure.jar")
 
     flash_flags = "-swf-header 640:480:60:ffffff".split()
     html_flags = "-D html --macro flambe.macro.BrowserJSGenerator.use()".split()
 
-    if ctx.env.debug:
+    if debug:
         flags += "-D debug --no-opt --no-inline".split()
         # Only generate line numbers for Flash. The stack -debug creates for JS isn't too useful
         flash_flags += ["-debug"]
@@ -34,12 +38,26 @@ def apply_flambe(ctx):
         flags=flags + flash_flags,
         swflib="bootstrap.swf" if hasBootstrap else None,
         target="app.swf")
-    ctx.bld.install_files("deploy/web", "app.swf");
+    ctx.bld.install_files("deploy/web", "app.swf")
 
     ctx.bld(features="haxe", classpath=["src", FLAMBE_ROOT+"/src"],
         flags=flags + html_flags,
-        target="app-html.js")
-    ctx.bld.install_files("deploy/web", "app-html.js");
+        target="app-html.js" if debug else "app-html.uncompressed.js")
+    if not debug:
+        import textwrap
+        wrapper = textwrap.dedent("""\
+            /**
+             * Cooked with Flambe
+             * https://github.com/aduros/flambe
+             */
+            %%output%%""")
+        # TODO(bruno): Higher compilation levels break the app because haXe uses eval in places.
+        # Submit an issue/patch upstream.
+        ctx.bld(rule=("%s -jar '%s' --js ${SRC} --js_output_file ${TGT} " +
+            "--output_wrapper  '%s' --compilation_level WHITESPACE_ONLY --warning_level QUIET") %
+                (ctx.env.JAVA, closure.abspath(), wrapper),
+            source="app-html.uncompressed.js", target="app-html.js")
+    ctx.bld.install_files("deploy/web", "app-html.js")
 
     res = ctx.path.find_dir("res")
     if res is not None:
@@ -49,7 +67,7 @@ def apply_flambe(ctx):
             libs="format",
             target="packager.n")
         # -interp because neko JIT is unstable...
-        ctx.bld(rule="neko -interp ${SRC} " + res.abspath() + " .",
+        ctx.bld(rule="%s -interp ${SRC} %s ." % (ctx.env.NEKO, res.abspath()),
             source="packager.n", target= "bootstrap.swf" if hasBootstrap else None)
 
         # Force a rebuild when anything in res/ has been updated
@@ -61,11 +79,11 @@ def apply_flambe(ctx):
         ctx.bld.install_files("deploy/web", assets, cwd=res, relative_trick=True)
 
     # Compile the embedder script
-    closure = ctx.bld.path.find_resource(FLAMBE_ROOT+"/tools/closure.jar");
     scripts = ctx.bld.path.find_dir(FLAMBE_ROOT+"/tools/embedder").ant_glob("*.js")
-    ctx.bld(rule="java -jar '" + closure.abspath() + "' " +
-        " ".join(["--js '" + script.abspath() + "'" for script in scripts]) +
-        " --js_output_file ${TGT}", target="flambe.js");
+    ctx.bld(rule="%s -jar '%s' %s --js_output_file ${TGT}" %
+        (ctx.env.JAVA, closure.abspath(),
+        " ".join(["--js '" + script.abspath() + "'" for script in scripts]),
+        ), target="flambe.js")
     for script in scripts:
         ctx.bld.add_manual_dependency("flambe.js", script)
     ctx.bld.install_files("deploy/web", "flambe.js")
@@ -76,7 +94,7 @@ def apply_flambe(ctx):
             ctx.bld.path.find_resource(FLAMBE_ROOT+"/tools/embedder/index.html"))
 
     # Also install any other files in /web
-    ctx.bld.install_files("deploy", ctx.path.ant_glob("web/**/*"), relative_trick=True);
+    ctx.bld.install_files("deploy", ctx.path.ant_glob("web/**/*"), relative_trick=True)
 
 @feature("flambe-server")
 def apply_flambe_server(ctx):
@@ -92,9 +110,10 @@ def apply_flambe_server(ctx):
 
     ctx.bld(features="haxe", classpath=["src", FLAMBE_ROOT+"/src"],
         flags=flags, target="server.js")
-    ctx.bld.install_files("deploy", "server.js");
-    ctx.bld.install_files("deploy", ctx.path.ant_glob("etc/**/*"), relative_trick=True);
-    ctx.bld.add_post_fun(restart_server);
+    ctx.bld.install_files("deploy", "server.js")
+    ctx.bld.install_files("deploy", ctx.path.ant_glob("etc/**/*"), relative_trick=True)
+    if ctx.bld.cmd == "install":
+        ctx.bld.add_post_fun(restart_server)
 
 # Run the app in a Flash player
 def flash_test(ctx):
@@ -111,9 +130,9 @@ SERVER_PID = "/tmp/flambe-server.pid"
 # Spawns a development server for testing
 def server(ctx):
     from subprocess import Popen
-    print("Restart the server using 'waf restart_server' or 'kill `cat %s`." % SERVER_PID);
+    print("Restart the server using 'waf restart_server' or 'kill `cat %s`." % SERVER_PID)
     while True:
-        p = Popen(["node", "deploy/server.js"]);
+        p = Popen(["node", "deploy/server.js"])
         with open(SERVER_PID, "w") as file:
             file.write(str(p.pid))
         p.wait()
@@ -126,6 +145,6 @@ def restart_server(ctx):
     try:
         with open(SERVER_PID, "r") as file:
             os.kill(int(file.read()), signal.SIGTERM)
-    except IOError as e:
+    except (IOError, OSError):
         pass
 Context.g_module.__dict__["restart_server"] = restart_server

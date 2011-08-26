@@ -12,6 +12,7 @@ import haxe.macro.Expr;
 import haxe.macro.Context;
 import haxe.macro.Type;
 
+using flambe.macro.Macros;
 using Lambda;
 using StringTools;
 #end
@@ -26,7 +27,7 @@ class ManifestBuilder
     {
         var assetDir = "../res/";
         var exprs :Array<Expr> = [];
-        var set = exprOf(EField(manifest, "set"));
+        var setter = EField(manifest, "set").toExpr();
 
         for (packName in readDirectoryNoHidden(assetDir)) {
             var entries :Array<Expr> = [];
@@ -39,35 +40,24 @@ class ManifestBuilder
 
                     // Assemble the object literal for this file
                     var fileObject = exprOf(EObjectDecl([
-                        { field: "name", expr: string(name) },
-                        { field: "url", expr: string(url) },
-                        { field: "type", expr: exprOf(EConst(CIdent(type))) },
-                        { field: "bytes", expr: int(bytes) }
+                        { field: "name", expr: name.toExpr() },
+                        { field: "url", expr: url.toExpr() },
+                        { field: "type", expr: EConst(CIdent(type)).toExpr() },
+                        { field: "bytes", expr: bytes.toExpr() }
                     ]));
                     entries.push(fileObject);
                 }
 
                 // Build a pack with a list of file entries
-                exprs.push(exprOf(ECall(set, [ string(packName), array(entries) ])));
+                exprs.push(ECall(setter, [ packName.toExpr(),
+                    EArrayDecl(entries).toExpr() ]).toExpr());
             }
         }
 
-        return exprOf(EBlock(exprs));
+        return EBlock(exprs).toExpr();
     }
 
 #if macro
-    // TODO: Use Context.makeExpr in haxe 2.08
-    public static function string (str :String) :Expr
-    {
-        return exprOf(EConst(CString(str)));
-    }
-
-    public static function int (n :Int) :Expr
-    {
-        // OMFG
-        return exprOf(EConst(CInt(Std.string(n))));
-    }
-
     public static function array (arr :Array<Expr>) :Expr
     {
         return exprOf(EArrayDecl(arr));

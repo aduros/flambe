@@ -12,11 +12,23 @@ import haxe.macro.Expr;
 import haxe.macro.Context;
 import haxe.macro.Type;
 
+// 'using' of import, because Type conflicts with haxe.macro.Type. hrmm.
+using Type;
+
 /**
  * Utilities for haXe compiler macros.
  */
 class Macros
 {
+    public static function toExpr (object :Dynamic) :Expr
+    {
+        var pos = Context.currentPos();
+        if (object.getEnum() == ExprDef) {
+            return { expr: object, pos: pos };
+        }
+        return Context.makeExpr(object, pos);
+    }
+
     /**
      * Creates a list of fields from a source code string.
      */

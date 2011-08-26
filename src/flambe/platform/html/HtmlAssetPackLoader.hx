@@ -61,7 +61,6 @@ class HtmlAssetPackLoader
 
     private function loadFile (file :FileEntry)
     {
-        var self = this;
         switch (file.type) {
             case Image:
                 var image :Image = untyped __js__ ("new Image()");
@@ -79,20 +78,20 @@ class HtmlAssetPackLoader
                     } else {
                         texture.image = image;
                     }
-                    self.handleLoad(file, texture);
+                    handleLoad(file, texture);
                 };
                 image.onerror = function (_) {
-                    self.handleError(file);
+                    handleError(file);
                 };
                 image.src = file.url;
 
             case Data:
                 var http = new Http(file.url);
                 http.onData = function (data) {
-                    self.handleLoad(file, data);
+                    handleLoad(file, data);
                 };
                 http.onError = function (details) {
-                    self.handleError(file, details);
+                    handleError(file, details);
                 };
                 http.request(false);
         }

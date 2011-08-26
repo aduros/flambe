@@ -19,7 +19,6 @@ class NodeRemoting
             return false;
         }
 
-        var self = this;
         req.addListener("data", function (buffer) {
             var relay = new NodeRelay(req);
             relay.success = function (data :Dynamic) {
@@ -47,7 +46,7 @@ class NodeRemoting
                 var path = u.unserialize();
                 var args :Array<Dynamic> = u.unserialize();
                 args.push(relay);
-                self._ctx.call(path,args);
+                _ctx.call(path,args);
             } catch (e :Dynamic) {
                 relay.error(e);
             }

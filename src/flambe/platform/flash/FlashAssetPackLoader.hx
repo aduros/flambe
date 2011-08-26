@@ -56,7 +56,6 @@ class FlashAssetPackLoader
             new Loader().contentLoaderInfo;
         }
 
-        var self = this;
         _loaderInfo.addEventListener(Event.COMPLETE, onComplete);
         _loaderInfo.addEventListener(ProgressEvent.PROGRESS, onProgress);
         _loaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onError);

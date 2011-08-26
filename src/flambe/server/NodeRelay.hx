@@ -48,15 +48,14 @@ class NodeRelay<T>
      */
     public function chain<A> (f :A -> Void) :NodeCallback<A>
     {
-        var self = this;
         return function (err, x :A) {
             if (err != null) {
-                self.error(err);
+                error(err);
             } else {
                 try {
                     f(x);
                 } catch (e :Dynamic) {
-                    self.error(e);
+                    error(e);
                 }
             }
         }

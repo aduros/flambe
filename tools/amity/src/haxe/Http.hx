@@ -27,16 +27,15 @@ class Http
 
     public function request (post :Bool) :Void
     {
-        var self = this;
         var req = amity.Net.createHttpRequest(url);
         req.onStatus = function (status) {
-            self.onStatus(status);
+            onStatus(status);
         };
         req.onComplete = function (data) {
-            self.onData(data);
-	};
-	req.onError = function (msg) {
-	    self.onError(msg);
+            onData(data);
+        };
+        req.onError = function (msg) {
+            onError(msg);
         };
         for (header in _headers.keys()) {
             req.setHeader(header, _headers.get(header));

@@ -133,31 +133,29 @@ private class ConfigParser
 
     public function keywords () :Iterator<String>
     {
-        var self = this;
         var text = _configText;
         return {
             next: function () {
-                text = advance(text, self._keywordPattern);
-                self._pairText = self._keywordPattern.matched(2);
-                return self._keywordPattern.matched(1);
+                text = advance(text, _keywordPattern);
+                _pairText = _keywordPattern.matched(2);
+                return _keywordPattern.matched(1);
             },
             hasNext: function () {
-                return self._keywordPattern.match(text);
+                return _keywordPattern.match(text);
             }
         };
     }
 
     public function pairs () :Iterator<ConfigPair>
     {
-        var self = this;
         var text = _pairText;
         return {
             next: function () {
-                text = advance(text, self._pairPattern);
-                return new ConfigPair(self._pairPattern.matched(1), self._pairPattern.matched(2));
+                text = advance(text, _pairPattern);
+                return new ConfigPair(_pairPattern.matched(1), _pairPattern.matched(2));
             },
             hasNext: function () {
-                return self._pairPattern.match(text);
+                return _pairPattern.match(text);
             }
         };
     }

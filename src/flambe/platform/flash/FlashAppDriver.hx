@@ -15,6 +15,7 @@ import flash.events.MouseEvent;
 import flash.Lib;
 import flash.net.SharedObject;
 import flash.system.Capabilities;
+import flash.ui.ContextMenu;
 import flash.ui.Mouse;
 
 import flambe.asset.AssetPackLoader;
@@ -57,6 +58,11 @@ class FlashAppDriver
             // Probably running in a mobile browser
             stage.addEventListener(MouseEvent.MOUSE_DOWN, handleFullScreen);
         }
+
+        // Hide the junk in the right click menu
+        var menu = new ContextMenu();
+        menu.hideBuiltInItems();
+        Lib.current.contextMenu = menu;
 
         _lastUpdate = Lib.getTimer();
     }

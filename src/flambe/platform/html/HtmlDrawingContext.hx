@@ -77,7 +77,7 @@ class HtmlDrawingContext
 
     public function multiplyAlpha (factor :Float)
     {
-        _canvasCtx.alpha *= factor;
+        _canvasCtx.globalAlpha *= factor;
     }
 
     private var _canvasCtx :Dynamic;

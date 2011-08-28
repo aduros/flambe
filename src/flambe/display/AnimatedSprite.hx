@@ -38,6 +38,7 @@ class AnimatedSprite extends Sprite
         this.texture = texture;
         _frameWidth = FMath.toInt(texture.width / framesWide);
         _frameHeight = FMath.toInt(texture.height / framesHigh);
+        _frame = -1;
         setFrame(0);
     }
 
@@ -116,7 +117,7 @@ class AnimatedSprite extends Sprite
         var x = frame*_frameWidth;
         _frameX = x % texture.width;
         _frameY = _frameHeight * FMath.toInt(x / texture.width);
-        _frame = _frameWidth;
+        _frame = frame;
     }
 
     private var _elapsed :Int;

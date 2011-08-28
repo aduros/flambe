@@ -11,6 +11,7 @@ interface DrawingContext
     function scale (x :Float, y :Float) :Void;
     function rotate (rotation :Float) :Void;
     function multiplyAlpha (factor :Float) :Void;
+    function setBlendMode (blendMode :BlendMode) :Void;
     function restore () :Void;
 
     function drawImage (texture :Texture, destX :Float, destY :Float) :Void;

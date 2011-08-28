@@ -66,4 +66,9 @@ class AmityDrawingContext
     {
         Canvas.multiplyAlpha(factor);
     }
+
+    public function setBlendMode (blendMode :BlendMode)
+    {
+        // Unimplemented
+    }
 }

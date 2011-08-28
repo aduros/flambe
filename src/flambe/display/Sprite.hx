@@ -18,6 +18,8 @@ class Sprite extends Component
     public var anchorY (default, null) :PFloat;
     public var visible (default, null) :PBool;
 
+    public var blendMode :BlendMode;
+
     public var mouseDown (default, null) :Signal1<MouseEvent>;
     public var mouseMove (default, null) :Signal1<MouseEvent>;
     public var mouseUp (default, null) :Signal1<MouseEvent>;
@@ -28,9 +30,11 @@ class Sprite extends Component
         this.anchorX = new PFloat(0, dirtyMatrix);
         this.anchorY = new PFloat(0, dirtyMatrix);
         this.visible = new PBool(true);
+        this.blendMode = null;
         this.mouseDown = new NotifyingSignal1(this);
         this.mouseMove = new NotifyingSignal1(this);
         this.mouseUp = new NotifyingSignal1(this);
+
         _viewMatrix = new Matrix();
         _listenerCount = 0;
     }

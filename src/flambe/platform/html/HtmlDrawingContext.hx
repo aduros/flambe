@@ -4,6 +4,7 @@
 
 package flambe.platform.html;
 
+import flambe.display.BlendMode;
 import flambe.display.DrawingContext;
 import flambe.display.Texture;
 import flambe.math.FMath;
@@ -79,6 +80,16 @@ class HtmlDrawingContext
     public function multiplyAlpha (factor :Float)
     {
         _canvasCtx.globalAlpha *= factor;
+    }
+
+    public function setBlendMode (blendMode :BlendMode)
+    {
+        var op;
+        switch (blendMode) {
+            case Normal: op = "source-over";
+            case Add: op = "lighter";
+        };
+        _canvasCtx.globalCompositeOperation = op;
     }
 
     private var _canvasCtx :Dynamic;

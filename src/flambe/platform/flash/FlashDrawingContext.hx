@@ -16,6 +16,7 @@ import flash.Lib;
 
 import haxe.FastList;
 
+import flambe.display.BlendMode;
 import flambe.display.DrawingContext;
 import flambe.display.Texture;
 import flambe.math.FMath;
@@ -41,6 +42,7 @@ class FlashDrawingContext
             var state = getTopState();
             copy.matrix = state.matrix.clone();
             copy.color = state.color;
+            copy.blendMode = state.blendMode;
         }
 
         _stack.add(copy);
@@ -115,8 +117,8 @@ class FlashDrawingContext
         var state = getTopState();
         var matrix = state.matrix;
 
-        // Does this matrix not involve rotation?
-        if (matrix.b == 0 && matrix.c == 0) {
+        // Does this matrix not involve rotation or blending?
+        if (matrix.b == 0 && matrix.c == 0 && state.blendMode == null) {
             var scaleX = matrix.a;
             var scaleY = matrix.d;
             var rect = new Rectangle(matrix.tx + x*scaleX, matrix.ty + y*scaleY,
@@ -144,7 +146,7 @@ class FlashDrawingContext
             localMatrix.translate(x, y);
             localMatrix.concat(matrix);
             _pixel.setPixel(0, 0, color);
-            _buffer.draw(_pixel, localMatrix, state.color);
+            _buffer.draw(_pixel, localMatrix, state.color, state.blendMode);
         }
     }
 
@@ -160,6 +162,15 @@ class FlashDrawingContext
         }
     }
 
+    public function setBlendMode (blendMode :BlendMode)
+    {
+        var state = getTopState();
+        switch (blendMode) {
+            case Normal: state.blendMode = null;
+            case Add: state.blendMode = flash.display.BlendMode.ADD;
+        };
+    }
+
     private function blit (texture :Texture, destX :Float, destY :Float, sourceRect :Rectangle)
     {
         flushGraphics();
@@ -171,7 +182,7 @@ class FlashDrawingContext
         // Use the faster copyPixels() if possible
         // TODO: Use approximately equals?
         if (matrix.a == 1 && matrix.b == 0 && matrix.c == 0 && matrix.d == 1
-                && state.color == null) {
+                && state.color == null && state.blendMode == null) {
 
             if (sourceRect == null) {
                 sourceRect = new Rectangle(0, 0, flashTexture.width, flashTexture.height);
@@ -193,11 +204,12 @@ class FlashDrawingContext
                         Std.int(sourceRect.width), Std.int(sourceRect.height),
                         flashTexture.bitmapData.transparent);
                     scratch.copyPixels(flashTexture.bitmapData, sourceRect, new Point(0, 0));
-                    _buffer.draw(scratch, matrix, state.color, null, null, true);
+                    _buffer.draw(scratch, matrix, state.color, state.blendMode, null, true);
                     scratch.dispose();
                 }
             } else {
-                _buffer.draw(flashTexture.bitmapData, matrix, state.color, null, null, true);
+                _buffer.draw(flashTexture.bitmapData, matrix,
+                    state.color, state.blendMode, null, true);
             }
             if (copy != null) {
                 state.matrix = copy;
@@ -205,7 +217,7 @@ class FlashDrawingContext
         }
     }
 
-    inline private function getTopState ()
+    inline private function getTopState () :DrawingState
     {
         return _stack.head.elt;
     }
@@ -215,7 +227,7 @@ class FlashDrawingContext
         // If we're in vector graphics mode, push it out to the screen buffer
         if (_graphics != null) {
             var state = getTopState();
-            _buffer.draw(_shape, state.matrix, state.color, null, null, true);
+            _buffer.draw(_shape, state.matrix, state.color, state.blendMode, null, true);
             _graphics.clear();
             _graphics = null;
         }
@@ -245,6 +257,7 @@ private class DrawingState
 {
     public var matrix :Matrix;
     public var color :ColorTransform;
+    public var blendMode :flash.display.BlendMode;
 
     public function new () { }
 }

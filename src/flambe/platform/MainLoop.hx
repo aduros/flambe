@@ -93,6 +93,10 @@ private class DrawVisitor
             _drawCtx.multiplyAlpha(n1);
         }
 
+        if (sprite.blendMode != null) {
+            _drawCtx.setBlendMode(sprite.blendMode);
+        }
+
         var transform = entity.get(Transform);
         n1 = transform.x.get();
         var n2 = transform.y.get();

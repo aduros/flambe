@@ -58,7 +58,7 @@ var flambe = (function () {
                     canvas.width = Math.min(window.innerWidth, width);
                     canvas.height = Math.min(window.innerHeight, height);
                 };
-                window.addEventListener("orientationchange", repack, true);
+                window.addEventListener("orientationchange", repack, false);
                 repack();
 
             } else {

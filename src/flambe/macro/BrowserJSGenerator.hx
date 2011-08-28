@@ -32,9 +32,9 @@ class BrowserJSGenerator extends DefaultJSGenerator
 		print("js.Boot.__res = {}");
 		newline();
 		if( Context.defined("debug") ) {
-			DefaultJSGenerator.fprint("%(api.stackVar) = []");
+			DefaultJSGenerator.fprint("var %(api.stackVar) = []"); // Tweak
 			newline();
-			DefaultJSGenerator.fprint("%(api.excVar) = []");
+			DefaultJSGenerator.fprint("var %(api.excVar) = []"); // Tweak
 			newline();
 		}
 		print("js.Boot.__init()");

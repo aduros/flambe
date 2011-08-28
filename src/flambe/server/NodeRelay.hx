@@ -11,53 +11,76 @@ package flambe.server;
 typedef NodeCallback<A> = Dynamic -> A -> Void;
 
 /**
- * Manages control flow for Node-style callbacks. Propagates the occurrence of
- * an error parameter to error(), and handles uncaught exceptions too. Quite
- * handy for remoting.
+ * Manages control flow in heavily asynchronous apps. Propagates NodeCallback errors and uncaught
+ * exceptions up to error().
  *
  * <code>
- * var rsp :NodeRelay<String>;
+ * var relay :NodeRelay<String>;
  * // ...
- * db.doAsyncOperation(rsp.chain(function (result) {
+ * myLib.doAsyncOperation(relay.chain(function (result) {
  *     if (!validateResult(result)) {
- *         throw new Error("Validation failed");
+ *         throw "Validation failed";
  *     }
- *     db.moarAsync(rsp.chain(function (result) {
- *         rsp.success(result.name);
+ *     db.moarAsync(relay.nodeCallback(function (result) {
+ *         relay.success(result.name);
  *     }));
  * }));
  * </code>
  */
 class NodeRelay<T>
 {
-    /**
-     * The HTTP request this relay originated from.
-     */
-    public var request (default, null) :Dynamic;
+    public var onSuccess (null, default) :T -> Void;
+    public var onError (null, default) :Dynamic -> Void;
 
-    public function new (request :Dynamic)
+    public function new (onSuccess :T -> Void)
     {
-        this.request = request;
+        this.onSuccess = onSuccess;
     }
 
-    public dynamic function success (result :T) { }
-    public dynamic function error (err :Dynamic) { }
+    public function success (result :T)
+    {
+        try {
+            onSuccess(result);
+        } catch (e :Dynamic) {
+            error(e);
+        }
+    }
+
+    public function error (err :Dynamic)
+    {
+        if (onError != null) {
+            onError(err);
+        }
+    }
+
+    public function chain<A> (handler :A -> Void) :NodeRelay<A>
+    {
+        var relay = new NodeRelay(handler);
+        relay.onError = this.onError;
+        return relay;
+    }
 
     /**
-     * Wraps a callback around a Node-style callback that does the right thing
+     * Many libraries use Node-style callbacks, this creates a NodeCallback compatible with them
+     * that works with this relay's error handling.
      */
-    public function chain<A> (f :A -> Void) :NodeCallback<A>
+    public function nodeCallback<A> (handler :A -> Void) :NodeCallback<A>
     {
         return function (err, x :A) {
             if (err != null) {
                 error(err);
             } else {
                 try {
-                    f(x);
+                    handler(x);
                 } catch (e :Dynamic) {
                     error(e);
                 }
             }
-        }
+        };
+    }
+
+    public function nodeCallback0 () :NodeCallback<T>
+    {
+        return nodeCallback(onSuccess);
     }
 }

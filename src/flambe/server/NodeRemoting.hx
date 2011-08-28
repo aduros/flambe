@@ -20,18 +20,17 @@ class NodeRemoting
         }
 
         req.addListener("data", function (buffer) {
-            var relay = new NodeRelay(req);
-            relay.success = function (data :Dynamic) {
+            var relay = new NodeRelay(function (data :Dynamic) {
                 var s = new haxe.Serializer();
                 s.serialize(data);
                 res.end("hxr" + s.toString());
-            };
-            relay.error = function (err :Dynamic) {
+            });
+            relay.onError = function (err :Dynamic) {
                 var message = (err.message != null) ? err.message : err;
                 var stack = err.stack;
 
-                // Log.info("Remoting error: " +
-                //     (err.stack != null ? message + "\n" + err.stack : message));
+                Node.puts("Remoting exception: " +
+                    (err.stack != null ? err.stack : message));
 
                 var s = new haxe.Serializer();
                 s.serializeException(message);

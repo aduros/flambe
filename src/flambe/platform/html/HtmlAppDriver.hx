@@ -140,6 +140,11 @@ class HtmlAppDriver
         return _storage;
     }
 
+    public function getLocale () :String
+    {
+        return untyped Lib.window.navigator.language;
+    }
+
     private var _canvas :Dynamic;
     private var _storage :Storage;
 }

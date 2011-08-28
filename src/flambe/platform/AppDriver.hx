@@ -18,4 +18,6 @@ interface AppDriver
     function getStageHeight () :Int;
 
     function getStorage () :Storage;
+
+    function getLocale () :String;
 }

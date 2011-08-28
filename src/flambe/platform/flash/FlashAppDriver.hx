@@ -95,6 +95,11 @@ class FlashAppDriver
         return _storage;
     }
 
+    public function getLocale () :String
+    {
+        return Capabilities.language;
+    }
+
     private function onMouseDown (event :MouseEvent)
     {
         Input.mouseDown.emit(createFlambeMouseEvent(event));

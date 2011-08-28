@@ -4,8 +4,6 @@
 
 package flambe.display;
 
-import flambe.platform.DrawingContext;
-
 class ImageSprite extends Sprite
 {
     public var texture :Texture;

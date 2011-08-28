@@ -6,6 +6,7 @@ package flambe.platform.amity;
 
 import amity.Canvas;
 
+import flambe.display.DrawingContext;
 import flambe.display.Texture;
 
 class AmityDrawingContext

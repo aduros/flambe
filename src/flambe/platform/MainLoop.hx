@@ -5,10 +5,11 @@
 package flambe.platform;
 
 import flambe.Component;
+import flambe.display.DrawingContext;
 import flambe.display.Sprite;
 import flambe.display.Transform;
-import flambe.scene.Director;
 import flambe.Entity;
+import flambe.scene.Director;
 import flambe.System;
 import flambe.Visitor;
 

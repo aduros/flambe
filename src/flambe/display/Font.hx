@@ -5,7 +5,6 @@
 package flambe.display;
 
 import flambe.asset.AssetPack;
-import flambe.platform.DrawingContext;
 
 using StringTools;
 

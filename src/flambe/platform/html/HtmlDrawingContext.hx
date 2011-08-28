@@ -4,6 +4,7 @@
 
 package flambe.platform.html;
 
+import flambe.display.DrawingContext;
 import flambe.display.Texture;
 import flambe.math.FMath;
 

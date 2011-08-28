@@ -9,7 +9,6 @@ import flambe.display.Transform;
 import flambe.display.Sprite;
 import flambe.math.Matrix;
 import flambe.math.FMath;
-import flambe.platform.DrawingContext;
 import flambe.util.Signal1;
 
 class Sprite extends Component

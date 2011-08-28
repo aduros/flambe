@@ -5,7 +5,6 @@
 package flambe.display;
 
 import flambe.math.FMath;
-import flambe.platform.DrawingContext;
 
 class Animation
 {

@@ -5,7 +5,6 @@
 package flambe.display;
 
 import flambe.display.Font;
-import flambe.platform.DrawingContext;
 
 class TextSprite extends Sprite
 {

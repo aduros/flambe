@@ -16,6 +16,7 @@ import flash.Lib;
 
 import haxe.FastList;
 
+import flambe.display.DrawingContext;
 import flambe.display.Texture;
 import flambe.math.FMath;
 

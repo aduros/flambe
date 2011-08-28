@@ -5,7 +5,6 @@
 package flambe.display;
 
 import flambe.animation.Property;
-import flambe.platform.DrawingContext;
 
 class PatternSprite extends Sprite
 {

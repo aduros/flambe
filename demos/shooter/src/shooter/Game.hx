@@ -38,9 +38,9 @@ class Game extends Component
         var water = new Entity()
             .add(new PatternSprite(ShooterCtx.pack.loadTexture("water.png")))
             .add(new WaterScroller(0.1/4));
-        water.get(PatternSprite).width.set(System.stageWidth);
-        water.get(PatternSprite).height.set(System.stageHeight+32);
-        water.get(Transform).y.set(-32);
+        water.get(PatternSprite).width._ = System.stageWidth;
+        water.get(PatternSprite).height._ = System.stageHeight+32;
+        water.get(Transform).y._ = -32;
         owner.addChild(water);
 
         var cloudLayer = new Entity().add(new Sprite()).add(new Script());
@@ -50,9 +50,9 @@ class Game extends Component
                 var texture = ShooterCtx.pack.loadTexture("cloud.png");
                 var cloud = new Entity().add(new ImageSprite(texture));
                 var t = cloud.get(Transform);
-                t.x.set(Math.random()*(System.stageWidth+texture.width) - texture.width);
-                t.y.set(-texture.height);
-                cloud.get(Sprite).alpha.set(0.8);
+                t.x._ = Math.random()*(System.stageWidth+texture.width) - texture.width;
+                t.y._ = -texture.height;
+                cloud.get(Sprite).alpha._ = 0.8;
                 cloudLayer.get(Script).run(new Sequence([
                     new AnimateTo(cloud.get(Transform).y, System.stageHeight, 3*Std.int(8000+2000*Math.random()), Easing.linear),
                     new CallFunction(cloud.dispose)
@@ -74,8 +74,8 @@ class Game extends Component
                    .add(new ImageSprite(ShooterCtx.pack.loadTexture("bullet.png")))
                    .add(new Bullet());
                bullet.get(Sprite).centerAnchor();
-               bullet.get(Transform).x.set(player.get(Transform).x.get());
-               bullet.get(Transform).y.set(player.get(Transform).y.get());
+               bullet.get(Transform).x._ = player.get(Transform).x._;
+               bullet.get(Transform).y._ = player.get(Transform).y._;
                flambe.System.root.addChild(bullet);
            }),
         ])));
@@ -85,8 +85,8 @@ class Game extends Component
                 return;
             }
             var t = player.get(Transform);
-            t.x.set(event.viewX);
-            t.y.set(event.viewY-100);
+            t.x._ = event.viewX;
+            t.y._ = event.viewY-100;
         });
         owner.addChild(player);
 
@@ -109,6 +109,9 @@ class Game extends Component
             .add(new Hull(20, 1))
             .add(new SwarmerAI());
         enemy.get(Sprite).centerAnchor();
+        enemy.get(Sprite).alpha.animate(0, 1, 2000);
+        enemy.get(Transform).scaleX.animate(0, 1, 2000);
+        enemy.get(Transform).scaleY.animate(0, 1, 2000);
         return enemy;
     }
 
@@ -119,8 +122,8 @@ class Game extends Component
             .add(new Hull(40, 5))
             .add(new BomberAI());
         enemy.get(Sprite).centerAnchor();
-        enemy.get(Transform).x.set(Math.random()*flambe.System.stageWidth);
-        enemy.get(Transform).y.set(-enemy.get(Sprite).getNaturalHeight()/2);
+        enemy.get(Transform).x._ = Math.random()*flambe.System.stageWidth;
+        enemy.get(Transform).y._ = -enemy.get(Sprite).getNaturalHeight()/2;
         return enemy;
     }
 

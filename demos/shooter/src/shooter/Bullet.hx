@@ -5,8 +5,13 @@
 package shooter;
 
 import flambe.Component;
+import flambe.display.AnimatedSprite;
 import flambe.display.Transform;
 import flambe.Entity;
+import flambe.script.CallFunction;
+import flambe.script.Delay;
+import flambe.script.Script;
+import flambe.script.Sequence;
 import flambe.System;
 
 class Bullet extends Component
@@ -16,30 +21,41 @@ class Bullet extends Component
     override public function onUpdate (dt)
     {
         var t = owner.get(Transform);
-        t.y.set(t.y.get() - dt*0.5);
-        if (t.x.get() < 0 || t.x.get() > System.stageWidth ||
-            t.y.get() < 0 || t.y.get() > System.stageHeight) {
+        t.y._ -= dt*0.5;
+        if (t.x._ < 0 || t.x._ > System.stageWidth ||
+            t.y._ < 0 || t.y._ > System.stageHeight) {
             owner.dispose();
             return;
         }
 
         for (enemy in Game.enemies) {
             var et = enemy.get(Transform);
-            var dx = t.x.get() - et.x.get();
-            var dy = t.y.get() - et.y.get();
+            var dx = t.x._ - et.x._;
+            var dy = t.y._ - et.y._;
 
             var hull = enemy.get(Hull);
             if (dx*dx + dy*dy < hull.radius*hull.radius) {
                 hull.damage(1);
 
-                var exp = new Entity().add(new ExplosionSprite());
-                exp.get(Transform).x.set(t.x.get());
-                exp.get(Transform).y.set(t.y.get());
-                System.root.addChild(exp);
+                var fireball = new Entity()
+                    .add(new AnimatedSprite(ShooterCtx.pack.loadTexture("explosion.png"), 13, 1))
+                    .add(new Script());
+                fireball.get(AnimatedSprite).centerAnchor();
+                fireball.get(Script).run(new Sequence([
+                    new Delay(0.001*EXPLOSION.delay*EXPLOSION.frames.length), // TODO(bruno): WaitForFrame
+                    new CallFunction(fireball.dispose),
+                ]));
+                fireball.get(AnimatedSprite).play(EXPLOSION);
+                fireball.get(Transform).x._ = t.x._;
+                fireball.get(Transform).y._ = t.y._;
+                // fireball.get(AnimatedSprite).blendMode = Add;
+                System.root.addChild(fireball);
 
                 owner.dispose();
                 return;
             }
         }
     }
+
+    public static var EXPLOSION = new Animation(50, [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ]);
 }

@@ -17,8 +17,8 @@ class BomberAI extends Component
     override public function onUpdate (dt)
     {
         var t = owner.get(Transform);
-        t.y.set(t.y.get() + dt*0.05);
-        if (t.y.get() > System.stageHeight) {
+        t.y._ += dt*0.05;
+        if (t.y._ > System.stageHeight) {
             owner.dispose();
         }
     }

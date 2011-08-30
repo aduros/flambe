@@ -21,16 +21,16 @@ class Draggable extends Component
     private function onMouseDown (event :MouseEvent)
     {
         _dragging = true;
-        _offset = owner.get(Sprite).getViewMatrix().inverseTransformPoint(
-            event.viewX, event.viewY);
+        var xform = owner.get(Transform);
+        _offset = new Point(event.viewX - xform.x._, event.viewY - xform.y._);
     }
 
     override public function onUpdate (dt :Int)
     {
         if (Input.isMouseDown && _dragging) {
             var xform = owner.get(Transform);
-            xform.x.set(Input.mouseX - _offset.x);
-            xform.y.set(Input.mouseY - _offset.y);
+            xform.x._ = Input.mouseX - _offset.x;
+            xform.y._ = Input.mouseY - _offset.y;
         } else {
             _dragging = false;
         }

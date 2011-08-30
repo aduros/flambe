@@ -43,6 +43,8 @@ class Main
             var xform = tentacle.get(Transform);
             xform.x._ = Math.random() * (System.stageWidth-sprite.getNaturalWidth());
             xform.y._ = Math.random() * (System.stageHeight-sprite.getNaturalHeight());
+            xform.scaleX._ = xform.scaleY._ = 0.5 + Math.random()*4;
+            xform.rotation._ = Math.random()*90;
             System.root.addChild(tentacle);
         }
     }

@@ -55,6 +55,12 @@ class Property<A>
         }
     }
 
+    public function animate (from :A, to :A, duration :Int, ?easing :EasingFunction)
+    {
+        set(from);
+        animateTo(to, duration, easing);
+    }
+
     public function animateTo (to :A, duration :Int, ?easing :EasingFunction)
     {
         setBehavior(cast new Tween(cast _value, cast to, duration, easing));

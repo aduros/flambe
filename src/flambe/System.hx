@@ -36,9 +36,14 @@ class System
         driver.init(root);
     }
 
-    inline public static function loadAssetPack (url)
+    inline public static function loadAssetPack (url :String)
     {
         return driver.loadAssetPack(url);
+    }
+
+    inline public static function callNative (funcName :String, ?params :Array<Dynamic>) :Dynamic
+    {
+        return driver.callNative(funcName, params);
     }
 
     inline private static function getStageWidth () :Int

@@ -12,6 +12,7 @@ import flash.display.StageDisplayState;
 import flash.display.StageScaleMode;
 import flash.events.Event;
 import flash.events.MouseEvent;
+import flash.external.ExternalInterface;
 import flash.Lib;
 import flash.net.SharedObject;
 import flash.system.Capabilities;
@@ -99,6 +100,15 @@ class FlashAppDriver
     public function getLocale () :String
     {
         return Capabilities.language;
+    }
+
+    public function callNative (funcName :String, params :Array<Dynamic>) :Dynamic
+    {
+        if (params == null) {
+            params = [];
+        }
+        var args = [ cast funcName ].concat(params);
+        return Reflect.callMethod(null, ExternalInterface.call, args);
     }
 
     private function onMouseDown (event :MouseEvent)

@@ -146,6 +146,19 @@ class HtmlAppDriver
         return untyped Lib.window.navigator.language;
     }
 
+    public function callNative (funcName :String, params :Array<Dynamic>) :Dynamic
+    {
+        if (params == null) {
+            params = [];
+        }
+        var func = Reflect.field(Lib.window, funcName);
+        try {
+            return Reflect.callMethod(null, func, params);
+        } catch (e :Dynamic) {
+            return null;
+        }
+    }
+
     private var _canvas :Dynamic;
     private var _storage :Storage;
 }

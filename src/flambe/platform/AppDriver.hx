@@ -20,4 +20,6 @@ interface AppDriver
     function getStorage () :Storage;
 
     function getLocale () :String;
+
+    function callNative (funcName :String, params :Array<Dynamic>) :Dynamic;
 }

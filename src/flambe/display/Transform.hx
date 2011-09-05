@@ -32,6 +32,18 @@ class Transform extends Component
         scaleY.update(dt);
     }
 
+    public function setXY (x :Float, y :Float)
+    {
+        this.x._ = x;
+        this.y._ = y;
+    }
+
+    public function setScale (scaleX :Float, scaleY :Float)
+    {
+        this.scaleX._ = scaleX;
+        this.scaleY._ = scaleY;
+    }
+
     public function distanceTo (x :Float, y :Float) :Float
     {
         var dx = x - this.x._;

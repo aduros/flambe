@@ -5,6 +5,7 @@
 package flambe.server;
 
 import haxe.remoting.Context;
+import haxe.Serializer;
 
 class NodeRemoting
 {
@@ -19,11 +20,11 @@ class NodeRemoting
             return false;
         }
 
-        req.addListener("data", function (buffer) {
+        var body = "";
+        req.on("data", function (chunk) body += chunk);
+        req.on("end", function () {
             var relay = new NodeRelay(function (data :Dynamic) {
-                var s = new haxe.Serializer();
-                s.serialize(data);
-                res.end("hxr" + s.toString());
+                res.end("hxr" + Serializer.run(data));
             });
             relay.onError = function (err :Dynamic) {
                 var message = (err.message != null) ? err.message : err;
@@ -39,7 +40,7 @@ class NodeRemoting
 
             res.writeHead(200);
             try {
-                var params = _querystring.parse(buffer.toString());
+                var params = querystring.parse(body);
                 var requestData = params.__x;
                 var u = new haxe.Unserializer(requestData);
                 var path = u.unserialize();
@@ -50,10 +51,11 @@ class NodeRemoting
                 relay.error(e);
             }
         });
+
         return true;
     }
 
     private var _ctx :Context;
 
-    private static var _querystring = Node.require("querystring");
+    private static var querystring = Node.require("querystring");
 }

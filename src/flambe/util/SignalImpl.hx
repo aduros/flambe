@@ -31,8 +31,8 @@ class SignalImpl
     {
         var idx = _connections.indexOf(connection);
         if (idx >= 0) {
-            _connections[idx] = null;
             connection._internal_signal = null;
+            _connections[idx] = null;
             return true;
         }
         return false;
@@ -41,11 +41,13 @@ class SignalImpl
     public function disconnectAll ()
     {
         for (ii in 0..._connections.length) {
+            _connections[ii]._internal_signal = null;
             _connections[ii] = null;
         }
         _connections = [];
     }
 
+    // FIXME(bruno): Adding another listener during an emit is broken
     public function emit (args :Array<Dynamic>)
     {
         var ii = 0;

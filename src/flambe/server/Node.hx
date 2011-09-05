@@ -15,6 +15,11 @@ class Node
         _sys.puts(message);
     }
 
+    inline public static function newBuffer (?data :String, ?encoding :String) :Dynamic
+    {
+        return untyped __js__("new Buffer")(data, encoding);
+    }
+
     /** 'Error' isn't available in haXe, but it's the only way to get a stack trace. */
     inline public static function throwError (message :String)
     {

@@ -72,7 +72,8 @@ class HtmlDrawingContext
 
     public function fillRect (color :Int, x :Float, y :Float, width :Float, height :Float)
     {
-        _canvasCtx.fillStyle = "#" + (untyped color).toString(16);
+        // Use slice() here rather than haXe's substr monkey patch
+        _canvasCtx.fillStyle = untyped "#" + ("000000" + color.toString(16)).slice(-6);
         _canvasCtx.fillRect(FMath.toInt(x), FMath.toInt(y),
             FMath.toInt(width), FMath.toInt(height));
     }

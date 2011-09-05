@@ -24,11 +24,14 @@ class MainLoop
         _drawVisitor = new DrawVisitor(drawCtx);
     }
 
-    public function runFrame (dt :Int)
+    public function update (dt :Int)
     {
         _updateVisitor.dt = dt;
         System.root.visit(_updateVisitor, true, true);
+    }
 
+    public function render ()
+    {
         System.root.visit(_drawVisitor, false, true);
     }
 

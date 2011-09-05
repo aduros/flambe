@@ -47,6 +47,7 @@ class FlashAppDriver
         onResize(null);
 
         stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
+        stage.addEventListener(Event.RENDER, onRender);
         stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
         stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
         stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
@@ -130,8 +131,14 @@ class FlashAppDriver
 
         _lastUpdate = now;
 
+        _loop.update(dt);
+        Lib.current.stage.invalidate();
+    }
+
+    private function onRender (_)
+    {
         _screen.lock();
-        _loop.runFrame(dt);
+        _loop.render();
         _screen.unlock();
     }
 

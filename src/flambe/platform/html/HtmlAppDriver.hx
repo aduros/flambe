@@ -49,7 +49,8 @@ class HtmlAppDriver
             var dt = now - lastUpdate;
             lastUpdate = now;
 
-            loop.runFrame(cast dt);
+            loop.update(cast dt);
+            loop.render();
         }, 1000/60);
 
         var createMouseEvent = function (data :Dynamic) {

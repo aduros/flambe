@@ -11,6 +11,7 @@ using StringTools;
 class Font
 {
     public var name (default, null) :String;
+    public var size (default, null) :Int;
 
     public function new (pack :AssetPack, name :String)
     {
@@ -26,6 +27,14 @@ class Font
 
         for (keyword in parser.keywords()) {
             switch (keyword) {
+                case "info":
+                    for (pair in parser.pairs()) {
+                        switch (pair.key) {
+                            case "size":
+                                size = pair.getInt();
+                        }
+                    }
+
                 case "page":
                     var pageId :Int = 0;
                     var file :String = null;

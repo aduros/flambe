@@ -22,4 +22,6 @@ interface AppDriver
     function getLocale () :String;
 
     function callNative (funcName :String, params :Array<Dynamic>) :Dynamic;
+
+    function lockOrientation (orient :Orientation) :Void;
 }

@@ -7,6 +7,7 @@ package flambe;
 import flambe.display.MouseEvent;
 import flambe.display.Sprite;
 import flambe.platform.AppDriver;
+import flambe.platform.Orientation;
 import flambe.platform.Storage;
 import flambe.util.Signal1;
 
@@ -44,6 +45,11 @@ class System
     inline public static function callNative (funcName :String, ?params :Array<Dynamic>) :Dynamic
     {
         return driver.callNative(funcName, params);
+    }
+
+    inline public static function lockOrientation (orient :Orientation)
+    {
+        driver.lockOrientation(orient);
     }
 
     inline private static function getStageWidth () :Int

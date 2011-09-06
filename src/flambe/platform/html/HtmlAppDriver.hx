@@ -159,6 +159,11 @@ class HtmlAppDriver
         }
     }
 
+    public function lockOrientation (orient :Orientation)
+    {
+        // Nothing at all
+    }
+
     private var _canvas :Dynamic;
     private var _storage :Storage;
 }

@@ -10,6 +10,7 @@ import flash.display.Sprite;
 import flash.display.Stage;
 import flash.display.StageDisplayState;
 import flash.display.StageScaleMode;
+import flash.media.Video;
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.external.ExternalInterface;
@@ -53,10 +54,7 @@ class FlashAppDriver
         stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
         stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
 
-        // Look up Mouse.supportsCursor reflectively, because it's not worth depending on Flash 10.1
-        var supportsCursor = !Reflect.hasField(Mouse, "supportsCursor")
-            || Reflect.field(Mouse, "supportsCursor");
-        if (Capabilities.playerType == "PlugIn" && !supportsCursor) {
+        if (Capabilities.playerType == "PlugIn" && isMobile()) {
             // Probably running in a mobile browser
             stage.addEventListener(MouseEvent.MOUSE_DOWN, handleFullScreen);
         }
@@ -109,6 +107,41 @@ class FlashAppDriver
         }
         var args = [ cast funcName ].concat(params);
         return Reflect.callMethod(null, ExternalInterface.call, args);
+    }
+
+    public function lockOrientation (orient :Orientation)
+    {
+        if (!isMobile()) {
+            return;
+        }
+        if (orient == null) {
+            if (_orientHack != null) {
+                _orientHack.parent.removeChild(_orientHack);
+                _orientHack = null;
+            }
+            return;
+        }
+
+        // http://www.kongregate.com/pages/flash-sizing-zen#device_orientation
+        // Only works in full screen. AIR has something less whack, but this works in the browser
+        switch (orient) {
+        case Portrait:
+            // Unimplemented
+        case Landscape:
+            if (_orientHack == null) {
+                _orientHack = new Video(0, 0);
+                _orientHack.visible = false;
+                Lib.current.addChild(_orientHack);
+            }
+        }
+    }
+
+    // Tries to guess if we're running on a mobile device
+    private function isMobile ()
+    {
+        // Look up Mouse.supportsCursor reflectively, because it's not worth depending on Flash 10.1
+        return Reflect.hasField(Mouse, "supportsCursor")
+            && !Reflect.field(Mouse, "supportsCursor");
     }
 
     private function onMouseDown (event :MouseEvent)
@@ -171,8 +204,11 @@ class FlashAppDriver
     }
 
     private var _bitmap :Bitmap;
+    private var _orientHack :Video;
+
     private var _screen :BitmapData;
     private var _loop :MainLoop;
     private var _lastUpdate :Int;
+
     private var _storage :Storage;
 }

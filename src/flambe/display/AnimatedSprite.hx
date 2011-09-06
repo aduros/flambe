@@ -84,7 +84,7 @@ class AnimatedSprite extends Sprite
 
     override public function draw (ctx :DrawingContext)
     {
-        ctx.drawSubImage(texture, 0, 0, _frameX, _frameY, _frameWidth, _frameHeight);
+        ctx.drawSubImage(texture, -anchorX._, -anchorY._, _frameX, _frameY, _frameWidth, _frameHeight);
     }
 
     override public function getNaturalWidth () :Float

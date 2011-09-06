@@ -85,15 +85,15 @@ private class DrawVisitor
             return true;
         }
 
-        var n1 = sprite.alpha.get();
-        if (!sprite.visible.get() || n1 < 0) {
+        var alpha = sprite.alpha._;
+        if (!sprite.visible._ || alpha < 0) {
             return false;
         }
 
         _drawCtx.save();
 
-        if (n1 < 1) {
-            _drawCtx.multiplyAlpha(n1);
+        if (alpha < 1) {
+            _drawCtx.multiplyAlpha(alpha);
         }
 
         if (sprite.blendMode != null) {
@@ -101,27 +101,21 @@ private class DrawVisitor
         }
 
         var transform = entity.get(Transform);
-        n1 = transform.x.get();
-        var n2 = transform.y.get();
-        if (n1 != 0 || n2 != 0) {
-            _drawCtx.translate(n1, n2);
+        var x = transform.x._;
+        var y = transform.y._;
+        if (x != 0 || y != 0) {
+            _drawCtx.translate(x, y);
         }
 
-        n1 = transform.rotation.get();
-        if (n1 != 0) {
-            _drawCtx.rotate(n1);
+        var rotation = transform.rotation._;
+        if (rotation != 0) {
+            _drawCtx.rotate(rotation);
         }
 
-        n1 = transform.scaleX.get();
-        n2 = transform.scaleY.get();
-        if (n1 != 1 || n2 != 1) {
-            _drawCtx.scale(n1, n2);
-        }
-
-        n1 = sprite.anchorX.get();
-        n2 = sprite.anchorY.get();
-        if (n1 != 0 || n2 != 0) {
-            _drawCtx.translate(-n1, -n2);
+        var scaleX = transform.scaleX._;
+        var scaleY = transform.scaleY._;
+        if (scaleX != 1 || scaleY != 1) {
+            _drawCtx.scale(scaleX, scaleY);
         }
 
         sprite.draw(_drawCtx);

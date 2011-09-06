@@ -20,9 +20,10 @@ class TextSprite extends Sprite
 
     override public function draw (ctx :DrawingContext)
     {
-        var x = 0;
+        var x = -anchorX._;
+        var y = -anchorY._;
         for (glyph in _glyphs) {
-            glyph.draw(ctx, x, 0);
+            glyph.draw(ctx, x, y);
             x += glyph.xAdvance;
         }
     }

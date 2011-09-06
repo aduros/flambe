@@ -16,7 +16,7 @@ class ImageSprite extends Sprite
 
     override public function draw (ctx :DrawingContext)
     {
-        ctx.drawImage(texture, 0, 0);
+        ctx.drawImage(texture, -anchorX._, -anchorY._);
     }
 
     override public function getNaturalWidth () :Float

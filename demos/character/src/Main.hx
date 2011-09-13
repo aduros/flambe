@@ -4,18 +4,18 @@
 
 import flambe.animation.Easing;
 import flambe.asset.AssetPackLoader;
-import flambe.display.Sprite;
-import flambe.display.FillSprite;
-import flambe.display.Transform;
 import flambe.display.AnimatedSprite;
-import flambe.script.Script;
-import flambe.script.AnimateTo;
-import flambe.script.Parallel;
-import flambe.script.Sequence;
-import flambe.script.CallFunction;
+import flambe.display.FillSprite;
+import flambe.display.Sprite;
+import flambe.display.Transform;
 import flambe.Entity;
-import flambe.System;
 import flambe.Input;
+import flambe.script.CallFunction;
+import flambe.script.MoveTo;
+import flambe.script.Parallel;
+import flambe.script.Script;
+import flambe.script.Sequence;
+import flambe.System;
 
 class Main
 {
@@ -49,13 +49,9 @@ class Main
             var script = character.get(Script);
             script.stopAll();
             script.run(new Sequence([
-                // TODO: This should be way less verbose, something like:
+                // TODO: This could be a bit less verbose, something like:
                 // MoveTo.linear(event.viewX, event.viewY, delay),
-                // new PlayAnimation(IDLE)
-                new Parallel([
-                    new AnimateTo(transform.x, event.viewX, delay, Easing.linear),
-                    new AnimateTo(transform.y, event.viewY, delay, Easing.linear)
-                ]),
+                new MoveTo(event.viewX, event.viewY, delay, Easing.linear),
                 new CallFunction(function () {
                     sprite.play(IDLE);
                     sprite.play(PUNCH);

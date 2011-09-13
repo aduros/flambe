@@ -4,6 +4,8 @@
 
 package flambe.script;
 
+import flambe.Entity;
+
 class Repeat
     implements Action
 {
@@ -12,10 +14,10 @@ class Repeat
         _action = action;
     }
 
-    public function update (dt)
+    public function update (dt :Int, actor :Entity)
     {
-        _action.update(dt);
-        return false;
+        _action.update(dt, actor);
+        return false; // Repeat forever
     }
 
     private var _action :Action;

@@ -4,6 +4,8 @@
 
 package flambe.script;
 
+import flambe.Entity;
+
 class CallFunction
     implements Action
 {
@@ -12,7 +14,7 @@ class CallFunction
         _fn = fn;
     }
 
-    public function update (dt)
+    public function update (dt :Int, actor :Entity)
     {
         _fn();
         return true;

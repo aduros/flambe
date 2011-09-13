@@ -7,6 +7,7 @@ package flambe.script;
 import flambe.animation.Easing;
 import flambe.animation.Property;
 import flambe.animation.Tween;
+import flambe.Entity;
 
 class AnimateTo
     implements Action
@@ -24,21 +25,19 @@ class AnimateTo
         this.easing = easing;
     }
 
-    public function update (dt :Int) :Bool
+    public function update (dt :Int, actor :Entity) :Bool
     {
-        if (!_didStart) {
-            _tween = new Tween(property.get(), to, duration, easing);
+        if (_tween == null) {
+            _tween = new Tween(property._, to, duration, easing);
             property.setBehavior(_tween);
             property.update(dt); // Fake an update to account for this frame
-            _didStart = true;
         }
         if (property.getBehavior() != _tween) {
-            _didStart = false;
+            _tween = null;
             return true;
         }
         return false;
     }
 
-    private var _didStart :Bool;
     private var _tween :Tween;
 }

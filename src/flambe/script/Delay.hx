@@ -4,6 +4,8 @@
 
 package flambe.script;
 
+import flambe.Entity;
+
 class Delay
     implements Action
 {
@@ -13,7 +15,7 @@ class Delay
         _elapsed = 0;
     }
 
-    public function update (dt)
+    public function update (dt :Int, actor :Entity)
     {
         _elapsed += dt;
         if (_elapsed >= _duration) {

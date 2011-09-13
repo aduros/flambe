@@ -39,7 +39,7 @@ class Script extends Component
         while (ii < _actions.length) {
             var action = _actions[ii];
             // Action can be null if stop() was called during iteration
-            if (action == null || action.update(dt)) {
+            if (action == null || action.update(dt, owner)) {
                 _actions.splice(ii, 1);
             } else {
                 ++ii;

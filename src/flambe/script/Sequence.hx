@@ -4,6 +4,8 @@
 
 package flambe.script;
 
+import flambe.Entity;
+
 using Lambda;
 
 class Sequence
@@ -36,10 +38,10 @@ class Sequence
         _runningActions = [];
     }
 
-    public function update (dt :Int) :Bool
+    public function update (dt :Int, actor :Entity) :Bool
     {
         var action = _runningActions[_idx];
-        if (action == null || action.update(dt)) {
+        if (action == null || action.update(dt, actor)) {
             ++_idx;
             if (_idx >= _runningActions.length) {
                 _idx = 0;

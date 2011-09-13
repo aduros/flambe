@@ -4,6 +4,8 @@
 
 package flambe.script;
 
+import flambe.Entity;
+
 using Lambda;
 
 class Parallel
@@ -36,13 +38,13 @@ class Parallel
         _completedActions = [];
     }
 
-    public function update (dt :Int)
+    public function update (dt :Int, actor :Entity)
     {
         var done = true;
         for (ii in 0..._runningActions.length) {
             var action = _runningActions[ii];
             if (action != null) {
-                if (action.update(dt)) {
+                if (action.update(dt, actor)) {
                     _runningActions[ii] = null;
                     _completedActions.push(action);
                 } else {

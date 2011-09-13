@@ -111,7 +111,7 @@ def apply_flambe_server(ctx):
     ctx.bld(features="haxe", classpath=["src", FLAMBE_ROOT+"/src"],
         flags=flags, target="server.js")
     ctx.bld.install_files("deploy", "server.js")
-    ctx.bld.install_files("deploy", ctx.path.ant_glob("etc/**/*"), relative_trick=True)
+    ctx.bld.install_files("deploy", ctx.path.ant_glob("data/**/*"), relative_trick=True)
     if ctx.bld.cmd == "install":
         ctx.bld.add_post_fun(restart_server)
 

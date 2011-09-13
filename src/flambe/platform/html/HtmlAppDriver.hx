@@ -7,6 +7,7 @@ package flambe.platform.html;
 import js.Lib;
 
 import flambe.asset.AssetPackLoader;
+import flambe.display.KeyEvent;
 import flambe.display.MouseEvent;
 import flambe.display.Texture;
 import flambe.Entity;
@@ -53,21 +54,34 @@ class HtmlAppDriver
             loop.render();
         }, 1000/60);
 
+        // Allow the canvas to be focusable
+        _canvas.setAttribute("tabindex", "0");
+        // ...but hide the focus rectangle
+        _canvas.style.outlineStyle = "none";
+
         var createMouseEvent = function (data :Dynamic) {
-            var event = new MouseEvent();
             var rect = data.target.getBoundingClientRect();
-            event.viewX = data.clientX - rect.left;
-            event.viewY = data.clientY - rect.top;
-            return event;
+            return new MouseEvent(
+                data.clientX - rect.left,
+                data.clientY - rect.top);
         };
         _canvas.addEventListener("mousedown", function (event) {
             Input.mouseDown.emit(createMouseEvent(event));
+            _canvas.focus();
         }, false);
         _canvas.addEventListener("mousemove", function (event) {
             Input.mouseMove.emit(createMouseEvent(event));
         }, false);
         _canvas.addEventListener("mouseup", function (event) {
             Input.mouseUp.emit(createMouseEvent(event));
+        }, false);
+        _canvas.addEventListener("keydown", function (event) {
+            event.preventDefault();
+            Input.keyDown.emit(new KeyEvent(event.keyCode));
+        }, false);
+        _canvas.addEventListener("keyup", function (event) {
+            event.preventDefault();
+            Input.keyUp.emit(new KeyEvent(event.keyCode));
         }, false);
 
         var touchId = -1;

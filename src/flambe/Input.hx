@@ -4,6 +4,7 @@
 
 package flambe;
 
+import flambe.display.KeyEvent;
 import flambe.display.MouseEvent;
 import flambe.display.Sprite;
 import flambe.util.Signal1;
@@ -13,6 +14,9 @@ class Input
     public static var mouseDown (default, null) :Signal1<MouseEvent>;
     public static var mouseMove (default, null) :Signal1<MouseEvent>;
     public static var mouseUp (default, null) :Signal1<MouseEvent>;
+
+    public static var keyDown (default, null) :Signal1<KeyEvent>;
+    public static var keyUp (default, null) :Signal1<KeyEvent>;
 
     // TODO: These fields are temporary. While it would be handy to record the mouse state for
     // polling, we want a system that works similarly with touch events too.
@@ -102,5 +106,7 @@ class Input
         mouseDown = new Signal1(onMouseDown);
         mouseMove = new Signal1(onMouseMove);
         mouseUp = new Signal1(onMouseUp);
+        keyDown = new Signal1();
+        keyUp = new Signal1();
     }
 }

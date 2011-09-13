@@ -10,17 +10,19 @@ import flash.display.Sprite;
 import flash.display.Stage;
 import flash.display.StageDisplayState;
 import flash.display.StageScaleMode;
-import flash.media.Video;
 import flash.events.Event;
+import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.external.ExternalInterface;
 import flash.Lib;
+import flash.media.Video;
 import flash.net.SharedObject;
 import flash.system.Capabilities;
 import flash.ui.ContextMenu;
 import flash.ui.Mouse;
 
 import flambe.asset.AssetPackLoader;
+import flambe.display.KeyEvent;
 import flambe.display.Texture;
 import flambe.Entity;
 import flambe.Input;
@@ -53,6 +55,8 @@ class FlashAppDriver
         stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
         stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
         stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+        stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+        stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
 
         if (Capabilities.playerType == "PlugIn" && isMobile()) {
             // Probably running in a mobile browser
@@ -146,25 +150,27 @@ class FlashAppDriver
 
     private function onMouseDown (event :MouseEvent)
     {
-        Input.mouseDown.emit(createFlambeMouseEvent(event));
+        Input.mouseDown.emit(new flambe.display.MouseEvent(event.stageX, event.stageY));
     }
 
     private function onMouseMove (event :MouseEvent)
     {
-        Input.mouseMove.emit(createFlambeMouseEvent(event));
+        Input.mouseMove.emit(new flambe.display.MouseEvent(event.stageX, event.stageY));
     }
 
     private function onMouseUp (event :MouseEvent)
     {
-        Input.mouseUp.emit(createFlambeMouseEvent(event));
+        Input.mouseUp.emit(new flambe.display.MouseEvent(event.stageX, event.stageY));
     }
 
-    private static function createFlambeMouseEvent (event :MouseEvent) :flambe.display.MouseEvent
+    private function onKeyDown (event :KeyboardEvent)
     {
-        var f = new flambe.display.MouseEvent();
-        f.viewX = event.stageX;
-        f.viewY = event.stageY;
-        return f;
+        Input.keyDown.emit(new KeyEvent(event.charCode));
+    }
+
+    private function onKeyUp (event :KeyboardEvent)
+    {
+        Input.keyUp.emit(new KeyEvent(event.charCode));
     }
 
     private function onEnterFrame (_)

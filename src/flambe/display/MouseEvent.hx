@@ -6,10 +6,12 @@ package flambe.display;
 
 class MouseEvent
 {
-    public var viewX :Float;
-    public var viewY :Float;
+    public var viewX (default, null) :Float;
+    public var viewY (default, null) :Float;
 
-    public function new ()
+    public function new (viewX :Float, viewY :Float)
     {
+        this.viewX = viewX;
+        this.viewY = viewY;
     }
 }

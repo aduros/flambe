@@ -24,6 +24,12 @@ class Input
     public static var mouseX (default, null) :Float;
     public static var mouseY (default, null) :Float;
 
+    // Returns true if a key with given charCode is being held down
+    inline public static function isKeyDown (charCode :Int) :Bool
+    {
+        return _keyMap.exists(charCode);
+    }
+
     private static function onMouseDown (event :MouseEvent)
     {
         isMouseDown = true;
@@ -71,6 +77,16 @@ class Input
         }
     }
 
+    private static function onKeyDown (event :KeyEvent)
+    {
+        _keyMap.set(event.charCode, true);
+    }
+
+    private static function onKeyUp (event :KeyEvent)
+    {
+        _keyMap.remove(event.charCode);
+    }
+
     /**
      * Get the top-most, visible entity that owns a sprite with a mouse signal listener.
      */
@@ -106,7 +122,9 @@ class Input
         mouseDown = new Signal1(onMouseDown);
         mouseMove = new Signal1(onMouseMove);
         mouseUp = new Signal1(onMouseUp);
-        keyDown = new Signal1();
-        keyUp = new Signal1();
+        keyDown = new Signal1(onKeyDown);
+        keyUp = new Signal1(onKeyUp);
     }
+
+    private static var _keyMap = new IntHash<Bool>();
 }

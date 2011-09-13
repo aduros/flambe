@@ -77,11 +77,15 @@ class HtmlAppDriver
         }, false);
         _canvas.addEventListener("keydown", function (event) {
             event.preventDefault();
-            Input.keyDown.emit(new KeyEvent(event.keyCode));
+            if (!Input.isKeyDown(event.keyCode)) {
+                Input.keyDown.emit(new KeyEvent(event.keyCode));
+            }
         }, false);
         _canvas.addEventListener("keyup", function (event) {
             event.preventDefault();
-            Input.keyUp.emit(new KeyEvent(event.keyCode));
+            if (Input.isKeyDown(event.keyCode)) {
+                Input.keyUp.emit(new KeyEvent(event.keyCode));
+            }
         }, false);
 
         var touchId = -1;

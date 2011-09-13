@@ -165,12 +165,16 @@ class FlashAppDriver
 
     private function onKeyDown (event :KeyboardEvent)
     {
-        Input.keyDown.emit(new KeyEvent(event.charCode));
+        if (!Input.isKeyDown(event.charCode)) {
+            Input.keyDown.emit(new KeyEvent(event.charCode));
+        }
     }
 
     private function onKeyUp (event :KeyboardEvent)
     {
-        Input.keyUp.emit(new KeyEvent(event.charCode));
+        if (Input.isKeyDown(event.charCode)) {
+            Input.keyUp.emit(new KeyEvent(event.charCode));
+        }
     }
 
     private function onEnterFrame (_)

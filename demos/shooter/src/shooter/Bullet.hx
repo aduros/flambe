@@ -48,7 +48,7 @@ class Bullet extends Component
                 fireball.get(AnimatedSprite).play(EXPLOSION);
                 fireball.get(Transform).x._ = t.x._;
                 fireball.get(Transform).y._ = t.y._;
-                // fireball.get(AnimatedSprite).blendMode = Add;
+                fireball.get(AnimatedSprite).blendMode = Add;
                 System.root.addChild(fireball);
 
                 owner.dispose();

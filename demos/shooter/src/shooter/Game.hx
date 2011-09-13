@@ -86,7 +86,7 @@ class Game extends Component
             }
             var t = player.get(Transform);
             t.x._ = event.viewX;
-            t.y._ = event.viewY-100;
+            t.y._ = event.viewY-50;
         });
         owner.addChild(player);
 

@@ -43,28 +43,30 @@ class HtmlAppDriver
             throw "Could not find a Flambe canvas! Are you not embedding with flambe.js?";
         }
 
-        var loop = new MainLoop(new HtmlDrawingContext(_canvas));
-        var lastUpdate = Date.now().getTime();
-        untyped Lib.window.setInterval(function () {
-            var now = Date.now().getTime();
-            var dt = now - lastUpdate;
-            lastUpdate = now;
+        _loop = new MainLoop(new HtmlDrawingContext(_canvas));
+        _lastUpdate = Date.now().getTime();
 
-            loop.update(cast dt);
-            loop.render();
-        }, 1000/60);
+        // Use requestAnimationFrame if available, otherwise a 60 FPS setInterval
+        // https://developer.mozilla.org/en/DOM/window.mozRequestAnimationFrame
+        var requestAnimationFrame = loadExtension("requestAnimationFrame");
+        if (requestAnimationFrame != null) {
+            var updateFrame = null;
+            updateFrame = function (now) {
+                update(now);
+                requestAnimationFrame(updateFrame, _canvas);
+            };
+            requestAnimationFrame(updateFrame, _canvas);
+        } else {
+            (untyped Lib.window.setInterval)(function () {
+                update(Date.now().getTime());
+            }, 1000/60);
+        }
 
         // Allow the canvas to be focusable
         _canvas.setAttribute("tabindex", "0");
         // ...but hide the focus rectangle
         _canvas.style.outlineStyle = "none";
 
-        var createMouseEvent = function (data :Dynamic) {
-            var rect = data.target.getBoundingClientRect();
-            return new MouseEvent(
-                data.clientX - rect.left,
-                data.clientY - rect.top);
-        };
         _canvas.addEventListener("mousedown", function (event) {
             Input.mouseDown.emit(createMouseEvent(event));
             _canvas.focus();
@@ -181,6 +183,52 @@ class HtmlAppDriver
     {
         // Nothing at all
     }
+
+    private function update (now :Float)
+    {
+        var dt = now - _lastUpdate;
+        _lastUpdate = now;
+
+        _loop.update(cast dt);
+        _loop.render();
+    }
+
+    private static function createMouseEvent (domEvent :Dynamic) :MouseEvent
+    {
+        var rect = domEvent.target.getBoundingClientRect();
+        return new MouseEvent(
+            domEvent.clientX - rect.left,
+            domEvent.clientY - rect.top);
+    }
+
+    // Load a prefixed vendor extension
+    private static function loadExtension (name :String, ?obj :Dynamic) :Dynamic
+    {
+        if (obj == null) {
+            obj = Lib.window;
+        }
+
+        // Try to load it as is
+        var extension = Reflect.field(obj, name);
+        if (extension != null) {
+            return extension;
+        }
+
+        // Look through common vendor prefixes
+        var capitalized = name.substr(0, 1).toUpperCase() + name.substr(1);
+        for (prefix in [ "webkit", "moz", "ms", "o", "khtml" ]) {
+            var extension = Reflect.field(obj, prefix + capitalized);
+            if (extension != null) {
+                return extension;
+            }
+        }
+
+        // Not found
+        return null;
+    }
+
+    private var _loop :MainLoop;
+    private var _lastUpdate :Float;
 
     private var _canvas :Dynamic;
     private var _storage :Storage;

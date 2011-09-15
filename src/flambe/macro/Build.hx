@@ -40,6 +40,13 @@ class Build
         return Context.getBuildFields().concat(fields);
     }
 
+    // Evaluates to a string containing the date at compile-time
+    @:macro
+    public static function date () :Expr
+    {
+        return Context.makeExpr(Date.now().toString(), Context.currentPos());
+    }
+
 #if macro
     public static function getDefaultComponentName (cl :ClassType) :String
     {

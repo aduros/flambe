@@ -11,6 +11,7 @@ import haxe.Http;
 
 import flambe.asset.AssetPack;
 import flambe.asset.AssetPackLoader;
+import flambe.macro.ManifestBuilder;
 import flambe.util.Signal0;
 import flambe.util.Signal1;
 
@@ -133,7 +134,7 @@ class HtmlAssetPackLoader
 
         // Populate the manifest hash with the files in /res using macro magic
         var manifest = new Manifest();
-        flambe.macro.ManifestBuilder.populateManifest(manifest);
+        ManifestBuilder.populateManifest(manifest);
         return manifest;
     }
 

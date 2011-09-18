@@ -36,7 +36,10 @@ class ManifestBuilder
                     var name = file;
                     var url = packName + "/" + file;
                     var bytes = FileSystem.stat(assetDir + packName + "/" + file).size;
-                    var type = file.toLowerCase().endsWith(".png") ? "Image" : "Data";
+                    var type = switch (getExtension(file.toLowerCase())) {
+                        case "png", "jpg": "Image";
+                        default: "Data";
+                    }
 
                     // Assemble the object literal for this file
                     var fileObject = exprOf(EObjectDecl([
@@ -81,6 +84,12 @@ class ManifestBuilder
             }
         }
         return result;
+    }
+
+    public static function getExtension (fileName :String) :String
+    {
+        var start = fileName.lastIndexOf(".") + 1;
+        return (start > 1 && start < fileName.length) ? fileName.substr(start) : null;
     }
 
     public static function readDirectoryNoHidden (dir)

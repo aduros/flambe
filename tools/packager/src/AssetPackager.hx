@@ -39,7 +39,7 @@ class PackSwfWriter
         for (file in files) {
             var bytes = File.read(packDir + "/" + file, true).readAll();
             var lower = file.toLowerCase();
-            var baseClass = if (lower.endsWith(".png")) {
+            var baseClass = if (lower.endsWith(".png") || lower.endsWith(".jpg")) {
                 writePng(bytes);
             } else if (lower.endsWith(".mp3")) {
                 writeMp3(bytes);

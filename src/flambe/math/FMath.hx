@@ -44,6 +44,16 @@ class FMath
     	return radians * 180/PI;
     }
 
+    inline public static function max (a :Float, b :Float) :Float
+    {
+        return (a > b) ? a : b;
+    }
+
+    inline public static function min (a :Float, b :Float) :Float
+    {
+        return (a < b) ? a : b;
+    }
+
     public static function clamp (value :Float, min :Float, max :Float) :Float
     {
         return (value < min) ? min : (value > max) ? max : value;

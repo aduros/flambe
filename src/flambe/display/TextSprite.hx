@@ -5,6 +5,7 @@
 package flambe.display;
 
 import flambe.display.Font;
+import flambe.math.FMath;
 
 class TextSprite extends Sprite
 {
@@ -65,7 +66,7 @@ class TextSprite extends Sprite
         _height = 0;
         for (glyph in _glyphs) {
             _width += glyph.xAdvance;
-            _height = Math.max(_height, glyph.height + glyph.yOffset);
+            _height = FMath.max(_height, glyph.height + glyph.yOffset);
         }
     }
 

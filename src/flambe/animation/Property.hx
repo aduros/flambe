@@ -87,6 +87,13 @@ class Property<A>
         return _behavior;
     }
 
+#if debug
+    public function toString () :String
+    {
+        return cast _value;
+    }
+#end
+
     private var _value :A;
     private var _behavior :Behavior<A>;
 }

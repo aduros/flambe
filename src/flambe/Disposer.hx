@@ -13,6 +13,7 @@ class Disposer extends Component
 {
     public function new ()
     {
+        _disposables = [];
     }
 
     public function add (disposable :Disposable)

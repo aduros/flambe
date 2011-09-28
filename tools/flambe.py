@@ -18,7 +18,11 @@ def configure(ctx):
 
 @feature("flambe")
 def apply_flambe(ctx):
-    flags = ["-main", ctx.main]
+    Utils.def_attrs(ctx, classpath="", flags="", libs="")
+    classpath=["src", FLAMBE_ROOT+"/src"] + Utils.to_list(ctx.classpath)
+    flags = ["-main", ctx.main] + Utils.to_list(ctx.flags)
+    libs = Utils.to_list(ctx.libs)
+
     debug = ctx.env.debug
     hasBootstrap = ctx.path.find_dir("res/bootstrap")
     closure = ctx.bld.path.find_resource(FLAMBE_ROOT+"/tools/closure.jar")
@@ -34,14 +38,16 @@ def apply_flambe(ctx):
         #flags += "--dead-code-elimination --no-traces".split()
         flags += "--no-traces".split()
 
-    ctx.bld(features="haxe", classpath=["src", FLAMBE_ROOT+"/src"],
+    ctx.bld(features="haxe", classpath=classpath,
         flags=flags + flash_flags,
         swflib="bootstrap.swf" if hasBootstrap else None,
+        libs=libs,
         target="app.swf")
     ctx.bld.install_files("deploy/web", "app.swf")
 
-    ctx.bld(features="haxe", classpath=["src", FLAMBE_ROOT+"/src"],
+    ctx.bld(features="haxe", classpath=classpath,
         flags=flags + html_flags,
+        libs=libs,
         target="app-html.js" if debug else "app-html.uncompressed.js")
     if not debug:
         import textwrap
@@ -98,7 +104,11 @@ def apply_flambe(ctx):
 
 @feature("flambe-server")
 def apply_flambe_server(ctx):
-    flags = ["-main", ctx.main]
+    Utils.def_attrs(ctx, classpath="", flags="", libs="")
+    classpath=["src", FLAMBE_ROOT+"/src"] + Utils.to_list(ctx.classpath)
+    flags = ["-main", ctx.main] + Utils.to_list(ctx.flags)
+    libs = Utils.to_list(ctx.libs)
+
     # TODO(bruno): Use the node externs in haxelib
     flags += "-D server --macro flambe.macro.AmityJSGenerator.use()".split()
 
@@ -108,8 +118,7 @@ def apply_flambe_server(ctx):
         #flags += "--dead-code-elimination --no-traces".split()
         flags += "--no-traces".split()
 
-    ctx.bld(features="haxe", classpath=["src", FLAMBE_ROOT+"/src"],
-        flags=flags, target="server.js")
+    ctx.bld(features="haxe", classpath=classpath, flags=flags, libs=libs, target="server.js")
     ctx.bld.install_files("deploy", "server.js")
     ctx.bld.install_files("deploy", ctx.path.ant_glob("data/**/*"), relative_trick=True)
     if ctx.bld.cmd == "install":

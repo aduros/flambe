@@ -95,7 +95,7 @@ def apply_flambe(ctx):
     ctx.bld.install_files("deploy/web", "flambe.js")
 
     # Install the default index.html if necessary
-    if ctx.bld.path.find_resource("web/index.html") == None:
+    if ctx.bld.path.find_dir("web") == None:
         ctx.bld.install_files("deploy/web",
             ctx.bld.path.find_resource(FLAMBE_ROOT+"/tools/embedder/index.html"))
 

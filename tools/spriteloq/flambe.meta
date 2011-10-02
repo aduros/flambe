@@ -1,0 +1,14 @@
+`target flambe`
+`extension json`
+{
+  "animations": [`assets`{
+    "name": "`assetName`",
+    "reference": [`assetReferenceX`,`assetReferenceY`],
+    "bounds": [`assetBoundsX`,`assetBoundsY`,`assetBoundsWidth`,`assetBoundsHeight`],
+    "frameRate": `assetFrameRate`,
+    "loop": `assetLoopParam`,
+    "frames": [
+      `assetFrames``frameTextureRectX`,`frameTextureRectY`,`frameTextureRectWidth`,`frameTextureRectHeight`,`frameSpriteColorRectX`,`frameSpriteColorRectY``endAssetFrames,`
+    ]
+  }`endAssets,`]
+}

@@ -105,7 +105,11 @@ class Sprite extends Component
         if (localX == Math.NaN || localY == Math.NaN) {
             return false;
         }
+        return containsLocal(localX, localY);
+    }
 
+    public function containsLocal (localX :Float, localY :Float) :Bool
+    {
         return localX >= 0 && localX < getNaturalWidth()
             && localY >= 0 && localY < getNaturalHeight();
     }

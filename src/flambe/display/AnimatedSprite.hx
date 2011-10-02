@@ -4,51 +4,29 @@
 
 package flambe.display;
 
+import flambe.display.SpriteSheet;
 import flambe.math.FMath;
-
-class Animation
-{
-    public var delay (default, null) :Int;
-    public var frames (default, null) :Array<Int>;
-    public var looping (default, null) :Bool;
-
-    public function new (delay :Int, frames :Array<Int>)
-    {
-        this.delay = delay;
-        this.frames = frames;
-        this.looping = false;
-    }
-
-    public function loop () :Animation
-    {
-        this.looping = true;
-        return this;
-    }
-}
 
 class AnimatedSprite extends Sprite
 {
-    public var texture (default, null) :Texture;
-    public var frame (getFrame, setFrameAndStop) :Int;
+    public var sheet (default, null) :SpriteSheet;
     public var animation (default, null) :Animation;
+    public var frame (getFrame, setFrame) :Int;
+    public var paused (default, null) :Bool;
 
-    public function new (texture :Texture, framesWide :Int, framesHigh :Int)
+    public function new (sheet :SpriteSheet)
     {
         super();
-        this.texture = texture;
-        _frameWidth = FMath.toInt(texture.width / framesWide);
-        _frameHeight = FMath.toInt(texture.height / framesHigh);
-        _frame = -1;
-        setFrame(0);
+        this.sheet = sheet;
     }
 
-    public function play (anim :Animation)
+    public function play (name :String)
     {
-        if (animation != null && animation.looping) {
+        animation = sheet.getAnimation(name);
+        if (animation.loop) {
             _defaultAnim = animation;
         }
-        animation = anim;
-        _frame = anim.frames[0];
+        _frame = 0;
         _elapsed = 0;
     }
 
@@ -58,43 +36,81 @@ class AnimatedSprite extends Sprite
         _defaultAnim = null;
     }
 
+    inline public function pause ()
+    {
+        paused = true;
+    }
+
     override public function onUpdate (dt :Int)
     {
         super.onUpdate(dt);
 
-        if (animation != null) {
+        if (animation != null && !paused) {
             _elapsed += dt;
-            var frameIdx = FMath.toInt(_elapsed / animation.delay);
-            if (frameIdx >= animation.frames.length) {
-                if (animation.looping) {
-                    frameIdx %= animation.frames.length;
-                } else {
-                    if (_defaultAnim != null) {
-                        play(_defaultAnim);
+            var framesElapsed = FMath.toInt(_elapsed / animation.delay);
+            if (framesElapsed > 0) {
+                _elapsed -= FMath.toInt(framesElapsed*animation.delay);
+                _frame += framesElapsed;
+
+                var frameCount = animation.frames.length;
+                if (_frame >= frameCount) {
+                    if (animation.loop) {
+                        _frame %= frameCount;
                     } else {
-                        // Stop on the last frame
-                        setFrameAndStop(animation.frames[animation.frames.length-1]);
+                        animation = _defaultAnim;
+                        _frame = 0;
+                        _elapsed = 0;
                     }
-                    return;
                 }
             }
-            setFrame(animation.frames[frameIdx]);
         }
     }
 
     override public function draw (ctx :DrawingContext)
     {
-        ctx.drawSubImage(texture, -anchorX._, -anchorY._, _frameX, _frameY, _frameWidth, _frameHeight);
+        if (animation == null) {
+            return;
+        }
+        var frameData = animation.frames[frame];
+        ctx.drawSubImage(sheet.texture,
+            -anchorX._ - animation.anchorX + frameData.offsetX,
+            -anchorY._ - animation.anchorY + frameData.offsetY,
+            frameData.x, frameData.y, frameData.width, frameData.height);
     }
 
     override public function getNaturalWidth () :Float
     {
-        return _frameWidth;
+        if (animation == null) {
+            return 0;
+        }
+        return animation.frames[frame].width;
     }
 
     override public function getNaturalHeight () :Float
     {
-        return _frameHeight;
+        if (animation == null) {
+            return 0;
+        }
+        return animation.frames[frame].height;
+    }
+
+    override public function containsLocal (localX :Float, localY :Float) :Bool
+    {
+        if (animation == null) {
+            return false;
+        }
+        var frameData = animation.frames[frame];
+        var left = -animation.anchorX + frameData.offsetX;
+        var top = -animation.anchorY + frameData.offsetY;
+        return localX >= left && localX < left + frameData.width
+            && localY >= top && localY < top + frameData.height;
+    }
+
+    inline private function setFrame (frame :Int) :Int
+    {
+        _frame = frame;
+        _elapsed = 0;
+        return frame;
     }
 
     inline private function getFrame () :Int
@@ -102,32 +118,7 @@ class AnimatedSprite extends Sprite
         return _frame;
     }
 
-    private function setFrameAndStop (frame :Int) :Int
-    {
-        setFrame(frame);
-        stop();
-        return frame;
-    }
-
-    private function setFrame (frame :Int)
-    {
-        if (frame == _frame) {
-            return;
-        }
-        var x = frame*_frameWidth;
-        _frameX = x % texture.width;
-        _frameY = _frameHeight * FMath.toInt(x / texture.width);
-        _frame = frame;
-    }
-
     private var _elapsed :Int;
-
     private var _frame :Int;
-    private var _frameX :Float;
-    private var _frameY :Float;
-
     private var _defaultAnim :Animation;
-
-    private var _frameWidth :Int;
-    private var _frameHeight :Int;
 }

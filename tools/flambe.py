@@ -21,7 +21,7 @@ def apply_flambe(ctx):
     Utils.def_attrs(ctx, classpath="", flags="", libs="")
     classpath=["src", FLAMBE_ROOT+"/src"] + Utils.to_list(ctx.classpath)
     flags = ["-main", ctx.main] + Utils.to_list(ctx.flags)
-    libs = Utils.to_list(ctx.libs)
+    libs = ["hxJson2"] + Utils.to_list(ctx.libs)
 
     debug = ctx.env.debug
     hasBootstrap = ctx.path.find_dir("res/bootstrap")

@@ -7,6 +7,7 @@ import flambe.asset.AssetPackLoader;
 import flambe.display.AnimatedSprite;
 import flambe.display.FillSprite;
 import flambe.display.Sprite;
+import flambe.display.SpriteSheet;
 import flambe.display.Transform;
 import flambe.Entity;
 import flambe.Input;
@@ -19,21 +20,15 @@ import flambe.System;
 
 class Main
 {
-    public static var IDLE = new Animation(100, [ 15, 16, 17, 16 ]).loop();
-    public static var WALKING = new Animation(100, [ 36, 37, 38, 37 ]).loop();
-    public static var PUNCH = new Animation(100, [ 3, 9, 4, 5, 9, 10, 11, 10, 3 ]);
-
     private static function onSuccess ()
     {
+        var sheet = new SpriteSheet(_loader.pack, "avatar");
+
         var character = new Entity()
-            .add(new AnimatedSprite(_loader.pack.loadTexture("avatar.png"), 6, 8))
+            .add(new AnimatedSprite(sheet))
             .add(new Script());
 
-        // Put the anchor near his feet
-        var sprite = character.get(AnimatedSprite);
-        sprite.anchorX._ = sprite.getNaturalWidth()/2;
-        sprite.anchorY._ = sprite.getNaturalHeight();
-        sprite.play(IDLE);
+        character.get(AnimatedSprite).play("idle");
 
         // Put it in the middle of the stage
         var transform = character.get(Transform);
@@ -43,9 +38,9 @@ class Main
         Input.mouseDown.connect(function (event) {
             // Face left or right
             var transform = character.get(Transform);
-            transform.scaleX._ = (event.viewX < transform.x._) ? 1 : -1;
+            transform.scaleX._ = (event.viewX > transform.x._) ? 1 : -1;
 
-            var delay = flambe.math.FMath.toInt(10*transform.distanceTo(event.viewX, event.viewY));
+            var delay = flambe.math.FMath.toInt(5*transform.distanceTo(event.viewX, event.viewY));
             var script = character.get(Script);
             script.stopAll();
             script.run(new Sequence([
@@ -53,11 +48,10 @@ class Main
                 // MoveTo.linear(event.viewX, event.viewY, delay),
                 new MoveTo(event.viewX, event.viewY, delay, Easing.linear),
                 new CallFunction(function () {
-                    sprite.play(IDLE);
-                    sprite.play(PUNCH);
+                    character.get(AnimatedSprite).play("idle");
                 }),
             ]));
-            sprite.play(WALKING);
+            character.get(AnimatedSprite).play("running");
         });
 
         var world = new Entity().add(new Sprite()); // TODO: Requiring new Sprite() here is quirky

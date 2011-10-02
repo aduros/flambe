@@ -57,15 +57,30 @@ class Matrix
         var sin = Math.sin(angle);
         var cos = Math.cos(angle);
 
-        var c00 = m00*cos + m01*sin;
-        var c01 = -m00*sin + m01*cos;
-        var c10 = m11*sin + m10*cos;
-        var c11 = m11*cos - m10*sin;
+        var t00 = m00*cos + m01*sin;
+        var t01 = -m00*sin + m01*cos;
+        m00 = t00;
+        m01 = t01;
 
-        m00 = c00;
-        m01 = c01;
-        m10 = c10;
-        m11 = c11;
+        var t10 = m11*sin + m10*cos;
+        var t11 = m11*cos - m10*sin;
+        m10 = t10;
+        m11 = t11;
+    }
+
+    public function transformX (x :Float, y :Float) :Float
+    {
+        return x*m00 + y*m01 + m02;
+    }
+
+    public function transformY (x :Float, y :Float) :Float
+    {
+        return x*m10 + y*m11 + m12;
+    }
+
+    public function transformPoint (x :Float, y :Float) :Point
+    {
+        return new Point(transformX(x, y), transformY(x, y));
     }
 
     public function getDeterminant ()

@@ -94,7 +94,9 @@ class ManifestBuilder
 
     public static function readDirectoryNoHidden (dir)
     {
-        return FileSystem.readDirectory(dir).filter(function (file) return file.charAt(0) != ".");
+        return FileSystem.exists(dir) && FileSystem.isDirectory(dir) ?
+            FileSystem.readDirectory(dir).filter(function (file) return file.charAt(0) != ".") :
+            cast [];
     }
 #end
 }

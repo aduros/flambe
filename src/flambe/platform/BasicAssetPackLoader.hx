@@ -42,7 +42,6 @@ class BasicAssetPackLoader
 
     private function handleLoad (entry :AssetEntry, asset :Dynamic)
     {
-        trace("Loaded " + entry.name);
         _assets.set(entry.name, asset);
 
         _assetsLoaded += 1;

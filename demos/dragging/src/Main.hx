@@ -2,6 +2,8 @@
 // Flambe - Rapid game development
 // https://github.com/aduros/flambe/blob/master/LICENSE.txt
 
+import flambe.asset.AssetPack;
+import flambe.asset.Manifest;
 import flambe.display.FillSprite;
 import flambe.display.ImageSprite;
 import flambe.display.Transform;
@@ -14,20 +16,18 @@ class Main
     {
         System.init();
 
-        _loader = System.loadAssetPack("bootstrap");
+        var loader = System.loadAssetPack(Manifest.res("bootstrap"));
         // Add listeners
-        _loader.success.connect(onSuccess);
-        _loader.error.connect(function (message) {
+        loader.success.connect(onSuccess);
+        loader.error.connect(function (message) {
             trace("Load error: " + message);
         });
-        _loader.progress.connect(function () {
-            trace("Loading progress... " + _loader.bytesLoaded + " of " + _loader.bytesTotal);
+        loader.progressChanged.connect(function () {
+            trace("Loading progress... " + loader.progress + " of " + loader.total);
         });
-        // Go!
-        _loader.start();
     }
 
-    private static function onSuccess ()
+    private static function onSuccess (pack :AssetPack)
     {
         trace("Loading complete!");
 

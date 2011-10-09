@@ -21,7 +21,8 @@ import flash.system.Capabilities;
 import flash.ui.ContextMenu;
 import flash.ui.Mouse;
 
-import flambe.asset.AssetPackLoader;
+import flambe.asset.AssetPack;
+import flambe.asset.Manifest;
 import flambe.display.KeyEvent;
 import flambe.display.Texture;
 import flambe.Entity;
@@ -29,6 +30,7 @@ import flambe.Input;
 import flambe.platform.AppDriver;
 import flambe.platform.MainLoop;
 import flambe.System;
+import flambe.util.Promise;
 
 class FlashAppDriver
     implements AppDriver
@@ -71,9 +73,9 @@ class FlashAppDriver
         _lastUpdate = Lib.getTimer();
     }
 
-    public function loadAssetPack (url :String) :AssetPackLoader
+    public function loadAssetPack (manifest :Manifest) :Promise<AssetPack>
     {
-        return new FlashAssetPackLoader(url);
+        return new FlashAssetPackLoader(manifest).promise;
     }
 
     public function getStageWidth () :Int

@@ -3,7 +3,8 @@
 // https://github.com/aduros/flambe/blob/master/LICENSE.txt
 
 import flambe.animation.Easing;
-import flambe.asset.AssetPackLoader;
+import flambe.asset.AssetPack;
+import flambe.asset.Manifest;
 import flambe.display.AnimatedSprite;
 import flambe.display.FillSprite;
 import flambe.display.Sprite;
@@ -20,9 +21,9 @@ import flambe.System;
 
 class Main
 {
-    private static function onSuccess ()
+    private static function onSuccess (pack :AssetPack)
     {
-        var sheet = new SpriteSheet(_loader.pack, "avatar");
+        var sheet = new SpriteSheet(pack, "avatar");
 
         var character = new Entity()
             .add(new AnimatedSprite(sheet))
@@ -66,13 +67,10 @@ class Main
     {
         System.init();
 
-        _loader = System.loadAssetPack("bootstrap");
-        _loader.success.connect(onSuccess);
-        _loader.error.connect(function (message) {
+        var loader = System.loadAssetPack(Manifest.res("bootstrap"));
+        loader.success.connect(onSuccess);
+        loader.error.connect(function (message) {
             trace("Load error: " + message);
         });
-        _loader.start();
     }
-
-    private static var _loader :AssetPackLoader;
 }

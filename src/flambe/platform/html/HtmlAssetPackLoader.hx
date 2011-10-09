@@ -9,60 +9,21 @@ import js.Lib;
 
 import haxe.Http;
 
-import flambe.asset.AssetPack;
-import flambe.asset.AssetPackLoader;
-import flambe.macro.ManifestBuilder;
+import flambe.asset.AssetEntry;
+import flambe.asset.Manifest;
 import flambe.util.Signal0;
 import flambe.util.Signal1;
 
-class HtmlAssetPackLoader
-    implements AssetPackLoader
+class HtmlAssetPackLoader extends BasicAssetPackLoader
 {
-    public var url (default, null) :String;
-    public var bytesLoaded (default, null) :Int;
-    public var bytesTotal (default, null) :Int;
-    public var pack (default, null) :AssetPack;
-
-    public var progress (default, null) :Signal0;
-    public var success (default, null) :Signal0;
-    public var error (default, null) :Signal1<String>;
-
-    public function new (url :String)
+    public function new (manifest :Manifest)
     {
-        this.url = url;
-        this.progress = new Signal0();
-        this.success = new Signal0();
-        this.error = new Signal1();
+        super(manifest);
     }
 
-    public function start () :Void
+    override private function loadEntry (entry :AssetEntry)
     {
-        cancel();
-
-        bytesLoaded = 0;
-        bytesTotal = 0;
-
-        var files = MANIFEST.get(url);
-        if (files == null) {
-            error.emit("Unrecognized pack: " + url);
-            return;
-        }
-
-        for (file in files) {
-            bytesTotal += file.bytes;
-            loadFile(file);
-        }
-    }
-
-    public function cancel ()
-    {
-        // TODO: Actually stop loading everything
-        _contents = new Hash();
-    }
-
-    private function loadFile (file :FileEntry)
-    {
-        switch (file.type) {
+        switch (entry.type) {
             case Image:
                 var image :Image = untyped __js__ ("new Image()");
                 // TODO(bruno): Uncomment this if content hashing is ever added
@@ -79,84 +40,32 @@ class HtmlAssetPackLoader
                     } else {
                         texture.image = image;
                     }
-                    handleLoad(file, texture);
+                    handleLoad(entry, texture);
                 };
                 image.onerror = function (_) {
-                    handleError(file);
+                    handleError("Failed to load image " + entry.url);
                 };
-                image.src = file.url;
+                image.src = entry.url;
 
             case Data:
-                var http = new Http(file.url);
+                var http = new Http(entry.url);
                 http.onData = function (data) {
-                    handleLoad(file, data);
+                    handleLoad(entry, data);
                 };
-                http.onError = function (details) {
-                    handleError(file, details);
-                };
+                http.onError = handleError;
                 http.request(false);
         }
     }
 
-    private function handleLoad (file :FileEntry, data :Dynamic)
-    {
-        _contents.set(file.name, data);
-
-        bytesLoaded += file.bytes;
-        progress.emit();
-
-        if (bytesLoaded == bytesTotal) {
-            pack = new HtmlAssetPack(_contents);
-            success.emit();
-        }
-    }
-
-    private function handleError (file :FileEntry, ?details :String)
-    {
-        var text = "Error loading " + file.url;
-        if (details != null) {
-            text += ": " + details;
-        }
-        error.emit(text);
-    }
-
-    private static function createManifest ()
-    {
+    /** If true, blit loaded images to a canvas and use that as the texture. */
+    private static var CANVAS_TEXTURES :Bool = (function () {
         // On iOS < 5, canvas textures are way faster
         // http://jsperf.com/drawimage-vs-canvaspattern/5
         var pattern = ~/(iPhone|iPod|iPad).*OS (\d+)/;
         if (pattern.match(Lib.window.navigator.userAgent)) {
             var version = Std.parseInt(pattern.matched(2));
-            CANVAS_TEXTURES = (version < 5);
-        } else {
-            CANVAS_TEXTURES = false;
+            return (version < 5);
         }
-
-        // Populate the manifest hash with the files in /res using macro magic
-        var manifest = new Manifest();
-        ManifestBuilder.populateManifest(manifest);
-        return manifest;
-    }
-
-    /** If true, blit loaded images to a canvas and use that as the texture. */
-    private static var CANVAS_TEXTURES :Bool;
-
-    private static var MANIFEST = createManifest();
-
-    private var _contents :Hash<Dynamic>;
+        return false;
+    })();
 }
-
-enum FileType
-{
-    Image;
-    Data;
-}
-
-private typedef FileEntry = {
-    var name :String;
-    var url :String;
-    var type :FileType;
-    var bytes :Int;
-};
-
-private typedef Manifest = Hash<Array<FileEntry>>;

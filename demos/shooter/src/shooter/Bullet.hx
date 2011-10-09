@@ -37,25 +37,24 @@ class Bullet extends Component
             if (dx*dx + dy*dy < hull.radius*hull.radius) {
                 hull.damage(1);
 
-                var fireball = new Entity()
-                    .add(new AnimatedSprite(ShooterCtx.pack.loadTexture("explosion.png"), 13, 1))
-                    .add(new Script());
-                fireball.get(AnimatedSprite).centerAnchor();
-                fireball.get(Script).run(new Sequence([
-                    new Delay(0.001*EXPLOSION.delay*EXPLOSION.frames.length), // TODO(bruno): WaitForFrame
-                    new CallFunction(fireball.dispose),
-                ]));
-                fireball.get(AnimatedSprite).play(EXPLOSION);
-                fireball.get(Transform).x._ = t.x._;
-                fireball.get(Transform).y._ = t.y._;
-                fireball.get(AnimatedSprite).blendMode = Add;
-                System.root.addChild(fireball);
+                // FIXME: Migrate to new AnimatedSprite system
+                // var fireball = new Entity()
+                //     .add(new AnimatedSprite(ShooterCtx.pack.loadTexture("explosion.png"), 13, 1))
+                //     .add(new Script());
+                // fireball.get(AnimatedSprite).centerAnchor();
+                // fireball.get(Script).run(new Sequence([
+                //     new Delay(0.001*EXPLOSION.delay*EXPLOSION.frames.length), // TODO(bruno): WaitForFrame
+                //     new CallFunction(fireball.dispose),
+                // ]));
+                // fireball.get(AnimatedSprite).play(EXPLOSION);
+                // fireball.get(Transform).x._ = t.x._;
+                // fireball.get(Transform).y._ = t.y._;
+                // fireball.get(AnimatedSprite).blendMode = Add;
+                // System.root.addChild(fireball);
 
                 owner.dispose();
                 return;
             }
         }
     }
-
-    public static var EXPLOSION = new Animation(50, [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ]);
 }

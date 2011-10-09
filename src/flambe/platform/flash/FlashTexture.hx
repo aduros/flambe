@@ -14,10 +14,11 @@ class FlashTexture
     public var width (getWidth, null) :Int;
     public var height (getHeight, null) :Int;
 
-    public var bitmapData :BitmapData;
+    public var bitmapData (default, null) :BitmapData;
 
-    public function new ()
+    public function new (bitmapData)
     {
+        this.bitmapData = bitmapData;
     }
 
     inline private function getWidth () :Int

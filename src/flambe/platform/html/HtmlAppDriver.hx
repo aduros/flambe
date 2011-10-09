@@ -6,7 +6,8 @@ package flambe.platform.html;
 
 import js.Lib;
 
-import flambe.asset.AssetPackLoader;
+import flambe.asset.AssetPack;
+import flambe.asset.Manifest;
 import flambe.display.KeyEvent;
 import flambe.display.MouseEvent;
 import flambe.display.Texture;
@@ -15,6 +16,7 @@ import flambe.Input;
 import flambe.platform.AppDriver;
 import flambe.platform.MainLoop;
 import flambe.System;
+import flambe.util.Promise;
 import flambe.util.Signal1;
 
 class HtmlAppDriver
@@ -129,9 +131,9 @@ class HtmlAppDriver
         Lib.window.scrollTo(0, 0);
     }
 
-    public function loadAssetPack (url :String) :AssetPackLoader
+    public function loadAssetPack (manifest :Manifest) :Promise<AssetPack>
     {
-        return new HtmlAssetPackLoader(url);
+        return new HtmlAssetPackLoader(manifest).promise;
     }
 
     public function getStageWidth () :Int

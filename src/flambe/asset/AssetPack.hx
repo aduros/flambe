@@ -4,11 +4,16 @@
 
 package flambe.asset;
 
+import flambe.asset.Manifest;
 import flambe.display.Texture;
 
 interface AssetPack
 {
-    public function loadTexture (file :String) :Texture;
+    public var manifest (getManifest, null) :Manifest;
 
-    public function loadFile (file :String) :String;
+    public function loadTexture (name :String) :Texture;
+
+    public function loadFile (name :String) :String;
+
+    public function getManifest () :Manifest;
 }

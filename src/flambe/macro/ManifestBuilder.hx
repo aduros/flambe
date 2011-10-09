@@ -18,16 +18,16 @@ using StringTools;
 #end
 
 /**
- * Creates the asset manifest from the files in /res
+ * Creates the asset manifests from the files in /res
  */
 class ManifestBuilder
 {
     @:macro
-    public static function populateManifest (manifest :Expr)
+    public static function populate (hash :Expr)
     {
         var assetDir = "../res/";
         var exprs :Array<Expr> = [];
-        var setter = EField(manifest, "set").toExpr();
+        var hash_set = EField(hash, "set").toExpr();
 
         for (packName in readDirectoryNoHidden(assetDir)) {
             var entries :Array<Expr> = [];
@@ -36,23 +36,18 @@ class ManifestBuilder
                     var name = file;
                     var url = packName + "/" + file;
                     var bytes = FileSystem.stat(assetDir + packName + "/" + file).size;
-                    var type = switch (getExtension(file.toLowerCase())) {
-                        case "png", "jpg": "Image";
-                        default: "Data";
-                    }
 
-                    // Assemble the object literal for this file
-                    var fileObject = exprOf(EObjectDecl([
+                    // Assemble the object literal for this asset
+                    var entry = exprOf(EObjectDecl([
                         { field: "name", expr: name.toExpr() },
                         { field: "url", expr: url.toExpr() },
-                        { field: "type", expr: EConst(CIdent(type)).toExpr() },
                         { field: "bytes", expr: bytes.toExpr() }
                     ]));
-                    entries.push(fileObject);
+                    entries.push(entry);
                 }
 
                 // Build a pack with a list of file entries
-                exprs.push(ECall(setter, [ packName.toExpr(),
+                exprs.push(ECall(hash_set, [ packName.toExpr(),
                     EArrayDecl(entries).toExpr() ]).toExpr());
             }
         }

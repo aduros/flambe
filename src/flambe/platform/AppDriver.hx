@@ -4,15 +4,17 @@
 
 package flambe.platform;
 
-import flambe.asset.AssetPackLoader;
-import flambe.Entity;
+import flambe.asset.AssetPack;
+import flambe.asset.Manifest;
 import flambe.display.Texture;
+import flambe.Entity;
+import flambe.util.Promise;
 
 interface AppDriver
 {
     function init (root :Entity) :Void;
 
-    function loadAssetPack (url :String) :AssetPackLoader;
+    function loadAssetPack (manifest :Manifest) :Promise<AssetPack>;
 
     function getStageWidth () :Int;
     function getStageHeight () :Int;

@@ -4,6 +4,7 @@
 
 package flambe;
 
+import flambe.asset.Manifest;
 import flambe.display.MouseEvent;
 import flambe.display.Sprite;
 import flambe.platform.AppDriver;
@@ -37,9 +38,9 @@ class System
         driver.init(root);
     }
 
-    inline public static function loadAssetPack (url :String)
+    inline public static function loadAssetPack (manifest :Manifest)
     {
-        return driver.loadAssetPack(url);
+        return driver.loadAssetPack(manifest);
     }
 
     inline public static function callNative (funcName :String, ?params :Array<Dynamic>) :Dynamic

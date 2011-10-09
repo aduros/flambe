@@ -4,6 +4,7 @@
 
 import flambe.animation.Easing;
 import flambe.asset.AssetPack;
+import flambe.asset.Manifest;
 import flambe.display.FillSprite;
 import flambe.display.Font;
 import flambe.display.TextSprite;
@@ -13,12 +14,12 @@ import flambe.System;
 
 class Main
 {
-    public static function run ()
+    public static function onSuccess (pack :AssetPack)
     {
         var bg = new Entity().add(new FillSprite(0xffffff, System.stageWidth, System.stageHeight));
         System.root.addChild(bg);
 
-        var font = new Font(_pack, "myfont");
+        var font = new Font(pack, "myfont");
         var label = new Entity()
             .add(new TextSprite(font, "Go ahead, tap me"));
 
@@ -47,16 +48,10 @@ class Main
     {
         System.init();
 
-        var loader = System.loadAssetPack("bootstrap");
-        loader.success.connect(function () {
-            _pack = loader.pack;
-            run();
-        });
+        var loader = System.loadAssetPack(Manifest.res("bootstrap"));
+        loader.success.connect(onSuccess);
         loader.error.connect(function (message) {
             trace("Load error: " + message);
         });
-        loader.start();
     }
-
-    private static var _pack :AssetPack;
 }

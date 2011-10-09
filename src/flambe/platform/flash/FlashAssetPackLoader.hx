@@ -6,15 +6,16 @@ package flambe.platform.flash;
 
 import flash.display.Bitmap;
 import flash.display.Loader;
+import flash.errors.Error;
+import flash.events.ErrorEvent;
 import flash.events.Event;
 import flash.events.IEventDispatcher;
 import flash.events.IOErrorEvent;
-import flash.events.ErrorEvent;
 import flash.events.ProgressEvent;
 import flash.events.SecurityErrorEvent;
 import flash.net.URLLoader;
 import flash.net.URLRequest;
-import flash.errors.Error;
+import flash.system.LoaderContext;
 
 import flambe.asset.AssetEntry;
 import flambe.asset.Manifest;
@@ -40,8 +41,10 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
                     var bitmap :Bitmap = cast loader.content;
                     handleLoad(entry, new FlashTexture(bitmap.bitmapData));
                 });
+                var ctx = new LoaderContext();
+                ctx.checkPolicyFile = true;
                 try {
-                    loader.load(req);
+                    loader.load(req, ctx);
                 } catch (error :Error) {
                     promise.error.emit(error.message);
                 }

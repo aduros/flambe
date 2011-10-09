@@ -24,7 +24,6 @@ def apply_flambe(ctx):
     libs = ["hxJson2"] + Utils.to_list(ctx.libs)
 
     debug = ctx.env.debug
-    hasBootstrap = ctx.path.find_dir("res/bootstrap")
     closure = ctx.bld.path.find_resource(FLAMBE_ROOT+"/tools/closure.jar")
 
     flash_flags = "-swf-header 640:480:60:ffffff".split()
@@ -40,7 +39,6 @@ def apply_flambe(ctx):
 
     ctx.bld(features="haxe", classpath=classpath,
         flags=flags + flash_flags,
-        swflib="bootstrap.swf" if hasBootstrap else None,
         libs=libs,
         target="app.swf")
     ctx.bld.install_files("deploy/web", "app.swf")
@@ -67,20 +65,11 @@ def apply_flambe(ctx):
 
     res = ctx.path.find_dir("res")
     if res is not None:
-        # Create asset swfs from the directories in /res
-        ctx.bld(features="haxe", classpath=FLAMBE_ROOT+"/tools/packager/src",
-            flags="-main AssetPackager",
-            libs="format",
-            target="packager.n")
-        # -interp because neko JIT is unstable...
-        ctx.bld(rule="%s -interp ${SRC} %s ." % (ctx.env.NEKO, res.abspath()),
-            source="packager.n", target= "bootstrap.swf" if hasBootstrap else None)
-
         # Force a rebuild when anything in res/ has been updated
         assets = res.ant_glob("**/*")
         for asset in assets:
             ctx.bld.add_manual_dependency("app-html.js", asset)
-            ctx.bld.add_manual_dependency("bootstrap.swf", asset)
+            ctx.bld.add_manual_dependency("app.swf", asset)
 
         ctx.bld.install_files("deploy/web", assets, cwd=res, relative_trick=True)
 

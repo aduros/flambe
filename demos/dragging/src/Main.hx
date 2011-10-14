@@ -33,21 +33,20 @@ class Main
 
         // Add a filled background color
         System.root.addChild(new Entity()
-            .add(new FillSprite(0x303030, System.stageWidth, System.stageHeight)));
+            .add(new FillSprite(0x303030, System.stage.width, System.stage.height)));
 
         for (ii in 0...10) {
             var tentacle = new Entity()
-                .add(new ImageSprite(_loader.pack.loadTexture("tentacle.png")))
+                .add(new ImageSprite(pack.loadTexture("tentacle.png")))
                 .add(new Draggable());
             var sprite = tentacle.get(ImageSprite);
             var xform = tentacle.get(Transform);
-            xform.x._ = Math.random() * (System.stageWidth-sprite.getNaturalWidth());
-            xform.y._ = Math.random() * (System.stageHeight-sprite.getNaturalHeight());
+            xform.x._ = Math.random() * (System.stage.width-sprite.getNaturalWidth());
+            xform.y._ = Math.random() * (System.stage.height-sprite.getNaturalHeight());
             xform.scaleX._ = xform.scaleY._ = 0.5 + Math.random()*4;
             xform.rotation._ = Math.random()*90;
             System.root.addChild(tentacle);
         }
     }
 
-    private static var _loader;
 }

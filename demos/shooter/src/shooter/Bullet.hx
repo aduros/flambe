@@ -22,8 +22,8 @@ class Bullet extends Component
     {
         var t = owner.get(Transform);
         t.y._ -= dt*0.5;
-        if (t.x._ < 0 || t.x._ > System.stageWidth ||
-            t.y._ < 0 || t.y._ > System.stageHeight) {
+        if (t.x._ < 0 || t.x._ > System.stage.width ||
+            t.y._ < 0 || t.y._ > System.stage.height) {
             owner.dispose();
             return;
         }

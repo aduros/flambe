@@ -18,7 +18,7 @@ class BomberAI extends Component
     {
         var t = owner.get(Transform);
         t.y._ += dt*0.05;
-        if (t.y._ > System.stageHeight) {
+        if (t.y._ > System.stage.height) {
             owner.dispose();
         }
     }

@@ -16,14 +16,10 @@ interface AppDriver
 
     function loadAssetPack (manifest :Manifest) :Promise<AssetPack>;
 
-    function getStageWidth () :Int;
-    function getStageHeight () :Int;
-
+    function getStage () :Stage;
     function getStorage () :Storage;
 
     function getLocale () :String;
 
     function callNative (funcName :String, params :Array<Dynamic>) :Dynamic;
-
-    function lockOrientation (orient :Orientation) :Void;
 }

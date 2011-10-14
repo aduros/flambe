@@ -19,8 +19,8 @@ class SwarmerAI extends Component
     override public function onUpdate (dt)
     {
         var t = owner.get(Transform);
-        var w = System.stageWidth/2;
-        var h = System.stageHeight/2;
+        var w = System.stage.width/2;
+        var h = System.stage.height/2;
         t.x._ = w + Math.cos(_angleX) * w;
         t.y._ = h + Math.sin(_angleY) * h;
         t.rotation._ = -45*Math.cos(_angleX);

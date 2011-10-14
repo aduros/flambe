@@ -16,7 +16,7 @@ class Main
 {
     public static function onSuccess (pack :AssetPack)
     {
-        var bg = new Entity().add(new FillSprite(0xffffff, System.stageWidth, System.stageHeight));
+        var bg = new Entity().add(new FillSprite(0xffffff, System.stage.width, System.stage.height));
         System.root.addChild(bg);
 
         var font = new Font(pack, "myfont");
@@ -34,9 +34,9 @@ class Main
             var transform = label.get(Transform);
             var margin = 50;
             transform.x.animateTo(
-                margin + (System.stageWidth - 2*margin)*Math.random(), 1000, Easing.linear);
+                margin + (System.stage.width - 2*margin)*Math.random(), 1000, Easing.linear);
             transform.y.animateTo(
-                margin + (System.stageHeight - 2*margin)*Math.random(), 1000, Easing.linear);
+                margin + (System.stage.height - 2*margin)*Math.random(), 1000, Easing.linear);
             transform.rotation.animateTo(360*Math.random(), 1000, Easing.quadOut);
             label.get(TextSprite).text = messages[taps++ % messages.length];
         });

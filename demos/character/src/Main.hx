@@ -33,8 +33,8 @@ class Main
 
         // Put it in the middle of the stage
         var transform = character.get(Transform);
-        transform.x._ = System.stageWidth/2;
-        transform.y._ = System.stageHeight/2;
+        transform.x._ = System.stage.width/2;
+        transform.y._ = System.stage.height/2;
 
         Input.mouseDown.connect(function (event) {
             // Face left or right
@@ -58,7 +58,7 @@ class Main
         var world = new Entity().add(new Sprite()); // TODO: Requiring new Sprite() here is quirky
         // Add a background
         world.addChild(new Entity().add(
-            new FillSprite(0x303030, System.stageWidth, System.stageHeight)));
+            new FillSprite(0x303030, System.stage.width, System.stage.height)));
         world.addChild(character);
         System.root.addChild(world);
     }

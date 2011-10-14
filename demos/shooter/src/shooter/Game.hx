@@ -38,8 +38,8 @@ class Game extends Component
         var water = new Entity()
             .add(new PatternSprite(ShooterCtx.pack.loadTexture("water.png")))
             .add(new WaterScroller(0.1/4));
-        water.get(PatternSprite).width._ = System.stageWidth;
-        water.get(PatternSprite).height._ = System.stageHeight+32;
+        water.get(PatternSprite).width._ = System.stage.width;
+        water.get(PatternSprite).height._ = System.stage.height+32;
         water.get(Transform).y._ = -32;
         owner.addChild(water);
 
@@ -50,11 +50,11 @@ class Game extends Component
                 var texture = ShooterCtx.pack.loadTexture("cloud.png");
                 var cloud = new Entity().add(new ImageSprite(texture));
                 var t = cloud.get(Transform);
-                t.x._ = Math.random()*(System.stageWidth+texture.width) - texture.width;
+                t.x._ = Math.random()*(System.stage.width+texture.width) - texture.width;
                 t.y._ = -texture.height;
                 cloud.get(Sprite).alpha._ = 0.8;
                 cloudLayer.get(Script).run(new Sequence([
-                    new AnimateTo(cloud.get(Transform).y, System.stageHeight, 3*Std.int(8000+2000*Math.random()), Easing.linear),
+                    new AnimateTo(cloud.get(Transform).y, System.stage.height, 3*Std.int(8000+2000*Math.random()), Easing.linear),
                     new CallFunction(cloud.dispose)
                 ]));
                 cloudLayer.addChild(cloud);
@@ -122,7 +122,7 @@ class Game extends Component
             .add(new Hull(40, 5))
             .add(new BomberAI());
         enemy.get(Sprite).centerAnchor();
-        enemy.get(Transform).x._ = Math.random()*flambe.System.stageWidth;
+        enemy.get(Transform).x._ = Math.random()*flambe.System.stage.width;
         enemy.get(Transform).y._ = -enemy.get(Sprite).getNaturalHeight()/2;
         return enemy;
     }

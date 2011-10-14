@@ -45,6 +45,8 @@ class HtmlAppDriver
             throw "Could not find a Flambe canvas! Are you not embedding with flambe.js?";
         }
 
+        _stage = new HtmlStage(_canvas);
+
         _loop = new MainLoop(new HtmlDrawingContext(_canvas));
         _lastUpdate = Date.now().getTime();
 
@@ -136,14 +138,9 @@ class HtmlAppDriver
         return new HtmlAssetPackLoader(manifest).promise;
     }
 
-    public function getStageWidth () :Int
+    public function getStage () :Stage
     {
-        return _canvas.width;
-    }
-
-    public function getStageHeight () :Int
-    {
-        return _canvas.height;
+        return _stage;
     }
 
     public function getStorage () :Storage
@@ -179,11 +176,6 @@ class HtmlAppDriver
         } catch (e :Dynamic) {
             return null;
         }
-    }
-
-    public function lockOrientation (orient :Orientation)
-    {
-        // Nothing at all
     }
 
     private function update (now :Float)
@@ -233,5 +225,6 @@ class HtmlAppDriver
     private var _lastUpdate :Float;
 
     private var _canvas :Dynamic;
+    private var _stage :Stage;
     private var _storage :Storage;
 }

@@ -5,10 +5,8 @@
 package flambe;
 
 import flambe.asset.Manifest;
-import flambe.display.MouseEvent;
-import flambe.display.Sprite;
 import flambe.platform.AppDriver;
-import flambe.platform.Orientation;
+import flambe.platform.Stage;
 import flambe.platform.Storage;
 import flambe.util.Signal1;
 
@@ -17,9 +15,7 @@ class System
     public static var root (default, null) :Entity;
     public static var driver (default, null) :AppDriver;
 
-    public static var stageWidth (getStageWidth, null) :Int;
-    public static var stageHeight (getStageHeight, null) :Int;
-
+    public static var stage (getStage, null) :Stage;
     public static var storage (getStorage, null) :Storage;
 
     public static function init ()
@@ -48,19 +44,9 @@ class System
         return driver.callNative(funcName, params);
     }
 
-    inline public static function lockOrientation (orient :Orientation)
+    inline private static function getStage () :Stage
     {
-        driver.lockOrientation(orient);
-    }
-
-    inline private static function getStageWidth () :Int
-    {
-        return driver.getStageWidth();
-    }
-
-    inline private static function getStageHeight () :Int
-    {
-        return driver.getStageHeight();
+        return driver.getStage();
     }
 
     inline private static function getStorage () :Storage

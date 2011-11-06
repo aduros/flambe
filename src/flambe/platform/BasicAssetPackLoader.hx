@@ -20,18 +20,22 @@ class BasicAssetPackLoader
         _manifest = manifest;
 
         var entries = manifest.getEntries();
-        _assetsLoaded = 0;
-        _assetsTotal = entries.length;
+        _assetsRemaining = entries.length;
         _assets = new Hash();
 
-        if (_assetsTotal == 0) {
+        _bytesLoaded = new Hash();
+
+        if (_assetsRemaining == 0) {
             // There's nothing to load, just send them an empty pack
             handleSuccess();
 
         } else {
+            var bytesTotal = 0;
             for (entry in entries) {
+                bytesTotal += entry.bytes;
                 loadEntry(entry);
             }
+            promise.total = bytesTotal;
         }
     }
 
@@ -44,10 +48,21 @@ class BasicAssetPackLoader
     {
         _assets.set(entry.name, asset);
 
-        _assetsLoaded += 1;
-        if (_assetsLoaded >= _assetsTotal) {
+        _assetsRemaining -= 1;
+        if (_assetsRemaining <= 0) {
             handleSuccess();
         }
+    }
+
+    private function handleProgress (entry :AssetEntry, bytesLoaded :Int)
+    {
+        _bytesLoaded.set(entry.name, bytesLoaded);
+
+        var bytesTotal = 0;
+        for (bytes in _bytesLoaded) {
+            bytesTotal += bytes;
+        }
+        promise.progress = bytesTotal;
     }
 
     private function handleSuccess ()
@@ -63,8 +78,11 @@ class BasicAssetPackLoader
     private var _manifest :Manifest;
     private var _assets :Hash<Dynamic>;
 
-    private var _assetsLoaded :Int;
-    private var _assetsTotal :Int;
+    // How many assets are still loading
+    private var _assetsRemaining :Int;
+
+    // How many bytes of each asset have been loaded
+    private var _bytesLoaded :Hash<Int>;
 }
 
 // A simple AssetPack backed by a Hash

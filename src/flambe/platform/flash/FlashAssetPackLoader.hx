@@ -65,8 +65,8 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
         dispatcher.addEventListener(Event.COMPLETE, function (_) {
             dispatcher = null;
         });
-        dispatcher.addEventListener(ProgressEvent.PROGRESS, function (_) {
-            // TODO
+        dispatcher.addEventListener(ProgressEvent.PROGRESS, function (event :ProgressEvent) {
+            handleProgress(entry, cast event.bytesLoaded);
         });
         dispatcher.addEventListener(IOErrorEvent.IO_ERROR, onError);
         dispatcher.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onError);

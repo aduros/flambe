@@ -57,6 +57,14 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         }
     }
 
+    override private function handleLoad (entry :AssetEntry, asset :Dynamic)
+    {
+        // We don't get progress events in JS, the best we can do is to update it when an asset
+        // finishes loading
+        handleProgress(entry, entry.bytes);
+        super.handleLoad(entry, asset);
+    }
+
     /** If true, blit loaded images to a canvas and use that as the texture. */
     private static var CANVAS_TEXTURES :Bool = (function () {
         // On iOS < 5, canvas textures are way faster

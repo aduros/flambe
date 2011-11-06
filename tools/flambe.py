@@ -27,7 +27,7 @@ def apply_flambe(ctx):
     closure = ctx.bld.path.find_resource(FLAMBE_ROOT+"/tools/closure.jar")
 
     flash_flags = "-swf-header 640:480:60:ffffff".split()
-    html_flags = "-D html --macro flambe.macro.BrowserJSGenerator.use()".split()
+    html_flags = "-D html".split()
 
     if debug:
         flags += "-D debug --no-opt --no-inline".split()
@@ -55,10 +55,8 @@ def apply_flambe(ctx):
              * https://github.com/aduros/flambe
              */
             %%output%%""")
-        # TODO(bruno): Higher compilation levels break the app because haXe uses eval in places.
-        # Submit an issue/patch upstream.
         ctx.bld(rule=("%s -jar '%s' --js ${SRC} --js_output_file ${TGT} " +
-            "--output_wrapper  '%s' --compilation_level WHITESPACE_ONLY --warning_level QUIET") %
+            "--output_wrapper '%s' --warning_level QUIET") %
                 (ctx.env.JAVA, closure.abspath(), wrapper),
             source="app-html.uncompressed.js", target="app-html.js")
     ctx.bld.install_files("deploy/web", "app-html.js")
@@ -99,7 +97,7 @@ def apply_flambe_server(ctx):
     libs = Utils.to_list(ctx.libs)
 
     # TODO(bruno): Use the node externs in haxelib
-    flags += "-D server --macro flambe.macro.AmityJSGenerator.use()".split()
+    flags += "-D server".split()
 
     if ctx.env.debug:
         flags += "-D debug --no-opt --no-inline".split()

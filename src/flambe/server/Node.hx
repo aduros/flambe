@@ -10,9 +10,9 @@ class Node
     public static var parse :String -> Dynamic = untyped JSON.parse;
     public static var require :String -> Dynamic = untyped __js__("require");
 
-    public static function puts (message :String)
+    public static function log (message :String)
     {
-        _sys.puts(message);
+        untyped console.log(message);
     }
 
     inline public static function newBuffer (?data :String, ?encoding :String) :Dynamic
@@ -25,6 +25,4 @@ class Node
     {
         throw untyped __js__("new Error")(message);
     }
-
-    private static var _sys = require("sys");
 }

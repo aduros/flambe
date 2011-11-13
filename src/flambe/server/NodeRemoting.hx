@@ -30,7 +30,7 @@ class NodeRemoting
                 var message = (err.message != null) ? err.message : err;
                 var stack = err.stack;
 
-                Node.puts("Remoting exception: " +
+                Node.log("Remoting exception: " +
                     (err.stack != null ? err.stack : message));
 
                 var s = new haxe.Serializer();

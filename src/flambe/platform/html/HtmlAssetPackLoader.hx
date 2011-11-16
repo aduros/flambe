@@ -67,13 +67,9 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
 
     /** If true, blit loaded images to a canvas and use that as the texture. */
     private static var CANVAS_TEXTURES :Bool = (function () {
-        // On iOS < 5, canvas textures are way faster
-        // http://jsperf.com/drawimage-vs-canvaspattern/5
-        var pattern = ~/(iPhone|iPod|iPad).*OS (\d+)/;
-        if (pattern.match(Lib.window.navigator.userAgent)) {
-            var version = Std.parseInt(pattern.matched(2));
-            return (version < 5);
-        }
-        return false;
+        // On iOS, canvas textures are way faster
+        // http://jsperf.com/drawimage-vs-canvaspattern/8
+        var pattern = ~/(iPhone|iPod|iPad)/;
+        return pattern.match(Lib.window.navigator.userAgent);
     })();
 }

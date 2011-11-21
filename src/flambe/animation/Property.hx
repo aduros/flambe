@@ -19,6 +19,7 @@ class Property<A>
     implements haxe.rtti.Generic // Generate typed templates in Flash
 {
     public var _ (get, set) :A;
+    public var behavior (getBehavior, setBehavior) :Behavior<A>;
 
     public var updated (default, null) :Signal1<Property<A>>;
 
@@ -76,10 +77,11 @@ class Property<A>
         setBehavior(new Binding(to, fn));
     }
 
-    public function setBehavior (behavior :Behavior<A>)
+    public function setBehavior (behavior :Behavior<A>) :Behavior<A>
     {
         _behavior = behavior;
         update(0);
+        return behavior;
     }
 
     inline public function getBehavior () :Behavior<A>

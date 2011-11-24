@@ -86,7 +86,7 @@ private class DrawVisitor
         }
 
         var alpha = sprite.alpha._;
-        if (!sprite.visible._ || alpha < 0) {
+        if (!sprite.visible._ || alpha <= 0) {
             return false;
         }
 

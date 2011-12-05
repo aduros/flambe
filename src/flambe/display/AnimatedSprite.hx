@@ -4,6 +4,7 @@
 
 package flambe.display;
 
+import flambe.animation.Property;
 import flambe.display.SpriteSheet;
 import flambe.math.FMath;
 
@@ -12,12 +13,15 @@ class AnimatedSprite extends Sprite
     public var sheet (default, null) :SpriteSheet;
     public var animation (default, null) :Animation;
     public var frame (getFrame, setFrame) :Int;
+
+    public var speed (default, null) :PFloat;
     public var paused (default, null) :Bool;
 
     public function new (sheet :SpriteSheet)
     {
         super();
         this.sheet = sheet;
+        this.speed = new PFloat(1);
     }
 
     public function play (name :String)
@@ -46,10 +50,10 @@ class AnimatedSprite extends Sprite
         super.onUpdate(dt);
 
         if (animation != null && !paused) {
-            _elapsed += dt;
+            _elapsed += dt*speed._;
             var framesElapsed = FMath.toInt(_elapsed / animation.delay);
             if (framesElapsed > 0) {
-                _elapsed -= FMath.toInt(framesElapsed*animation.delay);
+                _elapsed -= framesElapsed*animation.delay;
                 _frame += framesElapsed;
 
                 var frameCount = animation.frames.length;
@@ -118,7 +122,7 @@ class AnimatedSprite extends Sprite
         return _frame;
     }
 
-    private var _elapsed :Int;
+    private var _elapsed :Float;
     private var _frame :Int;
     private var _defaultAnim :Animation;
 }

@@ -92,6 +92,7 @@ def apply_flambe(ctx):
 @feature("flambe-server")
 def apply_flambe_server(ctx):
     Utils.def_attrs(ctx, classpath="", flags="", libs="")
+    if ctx.target == "": ctx.target = "server.js"
     classpath=["src", FLAMBE_ROOT+"/src"] + Utils.to_list(ctx.classpath)
     flags = ["-main", ctx.main] + Utils.to_list(ctx.flags)
     libs = Utils.to_list(ctx.libs)
@@ -105,8 +106,8 @@ def apply_flambe_server(ctx):
         #flags += "--dead-code-elimination --no-traces".split()
         flags += "--no-traces".split()
 
-    ctx.bld(features="haxe", classpath=classpath, flags=flags, libs=libs, target="server.js")
-    ctx.bld.install_files("deploy", "server.js")
+    ctx.bld(features="haxe", classpath=classpath, flags=flags, libs=libs, target=ctx.target)
+    ctx.bld.install_files("deploy", ctx.target)
     ctx.bld.install_files("deploy", ctx.path.ant_glob("data/**/*"), relative_trick=True)
     if ctx.bld.cmd == "install":
         ctx.bld.add_post_fun(restart_server)

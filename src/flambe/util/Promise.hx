@@ -38,6 +38,16 @@ class Promise<A>
         return result;
     }
 
+    /** Retrieve the value if available, otherwise receive it later. */
+    public function get (fn :A -> Void)
+    {
+        if (this.result == null) {
+            success.connect(fn).once();
+        } else {
+            fn(this.result);
+        }
+    }
+
     inline private function getProgress () :Float
     {
         return _progress;

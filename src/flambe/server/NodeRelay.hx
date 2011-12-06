@@ -32,7 +32,7 @@ class NodeRelay<T>
     public var onSuccess (null, default) :T -> Void;
     public var onError (null, default) :Dynamic -> Void;
 
-    public function new (onSuccess :T -> Void)
+    public function new (?onSuccess :T -> Void)
     {
         this.onSuccess = onSuccess;
     }
@@ -40,7 +40,9 @@ class NodeRelay<T>
     public function success (result :T)
     {
         try {
-            onSuccess(result);
+            if (onSuccess != null) {
+                onSuccess(result);
+            }
         } catch (e :Dynamic) {
             error(e);
         }

@@ -18,9 +18,16 @@ class System
     public static var stage (getStage, null) :Stage;
     public static var storage (getStorage, null) :Storage;
 
+    /**
+     * Emitted when an uncaught exception occurs, if the platform supports it. You can wire this up
+     * to your telemetry reporting service of choice.
+     */
+    public static var uncaughtError (default, null) :Signal1<String>;
+
     public static function init ()
     {
         root = new Entity();
+        uncaughtError = new Signal1();
 
 #if flash
         driver = new flambe.platform.flash.FlashAppDriver();

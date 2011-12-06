@@ -61,7 +61,7 @@ class HtmlAppDriver
             };
             requestAnimationFrame(updateFrame, _canvas);
         } else {
-            (untyped Lib.window.setInterval)(function () {
+            (untyped Lib.window).setInterval(function () {
                 update(Date.now().getTime());
             }, 1000/60);
         }
@@ -128,6 +128,13 @@ class HtmlAppDriver
         }, false);
         _canvas.addEventListener("touchend", onTouchEnd, false);
         _canvas.addEventListener("touchcancel", onTouchEnd, false);
+
+        // Handle uncaught errors
+        var oldErrorHandler = (untyped Lib.window).onerror;
+        (untyped Lib.window).onerror = function (message, url, line) {
+            System.uncaughtError.emit(message);
+            return (oldErrorHandler != null) ? oldErrorHandler(message, url, line) : false;
+        };
 
         // Hide the status bar on Mobile Safari
         Lib.window.scrollTo(0, 0);

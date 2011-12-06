@@ -8,6 +8,7 @@ import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.Sprite;
 import flash.events.Event;
+import flash.events.IEventDispatcher;
 import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.external.ExternalInterface;
@@ -34,9 +35,9 @@ class FlashAppDriver
     public function init (root :Entity)
     {
 #if debug
-        //haxe.Log.trace = function (v, ?pos) {
-        //    flash.Lib.trace(v);
-        //};
+        haxe.Log.trace = function (v, ?pos) {
+            flash.Lib.trace(v);
+        };
 #end
         var stage = Lib.current.stage;
         stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
@@ -50,6 +51,13 @@ class FlashAppDriver
         _stage = new FlashStage(stage);
         _stage.resize.connect(onResized);
         onResized();
+
+        // Handle uncaught errors
+        var loaderInfo = Lib.current.loaderInfo;
+        if (Reflect.hasField(loaderInfo, "uncaughtErrorEvents")) {
+            var dispatcher :IEventDispatcher = Reflect.field(loaderInfo, "uncaughtErrorEvents");
+            dispatcher.addEventListener("uncaughtError", onUncaughtError);
+        }
 
         _lastUpdate = Lib.getTimer();
     }
@@ -148,6 +156,13 @@ class FlashAppDriver
         }
         _bitmap = new Bitmap(_screen);
         Lib.current.addChild(_bitmap);
+    }
+
+    private function onUncaughtError (event :Event)
+    {
+        // More reflection here because I don't want to require Flash 10.1...
+        var error = Reflect.field(event, "error");
+        System.uncaughtError.emit(FlashUtil.getErrorMessage(error));
     }
 
     private var _bitmap :Bitmap;

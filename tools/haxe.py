@@ -56,7 +56,7 @@ class haxe(Task.Task):
 @feature("haxe")
 def apply_haxe(self):
     Utils.def_attrs(self,
-        target="", classpath="", flags="", libs="", swflib=None);
+        target="", classpath="", flags="", libs="", swflib=None, swf_version="9");
 
     classpath = Utils.to_list(self.classpath)
     flags = Utils.to_list(self.flags)
@@ -65,7 +65,7 @@ def apply_haxe(self):
     inputs = []
 
     if target.endswith(".swf"):
-        flags += ["-swf", target, "--flash-strict", "-swf-version", "10"]
+        flags += ["-swf", target, "--flash-strict", "-swf-version", self.swf_version]
         if (self.swflib is not None):
             swflib = self.path.get_bld().make_node(self.swflib)
             inputs += [swflib]

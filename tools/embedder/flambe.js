@@ -16,7 +16,7 @@ var flambe = (function () {
             }
 
             var pref = args["flambe-platform"];
-            var flashVersion = "10";
+            var flashVersion = "9";
 
             if ((pref == null || pref == "flash")
                     && swfobject.hasFlashPlayerVersion(flashVersion)) {

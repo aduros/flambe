@@ -18,14 +18,14 @@ using StringTools;
 #end
 
 /**
- * Creates the asset manifests from the files in /res
+ * Creates the asset manifests from the files in /assets
  */
 class ManifestBuilder
 {
     @:macro
     public static function populate (hash :Expr)
     {
-        var assetDir = "../res/";
+        var assetDir = "../assets/";
         var exprs :Array<Expr> = [];
         var hash_set = EField(hash, "set").toExpr();
 

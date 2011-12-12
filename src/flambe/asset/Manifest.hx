@@ -16,10 +16,10 @@ class Manifest
         _entries = [];
     }
 
-    // Get a manifest of an asset pack in /res
-    public static function res (packName :String)
+    // Get a manifest of a pack in the asset directory at build-time
+    public static function build (packName :String) :Manifest
     {
-        return _macroManifests.get(packName);
+        return _buildManifest.get(packName);
     }
 
     public function add (name :String, url :String, bytes :Int = 0, ?type :AssetType)
@@ -40,7 +40,7 @@ class Manifest
         return _entries.copy();
     }
 
-    private static function createMacroManifests ()
+    private static function createBuildManifests ()
     {
         var macroData = new Hash<Array<Dynamic>>();
         ManifestBuilder.populate(macroData);
@@ -56,7 +56,7 @@ class Manifest
         return manifests;
     }
 
-    private static var _macroManifests :Hash<Manifest> = createMacroManifests();
+    private static var _buildManifest :Hash<Manifest> = createBuildManifests();
 
     private var _entries :Array<AssetEntry>;
 }

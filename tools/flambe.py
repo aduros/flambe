@@ -61,15 +61,15 @@ def apply_flambe(ctx):
             source="app-html.uncompressed.js", target="app-html.js")
     ctx.bld.install_files("deploy/web", "app-html.js")
 
-    res = ctx.path.find_dir("res")
-    if res is not None:
-        # Force a rebuild when anything in res/ has been updated
-        assets = res.ant_glob("**/*")
+    assetDir = ctx.path.find_dir("assets")
+    if assetDir is not None:
+        # Force a rebuild when anything in the asset directory has been updated
+        assets = assetDir.ant_glob("**/*")
         for asset in assets:
             ctx.bld.add_manual_dependency("app-html.js", asset)
             ctx.bld.add_manual_dependency("app.swf", asset)
 
-        ctx.bld.install_files("deploy/web", assets, cwd=res, relative_trick=True)
+        ctx.bld.install_files("deploy/web", assets, cwd=assetDir, relative_trick=True)
 
     # Compile the embedder script
     scripts = ctx.bld.path.find_dir(FLAMBE_ROOT+"/tools/embedder").ant_glob("*.js")

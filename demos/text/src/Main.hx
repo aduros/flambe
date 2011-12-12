@@ -48,7 +48,7 @@ class Main
     {
         System.init();
 
-        var loader = System.loadAssetPack(Manifest.res("bootstrap"));
+        var loader = System.loadAssetPack(Manifest.build("bootstrap"));
         loader.success.connect(onSuccess);
         loader.error.connect(function (message) {
             trace("Load error: " + message);

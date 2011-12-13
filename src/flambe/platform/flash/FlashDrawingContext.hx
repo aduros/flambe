@@ -43,8 +43,10 @@ class FlashDrawingContext
         } else {
             var state = getTopState();
             copy.matrix = state.matrix.clone();
-            copy.color = state.color;
             copy.blendMode = state.blendMode;
+            if (state.color != null) {
+                copy.color = new ColorTransform(1, 1, 1, state.color.alphaMultiplier);
+            }
         }
 
         _stack.add(copy);

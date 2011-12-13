@@ -30,6 +30,8 @@ class FlashDrawingContext
         _stack = new FastList<DrawingState>();
         _shape = new Shape();
         _pixel = new BitmapData(1, 1, false);
+        _scratchRect = new Rectangle();
+        _scratchPoint =  new Point();
     }
 
     public function save ()
@@ -52,36 +54,39 @@ class FlashDrawingContext
     {
         flushGraphics();
 
-        // TODO: Optimize
         var matrix = getTopState().matrix;
-        var copy = matrix.clone();
-        matrix.identity();
-        matrix.translate(x, y);
-        matrix.concat(copy);
+        matrix.tx += matrix.a*x + matrix.c*y;
+        matrix.ty += matrix.b*x + matrix.d*y;
     }
 
     public function scale (x :Float, y :Float)
     {
         flushGraphics();
 
-        // TODO: Optimize
         var matrix = getTopState().matrix;
-        var copy = matrix.clone();
-        matrix.identity();
-        matrix.scale(x, y);
-        matrix.concat(copy);
+        matrix.a *= x;
+        matrix.b *= x;
+        matrix.c *= y;
+        matrix.d *= y;
     }
 
     public function rotate (rotation :Float)
     {
         flushGraphics();
 
-        // TODO: Optimize
         var matrix = getTopState().matrix;
-        var copy = matrix.clone();
-        matrix.identity();
-        matrix.rotate(FMath.toRadians(rotation));
-        matrix.concat(copy);
+        rotation = FMath.toRadians(rotation);
+        var sin = Math.sin(rotation);
+        var cos = Math.cos(rotation);
+        var a = matrix.a;
+        var b = matrix.b;
+        var c = matrix.c;
+        var d = matrix.d;
+
+        matrix.a = a*cos + c*sin;
+        matrix.b = b*cos + d*sin;
+        matrix.c = c*cos - a*sin;
+        matrix.d = d*cos - b*sin;
     }
 
     public function restore ()
@@ -98,7 +103,11 @@ class FlashDrawingContext
     public function drawSubImage (texture :Texture, destX :Float, destY :Float,
         sourceX :Float, sourceY :Float, sourceW :Float, sourceH :Float)
     {
-        blit(texture, destX, destY, new Rectangle(sourceX, sourceY, sourceW, sourceH));
+        _scratchRect.x = sourceX;
+        _scratchRect.y = sourceY;
+        _scratchRect.width = sourceW;
+        _scratchRect.height = sourceH;
+        blit(texture, destX, destY, _scratchRect);
     }
 
     public function drawPattern (texture :Texture, x :Float, y :Float, width :Float, height :Float)
@@ -121,8 +130,11 @@ class FlashDrawingContext
         if (matrix.b == 0 && matrix.c == 0 && state.blendMode == null) {
             var scaleX = matrix.a;
             var scaleY = matrix.d;
-            var rect = new Rectangle(matrix.tx + x*scaleX, matrix.ty + y*scaleY,
-                width*scaleX, height*scaleY);
+            var rect = _scratchRect;
+            rect.x = matrix.tx + x*scaleX;
+            rect.y = matrix.ty + y*scaleY;
+            rect.width = width*scaleX;
+            rect.height = height*scaleY;
 
             // If we don't need to alpha blend, use fillRect(), otherwise colorTransform()
             if (state.color == null) {
@@ -180,19 +192,25 @@ class FlashDrawingContext
         var matrix = state.matrix;
 
         // Use the faster copyPixels() if possible
-        // TODO: Use approximately equals?
+        // TODO(bruno): Use approximately equals?
         if (matrix.a == 1 && matrix.b == 0 && matrix.c == 0 && matrix.d == 1
                 && state.color == null && state.blendMode == null) {
 
             if (sourceRect == null) {
-                sourceRect = new Rectangle(0, 0, flashTexture.width, flashTexture.height);
+                sourceRect = _scratchRect;
+                sourceRect.x = 0;
+                sourceRect.y = 0;
+                sourceRect.width = flashTexture.width;
+                sourceRect.height = flashTexture.height;
             }
-            _buffer.copyPixels(flashTexture.bitmapData,
-                sourceRect, new Point(matrix.tx + destX, matrix.ty + destY));
+            _scratchPoint.x = matrix.tx + destX;
+            _scratchPoint.y = matrix.ty + destY;
+            _buffer.copyPixels(flashTexture.bitmapData, sourceRect, _scratchPoint);
 
         } else {
             var copy = null;
             if (destX != 0 || destY != 0) {
+                // TODO(bruno): Optimize?
                 copy = matrix.clone();
                 translate(destX, destY);
             }
@@ -200,10 +218,13 @@ class FlashDrawingContext
                 // BitmapData.draw() doesn't support a source rect, so we have to use a temp
                 // (contrary to the docs, clipRect is relative to the target, not the source)
                 if (sourceRect.width > 0 && sourceRect.height > 0) {
+                    // TODO(bruno): Optimize?
                     var scratch = new BitmapData(
                         Std.int(sourceRect.width), Std.int(sourceRect.height),
                         flashTexture.bitmapData.transparent);
-                    scratch.copyPixels(flashTexture.bitmapData, sourceRect, new Point(0, 0));
+                    _scratchPoint.x = 0;
+                    _scratchPoint.y = 0;
+                    scratch.copyPixels(flashTexture.bitmapData, sourceRect, _scratchPoint);
                     _buffer.draw(scratch, matrix, state.color, state.blendMode, null, true);
                     scratch.dispose();
                 }
@@ -251,6 +272,10 @@ class FlashDrawingContext
 
     // A 1x1 BitmapData used to optimize fillRect's worst-case
     private var _pixel :BitmapData;
+
+    // Reusable instances to avoid tons of allocation
+    private var _scratchPoint :Point;
+    private var _scratchRect :Rectangle;
 }
 
 private class DrawingState

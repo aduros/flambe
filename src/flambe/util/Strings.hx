@@ -4,6 +4,8 @@
 
 package flambe.util;
 
+using StringTools;
+
 class Strings
 {
     /**
@@ -13,5 +15,16 @@ class Strings
     {
         var start = fileName.lastIndexOf(".") + 1;
         return (start > 1 && start < fileName.length) ? fileName.substr(start) : null;
+    }
+
+    public static function hashCode (str :String) :Int
+    {
+        var code = 0;
+        if (str != null) {
+            for (ii in 0...str.length) {
+                code = 31*code + str.fastCodeAt(ii);
+            }
+        }
+        return code;
     }
 }

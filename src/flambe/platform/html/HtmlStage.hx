@@ -4,6 +4,8 @@
 
 package flambe.platform.html;
 
+import js.Lib;
+
 import flambe.platform.Stage;
 import flambe.util.Signal0;
 
@@ -18,7 +20,9 @@ class HtmlStage
     public function new (canvas :Dynamic)
     {
         _canvas = canvas;
-        _canvas.addEventListener("resize", function (_) {
+        resize = new Signal0();
+
+        (untyped Lib.window).addEventListener("resize", function (event) {
             resize.emit();
         }, false);
     }

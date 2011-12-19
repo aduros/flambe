@@ -114,4 +114,12 @@ class Matrix
     {
         return new Point(inverseTransformX(x, y), inverseTransformY(x, y));
     }
+
+#if debug
+    public function toString () :String
+    {
+        return m00 + " " + m01 + " " + m02 + " \\ " +
+            m10 + " " + m11 + " " + m12;
+    }
+#end
 }

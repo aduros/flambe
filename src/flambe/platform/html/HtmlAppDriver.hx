@@ -66,10 +66,15 @@ class HtmlAppDriver
             }, 1000/60);
         }
 
-        // Allow the canvas to be focusable
+        // Allow the canvas to trap keyboard focus
         _canvas.setAttribute("tabindex", "0");
         // ...but hide the focus rectangle
         _canvas.style.outlineStyle = "none";
+
+        // Browser optimization hints
+        _canvas.setAttribute("moz-opaque", "true");
+        // canvas.style.webkitTransform = "translateZ(0)";
+        // canvas.style.backgroundColor = "#000";
 
         _canvas.addEventListener("mousedown", function (event) {
             Input.mouseDown.emit(createMouseEvent(event));
@@ -116,7 +121,7 @@ class HtmlAppDriver
                 // We're already handling a finger
                 return;
             }
-            Lib.window.scrollTo(0, 0);
+            hideMobileBrowser();
 
             var touch = event.changedTouches[0];
             touchId = touch.identifier;
@@ -136,8 +141,10 @@ class HtmlAppDriver
             return (oldErrorHandler != null) ? oldErrorHandler(message, url, line) : false;
         };
 
-        // Hide the status bar on Mobile Safari
-        Lib.window.scrollTo(0, 0);
+        (untyped Lib.window).addEventListener("orientationchange", function (event) {
+            hideMobileBrowser();
+        }, false);
+        hideMobileBrowser();
     }
 
     public function loadAssetPack (manifest :Manifest) :Promise<AssetPack>
@@ -226,6 +233,11 @@ class HtmlAppDriver
 
         // Not found
         return null;
+    }
+
+    private static function hideMobileBrowser ()
+    {
+        Lib.window.scrollTo(1, 0);
     }
 
     private var _loop :MainLoop;

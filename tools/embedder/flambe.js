@@ -31,13 +31,12 @@ var flambe = (function () {
             } else if (pref == null || pref == "html") {
                 var canvas = document.createElement("canvas");
                 if ("getContext" in canvas) {
-                    canvas.width = width;
-                    canvas.height = height;
-
-                    // Browser optimization hints
-                    canvas.setAttribute("moz-opaque", "true");
-                    // canvas.style.webkitTransform = "translateZ(0)";
-                    // canvas.style.backgroundColor = "#000";
+                    var repack = function () {
+                        canvas.width = Math.min(window.innerWidth, width);
+                        canvas.height = Math.min(window.innerHeight, height);
+                    };
+                    repack();
+                    window.addEventListener("resize", repack, false);
 
                     var content = document.getElementById(elementId);
                     content.appendChild(canvas);
@@ -48,18 +47,11 @@ var flambe = (function () {
                     var script = document.createElement("script");
                     script.onload = function () {
                         flambe.canvas = null;
+                        repack();
                     };
                     script.src = appName + "-html.js";
                     content.appendChild(script);
                 }
-
-                var repack = function () {
-                    window.scrollTo(0, 0);
-                    canvas.width = Math.min(window.innerWidth, width);
-                    canvas.height = Math.min(window.innerHeight, height);
-                };
-                window.addEventListener("orientationchange", repack, false);
-                repack();
 
             } else {
                 throw new Error("Unrecognized platform: " + pref);

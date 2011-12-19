@@ -42,7 +42,6 @@ class Main
         });
 
         System.root.addChild(label);
-        System.root.addChild(new Entity().add(new flambe.util.FpsLog(font)));
     }
 
     private static function main ()

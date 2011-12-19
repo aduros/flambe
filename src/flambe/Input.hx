@@ -107,7 +107,7 @@ class Input
     {
         while (entity != null) {
             var sprite = entity.get(Sprite);
-            if (sprite != null && !sprite.visible.get()) {
+            if (sprite != null && !sprite.visible._) {
                 return false;
             }
             entity = entity.parent;

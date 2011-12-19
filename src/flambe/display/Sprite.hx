@@ -140,10 +140,10 @@ class Sprite extends Component
                 parentSprite.getViewMatrix() else IDENTITY;
             var transform = owner.get(Transform);
             _viewMatrix.copyFrom(parentViewMatrix);
-            _viewMatrix.translate(transform.x.get(), transform.y.get());
-            _viewMatrix.rotate(FMath.toRadians(transform.rotation.get()));
-            _viewMatrix.scale(transform.scaleX.get(), transform.scaleY.get());
-            _viewMatrix.translate(-anchorX.get(), -anchorY.get());
+            _viewMatrix.translate(transform.x._, transform.y._);
+            _viewMatrix.rotate(FMath.toRadians(transform.rotation._));
+            _viewMatrix.scale(transform.scaleX._, transform.scaleY._);
+            _viewMatrix.translate(-anchorX._, -anchorY._);
 
             _localMatrixDirty = false;
             if (parentSprite != null) {

@@ -17,7 +17,7 @@ class Binding<A>
 
     public function update (dt :Int) :A
     {
-        var value = _target.get();
+        var value = _target._;
         // TODO: Be lazy and only call _fn when the value is changed?
         if (_fn != null) {
             return _fn(value);

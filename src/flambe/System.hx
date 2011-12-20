@@ -33,8 +33,6 @@ class System
         driver = new flambe.platform.flash.FlashAppDriver();
 #elseif html
         driver = new flambe.platform.html.HtmlAppDriver();
-#elseif amity
-        driver = new flambe.platform.amity.AmityAppDriver();
 #else
 #error "Platform not supported!"
 #end

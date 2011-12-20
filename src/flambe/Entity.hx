@@ -50,9 +50,9 @@ class Entity
     {
         _comps = [];
 #if flash
-	_compMap = cast new flash.utils.Dictionary();
+        _compMap = cast new flash.utils.Dictionary();
 #elseif js
-	_compMap = {};
+        _compMap = {};
 #end
         _children = [];
     }

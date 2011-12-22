@@ -27,4 +27,14 @@ class Strings
         }
         return code;
     }
+
+    public static function substitute (str :String, values :Array<Dynamic>)
+    {
+        // FIXME(bruno): If your {0} replacement has a {1} in it, then that'll get replaced next
+        // iteration
+        for (ii in 0...values.length) {
+            str = str.replace("{" + ii + "}", values[ii]);
+        }
+        return str;
+    }
 }

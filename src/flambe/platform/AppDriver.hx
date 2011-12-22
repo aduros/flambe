@@ -19,6 +19,10 @@ interface AppDriver
     function getStage () :Stage;
     function getStorage () :Storage;
 
+    /**
+     * Gets the RFC 4646 language tag of the environment. For example, "en-US", "pt", or null if the
+     * locale is unknown.
+     */
     function getLocale () :String;
 
     function callNative (funcName :String, params :Array<Dynamic>) :Dynamic;

@@ -17,6 +17,7 @@ class System
 
     public static var stage (getStage, null) :Stage;
     public static var storage (getStorage, null) :Storage;
+    public static var locale (getLocale, null) :String;
 
     /**
      * Emitted when an uncaught exception occurs, if the platform supports it. You can wire this up
@@ -39,6 +40,8 @@ class System
         driver.init(root);
     }
 
+    // A bunch of short-hands to driver functions
+
     inline public static function loadAssetPack (manifest :Manifest)
     {
         return driver.loadAssetPack(manifest);
@@ -57,5 +60,10 @@ class System
     inline private static function getStorage () :Storage
     {
         return driver.getStorage();
+    }
+
+    inline private static function getLocale () :String
+    {
+        return driver.getLocale();
     }
 }

@@ -22,6 +22,34 @@ class Manifest
         return _buildManifest.get(packName);
     }
 
+    /**
+     * Try to find a pack suffixed with the closest available variant of the locale. For example,
+     * buildLocalized("foo", "pt-BR") will first try to load foo_pt-BR, then foo_pt, then just foo.
+     */
+    public static function buildLocalized (packName :String, locale :String = null)
+    {
+        if (locale == null) {
+            locale = System.locale;
+        }
+
+        if (locale != null) {
+            var parts = locale.split("-");
+            while (parts.length > 0) {
+                var manifest = build(packName + "_" + parts.join("-"));
+                if (manifest != null) {
+                    return manifest;
+                }
+                parts.pop();
+            }
+        }
+        return build(packName);
+    }
+
+    public static function exists (packName :String) :Bool
+    {
+        return _buildManifest.exists(packName);
+    }
+
     public function add (name :String, url :String, bytes :Int = 0, ?type :AssetType)
     {
         if (type == null) {

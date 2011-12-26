@@ -26,7 +26,7 @@ class Manifest
      * Try to find a pack suffixed with the closest available variant of the locale. For example,
      * buildLocalized("foo", "pt-BR") will first try to load foo_pt-BR, then foo_pt, then just foo.
      */
-    public static function buildLocalized (packName :String, locale :String = null)
+    public static function buildLocalized (packName :String, locale :String = null) :Manifest
     {
         if (locale == null) {
             locale = System.locale;

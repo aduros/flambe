@@ -54,7 +54,7 @@ class Manifest
     {
         if (type == null) {
             // Infer the type from the url
-            type = switch (url.toLowerCase().getFileExtension()) {
+            type = switch (url.split("?")[0].toLowerCase().getFileExtension()) {
                 case "png", "jpg", "gif": Image;
                 default: Data;
             };

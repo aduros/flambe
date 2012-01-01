@@ -6,6 +6,7 @@ package flambe.macro;
 
 #if macro
 import neko.FileSystem;
+import neko.io.File;
 import neko.Lib;
 
 import haxe.macro.Expr;
@@ -34,8 +35,10 @@ class ManifestBuilder
             if (FileSystem.isDirectory(assetDir + packName)) {
                 for (file in readRecursive(assetDir + packName)) {
                     var name = file;
-                    var url = packName + "/" + file;
-                    var bytes = FileSystem.stat(assetDir + packName + "/" + file).size;
+                    var path = assetDir + packName + "/" + file;
+                    var md5 = Context.signature(File.getBytes(path));
+                    var url = packName + "/" + file + "?v=" + md5;
+                    var bytes = FileSystem.stat(path).size;
 
                     // Assemble the object literal for this asset
                     var entry = EObjectDecl([

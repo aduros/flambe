@@ -38,12 +38,12 @@ class ManifestBuilder
                     var bytes = FileSystem.stat(assetDir + packName + "/" + file).size;
 
                     // Assemble the object literal for this asset
-                    var entry = exprOf(EObjectDecl([
+                    var entry = EObjectDecl([
                         { field: "name", expr: name.toExpr() },
                         { field: "url", expr: url.toExpr() },
                         { field: "bytes", expr: bytes.toExpr() }
-                    ]));
-                    entries.push(entry);
+                    ]);
+                    entries.push(entry.toExpr());
                 }
 
                 // Build a pack with a list of file entries
@@ -56,16 +56,6 @@ class ManifestBuilder
     }
 
 #if macro
-    public static function array (arr :Array<Expr>) :Expr
-    {
-        return exprOf(EArrayDecl(arr));
-    }
-
-    public static function exprOf (def :ExprDef) :Expr
-    {
-        return { expr: def, pos: Context.currentPos() };
-    }
-
     public static function readRecursive (root, dir = ".")
     {
         var result = [];
@@ -79,12 +69,6 @@ class ManifestBuilder
             }
         }
         return result;
-    }
-
-    public static function getExtension (fileName :String) :String
-    {
-        var start = fileName.lastIndexOf(".") + 1;
-        return (start > 1 && start < fileName.length) ? fileName.substr(start) : null;
     }
 
     public static function readDirectoryNoHidden (dir)

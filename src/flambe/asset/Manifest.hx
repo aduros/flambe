@@ -4,6 +4,8 @@
 
 package flambe.asset;
 
+import haxe.rtti.Meta;
+
 import flambe.asset.AssetEntry;
 import flambe.macro.ManifestBuilder;
 
@@ -73,11 +75,19 @@ class Manifest
         var macroData = new Hash<Array<Dynamic>>();
         ManifestBuilder.populate(macroData);
 
+        var meta = Meta.getType(Manifest);
+        var base = (meta.assetBase != null) ? meta.assetBase[0] : ".";
+
+        // Ensure it ends with a trailing slash
+        if (base.charAt(base.length - 1) != "/") {
+            base += "/";
+        }
+
         var manifests = new Hash();
         for (packName in macroData.keys()) {
             var manifest = new Manifest();
             for (asset in macroData.get(packName)) {
-                manifest.add(asset.name, asset.url, asset.bytes);
+                manifest.add(asset.name, base + asset.url, asset.bytes);
             }
             manifests.set(packName, manifest);
         }

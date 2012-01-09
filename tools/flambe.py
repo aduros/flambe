@@ -18,7 +18,7 @@ def configure(ctx):
 
 @feature("flambe")
 def apply_flambe(ctx):
-    Utils.def_attrs(ctx, classpath="", flags="", libs="")
+    Utils.def_attrs(ctx, classpath="", flags="", libs="", assetBase=None)
     classpath=["src", FLAMBE_ROOT+"/src"] + Utils.to_list(ctx.classpath)
     flags = ["-main", ctx.main] + Utils.to_list(ctx.flags)
     libs = ["hxJson2"] + Utils.to_list(ctx.libs)
@@ -36,6 +36,13 @@ def apply_flambe(ctx):
     else:
         #flags += "--dead-code-elimination --no-traces".split()
         flags += "--no-traces".split()
+
+    # Inject a custom asset base URL if provided
+    if ctx.assetBase != None:
+        flags += [
+            "--macro",
+            "addMetadata(\"@assetBase('%s')\", \"flambe.asset.Manifest\")" % ctx.assetBase,
+        ]
 
     ctx.bld(features="haxe", classpath=classpath,
         flags=flags + flash_flags,

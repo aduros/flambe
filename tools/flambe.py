@@ -76,7 +76,7 @@ def apply_flambe(ctx):
             ctx.bld.add_manual_dependency("app-html.js", asset)
             ctx.bld.add_manual_dependency("app.swf", asset)
 
-        ctx.bld.install_files("deploy/web", assets, cwd=assetDir, relative_trick=True)
+        ctx.bld.install_files("deploy/web/assets", assets, cwd=assetDir, relative_trick=True)
 
     # Compile the embedder script
     scripts = ctx.bld.path.find_dir(FLAMBE_ROOT+"/tools/embedder").ant_glob("*.js")

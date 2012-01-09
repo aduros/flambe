@@ -76,7 +76,7 @@ class Manifest
         ManifestBuilder.populate(macroData);
 
         var meta = Meta.getType(Manifest);
-        var base = (meta.assetBase != null) ? meta.assetBase[0] : ".";
+        var base = (meta.assetBase != null) ? meta.assetBase[0] : "assets";
 
         // Ensure it ends with a trailing slash
         if (base.charAt(base.length - 1) != "/") {

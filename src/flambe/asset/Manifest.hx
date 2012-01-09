@@ -87,7 +87,8 @@ class Manifest
         for (packName in macroData.keys()) {
             var manifest = new Manifest();
             for (asset in macroData.get(packName)) {
-                manifest.add(asset.name, base + asset.url, asset.bytes);
+                var url = base + packName + "/" + asset.name + "?v=" + asset.md5;
+                manifest.add(asset.name, url, asset.bytes);
             }
             manifests.set(packName, manifest);
         }

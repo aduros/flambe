@@ -37,13 +37,12 @@ class ManifestBuilder
                     var name = file;
                     var path = assetDir + packName + "/" + file;
                     var md5 = Context.signature(File.getBytes(path));
-                    var url = packName + "/" + file + "?v=" + md5;
                     var bytes = FileSystem.stat(path).size;
 
                     // Assemble the object literal for this asset
                     var entry = EObjectDecl([
                         { field: "name", expr: name.toExpr() },
-                        { field: "url", expr: url.toExpr() },
+                        { field: "md5", expr: md5.toExpr() },
                         { field: "bytes", expr: bytes.toExpr() }
                     ]);
                     entries.push(entry.toExpr());

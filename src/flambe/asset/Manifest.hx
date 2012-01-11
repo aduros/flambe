@@ -75,8 +75,14 @@ class Manifest
         var macroData = new Hash<Array<Dynamic>>();
         ManifestBuilder.populate(macroData);
 
+        // The path to our asset packs
+        var base = "assets";
+
+        // Use the custom asset base provided by the build, if we support CORS
         var meta = Meta.getType(Manifest);
-        var base = (meta.assetBase != null) ? meta.assetBase[0] : "assets";
+        if (meta.assetBase != null && supportsCrossOrigin()) {
+            base = meta.assetBase[0];
+        }
 
         // Ensure it ends with a trailing slash
         if (base.charAt(base.length - 1) != "/") {
@@ -93,6 +99,19 @@ class Manifest
             manifests.set(packName, manifest);
         }
         return manifests;
+    }
+
+    /**
+     * Returns true if the environment fully supports loading assets on another domain.
+     */
+    private static function supportsCrossOrigin ()
+    {
+#if js
+        var xhr :Dynamic = new js.XMLHttpRequest();
+        return (xhr.withCredentials != null);
+#else
+        return true;
+#end
     }
 
     private static var _buildManifest :Hash<Manifest> = createBuildManifests();

@@ -24,6 +24,7 @@ var flambe = (function () {
                     Math.min(window.innerWidth, width),
                     Math.min(window.innerHeight, height),
                     flashVersion, null, {}, {
+                        allowScriptAccess: "always",
                         allowFullScreen: "true",
                         fullscreenOnSelection: "true"
                     });

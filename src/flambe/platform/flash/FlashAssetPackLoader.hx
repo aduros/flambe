@@ -16,6 +16,7 @@ import flash.events.SecurityErrorEvent;
 import flash.net.URLLoader;
 import flash.net.URLRequest;
 import flash.system.LoaderContext;
+import flash.media.Sound;
 
 import flambe.asset.AssetEntry;
 import flambe.asset.Manifest;
@@ -49,6 +50,13 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
                     promise.error.emit(error.message);
                 }
 
+            case Audio:
+                var sound = new Sound(req);
+                dispatcher = sound;
+                dispatcher.addEventListener(Event.COMPLETE, function (_) {
+                    handleLoad(entry, new FlashSound(sound));
+                });
+
             case Data:
                 var urlLoader = new URLLoader();
                 dispatcher = urlLoader;
@@ -70,6 +78,13 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
         });
         dispatcher.addEventListener(IOErrorEvent.IO_ERROR, onError);
         dispatcher.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onError);
+    }
+
+    override private function getAudioFormats () :Array<String>
+    {
+        // TODO(bruno): Flash actually has an m4a decoder, but it's only accessible through the
+        // horrendous NetStream API and not good old flash.media.Sound
+        return [ "mp3" ];
     }
 
     private function onProgress (event :ProgressEvent)

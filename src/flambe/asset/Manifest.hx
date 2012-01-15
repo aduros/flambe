@@ -52,22 +52,29 @@ class Manifest
         return _buildManifest.exists(packName);
     }
 
-    public function add (name :String, url :String, bytes :Int = 0, ?type :AssetType)
+    public function add (name :String, url :String, bytes :Int = 0, ?type :AssetType) :AssetEntry
     {
         if (type == null) {
-            // Infer the type from the url
-            type = switch (url.split("?")[0].toLowerCase().getFileExtension()) {
-                case "png", "jpg", "gif": Image;
-                default: Data;
-            };
+            type = inferType(url);
         }
 
-        _entries.push(new AssetEntry(name, url, type, bytes));
+        var entry = new AssetEntry(name, url, type, bytes);
+        _entries.push(entry);
+        return entry;
     }
 
     public function getEntries () :Array<AssetEntry>
     {
         return _entries.copy();
+    }
+
+    private static function inferType (url :String) :AssetType
+    {
+        return switch (url.split("?")[0].getFileExtension().toLowerCase()) {
+            case "png", "jpg", "gif": Image;
+            case "ogg", "m4a", "mp3", "wav": Audio;
+            default: Data;
+        }
     }
 
     private static function createBuildManifests ()
@@ -93,8 +100,16 @@ class Manifest
         for (packName in macroData.keys()) {
             var manifest = new Manifest();
             for (asset in macroData.get(packName)) {
-                var url = base + packName + "/" + asset.name + "?v=" + asset.md5;
-                manifest.add(asset.name, url, asset.bytes);
+                var name = asset.name;
+                var url = base + packName + "/" + name + "?v=" + asset.md5;
+                var type = inferType(url);
+                if (type == Audio) {
+                    // If this an asset that not all platforms may support, trim the extension from
+                    // the name. We'll only load one of the assets if this creates a name collision.
+                    name = name.substr(0, name.lastIndexOf("."));
+                }
+
+                manifest.add(name, url, asset.bytes, type);
             }
             manifests.set(packName, manifest);
         }
@@ -104,7 +119,7 @@ class Manifest
     /**
      * Returns true if the environment fully supports loading assets on another domain.
      */
-    private static function supportsCrossOrigin ()
+    private static function supportsCrossOrigin () :Bool
     {
 #if js
         var xhr :Dynamic = new js.XMLHttpRequest();

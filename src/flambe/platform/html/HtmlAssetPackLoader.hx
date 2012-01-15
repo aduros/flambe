@@ -26,8 +26,6 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         switch (entry.type) {
             case Image:
                 var image :Image = untyped __js__ ("new Image()");
-                // TODO(bruno): Uncomment this if content hashing is ever added
-                // image.validate = "never";
                 image.onload = function (_) {
                     var texture = new HtmlTexture();
                     if (CANVAS_TEXTURES) {
@@ -47,6 +45,27 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                 };
                 image.src = entry.url;
 
+            case Audio:
+                // If we made it this far, we definitely support audio and can play this asset
+                var audio :Dynamic = Lib.document.createElement("audio");
+                audio.preload = "auto"; // Hint that we want to preload the entire file
+
+                var onCanPlayThrough = null;
+                onCanPlayThrough = function () {
+                    // Firefox fires this event multiple times during loading, so only handle it
+                    // the first time...
+                    audio.removeEventListener("canplaythrough", onCanPlayThrough, false);
+
+                    handleLoad(entry, new HtmlSound(audio));
+                };
+                audio.addEventListener("canplaythrough", onCanPlayThrough, false);
+                audio.addEventListener("error", function (_) {
+                    handleError("Failed to load audio " + entry.url + ", code=" + audio.error.code);
+                }, false);
+                // TODO(bruno): Handle progress events
+                audio.src = entry.url;
+                audio.load();
+
             case Data:
                 var http = new Http(entry.url);
                 http.onData = function (data) {
@@ -55,6 +74,46 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                 http.onError = handleError;
                 http.request(false);
         }
+    }
+
+    override private function getAudioFormats () :Array<String>
+    {
+        if (_audioFormats == null) {
+            _audioFormats = detectAudioFormats();
+        }
+        return _audioFormats;
+    }
+
+    private static function detectAudioFormats () :Array<String>
+    {
+        // Detect basic support for HTML5 audio
+        var element :Dynamic = Lib.document.createElement("audio");
+        if (element == null || element.canPlayType == null) {
+            return [];
+        }
+
+        // Reject browsers that claim to support audio, but are too buggy or incomplete
+        var blacklist = ~/\b(iPhone|iPod|iPad|Android)\b/;
+        if (blacklist.match(Lib.window.navigator.userAgent)) {
+            return [];
+        }
+
+        // Select what formats the browser supports and order them by confidence
+        var result = [];
+        var formats = [
+            { extension: "ogg", type: "audio/ogg; codecs=vorbis" },
+            { extension: "m4a", type: "audio/mp4; codecs=mp4a" },
+            { extension: "mp3", type: "audio/mpeg" },
+            { extension: "wav", type: "audio/wav" },
+        ];
+        for (confidence in [ "probably", "maybe" ]) {
+            for (format in formats) {
+                if (element.canPlayType(format.type) == confidence) {
+                    result.push(format.extension);
+                }
+            }
+        }
+        return result;
     }
 
     override private function handleLoad (entry :AssetEntry, asset :Dynamic)
@@ -72,4 +131,6 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         var pattern = ~/(iPhone|iPod|iPad)/;
         return pattern.match(Lib.window.navigator.userAgent);
     })();
+
+    private static var _audioFormats :Array<String>;
 }

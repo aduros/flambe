@@ -14,6 +14,7 @@ import haxe.macro.Context;
 import haxe.macro.Type;
 
 using flambe.macro.Macros;
+using flambe.util.Strings;
 using Lambda;
 using StringTools;
 #end

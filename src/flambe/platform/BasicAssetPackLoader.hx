@@ -5,10 +5,14 @@
 package flambe.platform;
 
 import flambe.asset.AssetEntry;
-import flambe.asset.Manifest;
 import flambe.asset.AssetPack;
+import flambe.asset.Manifest;
 import flambe.display.Texture;
+import flambe.sound.Sound;
 import flambe.util.Promise;
+
+using flambe.util.Strings;
+using Lambda;
 
 class BasicAssetPackLoader
 {
@@ -20,28 +24,97 @@ class BasicAssetPackLoader
         _manifest = manifest;
 
         var entries = manifest.getEntries();
-        _assetsRemaining = entries.length;
         _assets = new Hash();
 
         _bytesLoaded = new Hash();
 
-        if (_assetsRemaining == 0) {
+        if (entries.length == 0) {
             // There's nothing to load, just send them an empty pack
             handleSuccess();
 
         } else {
             var bytesTotal = 0;
+            var groups = new Hash<Array<AssetEntry>>();
+
+            // Group assets by name
             for (entry in entries) {
-                bytesTotal += entry.bytes;
-                loadEntry(entry);
+                var group = groups.get(entry.name);
+                if (group == null) {
+                    group = [];
+                    groups.set(entry.name, group);
+                }
+                group.push(entry);
             }
+
+            // Load the most suitable asset from each group
+            _assetsRemaining = groups.count();
+            for (group in groups) {
+                var bestEntry = (group.length > 1) ? pickBestEntry(group) : group[0];
+                var placeholder = createPlaceholder(bestEntry);
+
+                if (placeholder != null) {
+                    handleLoad(bestEntry, placeholder);
+
+                } else {
+                    bytesTotal += bestEntry.bytes;
+                    loadEntry(bestEntry);
+                }
+            }
+
             promise.total = bytesTotal;
         }
+    }
+
+    /**
+     * Out of a list of asset entries with the same name, select the one best suited to this
+     * environment.
+     */
+    private function pickBestEntry (entries :Array<AssetEntry>)
+    {
+        switch (entries[0].type) {
+            case Audio:
+                var extensions = getAudioFormats();
+                for (extension in extensions) {
+                    for (entry in entries) {
+                        if (entry.getUrlExtension() == extension) {
+                            return entry;
+                        }
+                    }
+                }
+
+            default:
+                // Fall through
+        }
+
+        // No preference, just use the first one
+        return entries[0];
+    }
+
+    private function createPlaceholder (entry :AssetEntry)
+    {
+        switch (entry.type) {
+            case Audio:
+                if (!getAudioFormats().has(entry.getUrlExtension())) {
+                    return DummySound.getInstance();
+                }
+            default:
+                // Fall through
+        }
+        return null;
     }
 
     private function loadEntry (entry :AssetEntry)
     {
         // See subclasses
+    }
+
+    /**
+     * Returns a list of audio file extensions the environment supports, ordered by preference.
+     */
+    private function getAudioFormats () :Array<String>
+    {
+        // See subclasses
+        return [];
     }
 
     private function handleLoad (entry :AssetEntry, asset :Dynamic)
@@ -98,6 +171,11 @@ private class BasicAssetPack
     }
 
     public function loadTexture (file :String) :Texture
+    {
+        return cast _contents.get(file);
+    }
+
+    public function loadSound (file :String) :Sound
     {
         return cast _contents.get(file);
     }

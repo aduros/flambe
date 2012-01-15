@@ -83,17 +83,20 @@ class Manifest
         ManifestBuilder.populate(macroData);
 
         // The path to our asset packs
-        var base = "assets";
+        var sameOriginBase = "assets/";
+        var crossOriginBase = sameOriginBase;
 
-        // Use the custom asset base provided by the build, if we support CORS
         var meta = Meta.getType(Manifest);
-        if (meta.assetBase != null && supportsCrossOrigin()) {
-            base = meta.assetBase[0];
-        }
-
-        // Ensure it ends with a trailing slash
-        if (base.charAt(base.length - 1) != "/") {
-            base += "/";
+        if (meta.assetBase != null) {
+            crossOriginBase = meta.assetBase[0];
+            if (crossOriginBase.charAt(crossOriginBase.length - 1) != "/") {
+                // Ensure it ends with a trailing slash
+                crossOriginBase += "/";
+            }
+            if (supportsCrossOrigin()) {
+                // We can load ALL asset types from this URL
+                sameOriginBase = crossOriginBase;
+            }
         }
 
         var manifests = new Hash();
@@ -101,15 +104,26 @@ class Manifest
             var manifest = new Manifest();
             for (asset in macroData.get(packName)) {
                 var name = asset.name;
-                var url = base + packName + "/" + name + "?v=" + asset.md5;
-                var type = inferType(url);
+                var path = packName + "/" + name + "?v=" + asset.md5;
+
+                var type = inferType(name);
                 if (type == Audio) {
                     // If this an asset that not all platforms may support, trim the extension from
                     // the name. We'll only load one of the assets if this creates a name collision.
                     name = name.substr(0, name.lastIndexOf("."));
                 }
 
-                manifest.add(name, url, asset.bytes, type);
+                var base = crossOriginBase;
+#if js
+                if (type != Image) {
+                    // Only images can be loaded across origins without CORS.
+                    // TODO(bruno): If Flambe ever gets an API to read pixels out of a texture,
+                    // sameOriginBase must be used for images too.
+                    base = sameOriginBase;
+                }
+#end
+
+                manifest.add(name, base + path, asset.bytes, type);
             }
             manifests.set(packName, manifest);
         }

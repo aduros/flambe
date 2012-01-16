@@ -7,7 +7,14 @@
  */
 var flambe = (function () {
     return {
-        embed: function (appName, elementId, width, height) {
+        embed: function (urls, elementId, width, height) {
+
+            // TODO(bruno): Allow you to order the URLs array based on preference. For now the swf
+            // must be first and the JS second.
+            if (typeof urls == "string") {
+                urls = [ urls + ".swf", urls + "-html.js" ];
+            }
+
             var args = {};
             var pairs = window.location.search.substr(1).split("&");
             for (var ii = 0; ii < pairs.length; ++ii) {
@@ -20,7 +27,7 @@ var flambe = (function () {
 
             if ((pref == null || pref == "flash")
                     && swfobject.hasFlashPlayerVersion(flashVersion)) {
-                swfobject.embedSWF(appName + ".swf", elementId,
+                swfobject.embedSWF(urls[0], elementId,
                     Math.min(window.innerWidth, width),
                     Math.min(window.innerHeight, height),
                     flashVersion, null, {}, {
@@ -50,7 +57,7 @@ var flambe = (function () {
                         flambe.canvas = null;
                         repack();
                     };
-                    script.src = appName + "-html.js";
+                    script.src = urls[1];
                     content.appendChild(script);
                 }
 

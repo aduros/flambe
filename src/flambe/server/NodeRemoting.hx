@@ -9,6 +9,8 @@ import haxe.Serializer;
 
 class NodeRemoting
 {
+    private static var querystring = Node.require("querystring");
+
     public function new (ctx :Context)
     {
         _ctx = ctx;
@@ -57,6 +59,4 @@ class NodeRemoting
     }
 
     private var _ctx :Context;
-
-    private static var querystring = Node.require("querystring");
 }

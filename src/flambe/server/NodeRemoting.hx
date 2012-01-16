@@ -38,6 +38,7 @@ class NodeRemoting
                 res.end("hxr" + s.toString());
             };
 
+            res.setHeader("Content-Type", "text/plain");
             res.writeHead(200);
             try {
                 var params = querystring.parse(body);

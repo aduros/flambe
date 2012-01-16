@@ -62,7 +62,9 @@ class FlashPlayback
     public function setVolume (volume :Float) :Float
     {
         var soundTransform = _channel.soundTransform;
-        return soundTransform.volume = volume;
+        soundTransform.volume = volume;
+        _channel.soundTransform = soundTransform; // Magic setter
+        return volume;
     }
 
     public function getSound () :Sound

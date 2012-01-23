@@ -9,13 +9,19 @@ import flambe.Visitor;
 
 class Director extends Component
 {
+    /** The front-most scene. */
     public var topScene (getTopScene, null) :Entity;
 
+    /** The complete list of scenes managed by this director, from back to front. */
     public var scenes (default, null) :Array<Entity>;
+
+    /** The list of scenes that are not occluded by an opaque scene, from back to front. */
+    public var visibleScenes (default, null) :Array<Entity>;
 
     public function new ()
     {
         scenes = [];
+        visibleScenes = [];
     }
 
     public function pushScene (scene :Entity)
@@ -24,7 +30,7 @@ class Director extends Component
             emitHidden(topScene);
         }
         scenes.push(scene);
-        emitShown();
+        invalidateVisibility();
     }
 
     public function popScene ()
@@ -33,10 +39,7 @@ class Director extends Component
         if (scene != null) {
             emitHidden(scene);
             scene.dispose();
-
-            if (scenes.length > 0) {
-                emitShown();
-            }
+            invalidateVisibility();
         }
     }
 
@@ -55,14 +58,14 @@ class Director extends Component
                 if (topScene != scene) {
                     scenes.pop().dispose();
                 } else {
-                    emitShown();
+                    invalidateVisibility();
                     return;
                 }
             }
         }
 
         scenes.push(scene);
-        emitShown();
+        invalidateVisibility();
     }
 
     override public function onDispose ()
@@ -86,19 +89,33 @@ class Director extends Component
         return scenes[scenes.length-1];
     }
 
-    private function emitShown ()
-    {
-        var events = topScene.get(Scene);
-        if (events != null) {
-            events.shown.emit();
-        }
-    }
-
     private function emitHidden (scene :Entity)
     {
         var events = scene.get(Scene);
         if (events != null) {
             events.hidden.emit();
+        }
+    }
+
+    private function invalidateVisibility ()
+    {
+        // Find the last index of an opaque scene, or 0
+        var ii = scenes.length;
+        while (ii > 0) {
+            var scene = scenes[--ii];
+            var comp = scene.get(Scene);
+            if (comp == null || comp.opaque) {
+                break;
+            }
+        }
+        visibleScenes = scenes.slice(ii, scenes.length);
+
+        // Notify the new top scene that it's being shown
+        if (scenes.length > 0) {
+            var events = topScene.get(Scene);
+            if (events != null) {
+                events.shown.emit();
+            }
         }
     }
 }

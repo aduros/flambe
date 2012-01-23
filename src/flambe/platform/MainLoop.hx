@@ -75,7 +75,7 @@ private class DrawVisitor
     {
         var director = entity.get(Director);
         if (director != null) {
-            for (scene in director.scenes) {
+            for (scene in director.visibleScenes) {
                 scene.visit(this, false, true);
             }
         }

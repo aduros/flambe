@@ -87,13 +87,6 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
         return [ "mp3" ];
     }
 
-    private function onProgress (event :ProgressEvent)
-    {
-        promise.progress = event.bytesLoaded;
-        promise.total = event.bytesTotal;
-        trace(promise.progress + "/" + promise.total);
-    }
-
     private function onError (event :ErrorEvent)
     {
         handleError(event.text);

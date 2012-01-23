@@ -13,10 +13,11 @@ import flash.events.IEventDispatcher;
 import flash.events.IOErrorEvent;
 import flash.events.ProgressEvent;
 import flash.events.SecurityErrorEvent;
+import flash.media.Sound;
 import flash.net.URLLoader;
 import flash.net.URLRequest;
+import flash.system.Capabilities;
 import flash.system.LoaderContext;
-import flash.media.Sound;
 
 import flambe.asset.AssetEntry;
 import flambe.asset.Manifest;
@@ -84,7 +85,7 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
     {
         // TODO(bruno): Flash actually has an m4a decoder, but it's only accessible through the
         // horrendous NetStream API and not good old flash.media.Sound
-        return [ "mp3" ];
+        return (Capabilities.hasAudio && Capabilities.hasMP3) ? [ "mp3" ] : [];
     }
 
     private function onError (event :ErrorEvent)

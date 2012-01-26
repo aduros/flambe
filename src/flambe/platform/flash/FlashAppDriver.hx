@@ -28,6 +28,10 @@ import flambe.util.Promise;
 class FlashAppDriver
     implements AppDriver
 {
+    public var stage (getStage, null) :Stage;
+    public var storage (getStorage, null) :Storage;
+    public var locale (getLocale, null) :String;
+
     public function new ()
     {
     }

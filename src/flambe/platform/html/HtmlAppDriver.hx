@@ -22,6 +22,10 @@ import flambe.util.Signal1;
 class HtmlAppDriver
     implements AppDriver
 {
+    public var stage (getStage, null) :Stage;
+    public var storage (getStorage, null) :Storage;
+    public var locale (getLocale, null) :String;
+
     public function new ()
     {
     }

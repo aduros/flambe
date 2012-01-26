@@ -4,10 +4,12 @@
 
 package flambe;
 
+import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
 import flambe.platform.AppDriver;
 import flambe.platform.Stage;
 import flambe.platform.Storage;
+import flambe.util.Promise;
 import flambe.util.Signal1;
 
 class System
@@ -42,7 +44,7 @@ class System
 
     // A bunch of short-hands to driver functions
 
-    inline public static function loadAssetPack (manifest :Manifest)
+    inline public static function loadAssetPack (manifest :Manifest) :Promise<AssetPack>
     {
         return driver.loadAssetPack(manifest);
     }
@@ -54,16 +56,16 @@ class System
 
     inline private static function getStage () :Stage
     {
-        return driver.getStage();
+        return driver.stage;
     }
 
     inline private static function getStorage () :Storage
     {
-        return driver.getStorage();
+        return driver.storage;
     }
 
     inline private static function getLocale () :String
     {
-        return driver.getLocale();
+        return driver.locale;
     }
 }

@@ -12,18 +12,18 @@ import flambe.util.Promise;
 
 interface AppDriver
 {
-    function init (root :Entity) :Void;
-
-    function loadAssetPack (manifest :Manifest) :Promise<AssetPack>;
-
-    function getStage () :Stage;
-    function getStorage () :Storage;
+    var stage (getStage, null) :Stage;
+    var storage (getStorage, null) :Storage;
 
     /**
      * Gets the RFC 4646 language tag of the environment. For example, "en-US", "pt", or null if the
      * locale is unknown.
      */
-    function getLocale () :String;
+    var locale (getLocale, null) :String;
+
+    function init (root :Entity) :Void;
+
+    function loadAssetPack (manifest :Manifest) :Promise<AssetPack>;
 
     function callNative (funcName :String, params :Array<Dynamic>) :Dynamic;
 }

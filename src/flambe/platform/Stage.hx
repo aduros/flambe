@@ -13,7 +13,5 @@ interface Stage
 
     var resize (default, null) :Signal0;
 
-    function getWidth () :Int;
-    function getHeight () :Int;
     function lockOrientation (orient :Orientation) :Void;
 }

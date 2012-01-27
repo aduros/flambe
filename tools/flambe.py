@@ -26,7 +26,8 @@ def apply_flambe(ctx):
     debug = ctx.env.debug
     closure = ctx.bld.path.find_resource(FLAMBE_ROOT+"/tools/closure.jar")
 
-    flash_flags = "-swf-header 640:480:60:ffffff".split()
+    # Don't forget to change flambe.js when changing -swf-version!
+    flash_flags = "-swf-version 10 -swf-header 640:480:60:ffffff".split()
     html_flags = "-D html".split()
 
     if debug:

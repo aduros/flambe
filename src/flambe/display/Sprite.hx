@@ -5,10 +5,11 @@
 package flambe.display;
 
 import flambe.animation.Property;
-import flambe.display.Transform;
 import flambe.display.Sprite;
-import flambe.math.Matrix;
+import flambe.display.Transform;
+import flambe.input.PointerEvent;
 import flambe.math.FMath;
+import flambe.math.Matrix;
 import flambe.util.Signal1;
 
 class Sprite extends Component
@@ -20,9 +21,9 @@ class Sprite extends Component
 
     public var blendMode :BlendMode;
 
-    public var mouseDown (default, null) :Signal1<MouseEvent>;
-    public var mouseMove (default, null) :Signal1<MouseEvent>;
-    public var mouseUp (default, null) :Signal1<MouseEvent>;
+    public var pointerDown (default, null) :Signal1<PointerEvent>;
+    public var pointerMove (default, null) :Signal1<PointerEvent>;
+    public var pointerUp (default, null) :Signal1<PointerEvent>;
 
     public function new ()
     {
@@ -31,9 +32,9 @@ class Sprite extends Component
         this.anchorY = new PFloat(0, dirtyMatrix);
         this.visible = new PBool(true);
         this.blendMode = null;
-        this.mouseDown = new NotifyingSignal1(this);
-        this.mouseMove = new NotifyingSignal1(this);
-        this.mouseUp = new NotifyingSignal1(this);
+        this.pointerDown = new NotifyingSignal1(this);
+        this.pointerMove = new NotifyingSignal1(this);
+        this.pointerUp = new NotifyingSignal1(this);
 
         _viewMatrix = new Matrix();
         _listenerCount = 0;
@@ -87,9 +88,9 @@ class Sprite extends Component
     override public function onDispose ()
     {
         // Should this be standard practice?
-        mouseDown.disconnectAll();
-        mouseMove.disconnectAll();
-        mouseUp.disconnectAll();
+        pointerDown.disconnectAll();
+        pointerMove.disconnectAll();
+        pointerUp.disconnectAll();
     }
 
     private function dirtyMatrix (_)
@@ -184,8 +185,8 @@ class Sprite extends Component
 
     private static var IDENTITY = new Matrix();
 
-    // All sprites that have mouse listeners attached, in screen depth order.
-    // Used to optimize mouse picking.
+    // All sprites that have input event listeners attached, in screen depth order.
+    // Used to optimize picking.
     public static var _internal_interactiveSprites :Array<Sprite> = [];
 
     private var _viewMatrix :Matrix;

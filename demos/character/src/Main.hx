@@ -11,7 +11,6 @@ import flambe.display.Sprite;
 import flambe.display.SpriteSheet;
 import flambe.display.Transform;
 import flambe.Entity;
-import flambe.Input;
 import flambe.script.CallFunction;
 import flambe.script.MoveTo;
 import flambe.script.Parallel;
@@ -36,7 +35,7 @@ class Main
         transform.x._ = System.stage.width/2;
         transform.y._ = System.stage.height/2;
 
-        Input.mouseDown.connect(function (event) {
+        System.input.pointerDown.connect(function (event) {
             // Face left or right
             var transform = character.get(Transform);
             transform.scaleX._ = (event.viewX > transform.x._) ? 1 : -1;

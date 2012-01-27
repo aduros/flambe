@@ -8,12 +8,13 @@ import js.Lib;
 
 import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
-import flambe.display.KeyEvent;
-import flambe.display.MouseEvent;
 import flambe.display.Texture;
 import flambe.Entity;
-import flambe.Input;
+import flambe.input.Input;
+import flambe.input.KeyEvent;
+import flambe.input.PointerEvent;
 import flambe.platform.AppDriver;
+import flambe.platform.BasicInput;
 import flambe.platform.MainLoop;
 import flambe.System;
 import flambe.util.Promise;
@@ -24,6 +25,7 @@ class HtmlAppDriver
 {
     public var stage (getStage, null) :Stage;
     public var storage (getStorage, null) :Storage;
+    public var input (getInput, null) :Input;
     public var locale (getLocale, null) :String;
 
     public function new ()
@@ -50,6 +52,7 @@ class HtmlAppDriver
         }
 
         _stage = new HtmlStage(_canvas);
+        _input = new BasicInput();
 
         _loop = new MainLoop(new HtmlDrawingContext(_canvas));
         _lastUpdate = Date.now().getTime();
@@ -81,41 +84,41 @@ class HtmlAppDriver
         // canvas.style.backgroundColor = "#000";
 
         _canvas.addEventListener("mousedown", function (event) {
-            Input.mouseDown.emit(createMouseEvent(event));
+            _input.pointerDown.emit(createPointerEvent(event));
             _canvas.focus();
         }, false);
         _canvas.addEventListener("mousemove", function (event) {
-            Input.mouseMove.emit(createMouseEvent(event));
+            _input.pointerMove.emit(createPointerEvent(event));
         }, false);
         _canvas.addEventListener("mouseup", function (event) {
-            Input.mouseUp.emit(createMouseEvent(event));
+            _input.pointerUp.emit(createPointerEvent(event));
         }, false);
         _canvas.addEventListener("keydown", function (event) {
             event.preventDefault();
-            if (!Input.isKeyDown(event.keyCode)) {
-                Input.keyDown.emit(new KeyEvent(event.keyCode));
+            if (!_input.isKeyDown(event.keyCode)) {
+                _input.keyDown.emit(new KeyEvent(event.keyCode));
             }
         }, false);
         _canvas.addEventListener("keyup", function (event) {
             event.preventDefault();
-            if (Input.isKeyDown(event.keyCode)) {
-                Input.keyUp.emit(new KeyEvent(event.keyCode));
+            if (_input.isKeyDown(event.keyCode)) {
+                _input.keyUp.emit(new KeyEvent(event.keyCode));
             }
         }, false);
 
         var touchId = -1;
-        var maybeEmit = function (signal :Signal1<MouseEvent>, event) :Bool {
+        var maybeEmit = function (signal :Signal1<PointerEvent>, event) :Bool {
             var changedTouches :Array<Dynamic> = event.changedTouches;
             for (touch in changedTouches) {
                 if (touch.identifier == touchId) {
-                    signal.emit(createMouseEvent(touch));
+                    signal.emit(createPointerEvent(touch));
                     return true;
                 }
             }
             return false;
         };
         var onTouchEnd = function (event) {
-            if (maybeEmit(Input.mouseUp, event)) {
+            if (maybeEmit(_input.pointerUp, event)) {
                 touchId = -1;
             }
         };
@@ -129,10 +132,10 @@ class HtmlAppDriver
 
             var touch = event.changedTouches[0];
             touchId = touch.identifier;
-            Input.mouseDown.emit(createMouseEvent(touch));
+            _input.pointerDown.emit(createPointerEvent(touch));
         }, false);
         _canvas.addEventListener("touchmove", function (event) {
-            maybeEmit(Input.mouseMove, event);
+            maybeEmit(_input.pointerMove, event);
             // preventDefault necessary here too?
         }, false);
         _canvas.addEventListener("touchend", onTouchEnd, false);
@@ -178,6 +181,11 @@ class HtmlAppDriver
         return _storage;
     }
 
+    public function getInput () :Input
+    {
+        return _input;
+    }
+
     public function getLocale () :String
     {
         return untyped Lib.window.navigator.language;
@@ -205,10 +213,10 @@ class HtmlAppDriver
         _loop.render();
     }
 
-    private static function createMouseEvent (domEvent :Dynamic) :MouseEvent
+    private static function createPointerEvent (domEvent :Dynamic) :PointerEvent
     {
         var rect = domEvent.target.getBoundingClientRect();
-        return new MouseEvent(
+        return new PointerEvent(
             domEvent.clientX - rect.left,
             domEvent.clientY - rect.top);
     }
@@ -249,5 +257,6 @@ class HtmlAppDriver
 
     private var _canvas :Dynamic;
     private var _stage :Stage;
+    private var _input :Input;
     private var _storage :Storage;
 }

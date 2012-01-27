@@ -18,10 +18,12 @@ import flash.system.Capabilities;
 
 import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
-import flambe.display.KeyEvent;
 import flambe.Entity;
-import flambe.Input;
+import flambe.input.Input;
+import flambe.input.KeyEvent;
+import flambe.input.PointerEvent;
 import flambe.platform.AppDriver;
+import flambe.platform.BasicInput;
 import flambe.platform.MainLoop;
 import flambe.util.Promise;
 
@@ -30,6 +32,7 @@ class FlashAppDriver
 {
     public var stage (getStage, null) :Stage;
     public var storage (getStorage, null) :Storage;
+    public var input (getInput, null) :Input;
     public var locale (getLocale, null) :String;
 
     public function new ()
@@ -44,6 +47,13 @@ class FlashAppDriver
         };
 #end
         var stage = Lib.current.stage;
+
+        _stage = new FlashStage(stage);
+        _stage.resize.connect(onResized);
+        onResized();
+
+        _input = new BasicInput();
+
         stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
         stage.addEventListener(Event.RENDER, onRender);
         stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
@@ -51,10 +61,6 @@ class FlashAppDriver
         stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
         stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
         stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
-
-        _stage = new FlashStage(stage);
-        _stage.resize.connect(onResized);
-        onResized();
 
         // Handle uncaught errors
         var loaderInfo = Lib.current.loaderInfo;
@@ -89,6 +95,11 @@ class FlashAppDriver
         return _storage;
     }
 
+    public function getInput () :Input
+    {
+        return _input;
+    }
+
     public function getLocale () :String
     {
         return Capabilities.language;
@@ -105,30 +116,30 @@ class FlashAppDriver
 
     private function onMouseDown (event :MouseEvent)
     {
-        Input.mouseDown.emit(new flambe.display.MouseEvent(event.stageX, event.stageY));
+        _input.pointerDown.emit(new PointerEvent(event.stageX, event.stageY));
     }
 
     private function onMouseMove (event :MouseEvent)
     {
-        Input.mouseMove.emit(new flambe.display.MouseEvent(event.stageX, event.stageY));
+        _input.pointerMove.emit(new PointerEvent(event.stageX, event.stageY));
     }
 
     private function onMouseUp (event :MouseEvent)
     {
-        Input.mouseUp.emit(new flambe.display.MouseEvent(event.stageX, event.stageY));
+        _input.pointerUp.emit(new PointerEvent(event.stageX, event.stageY));
     }
 
     private function onKeyDown (event :KeyboardEvent)
     {
-        if (!Input.isKeyDown(event.charCode)) {
-            Input.keyDown.emit(new KeyEvent(event.charCode));
+        if (!_input.isKeyDown(event.charCode)) {
+            _input.keyDown.emit(new KeyEvent(event.charCode));
         }
     }
 
     private function onKeyUp (event :KeyboardEvent)
     {
-        if (Input.isKeyDown(event.charCode)) {
-            Input.keyUp.emit(new KeyEvent(event.charCode));
+        if (_input.isKeyDown(event.charCode)) {
+            _input.keyUp.emit(new KeyEvent(event.charCode));
         }
     }
 
@@ -176,5 +187,6 @@ class FlashAppDriver
     private var _lastUpdate :Int;
 
     private var _stage :Stage;
+    private var _input :Input;
     private var _storage :Storage;
 }

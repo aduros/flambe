@@ -2,9 +2,8 @@
 // Flambe - Rapid game development
 // https://github.com/aduros/flambe/blob/master/LICENSE.txt
 
-package flambe.display;
+package flambe.input;
 
-// Ermm, this and MouseEvent don't really belong in flambe.display. flambe.events?
 class KeyEvent
 {
     // The key's character code. This value is platform dependent, so be sure to test thoroughly,

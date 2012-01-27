@@ -6,6 +6,7 @@ package flambe;
 
 import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
+import flambe.input.Input;
 import flambe.platform.AppDriver;
 import flambe.platform.Stage;
 import flambe.platform.Storage;
@@ -19,6 +20,7 @@ class System
 
     public static var stage (getStage, null) :Stage;
     public static var storage (getStorage, null) :Storage;
+    public static var input (getInput, null) :Input;
     public static var locale (getLocale, null) :String;
 
     /**
@@ -62,6 +64,11 @@ class System
     inline private static function getStorage () :Storage
     {
         return driver.storage;
+    }
+
+    inline private static function getInput () :Input
+    {
+        return driver.input;
     }
 
     inline private static function getLocale () :String

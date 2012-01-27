@@ -2,9 +2,9 @@
 // Flambe - Rapid game development
 // https://github.com/aduros/flambe/blob/master/LICENSE.txt
 
-package flambe.display;
+package flambe.input;
 
-class MouseEvent
+class PointerEvent
 {
     public var viewX (default, null) :Float;
     public var viewY (default, null) :Float;

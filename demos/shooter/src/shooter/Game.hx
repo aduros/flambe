@@ -11,7 +11,6 @@ import flambe.display.PatternSprite;
 import flambe.display.Sprite;
 import flambe.display.Transform;
 import flambe.Entity;
-import flambe.Input;
 import flambe.script.AnimateTo;
 import flambe.script.CallFunction;
 import flambe.script.Delay;
@@ -80,7 +79,7 @@ class Game extends Component
            }),
         ])));
 
-        Input.mouseMove.connect(function (event) {
+        System.input.pointerMove.connect(function (event) {
             if (player == null) {
                 return;
             }

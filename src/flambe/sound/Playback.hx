@@ -5,8 +5,10 @@
 package flambe.sound;
 
 import flambe.animation.Property;
+import flambe.util.Disposable;
 
 interface Playback
+    implements Disposable
 {
     /**
      * The volume of the sound being played, between 0 and 1 (inclusive).

@@ -108,6 +108,11 @@ class HtmlPlayback
         return false;
     }
 
+    public function dispose ()
+    {
+        setPaused(true);
+    }
+
     private function playAudio ()
     {
         _clone.play();

@@ -112,6 +112,11 @@ class FlashPlayback
         return false;
     }
 
+    public function dispose ()
+    {
+        setPaused(true);
+    }
+
     private function onSoundComplete (_)
     {
         _ended = true;

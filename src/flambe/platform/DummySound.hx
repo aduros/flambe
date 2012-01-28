@@ -84,5 +84,10 @@ class DummyPlayback
         return 0;
     }
 
+    public function dispose ()
+    {
+        // Nothing
+    }
+
     private var _sound :DummySound;
 }

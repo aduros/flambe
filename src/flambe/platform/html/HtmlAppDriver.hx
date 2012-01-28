@@ -90,6 +90,7 @@ class HtmlAppDriver
         // canvas.style.backgroundColor = "#000";
 
         _canvas.addEventListener("mousedown", function (event) {
+            event.preventDefault();
             _input.pointerDown.emit(createPointerEvent(event));
             _canvas.focus();
         }, false);
@@ -106,7 +107,6 @@ class HtmlAppDriver
             }
         }, false);
         _canvas.addEventListener("keyup", function (event) {
-            event.preventDefault();
             if (_input.isKeyDown(event.keyCode)) {
                 _input.keyUp.emit(new KeyEvent(event.keyCode));
             }

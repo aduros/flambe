@@ -13,7 +13,6 @@ def options(ctx):
 def configure(ctx):
     ctx.load("haxe", tooldir=FLAMBE_ROOT+"/tools")
     ctx.find_program("java", var="JAVA")
-    ctx.find_program("neko", var="NEKO")
     ctx.env.debug = ctx.options.debug
 
 @feature("flambe")

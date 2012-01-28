@@ -35,11 +35,17 @@ class FlashAppDriver
     public var input (getInput, null) :Input;
     public var locale (getLocale, null) :String;
 
-    public function new ()
+    public var mainLoop (default, null) :MainLoop;
+
+    public static function getInstance () :FlashAppDriver
     {
+        if (_instance == null) {
+            _instance = new FlashAppDriver();
+        }
+        return _instance;
     }
 
-    public function init (root :Entity)
+    private function new ()
     {
 #if debug
         haxe.Log.trace = function (v, ?pos) {
@@ -150,21 +156,21 @@ class FlashAppDriver
 
         _lastUpdate = now;
 
-        _loop.update(dt);
+        mainLoop.update(dt);
         Lib.current.stage.invalidate();
     }
 
     private function onRender (_)
     {
         _screen.lock();
-        _loop.render();
+        mainLoop.render();
         _screen.unlock();
     }
 
     private function onResized ()
     {
         _screen = new BitmapData(_stage.width, _stage.height, false);
-        _loop = new MainLoop(new FlashDrawingContext(_screen));
+        mainLoop = new MainLoop(new FlashDrawingContext(_screen));
 
         if (_bitmap != null) {
             Lib.current.removeChild(_bitmap);
@@ -180,10 +186,11 @@ class FlashAppDriver
         System.uncaughtError.emit(FlashUtil.getErrorMessage(error));
     }
 
+    private static var _instance :FlashAppDriver;
+
     private var _bitmap :Bitmap;
 
     private var _screen :BitmapData;
-    private var _loop :MainLoop;
     private var _lastUpdate :Int;
 
     private var _stage :Stage;

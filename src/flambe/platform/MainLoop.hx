@@ -13,6 +13,8 @@ import flambe.scene.Director;
 import flambe.System;
 import flambe.Visitor;
 
+using Lambda;
+
 /**
  * Updates all components and renders.
  */
@@ -22,10 +24,23 @@ class MainLoop
     {
         _updateVisitor = new UpdateVisitor();
         _drawVisitor = new DrawVisitor(drawCtx);
+        _tickables = [];
     }
 
     public function update (dt :Int)
     {
+        // First update any tickables, folding away nulls
+        var ii = 0;
+        while (ii < _tickables.length) {
+            var t = _tickables[ii];
+            if (t == null || t.update(dt)) {
+                _tickables.splice(ii, 1);
+            } else {
+                ++ii;
+            }
+        }
+
+        // Then update the entity hierarchy
         _updateVisitor.dt = dt;
         System.root.visit(_updateVisitor, true, true);
     }
@@ -35,8 +50,24 @@ class MainLoop
         System.root.visit(_drawVisitor, false, true);
     }
 
+    public function addTickable (t :Tickable)
+    {
+        _tickables.push(t);
+    }
+
+    public function removeTickable (t :Tickable)
+    {
+        var idx = _tickables.indexOf(t);
+        if (idx >= 0) {
+            // Actual removals only happen in update()
+            _tickables[idx] = null;
+        }
+    }
+
     private var _updateVisitor :UpdateVisitor;
     private var _drawVisitor :DrawVisitor;
+
+    private var _tickables :Array<Tickable>;
 }
 
 private class UpdateVisitor

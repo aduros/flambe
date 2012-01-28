@@ -4,13 +4,14 @@
 
 package flambe.sound;
 
+import flambe.animation.Property;
+
 interface Playback
 {
     /**
      * The volume of the sound being played, between 0 and 1 (inclusive).
      */
-    // TODO(bruno): Make volume an animatable PFloat
-    var volume (getVolume, setVolume) :Float;
+    var volume (default, null) :PFloat;
 
     var paused (isPaused, setPaused) :Bool;
 

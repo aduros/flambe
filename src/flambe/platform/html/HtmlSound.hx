@@ -6,8 +6,10 @@ package flambe.platform.html;
 
 import js.Lib;
 
-import flambe.sound.Sound;
+import flambe.animation.Property;
+import flambe.platform.Tickable;
 import flambe.sound.Playback;
+import flambe.sound.Sound;
 
 class HtmlSound
     implements Sound
@@ -37,9 +39,10 @@ class HtmlSound
 }
 
 class HtmlPlayback
-    implements Playback
+    implements Playback,
+    implements Tickable
 {
-    public var volume (getVolume, setVolume) :Float;
+    public var volume (default, null) :PFloat;
     public var paused (isPaused, setPaused) :Bool;
     public var position (getPosition, null) :Float;
     public var sound (getSound, null) :Sound;
@@ -47,18 +50,18 @@ class HtmlPlayback
     public function new (sound :HtmlSound, volume :Float, loop :Bool)
     {
         _sound = sound;
+        _tickableAdded = false;
+        this.volume = new PFloat(volume, function (v) {
+            _clone.volume = v._;
+        });
 
         // Create a copy of the original sound's element. Note that cloneNode() doesn't work in IE
         _clone = Lib.document.createElement("audio");
         _clone.volume = volume;
         _clone.loop = loop;
         _clone.src = sound.element.src;
-        _clone.play();
-    }
 
-    public function getVolume () :Float
-    {
-        return _clone.volume;
+        playAudio();
     }
 
     public function setVolume (volume :Float) :Float
@@ -71,7 +74,7 @@ class HtmlPlayback
         return _sound;
     }
 
-    public function isPaused () :Bool
+    inline public function isPaused () :Bool
     {
         return _clone.paused;
     }
@@ -82,7 +85,7 @@ class HtmlPlayback
             if (paused) {
                 _clone.pause();
             } else {
-                _clone.play();
+                playAudio();
             }
         }
         return paused;
@@ -93,6 +96,30 @@ class HtmlPlayback
         return _clone.currentTime*1000;
     }
 
+    public function update (dt :Int) :Bool
+    {
+        volume.update(dt);
+
+        if (_clone.ended || isPaused()) {
+            // Allow ended or paused sounds to be garbage collected
+            _tickableAdded = false;
+            return true;
+        }
+        return false;
+    }
+
+    private function playAudio ()
+    {
+        _clone.play();
+
+        if (!_tickableAdded) {
+            HtmlAppDriver.getInstance().mainLoop.addTickable(this);
+            _tickableAdded = true;
+        }
+    }
+
     private var _sound :HtmlSound;
     private var _clone :Dynamic;
+
+    private var _tickableAdded :Bool;
 }

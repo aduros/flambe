@@ -28,11 +28,17 @@ class HtmlAppDriver
     public var input (getInput, null) :Input;
     public var locale (getLocale, null) :String;
 
-    public function new ()
+    public var mainLoop (default, null) :MainLoop;
+
+    public static function getInstance () :HtmlAppDriver
     {
+        if (_instance == null) {
+            _instance = new HtmlAppDriver();
+        }
+        return _instance;
     }
 
-    public function init (root :Entity)
+    private function new ()
     {
 #if debug
         haxe.Firebug.redirectTraces();
@@ -54,7 +60,7 @@ class HtmlAppDriver
         _stage = new HtmlStage(_canvas);
         _input = new BasicInput();
 
-        _loop = new MainLoop(new HtmlDrawingContext(_canvas));
+        mainLoop = new MainLoop(new HtmlDrawingContext(_canvas));
         _lastUpdate = Date.now().getTime();
 
         // Use requestAnimationFrame if available, otherwise a 60 FPS setInterval
@@ -209,8 +215,8 @@ class HtmlAppDriver
         var dt = now - _lastUpdate;
         _lastUpdate = now;
 
-        _loop.update(cast dt);
-        _loop.render();
+        mainLoop.update(cast dt);
+        mainLoop.render();
     }
 
     private static function createPointerEvent (domEvent :Dynamic) :PointerEvent
@@ -252,7 +258,8 @@ class HtmlAppDriver
         Lib.window.scrollTo(1, 0);
     }
 
-    private var _loop :MainLoop;
+    private static var _instance :HtmlAppDriver;
+
     private var _lastUpdate :Float;
 
     private var _canvas :Dynamic;

@@ -4,12 +4,15 @@
 
 package flambe.platform.flash;
 
+import flash.events.Event;
 import flash.media.SoundChannel;
 import flash.media.SoundTransform;
 
-import flambe.sound.Sound;
-import flambe.sound.Playback;
+import flambe.animation.Property;
 import flambe.math.FMath;
+import flambe.platform.Tickable;
+import flambe.sound.Playback;
+import flambe.sound.Sound;
 
 class FlashSound
     implements Sound
@@ -39,9 +42,10 @@ class FlashSound
 }
 
 class FlashPlayback
-    implements Playback
+    implements Playback,
+    implements Tickable
 {
-    public var volume (getVolume, setVolume) :Float;
+    public var volume (default, null) :PFloat;
     public var paused (isPaused, setPaused) :Bool;
     public var position (getPosition, null) :Float;
     public var sound (getSound, null) :Sound;
@@ -49,22 +53,17 @@ class FlashPlayback
     public function new (sound :FlashSound, volume :Float, loops :Int)
     {
         _sound = sound;
-        _pausePosition = -1;
-        _channel = sound.fms.play(0, loops, new SoundTransform(volume));
         _loops = loops;
+        this.volume = new PFloat(volume, onVolumeUpdated);
+
+        playAudio(0, new SoundTransform(volume));
     }
 
-    public function getVolume () :Float
-    {
-        return _channel.soundTransform.volume;
-    }
-
-    public function setVolume (volume :Float) :Float
+    public function onVolumeUpdated (volume :PFloat)
     {
         var soundTransform = _channel.soundTransform;
-        soundTransform.volume = volume;
+        soundTransform.volume = volume._;
         _channel.soundTransform = soundTransform; // Magic setter
-        return volume;
     }
 
     public function getSound () :Sound
@@ -72,7 +71,7 @@ class FlashPlayback
         return _sound;
     }
 
-    public function isPaused () :Bool
+    inline public function isPaused () :Bool
     {
         return _pausePosition >= 0;
     }
@@ -89,8 +88,7 @@ class FlashPlayback
                 // seek back to _pausePosition on each loop. Maybe handle looping manually in this
                 // case?
                 var startPosition = (_loops > 0) ? 0 : _pausePosition;
-                _channel = _sound.fms.play(startPosition, _loops, _channel.soundTransform);
-                _pausePosition = -1;
+                playAudio(startPosition, _channel.soundTransform);
             }
         }
         return paused;
@@ -101,8 +99,41 @@ class FlashPlayback
         return _channel.position;
     }
 
+    public function update (dt :Int) :Bool
+    {
+        // trace("FlashPlayback update:" + dt);
+        volume.update(dt);
+
+        if (_ended || isPaused()) {
+            // Allow ended or paused sounds to be garbage collected
+            _tickableAdded = false;
+            return true;
+        }
+        return false;
+    }
+
+    private function onSoundComplete (_)
+    {
+        _ended = true;
+    }
+
+    private function playAudio (startPosition :Float, soundTransform :SoundTransform)
+    {
+        _channel = _sound.fms.play(startPosition, _loops, soundTransform);
+        _channel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
+        _pausePosition = -1;
+
+        if (!_tickableAdded) {
+            FlashAppDriver.getInstance().mainLoop.addTickable(this);
+            _tickableAdded = true;
+        }
+    }
+
     private var _sound :FlashSound;
     private var _channel :SoundChannel;
-    private var _pausePosition :Float;
     private var _loops :Int;
+
+    private var _pausePosition :Float;
+    private var _ended :Bool;
+    private var _tickableAdded :Bool;
 }

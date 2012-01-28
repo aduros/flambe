@@ -35,13 +35,12 @@ class System
         uncaughtError = new Signal1();
 
 #if flash
-        driver = new flambe.platform.flash.FlashAppDriver();
+        driver = flambe.platform.flash.FlashAppDriver.getInstance();
 #elseif html
-        driver = new flambe.platform.html.HtmlAppDriver();
+        driver = flambe.platform.html.HtmlAppDriver.getInstance();
 #else
 #error "Platform not supported!"
 #end
-        driver.init(root);
     }
 
     // A bunch of short-hands to driver functions

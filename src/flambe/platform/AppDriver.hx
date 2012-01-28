@@ -23,8 +23,6 @@ interface AppDriver
      */
     var locale (getLocale, null) :String;
 
-    function init (root :Entity) :Void;
-
     function loadAssetPack (manifest :Manifest) :Promise<AssetPack>;
 
     function callNative (funcName :String, params :Array<Dynamic>) :Dynamic;

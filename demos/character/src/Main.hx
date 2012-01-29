@@ -35,7 +35,7 @@ class Main
         transform.x._ = System.stage.width/2;
         transform.y._ = System.stage.height/2;
 
-        System.input.pointerDown.connect(function (event) {
+        System.pointer.down.connect(function (event) {
             // Face left or right
             var transform = character.get(Transform);
             transform.scaleX._ = (event.viewX > transform.x._) ? 1 : -1;

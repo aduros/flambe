@@ -19,11 +19,13 @@ import flash.system.Capabilities;
 import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
 import flambe.Entity;
-import flambe.input.Input;
+import flambe.input.Keyboard;
 import flambe.input.KeyEvent;
+import flambe.input.Pointer;
 import flambe.input.PointerEvent;
 import flambe.platform.AppDriver;
-import flambe.platform.BasicInput;
+import flambe.platform.BasicKeyboard;
+import flambe.platform.BasicPointer;
 import flambe.platform.MainLoop;
 import flambe.util.Promise;
 
@@ -32,7 +34,8 @@ class FlashAppDriver
 {
     public var stage (getStage, null) :Stage;
     public var storage (getStorage, null) :Storage;
-    public var input (getInput, null) :Input;
+    public var pointer (getPointer, null) :Pointer;
+    public var keyboard (getKeyboard, null) :Keyboard;
     public var locale (getLocale, null) :String;
 
     public var mainLoop (default, null) :MainLoop;
@@ -58,7 +61,8 @@ class FlashAppDriver
         _stage.resize.connect(onResized);
         onResized();
 
-        _input = new BasicInput();
+        _pointer = new BasicPointer();
+        _keyboard = new BasicKeyboard();
 
         stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
         stage.addEventListener(Event.RENDER, onRender);
@@ -101,9 +105,14 @@ class FlashAppDriver
         return _storage;
     }
 
-    public function getInput () :Input
+    public function getPointer () :Pointer
     {
-        return _input;
+        return _pointer;
+    }
+
+    public function getKeyboard () :Keyboard
+    {
+        return _keyboard;
     }
 
     public function getLocale () :String
@@ -122,31 +131,27 @@ class FlashAppDriver
 
     private function onMouseDown (event :MouseEvent)
     {
-        _input.pointerDown.emit(new PointerEvent(event.stageX, event.stageY));
+        _pointer.submitDown(new PointerEvent(event.stageX, event.stageY));
     }
 
     private function onMouseMove (event :MouseEvent)
     {
-        _input.pointerMove.emit(new PointerEvent(event.stageX, event.stageY));
+        _pointer.submitMove(new PointerEvent(event.stageX, event.stageY));
     }
 
     private function onMouseUp (event :MouseEvent)
     {
-        _input.pointerUp.emit(new PointerEvent(event.stageX, event.stageY));
+        _pointer.submitUp(new PointerEvent(event.stageX, event.stageY));
     }
 
     private function onKeyDown (event :KeyboardEvent)
     {
-        if (!_input.isKeyDown(event.charCode)) {
-            _input.keyDown.emit(new KeyEvent(event.charCode));
-        }
+        _keyboard.submitDown(new KeyEvent(event.charCode));
     }
 
     private function onKeyUp (event :KeyboardEvent)
     {
-        if (_input.isKeyDown(event.charCode)) {
-            _input.keyUp.emit(new KeyEvent(event.charCode));
-        }
+        _keyboard.submitUp(new KeyEvent(event.charCode));
     }
 
     private function onEnterFrame (_)
@@ -194,6 +199,7 @@ class FlashAppDriver
     private var _lastUpdate :Int;
 
     private var _stage :Stage;
-    private var _input :Input;
+    private var _pointer :BasicPointer;
+    private var _keyboard :BasicKeyboard;
     private var _storage :Storage;
 }

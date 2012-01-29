@@ -27,10 +27,10 @@ class Draggable extends Component
     override public function onUpdate (dt :Int)
     {
         if (_dragging) {
-            if (System.input.isPointerDown()) {
+            if (System.pointer.isDown()) {
                 var xform = owner.get(Transform);
-                xform.x._ = System.input.pointerX - _offset.x;
-                xform.y._ = System.input.pointerY - _offset.y;
+                xform.x._ = System.pointer.x - _offset.x;
+                xform.y._ = System.pointer.y - _offset.y;
             } else {
                 _dragging = false;
             }

@@ -6,50 +6,65 @@ package flambe.platform;
 
 import flambe.display.Sprite;
 import flambe.Entity;
-import flambe.input.Input;
-import flambe.input.KeyEvent;
+import flambe.input.Pointer;
 import flambe.input.PointerEvent;
 import flambe.util.Signal1;
 
-class BasicInput
-    implements Input
+class BasicPointer
+    implements Pointer
 {
-    public var pointerDown (default, null) :Signal1<PointerEvent>;
-    public var pointerMove (default, null) :Signal1<PointerEvent>;
-    public var pointerUp (default, null) :Signal1<PointerEvent>;
+    public var supported (isSupported, null) :Bool;
 
-    public var pointerX (default, null) :Float;
-    public var pointerY (default, null) :Float;
+    public var down (default, null) :Signal1<PointerEvent>;
+    public var move (default, null) :Signal1<PointerEvent>;
+    public var up (default, null) :Signal1<PointerEvent>;
 
-    public var keyDown (default, null) :Signal1<KeyEvent>;
-    public var keyUp (default, null) :Signal1<KeyEvent>;
+    public var x (getX, null) :Float;
+    public var y (getY, null) :Float;
 
-    public function new ()
+    public function new (x :Int = 0, y :Int = 0, isDown :Bool = false)
     {
-        pointerDown = new Signal1(onPointerDown);
-        pointerMove = new Signal1(onPointerMove);
-        pointerUp = new Signal1(onPointerUp);
-        keyDown = new Signal1(onKeyDown);
-        keyUp = new Signal1(onKeyUp);
-        _pointerDown = false;
-        _keyStates = new IntHash();
+        down = new Signal1();
+        move = new Signal1();
+        up = new Signal1();
+        _x = x;
+        _y = y;
+        _isDown = isDown;
     }
 
-    public function isPointerDown () :Bool
+    public function isSupported () :Bool
     {
-        return _pointerDown;
+        return true;
     }
 
-    public function isKeyDown (charCode :Int) :Bool
+    public function getX () :Float
     {
-        return _keyStates.exists(charCode);
+        return _x;
     }
 
-    private function onPointerDown (event :PointerEvent)
+    public function getY () :Float
     {
-        _pointerDown = true;
-        pointerX = event.viewX;
-        pointerY = event.viewY;
+        return _y;
+    }
+
+    public function isDown () :Bool
+    {
+        return _isDown;
+    }
+
+    /**
+     * Called by the platform to handle a down event.
+     */
+    public function submitDown (event :PointerEvent)
+    {
+        if (_isDown) {
+            return; // Ignore repeat down events
+        }
+
+        _isDown = true;
+        _x = event.viewX;
+        _y = event.viewY;
+        down.emit(event);
 
         var entity = getEntityUnderPoint(event.viewX, event.viewY);
         while (entity != null) {
@@ -61,10 +76,14 @@ class BasicInput
         }
     }
 
-    private function onPointerMove (event :PointerEvent)
+    /**
+     * Called by the platform to handle a move event.
+     */
+    public function submitMove (event :PointerEvent)
     {
-        pointerX = event.viewX;
-        pointerY = event.viewY;
+        _x = event.viewX;
+        _y = event.viewY;
+        move.emit(event);
 
         var entity = getEntityUnderPoint(event.viewX, event.viewY);
         while (entity != null) {
@@ -76,11 +95,19 @@ class BasicInput
         }
     }
 
-    private function onPointerUp (event :PointerEvent)
+    /**
+     * Called by the platform to handle an up event.
+     */
+    public function submitUp (event :PointerEvent)
     {
-        _pointerDown = false;
-        pointerX = event.viewX;
-        pointerY = event.viewY;
+        if (!_isDown) {
+            return; // Ignore repeat up events
+        }
+
+        _isDown = false;
+        _x = event.viewX;
+        _y = event.viewY;
+        up.emit(event);
 
         var entity = getEntityUnderPoint(event.viewX, event.viewY);
         while (entity != null) {
@@ -90,16 +117,6 @@ class BasicInput
             }
             entity = entity.parent;
         }
-    }
-
-    private function onKeyDown (event :KeyEvent)
-    {
-        _keyStates.set(event.charCode, true);
-    }
-
-    private function onKeyUp (event :KeyEvent)
-    {
-        _keyStates.remove(event.charCode);
     }
 
     /**
@@ -130,6 +147,7 @@ class BasicInput
         return true;
     }
 
-    private var _pointerDown :Bool;
-    private var _keyStates :IntHash<Bool>;
+    private var _x :Float;
+    private var _y :Float;
+    private var _isDown :Bool;
 }

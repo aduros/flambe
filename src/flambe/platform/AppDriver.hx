@@ -7,15 +7,20 @@ package flambe.platform;
 import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
 import flambe.display.Texture;
-import flambe.input.Input;
 import flambe.Entity;
+import flambe.input.Keyboard;
+import flambe.input.Pointer;
 import flambe.util.Promise;
 
 interface AppDriver
 {
     var stage (getStage, null) :Stage;
+
     var storage (getStorage, null) :Storage;
-    var input (getInput, null) :Input;
+
+    var pointer (getPointer, null) :Pointer;
+
+    var keyboard (getKeyboard, null) :Keyboard;
 
     /**
      * Gets the RFC 4646 language tag of the environment. For example, "en-US", "pt", or null if the

@@ -10,11 +10,13 @@ import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
 import flambe.display.Texture;
 import flambe.Entity;
-import flambe.input.Input;
+import flambe.input.Keyboard;
 import flambe.input.KeyEvent;
+import flambe.input.Pointer;
 import flambe.input.PointerEvent;
 import flambe.platform.AppDriver;
-import flambe.platform.BasicInput;
+import flambe.platform.BasicKeyboard;
+import flambe.platform.BasicPointer;
 import flambe.platform.MainLoop;
 import flambe.System;
 import flambe.util.Promise;
@@ -25,7 +27,8 @@ class HtmlAppDriver
 {
     public var stage (getStage, null) :Stage;
     public var storage (getStorage, null) :Storage;
-    public var input (getInput, null) :Input;
+    public var pointer (getPointer, null) :Pointer;
+    public var keyboard (getKeyboard, null) :Keyboard;
     public var locale (getLocale, null) :String;
 
     public var mainLoop (default, null) :MainLoop;
@@ -58,7 +61,8 @@ class HtmlAppDriver
         }
 
         _stage = new HtmlStage(_canvas);
-        _input = new BasicInput();
+        _pointer = new BasicPointer();
+        _keyboard = new BasicKeyboard();
 
         mainLoop = new MainLoop(new HtmlDrawingContext(_canvas));
         _lastUpdate = Date.now().getTime();
@@ -91,58 +95,58 @@ class HtmlAppDriver
 
         _canvas.addEventListener("mousedown", function (event) {
             event.preventDefault();
-            _input.pointerDown.emit(createPointerEvent(event));
+            _pointer.submitDown(createPointerEvent(event));
             _canvas.focus();
         }, false);
         _canvas.addEventListener("mousemove", function (event) {
-            _input.pointerMove.emit(createPointerEvent(event));
+            _pointer.submitMove(createPointerEvent(event));
         }, false);
         _canvas.addEventListener("mouseup", function (event) {
-            _input.pointerUp.emit(createPointerEvent(event));
+            _pointer.submitUp(createPointerEvent(event));
         }, false);
         _canvas.addEventListener("keydown", function (event) {
             event.preventDefault();
-            if (!_input.isKeyDown(event.keyCode)) {
-                _input.keyDown.emit(new KeyEvent(event.keyCode));
-            }
+            _keyboard.submitDown(new KeyEvent(event.keyCode));
         }, false);
         _canvas.addEventListener("keyup", function (event) {
-            if (_input.isKeyDown(event.keyCode)) {
-                _input.keyUp.emit(new KeyEvent(event.keyCode));
-            }
+            _keyboard.submitUp(new KeyEvent(event.keyCode));
         }, false);
 
         var touchId = -1;
-        var maybeEmit = function (signal :Signal1<PointerEvent>, event) :Bool {
-            var changedTouches :Array<Dynamic> = event.changedTouches;
+        var getPointerTouch = function (domEvent) :Bool {
+            var changedTouches :Array<Dynamic> = domEvent.changedTouches;
             for (touch in changedTouches) {
                 if (touch.identifier == touchId) {
-                    signal.emit(createPointerEvent(touch));
-                    return true;
+                    return touch;
                 }
             }
-            return false;
+            return null;
         };
-        var onTouchEnd = function (event) {
-            if (maybeEmit(_input.pointerUp, event)) {
+        var onTouchEnd = function (domEvent) {
+            var touch = getPointerTouch(domEvent);
+            if (touch != null) {
+                _pointer.submitUp(createPointerEvent(touch));
                 touchId = -1;
             }
         };
-        _canvas.addEventListener("touchstart", function (event) {
-            event.preventDefault();
+        _canvas.addEventListener("touchstart", function (domEvent) {
+            domEvent.preventDefault();
             if (touchId >= 0) {
                 // We're already handling a finger
                 return;
             }
             hideMobileBrowser();
 
-            var touch = event.changedTouches[0];
+            var touch = domEvent.changedTouches[0];
             touchId = touch.identifier;
-            _input.pointerDown.emit(createPointerEvent(touch));
+            _pointer.submitDown(createPointerEvent(touch));
         }, false);
-        _canvas.addEventListener("touchmove", function (event) {
-            maybeEmit(_input.pointerMove, event);
+        _canvas.addEventListener("touchmove", function (domEvent) {
             // preventDefault necessary here too?
+            var touch = getPointerTouch(domEvent);
+            if (touch != null) {
+                _pointer.submitMove(createPointerEvent(touch));
+            }
         }, false);
         _canvas.addEventListener("touchend", onTouchEnd, false);
         _canvas.addEventListener("touchcancel", onTouchEnd, false);
@@ -187,11 +191,6 @@ class HtmlAppDriver
         return _storage;
     }
 
-    public function getInput () :Input
-    {
-        return _input;
-    }
-
     public function getLocale () :String
     {
         return untyped Lib.window.navigator.language;
@@ -217,6 +216,16 @@ class HtmlAppDriver
 
         mainLoop.update(cast dt);
         mainLoop.render();
+    }
+
+    public function getPointer () :Pointer
+    {
+        return _pointer;
+    }
+
+    public function getKeyboard () :Keyboard
+    {
+        return _keyboard;
     }
 
     private static function createPointerEvent (domEvent :Dynamic) :PointerEvent
@@ -264,6 +273,7 @@ class HtmlAppDriver
 
     private var _canvas :Dynamic;
     private var _stage :Stage;
-    private var _input :Input;
+    private var _pointer :BasicPointer;
+    private var _keyboard :BasicKeyboard;
     private var _storage :Storage;
 }

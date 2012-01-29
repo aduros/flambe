@@ -6,7 +6,8 @@ package flambe;
 
 import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
-import flambe.input.Input;
+import flambe.input.Pointer;
+import flambe.input.Keyboard;
 import flambe.platform.AppDriver;
 import flambe.platform.Stage;
 import flambe.platform.Storage;
@@ -19,9 +20,17 @@ class System
     public static var driver (default, null) :AppDriver;
 
     public static var stage (getStage, null) :Stage;
+
     public static var storage (getStorage, null) :Storage;
-    public static var input (getInput, null) :Input;
+
+    public static var pointer (getPointer, null) :Pointer;
+
+    public static var keyboard (getKeyboard, null) :Keyboard;
+
     public static var locale (getLocale, null) :String;
+
+    // TODO(bruno): mouse, touch, accelerometer, gamepads, haptic, geolocation, video, web,
+    // textInput
 
     /**
      * Emitted when an uncaught exception occurs, if the platform supports it. You can wire this up
@@ -65,9 +74,14 @@ class System
         return driver.storage;
     }
 
-    inline private static function getInput () :Input
+    inline private static function getPointer () :Pointer
     {
-        return driver.input;
+        return driver.pointer;
+    }
+
+    inline private static function getKeyboard () :Keyboard
+    {
+        return driver.keyboard;
     }
 
     inline private static function getLocale () :String

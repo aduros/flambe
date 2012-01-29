@@ -79,7 +79,7 @@ class Game extends Component
            }),
         ])));
 
-        System.input.pointerMove.connect(function (event) {
+        System.pointer.move.connect(function (event) {
             if (player == null) {
                 return;
             }

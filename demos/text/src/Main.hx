@@ -30,7 +30,7 @@ class Main
             "(Your touch screen works)",
         ];
         var taps = 0;
-        bg.get(FillSprite).pointerDown.connect(function (_) {
+        label.get(TextSprite).pointerDown.connect(function (_) {
             var transform = label.get(Transform);
             var margin = 50;
             transform.x.animateTo(

@@ -12,7 +12,7 @@ var flambe = (function () {
             // TODO(bruno): Allow you to order the URLs array based on preference. For now the swf
             // must be first and the JS second.
             if (typeof urls == "string") {
-                urls = [ urls + ".swf", urls + "-html.js" ];
+                urls = [ urls + "-flash.swf", urls + "-html.js" ];
             }
 
             var args = {};

@@ -7,8 +7,11 @@ import os
 # Waf hates absolute paths for some reason
 FLAMBE_ROOT = os.path.dirname(__file__) + "/.."
 
+SERVER_CONFIG = "/tmp/flambe-server.py"
+
 def options(ctx):
-    ctx.add_option("--debug", action="store_true", default=False, help="Build a development version")
+    ctx.add_option("--debug", action="store_true", default=False,
+        help="Build a development version")
 
 def configure(ctx):
     ctx.load("haxe", tooldir=FLAMBE_ROOT+"/tools")
@@ -17,10 +20,16 @@ def configure(ctx):
 
 @feature("flambe")
 def apply_flambe(ctx):
-    Utils.def_attrs(ctx, classpath="", flags="", libs="", assetBase=None)
+    Utils.def_attrs(ctx, platforms="flash html", app="default",
+        classpath="", flags="", libs="", assetBase=None)
+
     classpath=["src", FLAMBE_ROOT+"/src"] + Utils.to_list(ctx.classpath)
     flags = ["-main", ctx.main] + Utils.to_list(ctx.flags)
     libs = ["hxJson2"] + Utils.to_list(ctx.libs)
+    platforms = Utils.to_list(ctx.platforms)
+    assetDir = ctx.path.find_dir("assets")
+    installPrefix = "deploy/" + ctx.app + "/"
+    buildPrefix = ctx.app + "/"
 
     debug = ctx.env.debug
     closure = ctx.bld.path.find_resource(FLAMBE_ROOT+"/tools/closure.jar")
@@ -28,6 +37,9 @@ def apply_flambe(ctx):
     # Don't forget to change flambe.js when changing -swf-version!
     flash_flags = "-swf-version 10 -swf-header 640:480:60:ffffff".split()
     html_flags = "-D html".split()
+
+    # The files that are built and should be installed
+    outputs = []
 
     if debug:
         flags += "-D debug --no-opt --no-inline".split()
@@ -44,65 +56,78 @@ def apply_flambe(ctx):
             "addMetadata(\"@assetBase('%s')\", \"flambe.asset.Manifest\")" % ctx.assetBase,
         ]
 
-    ctx.bld(features="haxe", classpath=classpath,
-        flags=flags + flash_flags,
-        libs=libs,
-        target="app.swf")
-    ctx.bld.install_files("deploy/web", "app.swf")
+    if "flash" in platforms:
+        swf = buildPrefix + "app-flash.swf"
+        outputs += swf
+        ctx.bld(features="haxe", classpath=classpath,
+            flags=flags + flash_flags,
+            libs=libs,
+            target=swf)
+        ctx.bld.install_files(installPrefix + "web", swf)
 
-    ctx.bld(features="haxe", classpath=classpath,
-        flags=flags + html_flags,
-        libs=libs,
-        target="app-html.js" if debug else "app-html.uncompressed.js")
-    if not debug:
-        import textwrap
-        wrapper = textwrap.dedent("""\
-            /**
-             * Cooked with Flambe
-             * https://github.com/aduros/flambe
-             */
-            %%output%%""")
-        ctx.bld(rule=("%s -jar '%s' --js ${SRC} --js_output_file ${TGT} " +
-            "--output_wrapper '%s' --warning_level QUIET") %
-                (ctx.env.JAVA, closure.abspath(), wrapper),
-            source="app-html.uncompressed.js", target="app-html.js")
-    ctx.bld.install_files("deploy/web", "app-html.js")
+    if "html" in platforms:
+        uncompressed = buildPrefix + "app-html.uncompressed.js"
+        js = buildPrefix + "app-html.js"
+        outputs += js
+        ctx.bld(features="haxe", classpath=classpath,
+            flags=flags + html_flags,
+            libs=libs,
+            target=js if debug else uncompressed)
+        if not debug:
+            import textwrap
+            wrapper = textwrap.dedent("""\
+                /**
+                 * Cooked with Flambe
+                 * https://github.com/aduros/flambe
+                 */
+                %%output%%""")
+            ctx.bld(rule=("%s -jar '%s' --js ${SRC} --js_output_file ${TGT} " +
+                "--output_wrapper '%s' --warning_level QUIET") %
+                    (ctx.env.JAVA, closure.abspath(), wrapper),
+                source=uncompressed, target=js)
+        ctx.bld.install_files(installPrefix + "web", js)
 
-    assetDir = ctx.path.find_dir("assets")
+    # Common web stuff
+    if "flash" in platforms or "html" in platforms:
+        # Compile the embedder script
+        embedder = buildPrefix + "flambe.js"
+        scripts = ctx.bld.path.find_dir(FLAMBE_ROOT+"/tools/embedder").ant_glob("*.js")
+        ctx.bld(rule="%s -jar '%s' %s --js_output_file ${TGT}" %
+            (ctx.env.JAVA, closure.abspath(),
+            " ".join(["--js '" + script.abspath() + "'" for script in scripts]),
+            ), target=embedder)
+        for script in scripts:
+            ctx.bld.add_manual_dependency(embedder, script)
+        ctx.bld.install_files(installPrefix + "web", embedder)
+
+        # Install the default index.html if necessary
+        if ctx.bld.path.find_dir("web") == None:
+            ctx.bld.install_files(installPrefix + "web",
+                ctx.bld.path.find_resource(FLAMBE_ROOT+"/tools/embedder/index.html"))
+
+        # Also install any other files in /web
+        ctx.bld.install_files(installPrefix, ctx.path.ant_glob("web/**/*"), relative_trick=True)
+
+    # Force a rebuild when anything in the asset directory has been updated
     if assetDir is not None:
-        # Force a rebuild when anything in the asset directory has been updated
         assets = assetDir.ant_glob("**/*")
         for asset in assets:
-            ctx.bld.add_manual_dependency("app-html.js", asset)
-            ctx.bld.add_manual_dependency("app.swf", asset)
+            for output in outputs:
+                ctx.bld.add_manual_dependency(output, asset)
 
-        ctx.bld.install_files("deploy/web/assets", assets, cwd=assetDir, relative_trick=True)
-
-    # Compile the embedder script
-    scripts = ctx.bld.path.find_dir(FLAMBE_ROOT+"/tools/embedder").ant_glob("*.js")
-    ctx.bld(rule="%s -jar '%s' %s --js_output_file ${TGT}" %
-        (ctx.env.JAVA, closure.abspath(),
-        " ".join(["--js '" + script.abspath() + "'" for script in scripts]),
-        ), target="flambe.js")
-    for script in scripts:
-        ctx.bld.add_manual_dependency("flambe.js", script)
-    ctx.bld.install_files("deploy/web", "flambe.js")
-
-    # Install the default index.html if necessary
-    if ctx.bld.path.find_dir("web") == None:
-        ctx.bld.install_files("deploy/web",
-            ctx.bld.path.find_resource(FLAMBE_ROOT+"/tools/embedder/index.html"))
-
-    # Also install any other files in /web
-    ctx.bld.install_files("deploy", ctx.path.ant_glob("web/**/*"), relative_trick=True)
+        ctx.bld.install_files(installPrefix + "web/assets", assets,
+            cwd=assetDir, relative_trick=True)
 
 @feature("flambe-server")
 def apply_flambe_server(ctx):
-    Utils.def_attrs(ctx, classpath="", flags="", libs="")
-    if ctx.target == "": ctx.target = "server.js"
+    Utils.def_attrs(ctx, app="default",
+        classpath="", flags="", libs="", assetBase=None)
+
     classpath=["src", FLAMBE_ROOT+"/src"] + Utils.to_list(ctx.classpath)
     flags = ["-main", ctx.main] + Utils.to_list(ctx.flags)
     libs = Utils.to_list(ctx.libs)
+    installPrefix = "deploy/" + ctx.app + "/server/"
+    buildPrefix = ctx.app + "/"
 
     # TODO(bruno): Use the node externs in haxelib
     flags += "-D server".split()
@@ -113,42 +138,43 @@ def apply_flambe_server(ctx):
         #flags += "--dead-code-elimination --no-traces".split()
         flags += "--no-traces".split()
 
-    ctx.bld(features="haxe", classpath=classpath, flags=flags, libs=libs, target=ctx.target)
-    ctx.bld.install_files("deploy", ctx.target)
-    ctx.bld.install_files("deploy", ctx.path.ant_glob("data/**/*"), relative_trick=True)
-    if ctx.bld.cmd == "install":
+    server = buildPrefix + "server.js"
+    ctx.bld(features="haxe", classpath=classpath, flags=flags, libs=libs, target=server)
+    ctx.bld.install_files(installPrefix, server)
+    ctx.bld.install_files(installPrefix, ctx.path.ant_glob("data/**/*"), relative_trick=True)
+
+    file = SERVER_CONFIG
+    conf = ConfigSet.ConfigSet()
+    try:
+        conf.load(file)
+    except (IOError):
+        pass
+    conf.script = installPrefix + "server.js"
+    conf.store(file)
+
+    # Restart the development server when installing
+    if ctx.bld.is_install:
         ctx.bld.add_post_fun(restart_server)
-
-# Run the app in a Flash player
-def flash_test(ctx):
-    os.system("flashplayer deploy/web/app.swf")
-Context.g_module.__dict__["flash_test"] = flash_test
-
-# View the app's log in Flash
-def flash_log(ctx):
-    os.system("tail -F $HOME/.macromedia/Flash_Player/Logs/flashlog.txt")
-Context.g_module.__dict__["flash_log"] = flash_log
-
-SERVER_PID = "/tmp/flambe-server.pid"
 
 # Spawns a development server for testing
 def server(ctx):
     from subprocess import Popen
-    print("Restart the server using 'waf restart_server' or 'kill `cat %s`." % SERVER_PID)
+    print("Restart the server using 'waf restart_server'.")
     while True:
-        p = Popen(["node", "deploy/server.js"])
-        with open(SERVER_PID, "w") as file:
-            file.write(str(p.pid))
+        conf = ConfigSet.ConfigSet(SERVER_CONFIG)
+        p = Popen(["node", conf.script])
+        conf.pid = p.pid
+        conf.store(SERVER_CONFIG)
         p.wait()
-        os.remove(SERVER_PID)
 Context.g_module.__dict__["server"] = server
 
 # Restart the local dev server
 def restart_server(ctx):
     import signal
     try:
-        with open(SERVER_PID, "r") as file:
-            os.kill(int(file.read()), signal.SIGTERM)
+        conf = ConfigSet.ConfigSet(SERVER_CONFIG)
+        if "pid" in conf:
+            os.kill(conf.pid, signal.SIGTERM)
     except (IOError, OSError):
         pass
 Context.g_module.__dict__["restart_server"] = restart_server

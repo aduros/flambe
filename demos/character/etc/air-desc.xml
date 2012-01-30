@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application xmlns="http://ns.adobe.com/air/application/3.1">
+    <id>flambe.character</id>
+    <versionNumber>1.0.0</versionNumber>
+    <filename>Character Demo</filename>
+    <initialWindow>
+      <content>app-air.swf</content>
+    </initialWindow>
+</application>

@@ -9,4 +9,11 @@ def configure(ctx):
     ctx.load("flambe", tooldir=FLAMBE_DIR+"/tools")
 
 def build(ctx):
-    ctx(features="flambe", main="Main")
+    platforms = ["flash", "html"]
+    if ctx.env.has_android:
+        platforms += ["android"]
+
+    ctx(features="flambe",
+        platforms=platforms,
+        airPassword="samplePassword",
+        main="Main")

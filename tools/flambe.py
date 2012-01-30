@@ -19,6 +19,7 @@ def configure(ctx):
     ctx.find_program("adt", var="ADT", mandatory=False)
     ctx.find_program("adb", var="ADB", mandatory=False)
     ctx.env.debug = ctx.options.debug
+    ctx.env.has_android = bool(ctx.env.ADT and ctx.env.ADB)
 
 @feature("flambe")
 def apply_flambe(ctx):

@@ -50,11 +50,6 @@ class FlashAppDriver
 
     private function new ()
     {
-#if debug
-        haxe.Log.trace = function (v, ?pos) {
-            flash.Lib.trace(v);
-        };
-#end
         var stage = Lib.current.stage;
 
         _stage = new FlashStage(stage);

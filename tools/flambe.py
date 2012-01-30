@@ -16,22 +16,28 @@ def options(ctx):
 def configure(ctx):
     ctx.load("haxe", tooldir=FLAMBE_ROOT+"/tools")
     ctx.find_program("java", var="JAVA")
+    ctx.find_program("adt", var="ADT", mandatory=False)
+    ctx.find_program("adb", var="ADB", mandatory=False)
     ctx.env.debug = ctx.options.debug
 
 @feature("flambe")
 def apply_flambe(ctx):
     Utils.def_attrs(ctx, platforms="flash html", app="default",
-        classpath="", flags="", libs="", assetBase=None)
+        classpath="", flags="", libs="", assetBase=None,
+        airCert="etc/air-cert.pfx", airDesc="etc/air-desc.xml", airPassword=None)
 
     classpath=["src", FLAMBE_ROOT+"/src"] + Utils.to_list(ctx.classpath)
     flags = ["-main", ctx.main] + Utils.to_list(ctx.flags)
     libs = ["hxJson2"] + Utils.to_list(ctx.libs)
     platforms = Utils.to_list(ctx.platforms)
+    debug = ctx.env.debug
+
     assetDir = ctx.path.find_dir("assets")
+    assetList = [] if assetDir is None else assetDir.ant_glob("**/*")
+
     installPrefix = "deploy/" + ctx.app + "/"
     buildPrefix = ctx.app + "/"
 
-    debug = ctx.env.debug
     closure = ctx.bld.path.find_resource(FLAMBE_ROOT+"/tools/closure.jar")
 
     # Don't forget to change flambe.js when changing -swf-version!
@@ -87,6 +93,73 @@ def apply_flambe(ctx):
                 source=uncompressed, target=js)
         ctx.bld.install_files(installPrefix + "web", js)
 
+    if "android" in platforms:
+        swf = buildPrefix + "app-air.swf"
+        ctx.bld(features="haxe", classpath=classpath,
+            flags=flags + flash_flags + "-D air".split(),
+            libs=libs,
+            target=swf)
+        apk = buildPrefix + "app-android.apk"
+        outputs += apk
+
+        adb = ctx.env.ADB
+        if not adb:
+            ctx.bld.fatal("adb from the Android SDK is required, " + \
+                "ensure it's in your $PATH and re-run waf configure.")
+
+        adt = ctx.env.ADT
+        if not adt:
+            ctx.bld.fatal("adt from the AIR SDK is required, " + \
+                "ensure it's in your $PATH and re-run waf configure.")
+
+        airCert = ctx.path.find_resource(ctx.airCert)
+        if not airCert:
+            ctx.bld.fatal("Could not find AIR certificate at %s." % ctx.airCert)
+
+        airDesc = ctx.path.find_resource(ctx.airDesc)
+        if not airCert:
+            ctx.bld.fatal("Could not find AIR descriptor at %s." % ctx.airDesc)
+
+        airPassword = ctx.airPassword
+        if not airPassword:
+            ctx.bld.fatal("You must specify the airPassword to your certificate.")
+
+        # Derive the location of the Android SDK from adb's path
+        androidRoot = adb[0:adb.rindex("/platform-tools/adb")]
+
+        apkType = "apk-debug" if debug else "apk-captive-runtime"
+        rule = ("'%s' -package -target %s " +
+            "-storetype pkcs12 -keystore '%s' -storepass '%s' " +
+            "'${TGT}' '%s' " +
+            "-platformsdk '%s' ") % (
+                adt, apkType, airCert.abspath(), airPassword, airDesc.abspath(), androidRoot)
+
+        # Include the swf in the APK
+        rule += "-C '%s' '%s' " % (buildPrefix, "app-air.swf")
+
+        # Include the assets in the APK
+        if assetDir is not None:
+            # Exclude assets Flash will never use
+            airAssets = assetDir.ant_glob("**/*", excl="**/*.(ogg,m4a,wav)")
+            rule += "-C '%s' %s " % (
+                ctx.path.abspath(),
+                " ".join([ "'" + asset.nice_path() + "'" for asset in airAssets ]))
+
+        ctx.bld(rule=rule, target=apk, source=swf)
+        ctx.bld.add_manual_dependency(apk, airCert);
+        ctx.bld.add_manual_dependency(apk, airDesc);
+        ctx.bld.install_files(installPrefix + "apps", apk)
+
+        if ctx.bld.cmd == "install":
+            # Install the APK if there's a device plugged in
+            def install_apk(ctx):
+                state = ctx.cmd_and_log("'%s' get-state" % adb, quiet=Context.STDOUT)
+                if state == "device\n":
+                    ctx.to_log("Installing APK to device...\n")
+                    ctx.exec_command("'%s' install -rs '%s'" %
+                        (adb, installPrefix + "apps/app-android.apk"))
+            ctx.bld.add_post_fun(install_apk)
+
     # Common web stuff
     if "flash" in platforms or "html" in platforms:
         # Compile the embedder script
@@ -105,18 +178,18 @@ def apply_flambe(ctx):
             ctx.bld.install_files(installPrefix + "web",
                 ctx.bld.path.find_resource(FLAMBE_ROOT+"/tools/embedder/index.html"))
 
+        # Install the assets
+        if assetDir is not None:
+            ctx.bld.install_files(installPrefix + "web/assets", assetList,
+                cwd=assetDir, relative_trick=True)
+
         # Also install any other files in /web
         ctx.bld.install_files(installPrefix, ctx.path.ant_glob("web/**/*"), relative_trick=True)
 
     # Force a rebuild when anything in the asset directory has been updated
-    if assetDir is not None:
-        assets = assetDir.ant_glob("**/*")
-        for asset in assets:
-            for output in outputs:
-                ctx.bld.add_manual_dependency(output, asset)
-
-        ctx.bld.install_files(installPrefix + "web/assets", assets,
-            cwd=assetDir, relative_trick=True)
+    for asset in assetList:
+        for output in outputs:
+            ctx.bld.add_manual_dependency(output, asset)
 
 @feature("flambe-server")
 def apply_flambe_server(ctx):
@@ -153,7 +226,7 @@ def apply_flambe_server(ctx):
     conf.store(file)
 
     # Restart the development server when installing
-    if ctx.bld.is_install:
+    if ctx.bld.cmd == "install":
         ctx.bld.add_post_fun(restart_server)
 
 # Spawns a development server for testing

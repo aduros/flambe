@@ -47,6 +47,7 @@ class FlashPlayback
 {
     public var volume (default, null) :PFloat;
     public var paused (isPaused, setPaused) :Bool;
+    public var ended (isEnded, null) :Bool;
     public var position (getPosition, null) :Float;
     public var sound (getSound, null) :Sound;
 
@@ -94,6 +95,11 @@ class FlashPlayback
         return paused;
     }
 
+    inline public function isEnded () :Bool
+    {
+        return _ended;
+    }
+
     public function getPosition () :Float
     {
         return _channel.position;
@@ -101,10 +107,9 @@ class FlashPlayback
 
     public function update (dt :Int) :Bool
     {
-        // trace("FlashPlayback update:" + dt);
         volume.update(dt);
 
-        if (_ended || isPaused()) {
+        if (isEnded() || isPaused()) {
             // Allow ended or paused sounds to be garbage collected
             _tickableAdded = false;
             return true;
@@ -115,6 +120,7 @@ class FlashPlayback
     public function dispose ()
     {
         setPaused(true);
+        _ended = true;
     }
 
     private function onSoundComplete (_)
@@ -127,6 +133,7 @@ class FlashPlayback
         _channel = _sound.fms.play(startPosition, _loops, soundTransform);
         _channel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
         _pausePosition = -1;
+        _ended = false;
 
         if (!_tickableAdded) {
             FlashAppDriver.getInstance().mainLoop.addTickable(this);

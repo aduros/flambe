@@ -44,6 +44,7 @@ class HtmlPlayback
 {
     public var volume (default, null) :PFloat;
     public var paused (isPaused, setPaused) :Bool;
+    public var ended (isEnded, null) :Bool;
     public var position (getPosition, null) :Float;
     public var sound (getSound, null) :Sound;
 
@@ -91,6 +92,11 @@ class HtmlPlayback
         return paused;
     }
 
+    inline public function isEnded () :Bool
+    {
+        return _clone.ended;
+    }
+
     public function getPosition () :Float
     {
         return _clone.currentTime*1000;
@@ -100,7 +106,7 @@ class HtmlPlayback
     {
         volume.update(dt);
 
-        if (_clone.ended || isPaused()) {
+        if (isEnded() || isPaused()) {
             // Allow ended or paused sounds to be garbage collected
             _tickableAdded = false;
             return true;

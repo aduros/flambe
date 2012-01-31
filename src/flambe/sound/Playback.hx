@@ -18,6 +18,12 @@ interface Playback
     var paused (isPaused, setPaused) :Bool;
 
     /**
+     * True if the playback has finished playing, or has been disposed. Looping playbacks will never
+     * end naturally, and return true only after being disposed.
+     */
+    var ended (isEnded, null) :Bool;
+
+    /**
      * The current playback position in milliseconds.
      */
     var position (getPosition, null) :Float;

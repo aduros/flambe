@@ -55,10 +55,11 @@ class DummyPlayback
 {
     public var volume (default, null) :PFloat;
     public var paused (isPaused, setPaused) :Bool;
+    public var ended (isEnded, null) :Bool;
     public var position (getPosition, null) :Float;
     public var sound (getSound, null) :Sound;
 
-    public function new (sound :DummySound)
+    public function new (sound :Sound)
     {
         _sound = sound;
         this.volume = new PFloat(0); // A little quirky? All DummyPlaybacks share the same volume
@@ -79,6 +80,11 @@ class DummyPlayback
         return true;
     }
 
+    public function isEnded () :Bool
+    {
+        return true;
+    }
+
     public function getPosition () :Float
     {
         return 0;
@@ -89,5 +95,5 @@ class DummyPlayback
         // Nothing
     }
 
-    private var _sound :DummySound;
+    private var _sound :Sound;
 }

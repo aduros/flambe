@@ -141,7 +141,7 @@ def apply_flambe(ctx):
         # Include the assets in the APK
         if assetDir is not None:
             # Exclude assets Flash will never use
-            airAssets = assetDir.ant_glob("**/*", excl="**/*.(ogg,m4a,wav)")
+            airAssets = assetDir.ant_glob("**/*", excl="**/*.(ogg|wav|m4a)")
             rule += "-C '%s' %s " % (
                 ctx.path.abspath(),
                 " ".join([ "'" + asset.nice_path() + "'" for asset in airAssets ]))

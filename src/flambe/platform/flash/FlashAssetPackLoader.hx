@@ -48,7 +48,7 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
                 try {
                     loader.load(req, ctx);
                 } catch (error :Error) {
-                    promise.error.emit(error.message);
+                    handleError(error.message);
                 }
 
             case Audio:
@@ -67,7 +67,7 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
                 try {
                     urlLoader.load(req);
                 } catch (error :Error) {
-                    promise.error.emit(error.message);
+                    handleError(error.message);
                 }
         }
 

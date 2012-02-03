@@ -65,7 +65,7 @@ def apply_flambe(ctx):
 
     if "flash" in platforms:
         swf = buildPrefix + "app-flash.swf"
-        outputs += swf
+        outputs.append(swf)
         ctx.bld(features="haxe", classpath=classpath,
             flags=flags + flash_flags,
             libs=libs,
@@ -75,7 +75,7 @@ def apply_flambe(ctx):
     if "html" in platforms:
         uncompressed = buildPrefix + "app-html.uncompressed.js"
         js = buildPrefix + "app-html.js"
-        outputs += js
+        outputs.append(js)
         ctx.bld(features="haxe", classpath=classpath,
             flags=flags + html_flags,
             libs=libs,
@@ -101,7 +101,7 @@ def apply_flambe(ctx):
             libs=libs,
             target=swf)
         apk = buildPrefix + "app-android.apk"
-        outputs += apk
+        outputs.append(apk)
 
         adb = ctx.env.ADB
         if not adb:

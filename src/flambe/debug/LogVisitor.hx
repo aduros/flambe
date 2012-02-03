@@ -2,14 +2,14 @@
 // Flambe - Rapid game development
 // https://github.com/aduros/flambe/blob/master/LICENSE.txt
 
-package flambe;
+package flambe.debug;
 
 import flambe.animation.Property;
 import flambe.display.Sprite;
 
-using flambe.display.Transform;
-using flambe.display.Sprite;
-
+/**
+ * An visitor that traces out an entity hierarchy, for debugging.
+ */
 class LogVisitor
     implements Visitor
 {
@@ -22,7 +22,7 @@ class LogVisitor
     public function enterEntity (entity :Entity) :Bool
     {
         ++_depth;
-        trace(tabs() + "( " + _comps.join(", ") + " )");
+        trace(indent() + "( " + _comps.join(", ") + " )");
         _comps = [];
         return true;
     }
@@ -37,7 +37,7 @@ class LogVisitor
         _comps.push(comp.getName());
     }
 
-    private function tabs ()
+    private function indent ()
     {
         var n = "";
         for (ii in 0..._depth) {

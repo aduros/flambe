@@ -16,6 +16,7 @@ def options(ctx):
 def configure(ctx):
     ctx.load("haxe", tooldir=FLAMBE_ROOT+"/tools")
     ctx.find_program("java", var="JAVA")
+    ctx.find_program("npm", var="NPM", mandatory=False)
     ctx.find_program("adt", var="ADT", mandatory=False)
     ctx.find_program("adb", var="ADB", mandatory=False)
     ctx.env.debug = ctx.options.debug
@@ -195,13 +196,30 @@ def apply_flambe(ctx):
 @feature("flambe-server")
 def apply_flambe_server(ctx):
     Utils.def_attrs(ctx, app="default",
-        classpath="", flags="", libs="", assetBase=None)
+        classpath="", flags="", libs="", npmLibs="")
 
     classpath=["src", FLAMBE_ROOT+"/src"] + Utils.to_list(ctx.classpath)
     flags = ["-main", ctx.main] + Utils.to_list(ctx.flags)
     libs = Utils.to_list(ctx.libs)
+    npmLibs = Utils.to_list(ctx.npmLibs)
     installPrefix = "deploy/" + ctx.app + "/server/"
     buildPrefix = ctx.app + "/"
+
+    if npmLibs:
+        if not ctx.env.NPM:
+            ctx.bld.fatal("npm is required to specify node libraries, " + \
+                "ensure it's in your $PATH and re-run waf configure.")
+
+        cwd = ctx.path.get_bld().make_node(buildPrefix)
+        for npmLib in npmLibs:
+            ctx.bld(rule="'%s' install '%s'" % (ctx.env.NPM, npmLib), cwd=cwd.abspath())
+
+        # Find files to install only after npm has downloaded them
+        def installModules(ctx):
+            dir = ctx.bldnode.find_dir(buildPrefix)
+            for node in dir.ant_glob("node_modules/**/*"):
+                ctx.do_install(node.abspath(), installPrefix + node.path_from(dir))
+        ctx.bld.add_post_fun(installModules)
 
     # TODO(bruno): Use the node externs in haxelib
     flags += "-D server".split()

@@ -7,6 +7,12 @@
  */
 var flambe = (function () {
     return {
+        /**
+         * Embed a Flambe game into the page.
+         *
+         * @return True if the game was successfully embedded. False if the browser doesn't have a
+         *     recent enough browser or Flash player.
+         */
         embed: function (urls, elementId, width, height) {
 
             // TODO(bruno): Allow you to order the URLs array based on preference. For now the swf
@@ -35,6 +41,7 @@ var flambe = (function () {
                         allowFullScreen: "true",
                         fullscreenOnSelection: "true"
                     });
+                return true;
 
             } else if (pref == null || pref == "html") {
                 var canvas = document.createElement("canvas");
@@ -59,11 +66,15 @@ var flambe = (function () {
                     };
                     script.src = urls[1];
                     content.appendChild(script);
+                    return true;
                 }
 
             } else {
                 throw new Error("Unrecognized platform: " + pref);
             }
+
+            // Nothing was embedded!
+            return false;
         }
     };
 })();

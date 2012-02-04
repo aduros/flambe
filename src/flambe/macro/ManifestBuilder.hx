@@ -30,8 +30,15 @@ class ManifestBuilder
         var assetDir = "../assets/";
         var exprs :Array<Expr> = [];
         var hash_set = EField(hash, "set").toExpr();
+    	
+		//winfix		
+		var assetDirWin = assetDir;
+		if (assetDirWin.charAt(assetDirWin.length-1) == "/")
+		{
+			assetDirWin = assetDirWin.substr(0, -1);
+		}			
 
-        for (packName in readDirectoryNoHidden(assetDir)) {
+        for (packName in readDirectoryNoHidden(assetDirWin)) {
             var entries :Array<Expr> = [];
             if (FileSystem.isDirectory(assetDir + packName)) {
                 for (file in readRecursive(assetDir + packName)) {

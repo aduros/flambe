@@ -205,7 +205,7 @@ def apply_flambe_server(ctx):
     installPrefix = "deploy/" + ctx.app + "/server/"
     buildPrefix = ctx.app + "/"
 
-    if True:
+    if npmLibs:
         if not ctx.env.NPM:
             ctx.bld.fatal("npm is required to specify node libraries, " + \
                 "ensure it's in your $PATH and re-run waf configure.")

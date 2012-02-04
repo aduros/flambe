@@ -16,7 +16,6 @@ def options(ctx):
 def configure(ctx):
     ctx.load("haxe", tooldir=FLAMBE_ROOT+"/tools")
     ctx.find_program("java", var="JAVA")
-    ctx.find_program("npm", var="NPM", mandatory=False)
     ctx.find_program("adt", var="ADT", mandatory=False)
     ctx.find_program("adb", var="ADB", mandatory=False)
     ctx.env.debug = ctx.options.debug
@@ -61,12 +60,12 @@ def apply_flambe(ctx):
     if ctx.assetBase != None:
         flags += [
             "--macro",
-            "addMetadata(\"@assetBase('%s')\", \"flambe.asset.Manifest\")" % ctx.assetBase,
+            "addMetadata(\"@assetBase(\"%s\")\", \"flambe.asset.Manifest\")" % ctx.assetBase,
         ]
 
     if "flash" in platforms:
         swf = buildPrefix + "app-flash.swf"
-        outputs.append(swf)
+        outputs += swf
         ctx.bld(features="haxe", classpath=classpath,
             flags=flags + flash_flags,
             libs=libs,
@@ -76,7 +75,7 @@ def apply_flambe(ctx):
     if "html" in platforms:
         uncompressed = buildPrefix + "app-html.uncompressed.js"
         js = buildPrefix + "app-html.js"
-        outputs.append(js)
+        outputs += js
         ctx.bld(features="haxe", classpath=classpath,
             flags=flags + html_flags,
             libs=libs,
@@ -89,7 +88,7 @@ def apply_flambe(ctx):
                  * https://github.com/aduros/flambe
                  */
                 %%output%%""")
-            ctx.bld(rule=("%s -jar '%s' --js ${SRC} --js_output_file ${TGT} " +
+            ctx.bld(rule=("%s -jar \"%s\" --js ${SRC} --js_output_file ${TGT} " +
                 "--output_wrapper '%s' --warning_level QUIET") %
                     (ctx.env.JAVA, closure.abspath(), wrapper),
                 source=uncompressed, target=js)
@@ -102,7 +101,7 @@ def apply_flambe(ctx):
             libs=libs,
             target=swf)
         apk = buildPrefix + "app-android.apk"
-        outputs.append(apk)
+        outputs += apk
 
         adb = ctx.env.ADB
         if not adb:
@@ -167,9 +166,9 @@ def apply_flambe(ctx):
         # Compile the embedder script
         embedder = buildPrefix + "flambe.js"
         scripts = ctx.bld.path.find_dir(FLAMBE_ROOT+"/tools/embedder").ant_glob("*.js")
-        ctx.bld(rule="%s -jar '%s' %s --js_output_file ${TGT}" %
+        ctx.bld(rule="\"%s\" -jar \"%s\" %s --js_output_file \"${TGT}\"" %
             (ctx.env.JAVA, closure.abspath(),
-            " ".join(["--js '" + script.abspath() + "'" for script in scripts]),
+            " ".join(["--js \"" + script.abspath() + "\"" for script in scripts]),
             ), target=embedder)
         for script in scripts:
             ctx.bld.add_manual_dependency(embedder, script)
@@ -195,31 +194,14 @@ def apply_flambe(ctx):
 
 @feature("flambe-server")
 def apply_flambe_server(ctx):
-    Utils.def_attrs(ctx, app="default", classpath="", flags="", libs="", npmLibs="", include="")
+    Utils.def_attrs(ctx, app="default",
+        classpath="", flags="", libs="", assetBase=None)
 
     classpath=["src", FLAMBE_ROOT+"/src"] + Utils.to_list(ctx.classpath)
     flags = ["-main", ctx.main] + Utils.to_list(ctx.flags)
     libs = Utils.to_list(ctx.libs)
-    npmLibs = Utils.to_list(ctx.npmLibs)
-    include = Utils.to_list(ctx.include)
     installPrefix = "deploy/" + ctx.app + "/server/"
     buildPrefix = ctx.app + "/"
-
-    if True:
-        if not ctx.env.NPM:
-            ctx.bld.fatal("npm is required to specify node libraries, " + \
-                "ensure it's in your $PATH and re-run waf configure.")
-
-        cwd = ctx.path.get_bld().make_node(buildPrefix)
-        for npmLib in npmLibs:
-            ctx.bld(rule="'%s' install '%s'" % (ctx.env.NPM, npmLib), cwd=cwd.abspath())
-
-        # Find files to install only after npm has downloaded them
-        def installModules(ctx):
-            dir = ctx.bldnode.find_dir(buildPrefix)
-            for node in dir.ant_glob("node_modules/**/*"):
-                ctx.do_install(node.abspath(), installPrefix + node.path_from(dir))
-        ctx.bld.add_post_fun(installModules)
 
     # TODO(bruno): Use the node externs in haxelib
     flags += "-D server".split()
@@ -233,10 +215,7 @@ def apply_flambe_server(ctx):
     server = buildPrefix + "server.js"
     ctx.bld(features="haxe", classpath=classpath, flags=flags, libs=libs, target=server)
     ctx.bld.install_files(installPrefix, server)
-
-    # Mark any other custom files for installation
-    if include:
-        ctx.bld.install_files(installPrefix, include, relative_trick=True)
+    ctx.bld.install_files(installPrefix, ctx.path.ant_glob("data/**/*"), relative_trick=True)
 
     file = SERVER_CONFIG
     conf = ConfigSet.ConfigSet()

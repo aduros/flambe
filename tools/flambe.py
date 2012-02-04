@@ -195,17 +195,17 @@ def apply_flambe(ctx):
 
 @feature("flambe-server")
 def apply_flambe_server(ctx):
-    Utils.def_attrs(ctx, app="default",
-        classpath="", flags="", libs="", npmLibs="")
+    Utils.def_attrs(ctx, app="default", classpath="", flags="", libs="", npmLibs="", include="")
 
     classpath=["src", FLAMBE_ROOT+"/src"] + Utils.to_list(ctx.classpath)
     flags = ["-main", ctx.main] + Utils.to_list(ctx.flags)
     libs = Utils.to_list(ctx.libs)
     npmLibs = Utils.to_list(ctx.npmLibs)
+    include = Utils.to_list(ctx.include)
     installPrefix = "deploy/" + ctx.app + "/server/"
     buildPrefix = ctx.app + "/"
 
-    if npmLibs:
+    if True:
         if not ctx.env.NPM:
             ctx.bld.fatal("npm is required to specify node libraries, " + \
                 "ensure it's in your $PATH and re-run waf configure.")
@@ -233,7 +233,10 @@ def apply_flambe_server(ctx):
     server = buildPrefix + "server.js"
     ctx.bld(features="haxe", classpath=classpath, flags=flags, libs=libs, target=server)
     ctx.bld.install_files(installPrefix, server)
-    ctx.bld.install_files(installPrefix, ctx.path.ant_glob("data/**/*"), relative_trick=True)
+
+    # Mark any other custom files for installation
+    if include:
+        ctx.bld.install_files(installPrefix, include, relative_trick=True)
 
     file = SERVER_CONFIG
     conf = ConfigSet.ConfigSet()

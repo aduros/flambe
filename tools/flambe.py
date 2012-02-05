@@ -89,9 +89,9 @@ def apply_flambe(ctx):
                  * https://github.com/aduros/flambe
                  */
                 %%output%%""")
-            ctx.bld(rule=("%s -jar '%s' --js ${SRC} --js_output_file ${TGT} " +
-                "--output_wrapper '%s' --warning_level QUIET") %
-                    (ctx.env.JAVA, closure.abspath(), wrapper),
+            ctx.bld(rule=("%s -jar %s --js \"${SRC}\" --js_output_file \"${TGT}\" " +
+                "--output_wrapper %s --warning_level QUIET") %
+                    (quote(ctx.env.JAVA), quote(closure.abspath()), quote(wrapper)),
                 source=uncompressed, target=js)
         ctx.bld.install_files(installPrefix + "web", js)
 
@@ -130,22 +130,23 @@ def apply_flambe(ctx):
         androidRoot = adb[0:adb.rindex("/platform-tools/adb")]
 
         apkType = "apk-debug" if debug else "apk-captive-runtime"
-        rule = ("'%s' -package -target %s " +
-            "-storetype pkcs12 -keystore '%s' -storepass '%s' " +
-            "'${TGT}' '%s' " +
-            "-platformsdk '%s' ") % (
-                adt, apkType, airCert.abspath(), airPassword, airDesc.abspath(), androidRoot)
+        rule = ("%s -package -target %s " +
+            "-storetype pkcs12 -keystore %s -storepass %s " +
+            "\"${TGT}\" %s " +
+            "-platformsdk %s ") % (
+                quote(adt), apkType, quote(airCert.abspath()), quote(airPassword),
+                quote(airDesc.abspath()), quote(androidRoot))
 
         # Include the swf in the APK
-        rule += "-C '%s' '%s' " % (buildPrefix, "app-air.swf")
+        rule += "-C %s %s " % (quote(buildPrefix), "app-air.swf")
 
         # Include the assets in the APK
         if assetDir is not None:
             # Exclude assets Flash will never use
             airAssets = assetDir.ant_glob("**/*", excl="**/*.(ogg|wav|m4a)")
-            rule += "-C '%s' %s " % (
-                ctx.path.abspath(),
-                " ".join([ "'" + asset.nice_path() + "'" for asset in airAssets ]))
+            rule += "-C %s %s " % (
+                quote(ctx.path.abspath()),
+                " ".join([ quote(asset.nice_path()) for asset in airAssets ]))
 
         ctx.bld(rule=rule, target=apk, source=swf)
         ctx.bld.add_manual_dependency(apk, airCert);
@@ -155,11 +156,11 @@ def apply_flambe(ctx):
         if ctx.bld.cmd == "install":
             # Install the APK if there's a device plugged in
             def install_apk(ctx):
-                state = ctx.cmd_and_log("'%s' get-state" % adb, quiet=Context.STDOUT)
+                state = ctx.cmd_and_log("%s get-state" % quote(adb), quiet=Context.STDOUT)
                 if state == "device\n":
                     ctx.to_log("Installing APK to device...\n")
-                    ctx.exec_command("'%s' install -rs '%s'" %
-                        (adb, installPrefix + "apps/app-android.apk"))
+                    ctx.exec_command("%s install -rs %s" %
+                        (quote(adb), quote(installPrefix + "apps/app-android.apk")))
             ctx.bld.add_post_fun(install_apk)
 
     # Common web stuff
@@ -167,9 +168,9 @@ def apply_flambe(ctx):
         # Compile the embedder script
         embedder = buildPrefix + "flambe.js"
         scripts = ctx.bld.path.find_dir(FLAMBE_ROOT+"/tools/embedder").ant_glob("*.js")
-        ctx.bld(rule="%s -jar '%s' %s --js_output_file ${TGT}" %
-            (ctx.env.JAVA, closure.abspath(),
-            " ".join(["--js '" + script.abspath() + "'" for script in scripts]),
+        ctx.bld(rule="%s -jar %s %s --js_output_file \"${TGT}\"" %
+            (quote(ctx.env.JAVA), quote(closure.abspath()),
+            " ".join(["--js " + quote(script.abspath()) for script in scripts]),
             ), target=embedder)
         for script in scripts:
             ctx.bld.add_manual_dependency(embedder, script)
@@ -212,7 +213,7 @@ def apply_flambe_server(ctx):
 
         cwd = ctx.path.get_bld().make_node(buildPrefix)
         for npmLib in npmLibs:
-            ctx.bld(rule="'%s' install '%s'" % (ctx.env.NPM, npmLib), cwd=cwd.abspath())
+            ctx.bld(rule="%s install %s" % (quote(ctx.env.NPM), quote(npmLib)), cwd=cwd.abspath())
 
         if ctx.bld.cmd == "install":
             # Find files to install only after npm has downloaded them
@@ -255,7 +256,7 @@ def apply_flambe_server(ctx):
 # Spawns a development server for testing
 def server(ctx):
     from subprocess import Popen
-    print("Restart the server using 'waf restart_server'.")
+    print("Restart the server using `waf restart_server`.")
     while True:
         conf = ConfigSet.ConfigSet(SERVER_CONFIG)
         p = Popen(["node", conf.script])
@@ -274,3 +275,7 @@ def restart_server(ctx):
     except (IOError, OSError):
         pass
 Context.g_module.__dict__["restart_server"] = restart_server
+
+# Surround a string in quotes
+def quote(string):
+    return '"' + string + '"';

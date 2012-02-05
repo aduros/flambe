@@ -214,12 +214,13 @@ def apply_flambe_server(ctx):
         for npmLib in npmLibs:
             ctx.bld(rule="'%s' install '%s'" % (ctx.env.NPM, npmLib), cwd=cwd.abspath())
 
-        # Find files to install only after npm has downloaded them
-        def installModules(ctx):
-            dir = ctx.bldnode.find_dir(buildPrefix)
-            for node in dir.ant_glob("node_modules/**/*"):
-                ctx.do_install(node.abspath(), installPrefix + node.path_from(dir))
-        ctx.bld.add_post_fun(installModules)
+        if ctx.bld.cmd == "install":
+            # Find files to install only after npm has downloaded them
+            def installModules(ctx):
+                dir = ctx.bldnode.find_dir(buildPrefix)
+                for file in dir.ant_glob("node_modules/**/*"):
+                    ctx.do_install(file.abspath(), installPrefix + file.path_from(dir))
+            ctx.bld.add_post_fun(installModules)
 
     # TODO(bruno): Use the node externs in haxelib
     flags += "-D server".split()

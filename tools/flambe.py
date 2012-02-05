@@ -61,7 +61,7 @@ def apply_flambe(ctx):
     if ctx.assetBase != None:
         flags += [
             "--macro",
-            "addMetadata(\"@assetBase('%s')\", \"flambe.asset.Manifest\")" % ctx.assetBase,
+            "addMetadata(\"@assetBase(\"%s\")\", \"flambe.asset.Manifest\")" % ctx.assetBase,
         ]
 
     if "flash" in platforms:
@@ -89,7 +89,7 @@ def apply_flambe(ctx):
                  * https://github.com/aduros/flambe
                  */
                 %%output%%""")
-            ctx.bld(rule=("%s -jar '%s' --js ${SRC} --js_output_file ${TGT} " +
+            ctx.bld(rule=("%s -jar \"%s\" --js ${SRC} --js_output_file ${TGT} " +
                 "--output_wrapper '%s' --warning_level QUIET") %
                     (ctx.env.JAVA, closure.abspath(), wrapper),
                 source=uncompressed, target=js)
@@ -167,9 +167,9 @@ def apply_flambe(ctx):
         # Compile the embedder script
         embedder = buildPrefix + "flambe.js"
         scripts = ctx.bld.path.find_dir(FLAMBE_ROOT+"/tools/embedder").ant_glob("*.js")
-        ctx.bld(rule="%s -jar '%s' %s --js_output_file ${TGT}" %
+        ctx.bld(rule="\"%s\" -jar \"%s\" %s --js_output_file \"${TGT}\"" %
             (ctx.env.JAVA, closure.abspath(),
-            " ".join(["--js '" + script.abspath() + "'" for script in scripts]),
+            " ".join(["--js \"" + script.abspath() + "\"" for script in scripts]),
             ), target=embedder)
         for script in scripts:
             ctx.bld.add_manual_dependency(embedder, script)

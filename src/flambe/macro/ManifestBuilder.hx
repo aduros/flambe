@@ -27,16 +27,16 @@ class ManifestBuilder
     @:macro
     public static function populate (hash :Expr)
     {
-        var assetDir = "../assets/";
+        var assetPrefix = "../assets/";
         var exprs :Array<Expr> = [];
         var hash_set = EField(hash, "set").toExpr();
 
-        for (packName in readDirectoryNoHidden(assetDir)) {
+        for (packName in readDirectoryNoHidden(assetPrefix)) {
             var entries :Array<Expr> = [];
-            if (FileSystem.isDirectory(assetDir + packName)) {
-                for (file in readRecursive(assetDir + packName)) {
+            if (FileSystem.isDirectory(assetPrefix + packName)) {
+                for (file in readRecursive(assetPrefix + packName)) {
                     var name = file;
-                    var path = assetDir + packName + "/" + file;
+                    var path = assetPrefix + packName + "/" + file;
                     var md5 = Context.signature(File.getBytes(path));
                     var bytes = FileSystem.stat(path).size;
 
@@ -59,12 +59,12 @@ class ManifestBuilder
     }
 
 #if macro
-    public static function readRecursive (root, dir = ".")
+    public static function readRecursive (root, dir = "")
     {
         var result = [];
         for (file in readDirectoryNoHidden(root + "/" + dir)) {
             var fullPath = root + "/" + dir + "/" + file;
-            var relPath = if (dir == ".") file else dir + "/" + file;
+            var relPath = if (dir == "") file else dir + "/" + file;
             if (FileSystem.isDirectory(fullPath)) {
                 result = result.concat(readRecursive(root, relPath));
             } else {
@@ -74,8 +74,13 @@ class ManifestBuilder
         return result;
     }
 
-    public static function readDirectoryNoHidden (dir)
+    public static function readDirectoryNoHidden (dir :String)
     {
+        if (dir.charAt(dir.length - 1) == "/") {
+            // Trim off the trailing slash. On Windows, FileSystem.exists() doesn't find directories
+            // with trailing slashes?
+            dir = dir.substr(0, -1);
+        }
         return FileSystem.exists(dir) && FileSystem.isDirectory(dir) ?
             FileSystem.readDirectory(dir).filter(function (file) return file.charAt(0) != ".") :
             cast [];

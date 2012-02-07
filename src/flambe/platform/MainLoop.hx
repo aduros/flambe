@@ -156,7 +156,9 @@ private class DrawVisitor
 
     public function leaveEntity (entity :Entity)
     {
-        _drawCtx.restore();
+        if (entity.has(Sprite)) {
+            _drawCtx.restore();
+        }
     }
 
     public function acceptComponent (component :Component)

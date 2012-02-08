@@ -32,6 +32,7 @@ class HtmlAppDriver
     public var locale (getLocale, null) :String;
 
     public var mainLoop (default, null) :MainLoop;
+    public var renderer :Renderer;
 
     public static function getInstance () :HtmlAppDriver
     {
@@ -65,8 +66,8 @@ class HtmlAppDriver
         _pointer = new BasicPointer();
         _keyboard = new BasicKeyboard();
 
-        _renderer = new CanvasRenderer(canvas);
-        mainLoop = new MainLoop(_renderer);
+        renderer = new CanvasRenderer(canvas);
+        mainLoop = new MainLoop();
 
         // Use requestAnimationFrame if available, otherwise a 60 FPS setInterval
         // https://developer.mozilla.org/en/DOM/window.mozRequestAnimationFrame
@@ -169,7 +170,7 @@ class HtmlAppDriver
 
     public function loadAssetPack (manifest :Manifest) :Promise<AssetPack>
     {
-        return new HtmlAssetPackLoader(manifest, _renderer).promise;
+        return new HtmlAssetPackLoader(manifest).promise;
     }
 
     public function getStage () :Stage
@@ -218,7 +219,7 @@ class HtmlAppDriver
         _lastUpdate = now;
 
         mainLoop.update(cast dt);
-        mainLoop.render();
+        mainLoop.render(renderer);
     }
 
     public function getPointer () :Pointer
@@ -278,5 +279,4 @@ class HtmlAppDriver
     private var _storage :Storage;
 
     private var _lastUpdate :Float;
-    private var _renderer :Renderer;
 }

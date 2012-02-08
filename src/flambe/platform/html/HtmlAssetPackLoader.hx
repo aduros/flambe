@@ -16,9 +16,9 @@ import flambe.util.Signal1;
 
 class HtmlAssetPackLoader extends BasicAssetPackLoader
 {
-    public function new (manifest :Manifest, renderer :Renderer)
+    public function new (manifest :Manifest)
     {
-        super(manifest, renderer);
+        super(manifest);
     }
 
     override private function loadEntry (entry :AssetEntry)
@@ -38,7 +38,9 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                     } else {
                         texture.image = image;
                     }
-                    _renderer.uploadTexture(texture);
+
+                    var renderer = HtmlAppDriver.getInstance().renderer;
+                    renderer.uploadTexture(texture);
                     handleLoad(entry, texture);
                 };
                 image.onerror = function (_) {

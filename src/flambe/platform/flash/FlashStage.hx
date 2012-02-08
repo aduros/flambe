@@ -26,7 +26,7 @@ class FlashStage implements Stage
 
         _stage.scaleMode = NO_SCALE;
         _stage.showDefaultContextMenu = false;
-        _stage.addEventListener(Event.RESIZE, onResized);
+        _stage.addEventListener(Event.RESIZE, onResize);
 
         // If we're running in a mobile browser, go full screen on a pointer event
         if (Capabilities.playerType == "PlugIn" && FlashUtil.isMobile()) {
@@ -76,7 +76,7 @@ class FlashStage implements Stage
         _stage.displayState = FULL_SCREEN;
     }
 
-    private function onResized (_)
+    private function onResize (_)
     {
         resize.emit();
     }

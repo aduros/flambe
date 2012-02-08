@@ -25,9 +25,9 @@ import flambe.platform.BasicAssetPackLoader;
 
 class FlashAssetPackLoader extends BasicAssetPackLoader
 {
-    public function new (manifest :Manifest, renderer :Renderer)
+    public function new (manifest :Manifest)
     {
-        super(manifest, renderer);
+        super(manifest);
     }
 
     override private function loadEntry (entry :AssetEntry)
@@ -42,7 +42,8 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
                 dispatcher.addEventListener(Event.COMPLETE, function (_) {
                     var bitmap :Bitmap = cast loader.content;
                     var texture = new FlashTexture(bitmap.bitmapData);
-                    _renderer.uploadTexture(texture);
+                    var renderer = FlashAppDriver.getInstance().renderer;
+                    renderer.uploadTexture(texture);
                     handleLoad(entry, texture);
                 });
                 var ctx = new LoaderContext();

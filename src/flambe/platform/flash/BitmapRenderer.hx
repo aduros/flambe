@@ -22,8 +22,8 @@ class BitmapRenderer
         _bitmap = new Bitmap();
         stage.addChild(_bitmap);
 
-        stage.addEventListener(Event.RESIZE, onResized);
-        onResized(null);
+        stage.addEventListener(Event.RESIZE, onResize);
+        onResize(null);
     }
 
     public function uploadTexture (texture :Texture)
@@ -42,7 +42,7 @@ class BitmapRenderer
         _screen.unlock();
     }
 
-    private function onResized (_)
+    private function onResize (_)
     {
         if (_screen != null) {
             _screen.dispose();

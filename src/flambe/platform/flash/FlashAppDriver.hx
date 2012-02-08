@@ -37,6 +37,7 @@ class FlashAppDriver
     public var locale (getLocale, null) :String;
 
     public var mainLoop (default, null) :MainLoop;
+    public var renderer :Renderer;
 
     public static function getInstance () :FlashAppDriver
     {
@@ -54,8 +55,14 @@ class FlashAppDriver
         _pointer = new BasicPointer();
         _keyboard = new BasicKeyboard();
 
-        _renderer = new BitmapRenderer();
-        mainLoop = new MainLoop(_renderer);
+#if flash11
+        var stage3DRenderer = new Stage3DRenderer();
+        renderer = stage3DRenderer;
+        stage3DRenderer.init();
+#else
+        renderer = new BitmapRenderer();
+#end
+        mainLoop = new MainLoop();
 
         stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
         stage.addEventListener(Event.RENDER, onRender);
@@ -77,7 +84,7 @@ class FlashAppDriver
 
     public function loadAssetPack (manifest :Manifest) :Promise<AssetPack>
     {
-        return new FlashAssetPackLoader(manifest, _renderer).promise;
+        return new FlashAssetPackLoader(manifest).promise;
     }
 
     public function getStage () :Stage
@@ -160,7 +167,7 @@ class FlashAppDriver
 
     private function onRender (_)
     {
-        mainLoop.render();
+        mainLoop.render(renderer);
     }
 
     private function onUncaughtError (event :Event)
@@ -178,5 +185,4 @@ class FlashAppDriver
     private var _storage :Storage;
 
     private var _lastUpdate :Int;
-    private var _renderer :Renderer;
 }

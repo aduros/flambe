@@ -16,6 +16,10 @@ class FlashTexture
 
     public var bitmapData (default, null) :BitmapData;
 
+#if flash11
+    public var nativeTexture :flash.display3D.textures.Texture;
+#end
+
     public function new (bitmapData)
     {
         this.bitmapData = bitmapData;

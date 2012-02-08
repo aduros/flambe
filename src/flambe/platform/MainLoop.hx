@@ -20,11 +20,8 @@ using Lambda;
  */
 class MainLoop
 {
-    public var renderer (default, null) :Renderer;
-
-    public function new (renderer :Renderer)
+    public function new ()
     {
-        this.renderer = renderer;
         _updateVisitor = new UpdateVisitor();
         _drawVisitor = new DrawVisitor();
         _tickables = [];
@@ -48,7 +45,7 @@ class MainLoop
         System.root.visit(_updateVisitor, true, true);
     }
 
-    public function render ()
+    public function render (renderer :Renderer)
     {
         var drawCtx = renderer.willRender();
         if (drawCtx != null) {

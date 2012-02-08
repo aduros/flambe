@@ -39,7 +39,8 @@ var flambe = (function () {
                     flashVersion, null, {}, {
                         allowScriptAccess: "always",
                         allowFullScreen: "true",
-                        fullscreenOnSelection: "true"
+                        fullscreenOnSelection: "true",
+                        wmode: "direct"
                     });
                 return true;
 

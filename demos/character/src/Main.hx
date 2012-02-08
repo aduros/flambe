@@ -54,7 +54,7 @@ class Main
             character.get(AnimatedSprite).play("running");
         });
 
-        var world = new Entity().add(new Sprite()); // TODO: Requiring new Sprite() here is quirky
+        var world = new Entity();
         // Add a background
         world.addChild(new Entity().add(
             new FillSprite(0x303030, System.stage.width, System.stage.height)));

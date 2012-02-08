@@ -151,6 +151,7 @@ class Entity
             parent.removeChild(this);
         }
 
+        // Dispose components
         var ii = 0;
         while (ii < _comps.length) {
             var comp = _comps[ii];
@@ -162,6 +163,8 @@ class Entity
             }
             ++ii;
         }
+
+        // Dispose children
         var ii = 0;
         while (ii < _children.length) {
             var child = _children[ii];

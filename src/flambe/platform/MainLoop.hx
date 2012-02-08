@@ -20,10 +20,13 @@ using Lambda;
  */
 class MainLoop
 {
-    public function new (drawCtx :DrawingContext)
+    public var renderer (default, null) :Renderer;
+
+    public function new (renderer :Renderer)
     {
+        this.renderer = renderer;
         _updateVisitor = new UpdateVisitor();
-        _drawVisitor = new DrawVisitor(drawCtx);
+        _drawVisitor = new DrawVisitor();
         _tickables = [];
     }
 
@@ -47,7 +50,12 @@ class MainLoop
 
     public function render ()
     {
-        System.root.visit(_drawVisitor, false, true);
+        var drawCtx = renderer.willRender();
+        if (drawCtx != null) {
+            _drawVisitor.drawCtx = drawCtx;
+            System.root.visit(_drawVisitor, false, true);
+            renderer.didRender();
+        }
     }
 
     public function addTickable (t :Tickable)
@@ -97,9 +105,10 @@ private class UpdateVisitor
 private class DrawVisitor
     implements Visitor
 {
-    public function new (drawCtx :DrawingContext)
+    public var drawCtx :DrawingContext;
+
+    public function new ()
     {
-        _drawCtx = drawCtx;
     }
 
     public function enterEntity (entity :Entity) :Bool
@@ -121,35 +130,35 @@ private class DrawVisitor
             return false;
         }
 
-        _drawCtx.save();
+        drawCtx.save();
 
         if (alpha < 1) {
-            _drawCtx.multiplyAlpha(alpha);
+            drawCtx.multiplyAlpha(alpha);
         }
 
         if (sprite.blendMode != null) {
-            _drawCtx.setBlendMode(sprite.blendMode);
+            drawCtx.setBlendMode(sprite.blendMode);
         }
 
         var transform = entity.get(Transform);
         var x = transform.x._;
         var y = transform.y._;
         if (x != 0 || y != 0) {
-            _drawCtx.translate(x, y);
+            drawCtx.translate(x, y);
         }
 
         var rotation = transform.rotation._;
         if (rotation != 0) {
-            _drawCtx.rotate(rotation);
+            drawCtx.rotate(rotation);
         }
 
         var scaleX = transform.scaleX._;
         var scaleY = transform.scaleY._;
         if (scaleX != 1 || scaleY != 1) {
-            _drawCtx.scale(scaleX, scaleY);
+            drawCtx.scale(scaleX, scaleY);
         }
 
-        sprite.draw(_drawCtx);
+        sprite.draw(drawCtx);
 
         return true;
     }
@@ -157,13 +166,11 @@ private class DrawVisitor
     public function leaveEntity (entity :Entity)
     {
         if (entity.has(Sprite)) {
-            _drawCtx.restore();
+            drawCtx.restore();
         }
     }
 
     public function acceptComponent (component :Component)
     {
     }
-
-    private var _drawCtx :DrawingContext;
 }

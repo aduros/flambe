@@ -18,10 +18,11 @@ class BasicAssetPackLoader
 {
     public var promise (default, null) :Promise<AssetPack>;
 
-    public function new (manifest :Manifest)
+    public function new (manifest :Manifest, renderer :Renderer)
     {
         promise = new Promise();
         _manifest = manifest;
+        _renderer = renderer;
 
         var entries = manifest.getEntries();
         _assets = new Hash();
@@ -150,6 +151,9 @@ class BasicAssetPackLoader
 
     private var _manifest :Manifest;
     private var _assets :Hash<Dynamic>;
+
+    // The renderer to upload textures to
+    private var _renderer :Renderer;
 
     // How many assets are still loading
     private var _assetsRemaining :Int;

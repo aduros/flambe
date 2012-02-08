@@ -10,7 +10,7 @@ import flambe.display.Texture;
 import flambe.math.FMath;
 
 // TODO(bruno): Remove pixel snapping once most browsers get canvas acceleration.
-class HtmlDrawingContext
+class CanvasDrawingContext
     implements DrawingContext
 {
     public function new (canvas :Dynamic)

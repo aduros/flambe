@@ -21,7 +21,7 @@ import flambe.display.DrawingContext;
 import flambe.display.Texture;
 import flambe.math.FMath;
 
-class FlashDrawingContext
+class BitmapDrawingContext
     implements DrawingContext
 {
     public function new (buffer :BitmapData)

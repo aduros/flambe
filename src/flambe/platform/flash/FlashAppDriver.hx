@@ -4,8 +4,6 @@
 
 package flambe.platform.flash;
 
-import flash.display.Bitmap;
-import flash.display.BitmapData;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.IEventDispatcher;
@@ -53,11 +51,11 @@ class FlashAppDriver
         var stage = Lib.current.stage;
 
         _stage = new FlashStage(stage);
-        _stage.resize.connect(onResized);
-        onResized();
-
         _pointer = new BasicPointer();
         _keyboard = new BasicKeyboard();
+
+        _renderer = new BitmapRenderer();
+        mainLoop = new MainLoop(_renderer);
 
         stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
         stage.addEventListener(Event.RENDER, onRender);
@@ -79,7 +77,7 @@ class FlashAppDriver
 
     public function loadAssetPack (manifest :Manifest) :Promise<AssetPack>
     {
-        return new FlashAssetPackLoader(manifest).promise;
+        return new FlashAssetPackLoader(manifest, _renderer).promise;
     }
 
     public function getStage () :Stage
@@ -162,21 +160,7 @@ class FlashAppDriver
 
     private function onRender (_)
     {
-        _screen.lock();
         mainLoop.render();
-        _screen.unlock();
-    }
-
-    private function onResized ()
-    {
-        _screen = new BitmapData(_stage.width, _stage.height, false);
-        mainLoop = new MainLoop(new FlashDrawingContext(_screen));
-
-        if (_bitmap != null) {
-            Lib.current.removeChild(_bitmap);
-        }
-        _bitmap = new Bitmap(_screen);
-        Lib.current.addChild(_bitmap);
     }
 
     private function onUncaughtError (event :Event)
@@ -188,13 +172,11 @@ class FlashAppDriver
 
     private static var _instance :FlashAppDriver;
 
-    private var _bitmap :Bitmap;
-
-    private var _screen :BitmapData;
-    private var _lastUpdate :Int;
-
     private var _stage :Stage;
     private var _pointer :BasicPointer;
     private var _keyboard :BasicKeyboard;
     private var _storage :Storage;
+
+    private var _lastUpdate :Int;
+    private var _renderer :Renderer;
 }

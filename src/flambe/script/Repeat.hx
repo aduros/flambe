@@ -9,16 +9,35 @@ import flambe.Entity;
 class Repeat
     implements Action
 {
-    public function new (action :Action)
+    /**
+     * @param count The number of times to repeat the action, or -1 to repeat forever.
+     */
+    public function new (action :Action, count :Int = -1)
     {
         _action = action;
+        _count = count;
+        _remaining = count;
     }
 
     public function update (dt :Int, actor :Entity)
     {
-        _action.update(dt, actor);
-        return false; // Repeat forever
+        if (_count == 0) {
+            // Handle the special case of a 0-count Repeat
+            return true;
+        }
+
+        var complete = _action.update(dt, actor);
+        if (complete && _count >= 0 && --_remaining < 0) {
+            _remaining = _count; // Reset state in case this Action is reused
+            return true;
+        }
+
+        // Keep repeating
+        return false;
     }
 
     private var _action :Action;
+
+    private var _count :Int;
+    private var _remaining :Int;
 }

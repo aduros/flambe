@@ -30,7 +30,7 @@ def apply_flambe(ctx):
 
     classpath=["src", FLAMBE_ROOT+"/src"] + Utils.to_list(ctx.classpath)
     flags = ["-main", ctx.main] + Utils.to_list(ctx.flags)
-    libs = ["hxJson2"] + Utils.to_list(ctx.libs)
+    libs = ["hxJson2", "format"] + Utils.to_list(ctx.libs)
     platforms = Utils.to_list(ctx.platforms)
     debug = ctx.env.debug
 

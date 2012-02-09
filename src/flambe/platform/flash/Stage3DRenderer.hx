@@ -68,17 +68,20 @@ class Stage3DRenderer
 
     private function uploadToContext3D (texture :FlashTexture)
     {
-        trace("Uploaded texture");
         var bitmapData = texture.bitmapData;
 
         // Use a resized copy if necessary
         var w2 = nextPowerOfTwo(bitmapData.width);
         var h2 = nextPowerOfTwo(bitmapData.height);
+
+        texture.maxU = bitmapData.width / w2;
+        texture.maxV = bitmapData.height / h2;
+
         if (bitmapData.width != w2 || bitmapData.height != h2) {
-            var resizedBitmapData = new BitmapData(w2, h2, bitmapData.transparent);
-            resizedBitmapData.copyPixels(bitmapData,
+            var resized = new BitmapData(w2, h2, bitmapData.transparent);
+            resized.copyPixels(bitmapData,
                 new Rectangle(0, 0, bitmapData.width, bitmapData.height), new Point(0, 0));
-            bitmapData = resizedBitmapData;
+            bitmapData = resized;
         }
 
         // TODO(bruno): Look into compressed textures

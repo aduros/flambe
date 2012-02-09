@@ -144,7 +144,7 @@ class HtmlAppDriver
             _pointer.submitDown(createPointerEvent(touch));
         }, false);
         canvas.addEventListener("touchmove", function (domEvent) {
-            // preventDefault necessary here too?
+            domEvent.preventDefault();
             var touch = getPointerTouch(domEvent);
             if (touch != null) {
                 _pointer.submitMove(createPointerEvent(touch));

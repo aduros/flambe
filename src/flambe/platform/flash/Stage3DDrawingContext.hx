@@ -19,6 +19,7 @@ import flambe.display.BlendMode;
 import flambe.display.DrawingContext;
 import flambe.display.Texture;
 import flambe.platform.shader.DrawImage;
+import flambe.platform.shader.DrawPattern;
 import flambe.platform.shader.FillRect;
 
 class Stage3DDrawingContext
@@ -36,6 +37,7 @@ class Stage3DDrawingContext
         _scratchVector3D = new Vector3D();
 
         _drawImageShader = new DrawImage(_context3D);
+        _drawPatternShader = new DrawPattern(_context3D);
 
         // TODO(bruno): _singleIndices contains indices for one quad. This shouldn't be necessary,
         // we should just be able to reuse the first 6 elements of _batchIndices, but I can't seem
@@ -197,7 +199,63 @@ class Stage3DDrawingContext
 
     public function drawPattern (texture :Texture, x :Float, y :Float, width :Float, height :Float)
     {
-        // Not yet implemented
+        flushBatch();
+
+        var flashTexture :FlashTexture = cast texture;
+        var state = getTopState();
+        var alpha = state.alpha;
+        var scratch = _scratchVector;
+        var x2 = x + width;
+        var y2 = y + height;
+        var u = flashTexture.maxU * (width / flashTexture.width);
+        var v = flashTexture.maxV * (height / flashTexture.height);
+
+        var data = _batchData;
+        data[0] = x;
+        data[1] = y;
+        data[2] = 0;
+        data[3] = 0;
+        data[4] = alpha;
+
+        data[5] = x2;
+        data[6] = y;
+        data[7] = u;
+        data[8] = 0;
+        data[9] = alpha;
+
+        data[10] = x2;
+        data[11] = y2;
+        data[12] = u;
+        data[13] = v;
+        data[14] = alpha;
+
+        data[15] = x;
+        data[16] = y2;
+        data[17] = 0;
+        data[18] = v;
+        data[19] = alpha;
+
+        var maxUV = _scratchVector3D;
+        maxUV.x = flashTexture.maxU;
+        maxUV.y = flashTexture.maxV;
+        maxUV.z = 0;
+        maxUV.w = 0;
+
+        _drawPatternShader.init({
+            model: state.matrix,
+            proj: _projMatrix,
+        }, {
+            texture: flashTexture.nativeTexture,
+            maxUV: maxUV,
+        });
+
+        _batchVerts.uploadFromVector(data, 0, 4);
+        _drawPatternShader.bind(_batchVerts);
+
+        // TODO(bruno): Batching similar patterns?
+        _context3D.drawTriangles(_batchIndices, 0, 2);
+
+        _drawPatternShader.unbind();
     }
 
     public function fillRect (color :Int, x :Float, y :Float, width :Float, height :Float)
@@ -366,6 +424,7 @@ class Stage3DDrawingContext
     private var _batchVerts :VertexBuffer3D;
     private var _batchIndices :IndexBuffer3D;
     private var _drawImageShader :DrawImage;
+    private var _drawPatternShader :DrawPattern;
 
     private var _singleIndices :IndexBuffer3D;
     private var _fillRectVerts :VertexBuffer3D;

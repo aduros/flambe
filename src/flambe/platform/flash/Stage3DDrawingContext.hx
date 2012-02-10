@@ -32,22 +32,25 @@ class Stage3DDrawingContext
 #end
 
         _stack = new FastList<DrawingState>();
+        _scratchVector = new Vector<Float>(12, true);
         _scratchVector3D = new Vector3D();
 
-        var stage = Lib.current.stage;
-        _projMatrix = createOrthoMatrix(stage.stageWidth, stage.stageHeight);
-
-        // Four vertices in a quad, with 4 floats for each vertex (x, y, u, v)
-        _quadVector = new Vector<Float>(4*4, true);
-        _quadVerts = _context3D.createVertexBuffer(4, 4);
-
-        // The index buffer for a quad is created once and never changes
-        var indices :Array<UInt> = [ 0, 1, 2, 2, 3, 0 ];
-        _quadIndices = _context3D.createIndexBuffer(6);
-        _quadIndices.uploadFromVector(Vector.ofArray(indices), 0, 6);
-
         _drawImageShader = new DrawImage(_context3D);
+
+        // TODO(bruno): _singleIndices contains indices for one quad. This shouldn't be necessary,
+        // we should just be able to reuse the first 6 elements of _batchIndices, but I can't seem
+        // to get drawTriangles to accept a sliced index buffer. It wants to use the entire thing
+        // every time. Perhaps test this on different hardware.
+        var v = new Vector<UInt>(6, true);
+        v[0] = 0; v[1] = 1; v[2] = 2; v[3] = 2; v[4] = 3; v[5] = 0;
+        _singleIndices = _context3D.createIndexBuffer(6);
+        _singleIndices.uploadFromVector(v, 0, 6);
+
         _fillRectShader = new FillRect(_context3D);
+        _fillRectVerts = _context3D.createVertexBuffer(4, 2);
+
+        _batchData = new Vector<Float>(0, true);
+        expandBatch();
     }
 
     public function save ()
@@ -55,9 +58,9 @@ class Stage3DDrawingContext
         var copy = new DrawingState();
 
         if (_stack.isEmpty()) {
-            copy.alpha = 1;
             copy.matrix = new Matrix3D();
-            applyBlendMode(Normal);
+            copy.alpha = 1;
+            copy.blendMode = Normal;
 
         } else {
             var state = getTopState();
@@ -92,69 +95,43 @@ class Stage3DDrawingContext
 
     public function restore ()
     {
-        var old = _stack.pop();
+        _stack.pop();
+    }
 
-        // Restore the new current blend mode if necessary
-        if (!_stack.isEmpty()) {
-            var state = getTopState();
-            if (state.blendMode != old.blendMode) {
-                applyBlendMode(state.blendMode);
-            }
+    private function addQuadToBatch ()
+    {
+        if (_quads >= MAX_BATCH_QUADS) {
+            flushBatch();
+            return 0;
         }
+
+        var offset = _quads*4*ELEMENTS_PER_VERTEX;
+        if (offset >= cast _batchData.length) {
+            expandBatch();
+        }
+        ++_quads;
+        return offset;
     }
 
     public function drawImage (texture :Texture, destX :Float, destY :Float)
     {
-        var flashTexture :FlashTexture = cast texture;
-
-        var x2 = destX + texture.width;
-        var y2 = destY + texture.height;
-        var vector = _quadVector;
-
-        vector[0] = destX;
-        vector[1] = destY;
-        vector[2] = 0;
-        vector[3] = 0;
-
-        vector[4] = x2;
-        vector[5] = destY;
-        vector[6] = flashTexture.maxU;
-        vector[7] = 0;
-
-        vector[8] = x2;
-        vector[9] = y2;
-        vector[10] = flashTexture.maxU;
-        vector[11] = flashTexture.maxV;
-
-        vector[12] = destX;
-        vector[13] = y2;
-        vector[14] = 0;
-        vector[15] = flashTexture.maxV;
-
-        _quadVerts.uploadFromVector(vector, 0, 4);
-
-        var state = getTopState();
-        _drawImageShader.init({
-            model: state.matrix,
-            proj: _projMatrix,
-        }, {
-            texture: flashTexture.nativeTexture,
-            alpha: state.alpha,
-        });
-
-        _drawImageShader.bind(_quadVerts);
-
-        // TODO(bruno): Batch multiple quads that use the same texture and alpha into a single
-        // drawTriangles
-        _context3D.drawTriangles(_quadIndices);
-
-        _drawImageShader.unbind();
+        drawSubImage(texture, destX, destY, 0, 0, texture.width, texture.height);
     }
 
     public function drawSubImage (texture :Texture, destX :Float, destY :Float,
         sourceX :Float, sourceY :Float, sourceW :Float, sourceH :Float)
     {
         var flashTexture :FlashTexture = cast texture;
+        if (_nextTexture != flashTexture) {
+            flushBatch();
+            _nextTexture = flashTexture;
+        }
+
+        var state = getTopState();
+        if (state.blendMode != _nextBlendMode) {
+            flushBatch();
+            _nextBlendMode = state.blendMode;
+        }
 
         var w = texture.width;
         var h = texture.height;
@@ -169,46 +146,53 @@ class Stage3DDrawingContext
         var u2 = flashTexture.maxU*(sourceX + sourceW) / w;
         var v2 = flashTexture.maxV*(sourceY + sourceH) / h;
 
-        var vector = _quadVector;
+        var scratch = _scratchVector;
 
-        vector[0] = x1;
-        vector[1] = y1;
-        vector[2] = u1;
-        vector[3] = v1;
+        scratch[0] = x1;
+        scratch[1] = y1;
+        scratch[2] = 0;
 
-        vector[4] = x2;
-        vector[5] = y1;
-        vector[6] = u2;
-        vector[7] = v1;
+        scratch[3] = x2;
+        scratch[4] = y1;
+        scratch[5] = 0;
 
-        vector[8] = x2;
-        vector[9] = y2;
-        vector[10] = u2;
-        vector[11] = v2;
+        scratch[6] = x2;
+        scratch[7] = y2;
+        scratch[8] = 0;
 
-        vector[12] = x1;
-        vector[13] = y2;
-        vector[14] = u1;
-        vector[15] = v2;
+        scratch[9] = x1;
+        scratch[10] = y2;
+        scratch[11] = 0;
 
-        _quadVerts.uploadFromVector(vector, 0, 4);
+        state.matrix.transformVectors(scratch, scratch);
 
-        var state = getTopState();
-        _drawImageShader.init({
-            model: state.matrix,
-            proj: _projMatrix,
-        }, {
-            texture: flashTexture.nativeTexture,
-            alpha: state.alpha,
-        });
+        var offset = addQuadToBatch();
+        var data = _batchData;
+        var alpha = state.alpha;
 
-        _drawImageShader.bind(_quadVerts);
+        data[offset] = scratch[0];
+        data[offset+1] = scratch[1];
+        data[offset+2] = u1;
+        data[offset+3] = v1;
+        data[offset+4] = alpha;
 
-        // TODO(bruno): Batch multiple quads that use the same texture and alpha into a single
-        // drawTriangles call
-        _context3D.drawTriangles(_quadIndices);
+        data[offset+5] = scratch[3];
+        data[offset+6] = scratch[4];
+        data[offset+7] = u2;
+        data[offset+8] = v1;
+        data[offset+9] = alpha;
 
-        _drawImageShader.unbind();
+        data[offset+10] = scratch[6];
+        data[offset+11] = scratch[7];
+        data[offset+12] = u2;
+        data[offset+13] = v2;
+        data[offset+14] = alpha;
+
+        data[offset+15] = scratch[9];
+        data[offset+16] = scratch[10];
+        data[offset+17] = u1;
+        data[offset+18] = v2;
+        data[offset+19] = alpha;
     }
 
     public function drawPattern (texture :Texture, x :Float, y :Float, width :Float, height :Float)
@@ -218,51 +202,41 @@ class Stage3DDrawingContext
 
     public function fillRect (color :Int, x :Float, y :Float, width :Float, height :Float)
     {
+        flushBatch();
+
         var state = getTopState();
+        var scratch = _scratchVector;
         var x2 = x + width;
         var y2 = y + height;
-        var vector = _quadVector;
 
-        vector[0] = x;
-        vector[1] = y;
-        vector[2] = 0;
-        vector[3] = 0;
+        scratch[0] = x;
+        scratch[1] = y;
+        scratch[2] = x2;
+        scratch[3] = y;
+        scratch[4] = x2;
+        scratch[5] = y2;
+        scratch[6] = x;
+        scratch[7] = y2;
 
-        vector[4] = x2;
-        vector[5] = y;
-        vector[6] = 0;
-        vector[7] = 0;
-
-        vector[8] = x2;
-        vector[9] = y2;
-        vector[10] = 0;
-        vector[11] = 0;
-
-        vector[12] = x;
-        vector[13] = y2;
-        vector[14] = 0;
-        vector[15] = 0;
-
-        _quadVerts.uploadFromVector(vector, 0, 4);
-
-        // Load the color into the scratch vector
-        _scratchVector3D.x = ((color>>16) & 0xff) / 255.0;
-        _scratchVector3D.y = ((color>>8) & 0xff) / 255.0;
-        _scratchVector3D.z = (color & 0xff) / 255.0;
-        _scratchVector3D.w = state.alpha;
+        var color4 = _scratchVector3D;
+        color4.x = ((color>>16) & 0xff) / 255.0;
+        color4.y = ((color>>8) & 0xff) / 255.0;
+        color4.z = (color & 0xff) / 255.0;
+        color4.w = state.alpha;
 
         _fillRectShader.init({
             model: state.matrix,
             proj: _projMatrix,
         }, {
-            color: _scratchVector3D,
+            color: color4,
         });
 
-        _fillRectShader.bind(_quadVerts);
+        _fillRectVerts.uploadFromVector(scratch, 0, 4);
+        _fillRectShader.bind(_fillRectVerts);
 
-        // TODO(bruno): Batch multiple quads that use the same color and alpha into a single
-        // drawTriangles call
-        _context3D.drawTriangles(_quadIndices);
+        // TODO(bruno): Batch multiple common fillRects into a single draw call
+        // _context3D.drawTriangles(_batchIndices, 0, 2);
+        _context3D.drawTriangles(_singleIndices);
 
         _fillRectShader.unbind();
     }
@@ -274,10 +248,103 @@ class Stage3DDrawingContext
 
     public function setBlendMode (blendMode :BlendMode)
     {
-        if (blendMode != Normal) {
-            getTopState().blendMode = blendMode;
+        getTopState().blendMode = blendMode;
+    }
+
+    public function willRender ()
+    {
+        _context3D.clear();
+    }
+
+    public function didRender ()
+    {
+        flushBatch();
+        _context3D.present();
+        trace("==================");
+    }
+
+    public function resize (width :Int, height :Int)
+    {
+        // TODO(bruno): Vary anti-alias quality depending on the environment
+        _context3D.configureBackBuffer(width, height, 2, false);
+
+        // Create an orthographic projection matrix
+        _projMatrix = new Matrix3D(Vector.ofArray([
+            2/width, 0, 0, 0,
+            0, -2/height, 0, 0,
+            0, 0, -1, 0,
+            -1, 1, 0, 1,
+        ]));
+    }
+
+    private function expandBatch ()
+    {
+        var oldSize = Std.int(_batchData.length/(4*ELEMENTS_PER_VERTEX));
+        var newSize = (oldSize == 0) ? 16 : 2*oldSize;
+
+        _batchData.fixed = false;
+        _batchData.length = 4*ELEMENTS_PER_VERTEX*newSize;
+        _batchData.fixed = true;
+
+        var indices = new Vector<UInt>(6*newSize, true);
+        for (ii in 0...newSize) {
+            indices[ii*6] = ii*4;
+            indices[ii*6 + 1] = ii*4 + 1;
+            indices[ii*6 + 2] = ii*4 + 2;
+            indices[ii*6 + 3] = ii*4 + 2;
+            indices[ii*6 + 4] = ii*4 + 3;
+            indices[ii*6 + 5] = ii*4;
         }
-        applyBlendMode(blendMode);
+
+        if (_batchIndices != null) {
+            _batchIndices.dispose();
+        }
+        _batchIndices = _context3D.createIndexBuffer(indices.length);
+        _batchIndices.uploadFromVector(indices, 0, indices.length);
+
+        if (_batchVerts != null) {
+            _batchVerts.dispose();
+        }
+        _batchVerts = _context3D.createVertexBuffer(4*newSize, ELEMENTS_PER_VERTEX);
+
+        trace("Expanded batch to " + newSize);
+    }
+
+    private function flushBatch ()
+    {
+        if (_quads < 1) {
+            return;
+        }
+
+        trace("Flushing batch of " + _quads + " quads");
+
+        if (_nextBlendMode != null) {
+            switch (_nextBlendMode) {
+            case Normal:
+                _context3D.setBlendFactors(SOURCE_ALPHA, ONE_MINUS_SOURCE_ALPHA);
+            case Add:
+                _context3D.setBlendFactors(ONE, ONE);
+            }
+        }
+
+        _drawImageShader.init({
+            proj: _projMatrix,
+        }, {
+            texture: _nextTexture.nativeTexture,
+        });
+
+        // Can't seem to be able to upload only the part of _batchData that we care about, so upload
+        // the whole damn thing. Hrmm.
+        // _batchVerts.uploadFromVector(_batchData, 0, _quads*4);
+        _batchVerts.uploadFromVector(_batchData, 0, Std.int(_batchData.length/ELEMENTS_PER_VERTEX));
+        _drawImageShader.bind(_batchVerts);
+
+        _context3D.drawTriangles(_batchIndices, 0, 2*_quads);
+
+        _drawImageShader.unbind();
+        _quads = 0;
+        _nextTexture = null;
+        _nextBlendMode = null;
     }
 
     inline private function getTopState () :DrawingState
@@ -285,48 +352,28 @@ class Stage3DDrawingContext
         return _stack.head.elt;
     }
 
-    private function applyBlendMode (blendMode :BlendMode)
-    {
-        if (blendMode == null) {
-            blendMode = Normal;
-        }
-
-        switch (blendMode) {
-        case Normal:
-            _context3D.setBlendFactors(SOURCE_ALPHA, ONE_MINUS_SOURCE_ALPHA);
-        case Add:
-            _context3D.setBlendFactors(ONE, ONE);
-        }
-    }
-
-    private static function createOrthoMatrix (width :Int, height :Int) :Matrix3D
-    {
-        var m = new Vector<Float>(16, true);
-        m[0] = 2 / width;
-        m[1] = m[2] = m[3] = m[4] = 0;
-        m[5] = -2 / height;
-        m[6] = m[7] = m[8] = m[9] = 0;
-        m[10] = -1.0;
-        m[11] = 0;
-        m[12] = -1;
-        m[13] = 1;
-        m[14] = 0;
-        m[15] = 1;
-        return new Matrix3D(m);
-    }
+    private static inline var ELEMENTS_PER_VERTEX = 5;
+    private static inline var MAX_BATCH_QUADS = 256;
 
     private var _context3D :Context3D;
 
     private var _stack :FastList<DrawingState>;
     private var _scratchVector3D :Vector3D;
+    private var _scratchVector :Vector<Float>;
     private var _projMatrix :Matrix3D;
 
-    private var _quadVector :Vector<Float>;
-    private var _quadVerts :VertexBuffer3D;
-    private var _quadIndices :IndexBuffer3D;
-
+    private var _batchData :Vector<Float>;
+    private var _batchVerts :VertexBuffer3D;
+    private var _batchIndices :IndexBuffer3D;
     private var _drawImageShader :DrawImage;
+
+    private var _singleIndices :IndexBuffer3D;
+    private var _fillRectVerts :VertexBuffer3D;
     private var _fillRectShader :FillRect;
+
+    private var _quads :Int;
+    private var _nextTexture :FlashTexture;
+    private var _nextBlendMode :BlendMode;
 }
 
 private class DrawingState

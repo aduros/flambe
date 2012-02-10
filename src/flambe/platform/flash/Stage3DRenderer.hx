@@ -33,16 +33,16 @@ class Stage3DRenderer
 
     public function willRender () :DrawingContext
     {
-        if (_context3D == null) {
+        if (_drawCtx == null) {
             return null;
         }
-        _context3D.clear();
+        _drawCtx.willRender();
         return _drawCtx;
     }
 
     public function didRender ()
     {
-        _context3D.present();
+        _drawCtx.didRender();
     }
 
     public function init ()
@@ -140,10 +140,9 @@ class Stage3DRenderer
 
     private function onResize (_)
     {
-        if (_context3D != null) {
+        if (_drawCtx != null) {
             var stage = Lib.current.stage;
-            // TODO(bruno): Vary anti-alias quality depending on the environment
-            _context3D.configureBackBuffer(stage.stageWidth, stage.stageHeight, 2, false);
+            _drawCtx.resize(stage.stageWidth, stage.stageHeight);
         }
     }
 
@@ -156,7 +155,7 @@ class Stage3DRenderer
         return p;
     }
 
-    private var _drawCtx :DrawingContext;
+    private var _drawCtx :Stage3DDrawingContext;
     private var _context3D :Context3D;
     private var _stage3D :Stage3D;
 

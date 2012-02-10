@@ -15,18 +15,21 @@ class DrawImage extends Shader
         var input :{
             pos :Float2,
             uv :Float2,
+            alpha :Float,
         };
 
-        var tuv :Float2;
+        var _uv :Float2;
+        var _alpha :Float;
 
-        function vertex (model :Matrix, proj :Matrix) {
-            out = pos.xyzw * model * proj;
-            tuv = uv;
+        function vertex (proj :Matrix) {
+            _uv = uv;
+            _alpha = alpha;
+            out = pos.xyzw * proj;
         }
 
-        function fragment (texture :Texture, alpha :Float) {
-            var color = texture.get(tuv);
-            color.a *= alpha;
+        function fragment (texture :Texture) {
+            var color = texture.get(_uv);
+            color.a *= _alpha;
             out = color;
         }
     }

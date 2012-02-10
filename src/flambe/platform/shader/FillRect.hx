@@ -16,6 +16,7 @@ class FillRect extends Shader
             pos :Float2,
         };
 
+        // Since fillRect is never batched, the model transform can happen on the GPU
         function vertex (model :Matrix, proj :Matrix) {
             out = pos.xyzw * model * proj;
         }

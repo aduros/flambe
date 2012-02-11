@@ -4,6 +4,8 @@
 
 package flambe.util;
 
+import flambe.math.FMath;
+
 using StringTools;
 
 class Strings
@@ -22,7 +24,7 @@ class Strings
         var code = 0;
         if (str != null) {
             for (ii in 0...str.length) {
-                code = 31*code + str.fastCodeAt(ii);
+                code = FMath.toInt(31*code + str.fastCodeAt(ii));
             }
         }
         return code;

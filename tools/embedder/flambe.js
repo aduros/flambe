@@ -13,12 +13,17 @@ var flambe = (function () {
          * @return True if the game was successfully embedded. False if the browser doesn't have a
          *     recent enough browser or Flash player.
          */
-        embed: function (urls, elementId, width, height) {
+        embed: function (urls, elementId) {
 
             // TODO(bruno): Allow you to order the URLs array based on preference. For now the swf
             // must be first and the JS second.
             if (typeof urls == "string") {
                 urls = [ urls + "-flash.swf", urls + "-html.js" ];
+            }
+
+            var container = document.getElementById(elementId);
+            if (container == null) {
+                throw new Error("Could not find element: " + elementId);
             }
 
             var args = {};
@@ -33,29 +38,25 @@ var flambe = (function () {
 
             if ((pref == null || pref == "flash")
                     && swfobject.hasFlashPlayerVersion(flashVersion)) {
-                swfobject.embedSWF(urls[0], elementId,
-                    Math.min(window.innerWidth, width),
-                    Math.min(window.innerHeight, height),
-                    flashVersion, null, {}, {
-                        allowScriptAccess: "always",
-                        allowFullScreen: "true",
-                        fullscreenOnSelection: "true",
-                        wmode: "direct"
-                    });
+
+                // SWFObject replaces the element it's given, so create a temporary inner element
+                // for parity with JS
+                var swf = document.createElement("div");
+                swf.id = "flambe-swf";
+                container.appendChild(swf);
+
+                swfobject.embedSWF(urls[0], swf.id, "100%", "100%", flashVersion, null, {}, {
+                    allowScriptAccess: "always",
+                    allowFullScreen: "true",
+                    fullscreenOnSelection: "true",
+                    wmode: "direct"
+                });
                 return true;
 
             } else if (pref == null || pref == "html") {
                 var canvas = document.createElement("canvas");
                 if ("getContext" in canvas) {
-                    var repack = function () {
-                        canvas.width = Math.min(window.innerWidth, width);
-                        canvas.height = Math.min(window.innerHeight, height);
-                    };
-                    repack();
-                    window.addEventListener("resize", repack, false);
-
-                    var content = document.getElementById(elementId);
-                    content.appendChild(canvas);
+                    container.appendChild(canvas);
 
                     // Expose the canvas so haXe can use it
                     flambe.canvas = canvas;
@@ -63,10 +64,9 @@ var flambe = (function () {
                     var script = document.createElement("script");
                     script.onload = function () {
                         flambe.canvas = null;
-                        repack();
                     };
                     script.src = urls[1];
-                    content.appendChild(script);
+                    container.appendChild(script);
                     return true;
                 }
 

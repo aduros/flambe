@@ -22,9 +22,8 @@ class HtmlStage
         _canvas = canvas;
         resize = new Signal0();
 
-        (untyped Lib.window).addEventListener("resize", function (event) {
-            resize.emit();
-        }, false);
+        (untyped Lib.window).addEventListener("resize", onResize, false);
+        onResize();
     }
 
     public function getWidth () :Int
@@ -40,6 +39,18 @@ class HtmlStage
     public function lockOrientation (orient :Orientation)
     {
         // Nothing until mobile browsers support it
+    }
+
+    private function onResize ()
+    {
+        // Resize the canvas to match its container's bounds
+        var container = _canvas.parentNode;
+
+        var rect = container.getBoundingClientRect();
+        _canvas.width = rect.width;
+        _canvas.height = rect.height;
+
+        resize.emit();
     }
 
     private var _canvas :Dynamic;

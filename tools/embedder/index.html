@@ -12,19 +12,43 @@
   <meta name="format-detection" content="telephone=no">
   <style>
     body {
-        text-align: center;
-        margin: 0;
-        background: black;
-        color: #404040;
-        font-family: sans-serif;
-        font-size: 10pt;
+      text-align: center;
+      margin: 0;
+      background: black;
+      color: #404040;
+      font-family: sans-serif;
+      font-size: 10pt;
     }
     a {
-        color: #F88113;
-        text-decoration: none;
+      color: #F88113;
+      text-decoration: none;
     }
     a:hover {
-        text-decoration: underline;
+      text-decoration: underline;
+    }
+
+    #content {
+      width: 640px;
+      height: 480px;
+      margin: 60px auto 20px auto;
+      box-shadow: 0px 4px 16px -4px #333;
+    }
+
+    /* On small devices, fill the entire screen and hide the rest of the page. */
+    @media (max-device-width: 8in), (max-device-height: 8in) {
+      html, body {
+        height: 100%;
+        overflow: hidden;
+      }
+      #content {
+        height: 100%;
+        width: 100%;
+        margin: inherit;
+        box-shadow: none;
+      }
+      .no-mobile {
+        display: none;
+      }
     }
   </style>
 </head>
@@ -33,15 +57,17 @@
 <div id="content"></div>
 <script src="flambe.js"></script>
 <script>
-    flambe.embed("app", "content", 640, 480);
+  flambe.embed("app", "content");
 </script>
 
+<footer class="no-mobile">
 <p>
   <a href="?">Default</a> |
   <a href="?flambe-platform=flash">Flash</a> |
-  <a href="?flambe-platform=html">Canvas</a>
+  <a href="?flambe-platform=html">HTML5</a>
 </p>
 <p>Cooked with <a href="https://github.com/aduros/flambe">Flambe</a></p>
+</footer>
 
 </body>
 </html>

@@ -137,7 +137,7 @@ class HtmlAppDriver
                 // We're already handling a finger
                 return;
             }
-            hideMobileBrowser();
+            HtmlUtil.hideMobileBrowser();
 
             var touch = domEvent.changedTouches[0];
             touchId = touch.identifier;
@@ -159,11 +159,6 @@ class HtmlAppDriver
             System.uncaughtError.emit(message);
             return (oldErrorHandler != null) ? oldErrorHandler(message, url, line) : false;
         };
-
-        (untyped Lib.window).addEventListener("orientationchange", function (event) {
-            hideMobileBrowser();
-        }, false);
-        hideMobileBrowser();
 
         _lastUpdate = Date.now().getTime();
     }
@@ -264,11 +259,6 @@ class HtmlAppDriver
 
         // Not found
         return null;
-    }
-
-    private static function hideMobileBrowser ()
-    {
-        Lib.window.scrollTo(1, 0);
     }
 
     private static var _instance :HtmlAppDriver;

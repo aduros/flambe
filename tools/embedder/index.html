@@ -36,9 +36,12 @@
 
     /* On small devices, fill the entire screen and hide the rest of the page. */
     @media (max-device-width: 8in), (max-device-height: 8in) {
+      html {
+        /* Prevent scrollbars from causing a resize feedback loop. */
+        overflow: hidden;
+      }
       html, body {
         height: 100%;
-        overflow: hidden;
       }
       #content {
         height: 100%;

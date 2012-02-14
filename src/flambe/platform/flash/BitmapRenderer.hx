@@ -47,7 +47,17 @@ class BitmapRenderer
         if (_screen != null) {
             _screen.dispose();
         }
-        _screen = new BitmapData(_bitmap.stage.stageWidth, _bitmap.stage.stageWidth, false);
+
+        var width = _bitmap.stage.stageWidth;
+        var height = _bitmap.stage.stageHeight;
+        if (width == 0 || height == 0) {
+            // In IE, stageWidth and height may initialized to zero! A resize event will come in
+            // after a couple frames to give us the real dimensions, use a fixed size until then.
+            // http://jodieorourke.com/view.php?id=79&blog=news
+            width = height = 100;
+        }
+
+        _screen = new BitmapData(width, height, false);
         _drawCtx = new BitmapDrawingContext(_screen);
         _bitmap.bitmapData = _screen;
     }

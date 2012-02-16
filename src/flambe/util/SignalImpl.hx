@@ -32,7 +32,8 @@ class SignalImpl
         var idx = _connections.indexOf(connection);
         if (idx >= 0) {
             connection._internal_signal = null;
-            _connections[idx] = null;
+            _connections = _connections.copy();
+            _connections.splice(idx, 1);
             return true;
         }
         return false;
@@ -42,24 +43,17 @@ class SignalImpl
     {
         for (ii in 0..._connections.length) {
             _connections[ii]._internal_signal = null;
-            _connections[ii] = null;
         }
         _connections = [];
     }
 
-    // FIXME(bruno): Adding another listener during an emit is broken
     public function emit (args :Array<Dynamic>)
     {
-        var ii = 0;
-        while (ii < _connections.length) {
-            var connection = _connections[ii];
-            if (connection != null) {
-                Reflect.callMethod(null, connection._internal_listener, args);
-            }
-            if (connection == null || !connection.stayInList) {
-                _connections.splice(ii, 1);
-            } else {
-                ++ii;
+        var snapshot = _connections;
+        for (connection in snapshot) {
+            Reflect.callMethod(null, connection._internal_listener, args);
+            if (!connection.stayInList) {
+                connection.dispose();
             }
         }
     }

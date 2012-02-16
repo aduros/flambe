@@ -33,14 +33,14 @@ class MoveTo
         var transform = actor.get(Transform);
         if (_tweenX == null) {
             _tweenX = new Tween(transform.x._, x, duration, easingX);
-            transform.x.setBehavior(_tweenX);
+            transform.x.behavior = _tweenX;
             transform.x.update(dt); // Fake an update to account for this frame
 
             _tweenY = new Tween(transform.y._, y, duration, (easingY != null) ? easingY : easingX);
-            transform.y.setBehavior(_tweenY);
+            transform.y.behavior = _tweenY;
             transform.y.update(dt); // Fake an update to account for this frame
         }
-        if (transform.x.getBehavior() != _tweenX && transform.y.getBehavior() != _tweenY) {
+        if (transform.x.behavior != _tweenX && transform.y.behavior != _tweenY) {
             _tweenX = null;
             _tweenY = null;
             return true;

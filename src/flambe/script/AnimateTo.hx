@@ -29,10 +29,10 @@ class AnimateTo
     {
         if (_tween == null) {
             _tween = new Tween(property._, to, duration, easing);
-            property.setBehavior(_tween);
+            property.behavior = _tween;
             property.update(dt); // Fake an update to account for this frame
         }
-        if (property.getBehavior() != _tween) {
+        if (property.behavior != _tween) {
             _tween = null;
             return true;
         }

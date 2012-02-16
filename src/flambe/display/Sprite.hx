@@ -160,10 +160,16 @@ class Sprite extends Component
     	return _viewMatrix;
     }
 
+    public function setAnchor (x :Float, y :Float)
+    {
+        anchorX._ = x;
+        anchorY._ = y;
+    }
+
     public function centerAnchor ()
     {
-        anchorX.set(getNaturalWidth()/2);
-        anchorY.set(getNaturalHeight()/2);
+        anchorX._ = getNaturalWidth()/2;
+        anchorY._ = getNaturalHeight()/2;
     }
 
     public function _internal_onListenersAdded (count :Int)

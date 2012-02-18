@@ -109,9 +109,9 @@ class Game extends Component
             .add(new Hull(20, 1))
             .add(new SwarmerAI());
         enemy.get(Sprite).centerAnchor();
-        enemy.get(Sprite).alpha.animate(0, 1, 2000);
-        enemy.get(Transform).scaleX.animate(0, 1, 2000);
-        enemy.get(Transform).scaleY.animate(0, 1, 2000);
+        enemy.get(Sprite).alpha.animate(0, 1, 2);
+        enemy.get(Transform).scaleX.animate(0, 1, 2);
+        enemy.get(Transform).scaleY.animate(0, 1, 2);
         return enemy;
     }
 

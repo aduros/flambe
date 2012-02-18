@@ -8,7 +8,6 @@ import flambe.animation.Easing;
 import flambe.animation.Tween;
 import flambe.display.Transform;
 import flambe.Entity;
-import flambe.math.FMath;
 
 class MoveBy
     implements Action
@@ -18,7 +17,7 @@ class MoveBy
     {
         _x = x;
         _y = y;
-        _duration = FMath.toInt(1000*seconds);
+        _seconds = seconds;
         _easingX = easingX;
         _easingY = easingY;
     }
@@ -27,11 +26,11 @@ class MoveBy
     {
         var transform = actor.get(Transform);
         if (_tweenX == null) {
-            _tweenX = new Tween(transform.x._, transform.x._ + _x, _duration, _easingX);
+            _tweenX = new Tween(transform.x._, transform.x._ + _x, _seconds, _easingX);
             transform.x.behavior = _tweenX;
             transform.x.update(dt); // Fake an update to account for this frame
 
-            _tweenY = new Tween(transform.y._, transform.y._ + _y, _duration,
+            _tweenY = new Tween(transform.y._, transform.y._ + _y, _seconds,
                 (_easingY != null) ? _easingY : _easingX);
             transform.y.behavior = _tweenY;
             transform.y.update(dt); // Fake an update to account for this frame
@@ -49,7 +48,7 @@ class MoveBy
 
     private var _x :Float;
     private var _y :Float;
-    private var _duration :Int;
+    private var _seconds :Float;
     private var _easingX :EasingFunction;
     private var _easingY :EasingFunction;
 }

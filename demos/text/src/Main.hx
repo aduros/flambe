@@ -34,10 +34,10 @@ class Main
             var transform = label.get(Transform);
             var margin = 50;
             transform.x.animateTo(
-                margin + (System.stage.width - 2*margin)*Math.random(), 1000, Easing.linear);
+                margin + (System.stage.width - 2*margin)*Math.random(), 1, Easing.linear);
             transform.y.animateTo(
-                margin + (System.stage.height - 2*margin)*Math.random(), 1000, Easing.linear);
-            transform.rotation.animateTo(360*Math.random(), 1000, Easing.quadOut);
+                margin + (System.stage.height - 2*margin)*Math.random(), 1, Easing.linear);
+            transform.rotation.animateTo(360*Math.random(), 1, Easing.quadOut);
             label.get(TextSprite).text = messages[taps++ % messages.length];
         });
 

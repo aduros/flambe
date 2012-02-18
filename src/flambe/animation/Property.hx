@@ -56,20 +56,20 @@ class Property<A>
         }
     }
 
-    public function animate (from :A, to :A, duration :Int, ?easing :EasingFunction)
+    public function animate (from :A, to :A, seconds :Float, ?easing :EasingFunction)
     {
         set(from);
-        animateTo(to, duration, easing);
+        animateTo(to, seconds, easing);
     }
 
-    public function animateTo (to :A, duration :Int, ?easing :EasingFunction)
+    public function animateTo (to :A, seconds :Float, ?easing :EasingFunction)
     {
-        setBehavior(cast new Tween(cast _value, cast to, duration, easing));
+        setBehavior(cast new Tween(cast _value, cast to, seconds, easing));
     }
 
-    public function animateBy (by :A, duration :Int, ?easing :EasingFunction)
+    public function animateBy (by :A, seconds :Float, ?easing :EasingFunction)
     {
-        setBehavior(cast new Tween(cast _value, (cast _value) + (cast by), duration, easing));
+        setBehavior(cast new Tween(cast _value, (cast _value) + (cast by), seconds, easing));
     }
 
     inline public function bindTo (to :Property<A>, ?fn :BindingFunction<A>)

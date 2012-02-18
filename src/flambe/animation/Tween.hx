@@ -5,38 +5,39 @@
 package flambe.animation;
 
 import flambe.animation.Easing;
+import flambe.math.FMath;
 
 class Tween
     implements Behavior<Float>
 {
-    public var from (default, null) :Float;
-    public var to (default, null) :Float;
-    public var elapsed (default, null) :Int;
-    public var duration (default, null) :Int;
-    public var easing (default, null) :EasingFunction;
-
-    public function new (from :Float, to :Float, duration :Int, ?easing :EasingFunction)
+    public function new (from :Float, to :Float, seconds :Float, ?easing :EasingFunction)
     {
-        this.from = from;
-        this.to = to;
-        this.duration = duration;
-        this.elapsed = 0;
-        this.easing = (easing != null) ? easing : Easing.linear;
+        _from = from;
+        _to = to;
+        _duration = FMath.toInt(1000*seconds);
+        _elapsed = 0;
+        _easing = (easing != null) ? easing : Easing.linear;
     }
 
     public function update (dt :Int) :Float
     {
-        elapsed += dt;
+        _elapsed += dt;
 
-        if (elapsed >= duration) {
-            return to;
+        if (_elapsed >= _duration) {
+            return _to;
         } else {
-            return from + (to - from)*easing(elapsed/duration);
+            return _from + (_to - _from)*_easing(_elapsed/_duration);
         }
     }
 
     public function isComplete () :Bool
     {
-        return elapsed >= duration;
+        return _elapsed >= _duration;
     }
+
+    private var _from :Float;
+    private var _to :Float;
+    private var _elapsed :Int;
+    private var _duration :Int;
+    private var _easing :EasingFunction;
 }

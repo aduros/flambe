@@ -48,5 +48,4 @@ class Main
             System.root.addChild(tentacle);
         }
     }
-
 }

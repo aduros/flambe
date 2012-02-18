@@ -13,15 +13,11 @@ import flambe.display.Transform;
 class Shake
     implements Action
 {
-    public var strengthX (default, null) :Float;
-    public var strengthY (default, null) :Float;
-    public var duration (default, null) :Int;
-
     public function new (strengthX :Float, strengthY :Float, duration :Int)
     {
-        this.strengthX = strengthX;
-        this.strengthY = strengthY;
-        this.duration = duration;
+        _strengthX = strengthX;
+        _strengthY = strengthY;
+        _duration = duration;
         _elapsed = 0;
     }
 
@@ -29,14 +25,14 @@ class Shake
     {
         var t = actor.get(Transform);
         if (_jitterX == null) {
-            _jitterX = new Jitter(t.x._, strengthX);
-            _jitterY = new Jitter(t.y._, strengthY);
+            _jitterX = new Jitter(t.x._, _strengthX);
+            _jitterY = new Jitter(t.y._, _strengthY);
             t.x.behavior = _jitterX;
             t.y.behavior = _jitterY;
         }
 
         _elapsed += dt;
-        if (_elapsed >= duration) {
+        if (_elapsed >= _duration) {
             if (t.x.behavior == _jitterX) {
                 t.x._ = _jitterX.base;
             }
@@ -54,4 +50,8 @@ class Shake
     private var _elapsed :Int;
     private var _jitterX :Jitter;
     private var _jitterY :Jitter;
+
+    private var _strengthX :Float;
+    private var _strengthY :Float;
+    private var _duration :Int;
 }

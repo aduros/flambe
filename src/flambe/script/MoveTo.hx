@@ -12,31 +12,26 @@ import flambe.Entity;
 class MoveTo
     implements Action
 {
-    public var x (default, null) :Float;
-    public var y (default, null) :Float;
-    public var duration (default, null) :Int;
-    public var easingX (default, null) :EasingFunction;
-    public var easingY (default, null) :EasingFunction;
-
     public function new (
         x :Float, y :Float, duration :Int, easingX :EasingFunction, ?easingY :EasingFunction)
     {
-        this.x = x;
-        this.y = y;
-        this.duration = duration;
-        this.easingX = easingX;
-        this.easingY = easingY;
+        _x = x;
+        _y = y;
+        _duration = duration;
+        _easingX = easingX;
+        _easingY = easingY;
     }
 
     public function update (dt :Int, actor :Entity) :Bool
     {
         var transform = actor.get(Transform);
         if (_tweenX == null) {
-            _tweenX = new Tween(transform.x._, x, duration, easingX);
+            _tweenX = new Tween(transform.x._, _x, _duration, _easingX);
             transform.x.behavior = _tweenX;
             transform.x.update(dt); // Fake an update to account for this frame
 
-            _tweenY = new Tween(transform.y._, y, duration, (easingY != null) ? easingY : easingX);
+            _tweenY = new Tween(transform.y._, _y, _duration,
+                (_easingY != null) ? _easingY : _easingX);
             transform.y.behavior = _tweenY;
             transform.y.update(dt); // Fake an update to account for this frame
         }
@@ -50,4 +45,10 @@ class MoveTo
 
     private var _tweenX :Tween;
     private var _tweenY :Tween;
+
+    private var _x :Float;
+    private var _y :Float;
+    private var _duration :Int;
+    private var _easingX :EasingFunction;
+    private var _easingY :EasingFunction;
 }

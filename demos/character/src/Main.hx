@@ -40,13 +40,13 @@ class Main
             var transform = character.get(Transform);
             transform.scaleX._ = (event.viewX > transform.x._) ? 1 : -1;
 
-            var delay = flambe.math.FMath.toInt(5*transform.distanceTo(event.viewX, event.viewY));
+            var seconds = transform.distanceTo(event.viewX, event.viewY) / 200;
             var script = character.get(Script);
             script.stopAll();
             script.run(new Sequence([
-                // TODO: This could be a bit less verbose, something like:
-                // MoveTo.linear(event.viewX, event.viewY, delay),
-                new MoveTo(event.viewX, event.viewY, delay, Easing.linear),
+                // TODO(bruno): This could be a bit less verbose, something like:
+                // MoveTo.linear(event.viewX, event.viewY, seconds),
+                new MoveTo(event.viewX, event.viewY, seconds, Easing.linear),
                 new CallFunction(function () {
                     character.get(AnimatedSprite).play("idle");
                 }),

@@ -53,7 +53,8 @@ class Game extends Component
                 t.y._ = -texture.height;
                 cloud.get(Sprite).alpha._ = 0.8;
                 cloudLayer.get(Script).run(new Sequence([
-                    new AnimateTo(cloud.get(Transform).y, System.stage.height, 3*Std.int(8000+2000*Math.random()), Easing.linear),
+                    new AnimateTo(cloud.get(Transform).y, System.stage.height,
+                        3*(8+2*Math.random()), Easing.linear),
                     new CallFunction(cloud.dispose)
                 ]));
                 cloudLayer.addChild(cloud);

@@ -8,15 +8,16 @@ import flambe.animation.Easing;
 import flambe.animation.Property;
 import flambe.animation.Tween;
 import flambe.Entity;
+import flambe.math.FMath;
 
 class AnimateTo
     implements Action
 {
-    public function new (property :PFloat, to :Float, duration :Int, easing :EasingFunction)
+    public function new (property :PFloat, to :Float, seconds :Float, easing :EasingFunction)
     {
         _property = property;
         _to = to;
-        _duration = duration;
+        _duration = FMath.toInt(1000*seconds);
         _easing = easing;
     }
 

@@ -6,6 +6,7 @@ package flambe.script;
 
 import flambe.animation.Jitter;
 import flambe.display.Transform;
+import flambe.math.FMath;
 
 /**
  * Shakes an entity's transform by jittering its X and Y for a set duration.
@@ -13,11 +14,11 @@ import flambe.display.Transform;
 class Shake
     implements Action
 {
-    public function new (strengthX :Float, strengthY :Float, duration :Int)
+    public function new (strengthX :Float, strengthY :Float, seconds :Float)
     {
         _strengthX = strengthX;
         _strengthY = strengthY;
-        _duration = duration;
+        _duration = FMath.toInt(1000*seconds);
         _elapsed = 0;
     }
 

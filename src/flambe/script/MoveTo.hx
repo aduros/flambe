@@ -8,16 +8,17 @@ import flambe.animation.Easing;
 import flambe.animation.Tween;
 import flambe.display.Transform;
 import flambe.Entity;
+import flambe.math.FMath;
 
 class MoveTo
     implements Action
 {
     public function new (
-        x :Float, y :Float, duration :Int, easingX :EasingFunction, ?easingY :EasingFunction)
+        x :Float, y :Float, seconds :Float, easingX :EasingFunction, ?easingY :EasingFunction)
     {
         _x = x;
         _y = y;
-        _duration = duration;
+        _duration = FMath.toInt(1000*seconds);
         _easingX = easingX;
         _easingY = easingY;
     }

@@ -8,7 +8,6 @@ import flambe.asset.Manifest;
 import flambe.display.FillSprite;
 import flambe.display.Font;
 import flambe.display.TextSprite;
-import flambe.display.Transform;
 import flambe.Entity;
 import flambe.System;
 
@@ -30,15 +29,15 @@ class Main
             "(Your touch screen works)",
         ];
         var taps = 0;
-        label.get(TextSprite).pointerDown.connect(function (_) {
-            var transform = label.get(Transform);
+        var sprite = label.get(TextSprite);
+        sprite.pointerDown.connect(function (_) {
             var margin = 50;
-            transform.x.animateTo(
+            sprite.x.animateTo(
                 margin + (System.stage.width - 2*margin)*Math.random(), 1, Easing.linear);
-            transform.y.animateTo(
+            sprite.y.animateTo(
                 margin + (System.stage.height - 2*margin)*Math.random(), 1, Easing.linear);
-            transform.rotation.animateTo(360*Math.random(), 1, Easing.quadOut);
-            label.get(TextSprite).text = messages[taps++ % messages.length];
+            sprite.rotation.animateTo(360*Math.random(), 1, Easing.quadOut);
+            sprite.text = messages[taps++ % messages.length];
         });
 
         System.root.addChild(label);

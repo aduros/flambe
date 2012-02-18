@@ -5,7 +5,7 @@
 package shooter;
 
 import flambe.Component;
-import flambe.display.Transform;
+import flambe.display.Sprite;
 import flambe.System;
 
 class BomberAI extends Component
@@ -16,9 +16,9 @@ class BomberAI extends Component
 
     override public function onUpdate (dt)
     {
-        var t = owner.get(Transform);
-        t.y._ += dt*0.05;
-        if (t.y._ > System.stage.height) {
+        var sprite = owner.get(Sprite);
+        sprite.y._ += dt*0.05;
+        if (sprite.y._ > System.stage.height) {
             owner.dispose();
         }
     }

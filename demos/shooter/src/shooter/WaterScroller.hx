@@ -6,7 +6,7 @@ package shooter;
 
 import flambe.animation.Property;
 import flambe.Component;
-import flambe.display.Transform;
+import flambe.display.Sprite;
 
 class WaterScroller extends Component
 {
@@ -21,10 +21,10 @@ class WaterScroller extends Component
     {
         speed.update(dt);
 
-        var transform = owner.get(Transform);
-        transform.y._ += dt*speed._;
-        while (transform.y._ > 0) {
-            transform.y._ -= 32;
+        var sprite = owner.get(Sprite);
+        sprite.y._ += dt*speed._;
+        while (sprite.y._ > 0) {
+            sprite.y._ -= 32;
         }
     }
 }

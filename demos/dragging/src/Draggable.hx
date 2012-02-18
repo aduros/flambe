@@ -4,7 +4,6 @@
 
 import flambe.Component;
 import flambe.display.Sprite;
-import flambe.display.Transform;
 import flambe.Entity;
 import flambe.input.PointerEvent;
 import flambe.math.Point;
@@ -20,17 +19,16 @@ class Draggable extends Component
     private function onPointerDown (event :PointerEvent)
     {
         _dragging = true;
-        var xform = owner.get(Transform);
-        _offset = new Point(event.viewX - xform.x._, event.viewY - xform.y._);
+        var sprite = owner.get(Sprite);
+        _offset = new Point(event.viewX - sprite.x._, event.viewY - sprite.y._);
     }
 
     override public function onUpdate (dt :Int)
     {
         if (_dragging) {
             if (System.pointer.isDown()) {
-                var xform = owner.get(Transform);
-                xform.x._ = System.pointer.x - _offset.x;
-                xform.y._ = System.pointer.y - _offset.y;
+                var sprite = owner.get(Sprite);
+                sprite.setXY(System.pointer.x - _offset.x, System.pointer.y - _offset.y);
             } else {
                 _dragging = false;
             }

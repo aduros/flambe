@@ -9,8 +9,8 @@ import flambe.display.AnimatedSprite;
 import flambe.display.FillSprite;
 import flambe.display.Sprite;
 import flambe.display.SpriteSheet;
-import flambe.display.Transform;
 import flambe.Entity;
+import flambe.math.Point;
 import flambe.script.CallFunction;
 import flambe.script.MoveTo;
 import flambe.script.Parallel;
@@ -27,20 +27,20 @@ class Main
         var character = new Entity()
             .add(new AnimatedSprite(sheet))
             .add(new Script());
+        var sprite = character.get(AnimatedSprite);
 
-        character.get(AnimatedSprite).play("idle");
+        sprite.play("idle");
 
         // Put it in the middle of the stage
-        var transform = character.get(Transform);
-        transform.x._ = System.stage.width/2;
-        transform.y._ = System.stage.height/2;
+        sprite.setXY(System.stage.width/2, System.stage.height/2);
 
         System.pointer.down.connect(function (event) {
             // Face left or right
-            var transform = character.get(Transform);
-            transform.scaleX._ = (event.viewX > transform.x._) ? 1 : -1;
+            sprite.scaleX._ = (event.viewX > sprite.x._) ? 1 : -1;
 
-            var seconds = transform.distanceTo(event.viewX, event.viewY) / 200;
+            var vector = new Point(sprite.x._ - event.viewX, sprite.y._ - event.viewY);
+            var distance = vector.magnitude();
+            var seconds = distance / 200;
             var script = character.get(Script);
             script.stopAll();
             script.run(new Sequence([

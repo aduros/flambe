@@ -5,11 +5,11 @@
 package flambe.script;
 
 import flambe.animation.Jitter;
-import flambe.display.Transform;
+import flambe.display.Sprite;
 import flambe.math.FMath;
 
 /**
- * Shakes an entity's transform by jittering its X and Y for a set duration.
+ * Shakes an entity's sprite by jittering its X and Y for a set duration.
  */
 class Shake
     implements Action
@@ -24,21 +24,21 @@ class Shake
 
     public function update (dt :Int, actor :Entity) :Bool
     {
-        var t = actor.get(Transform);
+        var sprite = actor.get(Sprite);
         if (_jitterX == null) {
-            _jitterX = new Jitter(t.x._, _strengthX);
-            _jitterY = new Jitter(t.y._, _strengthY);
-            t.x.behavior = _jitterX;
-            t.y.behavior = _jitterY;
+            _jitterX = new Jitter(sprite.x._, _strengthX);
+            _jitterY = new Jitter(sprite.y._, _strengthY);
+            sprite.x.behavior = _jitterX;
+            sprite.y.behavior = _jitterY;
         }
 
         _elapsed += dt;
         if (_elapsed >= _duration) {
-            if (t.x.behavior == _jitterX) {
-                t.x._ = _jitterX.base;
+            if (sprite.x.behavior == _jitterX) {
+                sprite.x._ = _jitterX.base;
             }
-            if (t.y.behavior == _jitterY) {
-                t.y._ = _jitterY.base;
+            if (sprite.y.behavior == _jitterY) {
+                sprite.y._ = _jitterY.base;
             }
             _jitterX = null;
             _jitterY = null;

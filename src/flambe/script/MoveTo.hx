@@ -6,7 +6,7 @@ package flambe.script;
 
 import flambe.animation.Easing;
 import flambe.animation.Tween;
-import flambe.display.Transform;
+import flambe.display.Sprite;
 import flambe.Entity;
 
 class MoveTo
@@ -24,18 +24,18 @@ class MoveTo
 
     public function update (dt :Int, actor :Entity) :Bool
     {
-        var transform = actor.get(Transform);
+        var sprite = actor.get(Sprite);
         if (_tweenX == null) {
-            _tweenX = new Tween(transform.x._, _x, _seconds, _easingX);
-            transform.x.behavior = _tweenX;
-            transform.x.update(dt); // Fake an update to account for this frame
+            _tweenX = new Tween(sprite.x._, _x, _seconds, _easingX);
+            sprite.x.behavior = _tweenX;
+            sprite.x.update(dt); // Fake an update to account for this frame
 
-            _tweenY = new Tween(transform.y._, _y, _seconds,
+            _tweenY = new Tween(sprite.y._, _y, _seconds,
                 (_easingY != null) ? _easingY : _easingX);
-            transform.y.behavior = _tweenY;
-            transform.y.update(dt); // Fake an update to account for this frame
+            sprite.y.behavior = _tweenY;
+            sprite.y.update(dt); // Fake an update to account for this frame
         }
-        if (transform.x.behavior != _tweenX && transform.y.behavior != _tweenY) {
+        if (sprite.x.behavior != _tweenX && sprite.y.behavior != _tweenY) {
             _tweenX = null;
             _tweenY = null;
             return true;

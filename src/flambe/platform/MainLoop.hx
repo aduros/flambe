@@ -7,7 +7,6 @@ package flambe.platform;
 import flambe.Component;
 import flambe.display.DrawingContext;
 import flambe.display.Sprite;
-import flambe.display.Transform;
 import flambe.Entity;
 import flambe.scene.Director;
 import flambe.System;
@@ -137,20 +136,19 @@ private class DrawVisitor
             drawCtx.setBlendMode(sprite.blendMode);
         }
 
-        var transform = entity.get(Transform);
-        var x = transform.x._;
-        var y = transform.y._;
+        var x = sprite.x._;
+        var y = sprite.y._;
         if (x != 0 || y != 0) {
             drawCtx.translate(x, y);
         }
 
-        var rotation = transform.rotation._;
+        var rotation = sprite.rotation._;
         if (rotation != 0) {
             drawCtx.rotate(rotation);
         }
 
-        var scaleX = transform.scaleX._;
-        var scaleY = transform.scaleY._;
+        var scaleX = sprite.scaleX._;
+        var scaleY = sprite.scaleY._;
         if (scaleX != 1 || scaleY != 1) {
             drawCtx.scale(scaleX, scaleY);
         }

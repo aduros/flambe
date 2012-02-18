@@ -5,7 +5,7 @@
 package shooter;
 
 import flambe.Component;
-import flambe.display.Transform;
+import flambe.display.Sprite;
 import flambe.System;
 
 class SwarmerAI extends Component
@@ -18,12 +18,13 @@ class SwarmerAI extends Component
 
     override public function onUpdate (dt)
     {
-        var t = owner.get(Transform);
         var w = System.stage.width/2;
         var h = System.stage.height/2;
-        t.x._ = w + Math.cos(_angleX) * w;
-        t.y._ = h + Math.sin(_angleY) * h;
-        t.rotation._ = -45*Math.cos(_angleX);
+        var sprite = owner.get(Sprite);
+        sprite.setXY(
+            w + Math.cos(_angleX) * w,
+            h + Math.sin(_angleY) * h);
+        sprite.rotation._ = -45*Math.cos(_angleX);
         _angleX += dt*0.0043*0.3;
         _angleY += dt*0.0018*0.3;
     }

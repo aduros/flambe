@@ -9,7 +9,6 @@ import flambe.Component;
 import flambe.display.ImageSprite;
 import flambe.display.PatternSprite;
 import flambe.display.Sprite;
-import flambe.display.Transform;
 import flambe.Entity;
 import flambe.script.AnimateTo;
 import flambe.script.CallFunction;
@@ -37,9 +36,10 @@ class Game extends Component
         var water = new Entity()
             .add(new PatternSprite(ShooterCtx.pack.loadTexture("water.png")))
             .add(new WaterScroller(0.1/4));
-        water.get(PatternSprite).width._ = System.stage.width;
-        water.get(PatternSprite).height._ = System.stage.height+32;
-        water.get(Transform).y._ = -32;
+        var sprite = water.get(PatternSprite);
+        sprite.width._ = System.stage.width;
+        sprite.height._ = System.stage.height+32;
+        sprite.y._ = -32;
         owner.addChild(water);
 
         var cloudLayer = new Entity().add(new Sprite()).add(new Script());
@@ -48,12 +48,12 @@ class Game extends Component
             new CallFunction(function () {
                 var texture = ShooterCtx.pack.loadTexture("cloud.png");
                 var cloud = new Entity().add(new ImageSprite(texture));
-                var t = cloud.get(Transform);
-                t.x._ = Math.random()*(System.stage.width+texture.width) - texture.width;
-                t.y._ = -texture.height;
-                cloud.get(Sprite).alpha._ = 0.8;
+                var sprite = cloud.get(Sprite);
+                sprite.x._ = Math.random()*(System.stage.width+texture.width) - texture.width;
+                sprite.y._ = -texture.height;
+                sprite.alpha._ = 0.8;
                 cloudLayer.get(Script).run(new Sequence([
-                    new AnimateTo(cloud.get(Transform).y, System.stage.height,
+                    new AnimateTo(sprite.y, System.stage.height,
                         3*(8+2*Math.random()), Easing.linear),
                     new CallFunction(cloud.dispose)
                 ]));
@@ -73,9 +73,10 @@ class Game extends Component
                var bullet = new Entity()
                    .add(new ImageSprite(ShooterCtx.pack.loadTexture("bullet.png")))
                    .add(new Bullet());
-               bullet.get(Sprite).centerAnchor();
-               bullet.get(Transform).x._ = player.get(Transform).x._;
-               bullet.get(Transform).y._ = player.get(Transform).y._;
+               var sprite = bullet.get(Sprite);
+               sprite.centerAnchor();
+               sprite.x._ = player.get(Sprite).x._;
+               sprite.y._ = player.get(Sprite).y._;
                flambe.System.root.addChild(bullet);
            }),
         ])));
@@ -84,9 +85,9 @@ class Game extends Component
             if (player == null) {
                 return;
             }
-            var t = player.get(Transform);
-            t.x._ = event.viewX;
-            t.y._ = event.viewY-50;
+            var sprite = player.get(Sprite);
+            sprite.x._ = event.viewX;
+            sprite.y._ = event.viewY-50;
         });
         owner.addChild(player);
 
@@ -96,7 +97,7 @@ class Game extends Component
             new CallFunction(function () {
                 var enemy = Math.random() > 0.5 ? buildBomber() : buildSwarmer();
                 enemies.push(enemy);
-                enemySpawner.parent.addChild(enemy);
+                owner.addChild(enemy);
             }),
         ])));
         owner.addChild(enemySpawner);
@@ -108,10 +109,11 @@ class Game extends Component
             .add(new ImageSprite(ShooterCtx.pack.loadTexture("enemy0.png")))
             .add(new Hull(20, 1))
             .add(new SwarmerAI());
-        enemy.get(Sprite).centerAnchor();
-        enemy.get(Sprite).alpha.animate(0, 1, 2);
-        enemy.get(Transform).scaleX.animate(0, 1, 2);
-        enemy.get(Transform).scaleY.animate(0, 1, 2);
+        var sprite = enemy.get(Sprite);
+        sprite.centerAnchor();
+        sprite.alpha.animate(0, 1, 2);
+        sprite.scaleX.animate(0, 1, 2);
+        sprite.scaleY.animate(0, 1, 2);
         return enemy;
     }
 
@@ -121,9 +123,10 @@ class Game extends Component
             .add(new ImageSprite(ShooterCtx.pack.loadTexture("enemy1.png")))
             .add(new Hull(40, 5))
             .add(new BomberAI());
-        enemy.get(Sprite).centerAnchor();
-        enemy.get(Transform).x._ = Math.random()*flambe.System.stage.width;
-        enemy.get(Transform).y._ = -enemy.get(Sprite).getNaturalHeight()/2;
+        var sprite = enemy.get(Sprite);
+        sprite.centerAnchor();
+        sprite.x._ = Math.random()*System.stage.width;
+        sprite.y._ = -sprite.getNaturalHeight()/2;
         return enemy;
     }
 

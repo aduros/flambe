@@ -6,7 +6,7 @@ package shooter;
 
 import flambe.Component;
 import flambe.display.AnimatedSprite;
-import flambe.display.Transform;
+import flambe.display.Sprite;
 import flambe.Entity;
 import flambe.script.CallFunction;
 import flambe.script.Delay;
@@ -20,18 +20,18 @@ class Bullet extends Component
 
     override public function onUpdate (dt)
     {
-        var t = owner.get(Transform);
-        t.y._ -= dt*0.5;
-        if (t.x._ < 0 || t.x._ > System.stage.width ||
-            t.y._ < 0 || t.y._ > System.stage.height) {
+        var sprite = owner.get(Sprite);
+        sprite.y._ -= dt*0.5;
+        if (sprite.x._ < 0 || sprite.x._ > System.stage.width ||
+            sprite.y._ < 0 || sprite.y._ > System.stage.height) {
             owner.dispose();
             return;
         }
 
         for (enemy in Game.enemies) {
-            var et = enemy.get(Transform);
-            var dx = t.x._ - et.x._;
-            var dy = t.y._ - et.y._;
+            var enemySprite = enemy.get(Sprite);
+            var dx = sprite.x._ - enemySprite.x._;
+            var dy = sprite.y._ - enemySprite.y._;
 
             var hull = enemy.get(Hull);
             if (dx*dx + dy*dy < hull.radius*hull.radius) {

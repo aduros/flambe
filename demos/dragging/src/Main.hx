@@ -6,7 +6,6 @@ import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
 import flambe.display.FillSprite;
 import flambe.display.ImageSprite;
-import flambe.display.Transform;
 import flambe.Entity;
 import flambe.System;
 
@@ -40,11 +39,10 @@ class Main
                 .add(new ImageSprite(pack.loadTexture("tentacle.png")))
                 .add(new Draggable());
             var sprite = tentacle.get(ImageSprite);
-            var xform = tentacle.get(Transform);
-            xform.x._ = Math.random() * (System.stage.width-sprite.getNaturalWidth());
-            xform.y._ = Math.random() * (System.stage.height-sprite.getNaturalHeight());
-            xform.scaleX._ = xform.scaleY._ = 0.5 + Math.random()*4;
-            xform.rotation._ = Math.random()*90;
+            sprite.x._ = Math.random() * (System.stage.width-sprite.getNaturalWidth());
+            sprite.y._ = Math.random() * (System.stage.height-sprite.getNaturalHeight());
+            sprite.scaleX._ = sprite.scaleY._ = 0.5 + Math.random()*4;
+            sprite.rotation._ = Math.random()*90;
             System.root.addChild(tentacle);
         }
     }

@@ -38,7 +38,7 @@ class HtmlSound
     }
 }
 
-class HtmlPlayback
+private class HtmlPlayback
     implements Playback,
     implements Tickable
 {

@@ -41,7 +41,7 @@ class FlashSound
     }
 }
 
-class FlashPlayback
+private class FlashPlayback
     implements Playback,
     implements Tickable
 {

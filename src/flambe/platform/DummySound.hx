@@ -50,7 +50,7 @@ class DummySound
 }
 
 // This should be immutable too
-class DummyPlayback
+private class DummyPlayback
     implements Playback
 {
     public var volume (default, null) :PFloat;

@@ -63,6 +63,7 @@ def apply_haxe(self):
     target = self.target;
 
     inputs = []
+    outputs = [ self.path.get_bld().make_node(target) ]
 
     if target.endswith(".swf"):
         flags += ["-swf", target, "--flash-strict", "-D", "nativeTrace"]
@@ -71,6 +72,8 @@ def apply_haxe(self):
             inputs += [swflib]
             flags += ["-swf-lib", str(swflib)]
     elif target.endswith(".js"):
+        if "-debug" in flags:
+            outputs += [self.path.get_bld().make_node(target + ".map")]
         flags += ["-js", target]
     elif target.endswith(".n"):
         flags += ["-neko", target]
@@ -80,7 +83,7 @@ def apply_haxe(self):
     for lib in Utils.to_list(self.libs):
         flags += ["-lib", lib]
 
-    task = self.create_task("haxe", inputs, self.path.get_bld().make_node(target))
+    task = self.create_task("haxe", inputs, outputs)
     task.classpath = [self.path.find_node(cp) for cp in classpath]
     task.env.flags = flags
     self.haxe_task = task

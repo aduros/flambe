@@ -44,15 +44,13 @@ def apply_flambe(ctx):
 
     # Don't forget to change flambe.js when changing -swf-version!
     flash_flags = "-swf-version 10 -swf-header 640:480:60:ffffff".split()
-    html_flags = "-D html".split()
+    html_flags = "-D html --js-contain".split()
 
     # The files that are built and should be installed
     outputs = []
 
     if debug:
-        flags += "-D debug --no-opt --no-inline".split()
-        # Only generate line numbers for Flash. The stack -debug creates for JS isn't too useful
-        flash_flags += ["-debug"]
+        flags += "-debug --no-opt --no-inline".split()
     else:
         #flags += "--dead-code-elimination --no-traces".split()
         flags += "--no-traces".split()
@@ -93,6 +91,8 @@ def apply_flambe(ctx):
                 "--output_wrapper %s --warning_level QUIET") %
                     (quote(ctx.env.JAVA), quote(closure.abspath()), quote(wrapper)),
                 source=uncompressed, target=js)
+        else:
+            ctx.bld.install_files(installPrefix + "web", js + ".map")
         ctx.bld.install_files(installPrefix + "web", js)
 
     if "android" in platforms:

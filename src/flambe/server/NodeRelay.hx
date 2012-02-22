@@ -39,12 +39,12 @@ class NodeRelay<T>
 
     public function success (result :T)
     {
-        try {
-            if (onSuccess != null) {
+        if (onSuccess != null) {
+            try {
                 onSuccess(result);
+            } catch (e :Dynamic) {
+                error(e);
             }
-        } catch (e :Dynamic) {
-            error(e);
         }
     }
 
@@ -71,7 +71,7 @@ class NodeRelay<T>
         return function (err, x :A) {
             if (err != null) {
                 error(err);
-            } else {
+            } else if (handler != null) {
                 try {
                     handler(x);
                 } catch (e :Dynamic) {

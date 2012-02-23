@@ -26,9 +26,9 @@ class Sprite extends Component
     public var blendMode :BlendMode;
     public var visible (default, null) :PBool;
 
-    public var pointerDown (default, null) :Signal1<PointerEvent>;
-    public var pointerMove (default, null) :Signal1<PointerEvent>;
-    public var pointerUp (default, null) :Signal1<PointerEvent>;
+    public var pointerDown (getPointerDown, null) :Signal1<PointerEvent>;
+    public var pointerMove (getPointerMove, null) :Signal1<PointerEvent>;
+    public var pointerUp (getPointerUp, null) :Signal1<PointerEvent>;
 
     public function new ()
     {
@@ -43,11 +43,7 @@ class Sprite extends Component
         anchorY = new PFloat(0, dirtyMatrix);
         visible = new PBool(true);
         blendMode = null;
-        pointerDown = new NotifyingSignal1(this);
-        pointerMove = new NotifyingSignal1(this);
-        pointerUp = new NotifyingSignal1(this);
 
-        _viewMatrix = new Matrix();
         _localMatrixDirty = false;
         _listenerCount = 0;
     }
@@ -173,6 +169,9 @@ class Sprite extends Component
 
     private function updateViewMatrix ()
     {
+        if (_viewMatrix == null) {
+            _viewMatrix = new Matrix();
+        }
     	if (isMatrixDirty()) {
             var parentSprite = getParentSprite();
             var parentViewMatrix = if (parentSprite != null)
@@ -189,6 +188,30 @@ class Sprite extends Component
             }
             ++_matrixUpdateCount;
         }
+    }
+
+    private function getPointerDown ()
+    {
+        if (_pointerDown == null) {
+            _pointerDown = new NotifyingSignal1(this);
+        }
+        return _pointerDown;
+    }
+
+    private function getPointerMove ()
+    {
+        if (_pointerMove == null) {
+            _pointerMove = new NotifyingSignal1(this);
+        }
+        return _pointerMove;
+    }
+
+    private function getPointerUp ()
+    {
+        if (_pointerUp == null) {
+            _pointerUp = new NotifyingSignal1(this);
+        }
+        return _pointerUp;
     }
 
     public function _internal_onListenersAdded (count :Int)
@@ -218,6 +241,10 @@ class Sprite extends Component
     private var _localMatrixDirty :Bool;
     private var _matrixUpdateCount :Int;
     private var _parentMatrixUpdateCount :Int;
+
+    private var _pointerDown :Signal1<PointerEvent>;
+    private var _pointerMove :Signal1<PointerEvent>;
+    private var _pointerUp :Signal1<PointerEvent>;
 
     private var _listenerCount :Int;
 }

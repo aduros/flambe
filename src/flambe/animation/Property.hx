@@ -21,12 +21,14 @@ class Property<A>
     public var _ (get, set) :A;
     public var behavior (getBehavior, setBehavior) :Behavior<A>;
 
-    public var updated (default, null) :Signal1<Property<A>>;
+    public var updated (getUpdated, null) :Signal1<Property<A>>;
 
     public function new (value :A, ?listener :Listener1<Property<A>>)
     {
         _value = value;
-        this.updated = new Signal1(listener);
+        if (listener != null) {
+            _updated = new Signal1(listener);
+        }
     }
 
     inline public function get () :A
@@ -38,7 +40,9 @@ class Property<A>
     {
         _value = value;
         _behavior = null;
-        updated.emit(this);
+        if (_updated != null) {
+            _updated.emit(this);
+        }
         return value;
     }
 
@@ -48,7 +52,9 @@ class Property<A>
             var v = _behavior.update(dt);
             if (_value != v) {
                 _value = v;
-                updated.emit(this);
+                if (_updated != null) {
+                    _updated.emit(this);
+                }
             }
             if (_behavior.isComplete()) {
                 _behavior = null;
@@ -89,6 +95,14 @@ class Property<A>
         return _behavior;
     }
 
+    private function getUpdated ()
+    {
+        if (_updated == null) {
+            _updated = new Signal1();
+        }
+        return _updated;
+    }
+
 #if debug
     public function toString () :String
     {
@@ -98,4 +112,6 @@ class Property<A>
 
     private var _value :A;
     private var _behavior :Behavior<A>;
+
+    private var _updated :Signal1<Property<A>>;
 }

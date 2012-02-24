@@ -21,14 +21,21 @@ class LogVisitor
 
     public function enterEntity (entity :Entity) :Bool
     {
+        if (_lastEntity != null && _lastEntity != entity) {
+            print();
+        }
+        _lastEntity = entity;
         ++_depth;
-        trace(indent() + "( " + _comps.join(", ") + " )");
         _comps = [];
         return true;
     }
 
     public function leaveEntity (entity :Entity)
     {
+        if (_lastEntity == entity) {
+            print();
+        }
+        _lastEntity = null;
         --_depth;
     }
 
@@ -37,15 +44,16 @@ class LogVisitor
         _comps.push(comp.getName());
     }
 
-    private function indent ()
+    private function print ()
     {
-        var n = "";
+        var indent = "";
         for (ii in 0..._depth) {
-            n += "  ";
+            indent += "  ";
         }
-        return n;
+        trace(indent + "( " + _comps.join(", ") + " )");
     }
 
     private var _depth :Int;
     private var _comps :Array<String>;
+    private var _lastEntity :Entity;
 }

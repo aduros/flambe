@@ -23,7 +23,16 @@ class FpsDisplay
         _fpsTime += dt;
         if (_fpsTime > 1000) {
             var fps = 1000 * _fpsFrames/_fpsTime;
-            owner.get(TextSprite).text = "FPS: " + FMath.toInt(fps*100) / 100;
+            var text = "FPS: " + FMath.toInt(fps*100) / 100;
+
+            // Use our owner's TextSprite if available, otherwise just log it
+            var sprite = owner.get(TextSprite);
+            if (sprite != null) {
+                sprite.text = text;
+            } else {
+                trace(text);
+            }
+
             _fpsTime = _fpsFrames = 0;
         }
     }

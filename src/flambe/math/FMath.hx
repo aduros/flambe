@@ -36,12 +36,12 @@ class FMath
 
     inline public static function toRadians (degrees :Float) :Float
     {
-    	return degrees * PI/180;
+        return degrees * PI/180;
     }
 
     inline public static function toDegrees (radians :Float) :Float
     {
-    	return radians * 180/PI;
+        return radians * 180/PI;
     }
 
     inline public static function max (a :Float, b :Float) :Float

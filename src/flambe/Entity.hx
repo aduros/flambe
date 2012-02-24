@@ -111,6 +111,7 @@ class Entity
                 }
             }
         }
+
         if (visitChildren) {
             var ii = 0;
             while (ii < _children.length) {

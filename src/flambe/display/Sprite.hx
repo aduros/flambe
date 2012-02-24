@@ -77,8 +77,8 @@ class Sprite extends Component
 
     public function getViewMatrix () :Matrix
     {
-    	updateViewMatrix();
-    	return _viewMatrix;
+        updateViewMatrix();
+        return _viewMatrix;
     }
 
     inline public function setAnchor (x :Float, y :Float)
@@ -172,7 +172,7 @@ class Sprite extends Component
         if (_viewMatrix == null) {
             _viewMatrix = new Matrix();
         }
-    	if (isMatrixDirty()) {
+        if (isMatrixDirty()) {
             var parentSprite = getParentSprite();
             var parentViewMatrix = if (parentSprite != null)
                 parentSprite.getViewMatrix() else IDENTITY;

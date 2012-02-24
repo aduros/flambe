@@ -8,20 +8,22 @@ import flambe.display.Library;
 
 class MovieSprite extends Sprite
 {
-    public function new (lib :Library)
+    public function new (movie :MovieSymbol)
     {
         super();
 
         var frames = 0;
         _layers = [];
-        for (layer in lib.layers) {
-            _layers.push(new MovieLayerSprite(layer));
+
+        for (layer in movie.layers) {
+            _layers.push(new LayerSprite(layer));
             frames = cast Math.max(layer.frames, frames);
         }
 
-        _duration = frames / 30;
+        _duration = 1000/30 *frames;
         _goingToFrame = false;
-        goto(0, true, false);
+        _frame = 0;
+        goto(1, true, false);
     }
 
     override public function onAdded ()
@@ -29,11 +31,24 @@ class MovieSprite extends Sprite
         for (layer in _layers) {
             owner.addChild(new Entity().add(layer));
         }
+        _elapsed = 0;
     }
 
     override public function onUpdate (dt :Int)
     {
         super.onUpdate(dt);
+
+        _elapsed += dt;
+        if (_elapsed > _duration) {
+            _elapsed = _elapsed % _duration;
+        }
+
+        var newFrame = Std.int(_elapsed * 30/1000);
+        var overDuration = dt >= _duration;
+
+        // TODO(bruno): Handle _stopFrame?
+
+        goto(newFrame, false, overDuration);
     }
 
     private function goto (newFrame :Int, fromSkip :Bool, overDuration :Bool)
@@ -42,21 +57,24 @@ class MovieSprite extends Sprite
             _pendingFrame = newFrame;
             return;
         }
-        _goingToFrame = true;
+        _goingToFrame = true; // TODO(bruno): Why is this necessary?
 
         var differentFrame = newFrame != _frame;
         var wrapped = newFrame < _frame;
         if (differentFrame) {
-            // if (wrapped) {
-            //     for (layer in _layers) {
-            //         layer.changedKeyframe = true;
-            //         layer.keyframeIdx = 0;
-            //     }
-            // }
+            if (wrapped) {
+                for (layer in _layers) {
+                    layer.changedKeyframe = true;
+                    layer.lastFrame = 0;
+                }
+            }
             for (layer in _layers) {
                 layer.composeFrame(newFrame);
             }
         }
+
+        var oldFrame = _frame;
+        _frame = newFrame;
 
         _goingToFrame = false;
         if (_pendingFrame != -1) {
@@ -68,8 +86,9 @@ class MovieSprite extends Sprite
 
     private var _lib :Library;
 
-    private var _layers :Array<MovieLayerSprite>;
+    private var _layers :Array<LayerSprite>;
     private var _duration :Float;
+    private var _elapsed :Float;
 
     private var _frame :Int;
     private var _goingToFrame :Bool;

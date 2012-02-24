@@ -7,57 +7,55 @@ package flambe.display;
 import haxe.xml.Fast;
 
 import flambe.asset.AssetPack;
+import flambe.math.FMath;
+import flambe.math.Matrix;
 
 using flambe.util.Xmls;
+
+// TODO(bruno): Split this up into multiple files
 
 class Library
 {
     public var name (default, null) :String;
 
-    public var layers (default, null) :Array<MovieLayer>;
-
     public function new (pack :AssetPack, baseDir :String)
     {
         _symbols = new Hash();
-        layers = [];
 
         var xml = Xml.parse(pack.loadFile(baseDir + "/resources.xml")).firstChild();
         var reader = new Fast(xml);
 
-        var symbolElement = reader.node.movie.node.DOMSymbolItem;
-        name = symbolElement.att.name;
-
-        var layerElements = symbolElement
-            .node.timeline
-            .node.DOMTimeline
-            .node.layers
-            .nodes.DOMLayer;
-
-        for (movieElement in layerElements) {
-            var layer = new MovieLayer(movieElement);
-            layers.push(layer);
-            _symbols.set(layer.name, layer);
+        for (movieElement in reader.nodes.movie) {
+            var movie = new MovieSymbol(movieElement);
+            _symbols.set(movie.name, movie);
         }
 
         for (atlasElement in reader.nodes.atlas) {
             // TODO(bruno): Should textures be relative to baseDir?
             var atlas = pack.loadTexture(atlasElement.att.filename);
             for (textureElement in atlasElement.nodes.texture) {
-                var image = new MovieImage(textureElement, atlas);
+                var image = new ImageSymbol(textureElement, atlas);
                 _symbols.set(image.name, image);
             }
         }
 
         // Now that all symbols have been parsed, go through keyframes and resolve references
-        for (layer in layers) {
-            for (kf in layer.keyframes) {
-                kf.symbol = _symbols.get(kf.symbolName);
-                // layer.symbolName = null;
-            }
+        for (symbol in _symbols) {
+            symbol.init(this);
         }
     }
 
-    public function createSprite (symbolName :String) :Sprite
+    inline public function movie (symbolName :String) :MovieSprite
+    {
+        return cast sprite(symbolName);
+    }
+
+    inline public function symbol (symbolName :String) :Symbol
+    {
+        return _symbols.get(symbolName);
+    }
+
+    public function sprite (symbolName :String) :Sprite
     {
         var symbol = _symbols.get(symbolName);
         return (symbol != null) ? symbol.createSprite() : null;
@@ -69,9 +67,50 @@ class Library
 private interface Symbol
 {
     function createSprite () :Sprite;
+
+    function init (library :Library) :Void;
 }
 
-class MovieImage
+class MovieSymbol
+    implements Symbol
+{
+    public var name (default, null) :String;
+    public var layers (default, null) :Array<Layer>;
+
+    public function new (reader :Fast)
+    {
+        var symbolElement = reader.node.DOMSymbolItem;
+        name = symbolElement.att.name;
+
+        var layerElements = symbolElement
+            .node.timeline
+            .node.DOMTimeline
+            .node.layers
+            .nodes.DOMLayer;
+
+        layers = [];
+        for (layerElement in layerElements) {
+            var layer = new Layer(layerElement);
+            layers.push(layer);
+        }
+    }
+
+    public function createSprite () :Sprite
+    {
+        return new MovieSprite(this);
+    }
+
+    public function init (lib :Library)
+    {
+        for (layer in layers) {
+            for (kf in layer.keyframes) {
+                kf.symbol = lib.symbol(kf.symbolName);
+            }
+        }
+    }
+}
+
+class ImageSymbol
     implements Symbol
 {
     public var name (default, null) :String;
@@ -98,13 +137,18 @@ class MovieImage
 
     public function createSprite () :Sprite
     {
-        return new MovieImageSprite(this);
+        return new ImageSymbolSprite(this);
+    }
+
+    public function init (lib :Library)
+    {
+        // Nothing
     }
 }
 
-class MovieImageSprite extends Sprite
+class ImageSymbolSprite extends Sprite
 {
-    public function new (symbol :MovieImage)
+    public function new (symbol :ImageSymbol)
     {
         super();
         _symbol = symbol;
@@ -128,14 +172,13 @@ class MovieImageSprite extends Sprite
         return _symbol.height;
     }
 
-    private var _symbol :MovieImage;
+    private var _symbol :ImageSymbol;
 }
 
-class MovieLayer
-    implements Symbol
+class Layer
 {
     public var name (default, null) :String;
-    public var keyframes (default, null) :Array<MovieKeyframe>;
+    public var keyframes (default, null) :Array<Keyframe>;
     public var frames (getFrames, null) :Int;
 
     public function new (reader :Fast)
@@ -144,13 +187,13 @@ class MovieLayer
 
         keyframes = [];
         for (element in reader.node.frames.nodes.DOMFrame) {
-            keyframes.push(new MovieKeyframe(element, false));
+            keyframes.push(new Keyframe(element, false));
         }
     }
 
     public function createSprite () :Sprite
     {
-        return new MovieLayerSprite(this);
+        return new LayerSprite(this);
     }
 
     private function getFrames () :Int
@@ -160,12 +203,16 @@ class MovieLayer
     }
 }
 
-class MovieLayerSprite extends Sprite
+class LayerSprite extends Sprite
 {
-    public function new (layer :MovieLayer)
+    public var changedKeyframe :Bool;
+    public var lastFrame :Int;
+
+    public function new (layer :Layer)
     {
         super();
-        _lastFrame = 0;
+        changedKeyframe = false;
+        lastFrame = 0;
         _keyframes = layer.keyframes;
     }
 
@@ -188,40 +235,48 @@ class MovieLayerSprite extends Sprite
         }
 
         if (multipleSymbols) {
-            _displays = [];
-            for (kf in _keyframes) {
-                var display = new Entity().add(this);
-            }
-        } else {
+            // _displays = [];
+            // for (kf in _keyframes) {
+            //     var display = new Entity().add(this);
+            // }
+        } else if (lastSymbol != null) {
             owner.addChild(new Entity().add(lastSymbol.createSprite()));
         }
     }
 
     public function composeFrame (frame :Int)
     {
-        var changedKeyframe = false;
-        while (_lastFrame < _keyframes.length - 1 && _keyframes[_lastFrame + 1].index <= frame) {
-            ++_lastFrame;
+        while (lastFrame < _keyframes.length - 1 && _keyframes[lastFrame + 1].index <= frame) {
+            ++lastFrame;
             changedKeyframe = true;
         }
 
         if (changedKeyframe && _displays != null) {
-            // owner.replaceChildAt(_layerIdx, _displays[_lastFrame]);
+            // owner.replaceChildAt(_layerIdx, _displays[lastFrame]);
         }
 
-        var kf = _keyframes[_lastFrame];
+        var kf = _keyframes[lastFrame];
 
-        x._ = kf.x;
-        y._ = kf.y;
-        scaleX._ = kf.scaleX;
-        scaleY._ = kf.scaleY;
-        rotation._ = kf.rotation;
+        if (lastFrame == _keyframes.length - 1 || kf.index == frame) {
+            x._ = kf.x;
+            y._ = kf.y;
+            scaleX._ = kf.scaleX;
+            scaleY._ = kf.scaleY;
+            rotation._ = kf.rotation;
+
+        } else {
+            var interp = (frame - kf.index)/kf.duration;
+            var nextKf = _keyframes[lastFrame + 1];
+            x._ = kf.x + (nextKf.x - kf.x) * interp;
+            y._ = kf.y + (nextKf.y - kf.y) * interp;
+            scaleX._ = kf.scaleX + (nextKf.scaleX - kf.scaleX) * interp;
+            scaleY._ = kf.scaleY + (nextKf.scaleY - kf.scaleY) * interp;
+            rotation._ = kf.rotation + (nextKf.rotation - kf.rotation) * interp;
+        }
     }
 
     // private var _layerIdx :Int;
-    private var _keyframes :Array<MovieKeyframe>;
-
-    private var _lastFrame :Int;
+    private var _keyframes :Array<Keyframe>;
 
     // Only created if there are multiple symbols on this layer. If it does exist, the appropriate
     // display is swapped in at keyframe changes. If it doesn't, the display is only added to the
@@ -229,7 +284,7 @@ class MovieLayerSprite extends Sprite
     private var _displays :Array<Entity>;
 }
 
-class MovieKeyframe
+private class Keyframe
 {
     public var index (default, null) :Int;
 
@@ -254,7 +309,7 @@ class MovieKeyframe
         label = reader.getStringAttr("name");
 
         if (flipbook) {
-            return;
+            return; // Purely labelled frame
         }
 
         reader = reader.node.elements;
@@ -262,12 +317,32 @@ class MovieKeyframe
             return;
         }
 
-        var instance = reader.node.DOMSymbolInstance;
-        symbolName = instance.att.libraryItemName;
+        reader = reader.node.DOMSymbolInstance;
+        symbolName = reader.att.libraryItemName;
+
+        if (!reader.hasNode.matrix) {
+            x = 0;
+            y = 0;
+            scaleX = 1;
+            scaleY = 1;
+            rotation = 0;
+            return;
+        }
+
+        reader = reader.node.matrix.node.Matrix;
         x = reader.getFloatAttr("tx");
         y = reader.getFloatAttr("ty");
-        scaleX = 1; // TODO(bruno): Extract from matrix
-        scaleY = 1;
-        rotation = 0;
+
+        var matrix = new flambe.math.Matrix();
+        matrix.m00 = reader.getFloatAttr("a", 1);
+        matrix.m10 = reader.getFloatAttr("b");
+        matrix.m01 = reader.getFloatAttr("c");
+        matrix.m11 = reader.getFloatAttr("d", 1);
+
+        scaleX = Math.sqrt(matrix.m00*matrix.m00 + matrix.m10*matrix.m10);
+        scaleY = Math.sqrt(matrix.m01*matrix.m01 + matrix.m11*matrix.m11);
+
+        var p = matrix.transformPoint(1, 0);
+        rotation = FMath.toDegrees(Math.atan2(p.y, p.x));
     }
 }

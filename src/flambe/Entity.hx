@@ -60,13 +60,17 @@ class Entity
     public function add (comp :Component) :Entity
     {
         var name = comp.getName();
-        if (getComponent(name) == null) {
-            untyped _compMap[name] = comp;
-            _comps.push(comp);
-
-            comp._internal_setOwner(this);
-            comp.onAdded();
+        var prev = getComponent(name);
+        if (prev != null) {
+            remove(prev);
         }
+
+        untyped _compMap[name] = comp;
+        _comps.push(comp);
+
+        comp._internal_setOwner(this);
+        comp.onAdded();
+
         return this;
     }
 

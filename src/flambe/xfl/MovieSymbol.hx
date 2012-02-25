@@ -93,8 +93,14 @@ class MovieKeyframe
     public function new (reader :Fast, flipbook :Bool)
     {
         index = reader.getIntAttr("index");
-        duration = reader.getFloatAttr("duration");
+        duration = reader.getFloatAttr("duration", 1);
         label = reader.getStringAttr("name");
+
+        x = 0;
+        y = 0;
+        scaleX = 1;
+        scaleY = 1;
+        rotation = 0;
 
         if (flipbook) {
             return; // Purely labelled frame
@@ -109,11 +115,6 @@ class MovieKeyframe
         symbolName = reader.att.libraryItemName;
 
         if (!reader.hasNode.matrix) {
-            x = 0;
-            y = 0;
-            scaleX = 1;
-            scaleY = 1;
-            rotation = 0;
             return;
         }
 

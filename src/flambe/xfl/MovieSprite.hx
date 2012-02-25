@@ -16,6 +16,7 @@ class MovieSprite extends Sprite
         var frames = 0;
         _layers = [];
 
+        // TODO(bruno): Cache this in MovieSymbol
         for (layer in movie.layers) {
             _layers.push(new LayerSprite(layer));
             frames = cast Math.max(layer.frames, frames);
@@ -24,7 +25,7 @@ class MovieSprite extends Sprite
         _duration = 1000/30 *frames;
         _goingToFrame = false;
         _frame = 0;
-        goto(1, true, false);
+        goto(0, true, false);
     }
 
     override public function onAdded ()
@@ -66,7 +67,7 @@ class MovieSprite extends Sprite
             if (wrapped) {
                 for (layer in _layers) {
                     layer.changedKeyframe = true;
-                    layer.lastFrame = 0;
+                    layer.keyframeIdx = 0;
                 }
             }
             for (layer in _layers) {
@@ -99,18 +100,17 @@ class MovieSprite extends Sprite
 private class LayerSprite extends Sprite
 {
     public var changedKeyframe :Bool;
-    public var lastFrame :Int;
+    public var keyframeIdx :Int;
 
     public function new (layer :MovieLayer)
     {
         super();
         changedKeyframe = false;
-        lastFrame = 0;
+        keyframeIdx = 0;
         _keyframes = layer.keyframes;
-    }
+        _content = new Entity();
 
-    override public function onAdded ()
-    {
+        // TODO(bruno): Cache this in MovieLayer
         var lastSymbol = null;
         for (kf in _keyframes) {
             if (kf.symbol != null) {
@@ -119,6 +119,7 @@ private class LayerSprite extends Sprite
             }
         }
 
+        // TODO(bruno): Cache this in MovieLayer
         var multipleSymbols = false;
         for (kf in _keyframes) {
             if (kf.symbol != lastSymbol) {
@@ -128,29 +129,39 @@ private class LayerSprite extends Sprite
         }
 
         if (multipleSymbols) {
-            // _displays = [];
-            // for (kf in _keyframes) {
-            //     var display = new Entity().add(this);
-            // }
+            _sprites = [];
+            for (kf in _keyframes) {
+                var sprite = kf.symbol.createSprite();
+                _sprites.push(sprite);
+            }
+            setSprite(_sprites[0]);
+
         } else if (lastSymbol != null) {
-            owner.addChild(new Entity().add(lastSymbol.createSprite()));
+            setSprite(lastSymbol.createSprite());
+        } else {
+            // setSprite(new Sprite());
         }
+    }
+
+    override public function onAdded ()
+    {
+        owner.addChild(_content);
     }
 
     public function composeFrame (frame :Int)
     {
-        while (lastFrame < _keyframes.length - 1 && _keyframes[lastFrame + 1].index <= frame) {
-            ++lastFrame;
+        while (keyframeIdx < _keyframes.length - 1 && _keyframes[keyframeIdx + 1].index <= frame) {
+            ++keyframeIdx;
             changedKeyframe = true;
         }
 
-        if (changedKeyframe && _displays != null) {
-            // owner.replaceChildAt(_layerIdx, _displays[lastFrame]);
+        if (changedKeyframe && _sprites != null) {
+            setSprite(_sprites[keyframeIdx]);
         }
 
-        var kf = _keyframes[lastFrame];
+        var kf = _keyframes[keyframeIdx];
 
-        if (lastFrame == _keyframes.length - 1 || kf.index == frame) {
+        if (keyframeIdx == _keyframes.length - 1 || kf.index == frame) {
             x._ = kf.x;
             y._ = kf.y;
             scaleX._ = kf.scaleX;
@@ -159,7 +170,7 @@ private class LayerSprite extends Sprite
 
         } else {
             var interp = (frame - kf.index)/kf.duration;
-            var nextKf = _keyframes[lastFrame + 1];
+            var nextKf = _keyframes[keyframeIdx + 1];
             x._ = kf.x + (nextKf.x - kf.x) * interp;
             y._ = kf.y + (nextKf.y - kf.y) * interp;
             scaleX._ = kf.scaleX + (nextKf.scaleX - kf.scaleX) * interp;
@@ -168,12 +179,23 @@ private class LayerSprite extends Sprite
         }
     }
 
-    // private var _layerIdx :Int;
+    private function setSprite (sprite :Sprite)
+    {
+        if (_sprite != null) {
+            _content.remove(_sprite);
+        }
+        _content.add(sprite);
+        _sprite = sprite;
+    }
+
     private var _keyframes :Array<MovieKeyframe>;
 
+    private var _content :Entity;
+    private var _sprite :Sprite;
+
     // Only created if there are multiple symbols on this layer. If it does exist, the appropriate
-    // display is swapped in at keyframe changes. If it doesn't, the display is only added to the
+    // sprite is swapped in at keyframe changes. If it doesn't, the sprite is only added to the
     // parent on layer creation.
-    private var _displays :Array<Entity>;
+    private var _sprites :Array<Sprite>;
 }
 

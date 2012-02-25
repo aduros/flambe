@@ -33,8 +33,8 @@ class Library
             // TODO(bruno): Should textures be relative to baseDir?
             var atlas = pack.loadTexture(atlasElement.att.filename);
             for (textureElement in atlasElement.nodes.texture) {
-                var image = new BitmapSymbol(textureElement, atlas);
-                _symbols.set(image.name, image);
+                var bitmap = new BitmapSymbol(textureElement, atlas);
+                _symbols.set(bitmap.name, bitmap);
             }
         }
 

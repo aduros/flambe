@@ -8,7 +8,7 @@ import haxe.xml.Fast;
 
 class Xmls
 {
-    public static function getStringAttr (reader :Fast, attr :String, def :String = null)
+    public static function getStringAttr (reader :Fast, attr :String, def :String = null) :String
     {
         if (reader.has.resolve(attr)) {
             return reader.att.resolve(attr);
@@ -16,18 +16,24 @@ class Xmls
         return def;
     }
 
-    public static function getFloatAttr (reader :Fast, attr :String, def :Float = 0)
+    public static function getFloatAttr (reader :Fast, attr :String, def :Float = 0) :Float
     {
         if (reader.has.resolve(attr)) {
-            return Std.parseFloat(reader.att.resolve(attr));
+            var value = Std.parseFloat(reader.att.resolve(attr));
+            if (!Math.isNaN(value)) {
+                return value;
+            }
         }
         return def;
     }
 
-    public static function getIntAttr (reader :Fast, attr :String, def :Int = 0)
+    public static function getIntAttr (reader :Fast, attr :String, def :Int = 0) :Int
     {
         if (reader.has.resolve(attr)) {
-            return Std.parseInt(reader.att.resolve(attr));
+            var value = Std.parseInt(reader.att.resolve(attr));
+            if (value != null) {
+                return value;
+            }
         }
         return def;
     }

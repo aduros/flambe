@@ -18,6 +18,9 @@ class MovieSymbol
     public var name (getName, null) :String;
     public var layers (default, null) :Array<MovieLayer>;
 
+    /** The total number of frames in this movie. */
+    public var frames (default, null) :Int;
+
     public function new (reader :Fast)
     {
         var symbolElement = reader.node.DOMSymbolItem;
@@ -29,9 +32,11 @@ class MovieSymbol
             .node.layers
             .nodes.DOMLayer;
 
+        frames = 0;
         layers = [];
         for (layerElement in layerElements) {
             var layer = new MovieLayer(layerElement);
+            frames = cast Math.max(layer.frames, frames);
             layers.push(layer);
         }
     }
@@ -55,9 +60,16 @@ class MovieLayer
     public var keyframes (default, null) :Array<MovieKeyframe>;
     public var frames (getFrames, null) :Int;
 
+    /** The symbol in the last keyframe that has one, or null if there are no symbol keyframes. */
+    public var lastSymbol :Symbol;
+
+    /** True if this layer contains keyframes with at least two different symbols. */
+    public var multipleSymbols :Bool;
+
     public function new (reader :Fast)
     {
         name = reader.att.name;
+        multipleSymbols = false;
 
         keyframes = [];
         for (element in reader.node.frames.nodes.DOMFrame) {
@@ -77,7 +89,7 @@ class MovieKeyframe
     public var index (default, null) :Int;
 
     /** The length of this keyframe in frames. */
-    public var duration (default, null) :Float;
+    public var duration (default, null) :Int;
 
     public var symbolName (default, null) :String;
     public var symbol :Symbol;
@@ -93,7 +105,7 @@ class MovieKeyframe
     public function new (reader :Fast, flipbook :Bool)
     {
         index = reader.getIntAttr("index");
-        duration = reader.getFloatAttr("duration", 1);
+        duration = reader.getIntAttr("duration", 1);
         label = reader.getStringAttr("name");
 
         x = 0;

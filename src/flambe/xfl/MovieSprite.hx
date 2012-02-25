@@ -13,28 +13,28 @@ class MovieSprite extends Sprite
     {
         super();
 
-        var frames = 0;
         _layers = [];
-
-        // TODO(bruno): Cache this in MovieSymbol
         for (layer in movie.layers) {
             _layers.push(new LayerSprite(layer));
-            frames = cast Math.max(layer.frames, frames);
         }
 
-        _duration = 1000/30 *frames;
+        _duration = 1000/30 * movie.frames;
         _goingToFrame = false;
         _frame = 0;
-        goto(0, true, false);
+        _elapsed = 0;
+        goto(1, true, false);
     }
 
     override public function onAdded ()
     {
+        super.onAdded();
+
         for (layer in _layers) {
             owner.addChild(new Entity().add(layer));
         }
-        _elapsed = 0;
     }
+
+    // TODO(bruno): onRemove
 
     override public function onUpdate (dt :Int)
     {
@@ -110,34 +110,16 @@ private class LayerSprite extends Sprite
         _keyframes = layer.keyframes;
         _content = new Entity();
 
-        // TODO(bruno): Cache this in MovieLayer
-        var lastSymbol = null;
-        for (kf in _keyframes) {
-            if (kf.symbol != null) {
-                lastSymbol = kf.symbol;
-                break;
-            }
-        }
-
-        // TODO(bruno): Cache this in MovieLayer
-        var multipleSymbols = false;
-        for (kf in _keyframes) {
-            if (kf.symbol != lastSymbol) {
-                multipleSymbols = true;
-                break;
-            }
-        }
-
-        if (multipleSymbols) {
+        if (layer.multipleSymbols) {
             _sprites = [];
             for (kf in _keyframes) {
                 var sprite = kf.symbol.createSprite();
                 _sprites.push(sprite);
             }
-            setSprite(_sprites[0]);
+            _content.add(_sprites[0]);
 
-        } else if (lastSymbol != null) {
-            setSprite(lastSymbol.createSprite());
+        } else if (layer.lastSymbol != null) {
+            _content.add(layer.lastSymbol.createSprite());
         } else {
             // setSprite(new Sprite());
         }
@@ -145,8 +127,12 @@ private class LayerSprite extends Sprite
 
     override public function onAdded ()
     {
+        super.onAdded();
+
         owner.addChild(_content);
     }
+
+    // TODO(bruno): onRemove
 
     public function composeFrame (frame :Int)
     {
@@ -156,7 +142,8 @@ private class LayerSprite extends Sprite
         }
 
         if (changedKeyframe && _sprites != null) {
-            setSprite(_sprites[keyframeIdx]);
+            // TODO(bruno): Test multi-symbol layers
+            _content.add(_sprites[keyframeIdx]);
         }
 
         var kf = _keyframes[keyframeIdx];
@@ -179,19 +166,9 @@ private class LayerSprite extends Sprite
         }
     }
 
-    private function setSprite (sprite :Sprite)
-    {
-        if (_sprite != null) {
-            _content.remove(_sprite);
-        }
-        _content.add(sprite);
-        _sprite = sprite;
-    }
-
     private var _keyframes :Array<MovieKeyframe>;
 
     private var _content :Entity;
-    private var _sprite :Sprite;
 
     // Only created if there are multiple symbols on this layer. If it does exist, the appropriate
     // sprite is swapped in at keyframe changes. If it doesn't, the sprite is only added to the

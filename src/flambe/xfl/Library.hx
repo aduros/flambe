@@ -42,7 +42,15 @@ class Library
         for (movie in movies) {
             for (layer in movie.layers) {
                 for (kf in layer.keyframes) {
-                    kf.symbol = _symbols.get(kf.symbolName);
+                    var symbol = _symbols.get(kf.symbolName);
+                    if (symbol != null) {
+                        if (layer.lastSymbol == null) {
+                            layer.lastSymbol = symbol;
+                        } else if (layer.lastSymbol != symbol) {
+                            layer.multipleSymbols = true;
+                        }
+                        kf.symbol = symbol;
+                    }
                 }
             }
         }

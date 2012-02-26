@@ -72,7 +72,7 @@ class HtmlAppDriver
 
         // Use requestAnimationFrame if available, otherwise a 60 FPS setInterval
         // https://developer.mozilla.org/en/DOM/window.mozRequestAnimationFrame
-        var requestAnimationFrame = loadExtension("requestAnimationFrame");
+        var requestAnimationFrame = HtmlUtil.loadExtension("requestAnimationFrame");
         if (requestAnimationFrame != null) {
             var updateFrame = null;
             updateFrame = function (now) {
@@ -244,32 +244,6 @@ class HtmlAppDriver
         return new PointerEvent(
             domEvent.clientX - rect.left,
             domEvent.clientY - rect.top);
-    }
-
-    // Load a prefixed vendor extension
-    private static function loadExtension (name :String, ?obj :Dynamic) :Dynamic
-    {
-        if (obj == null) {
-            obj = Lib.window;
-        }
-
-        // Try to load it as is
-        var extension = Reflect.field(obj, name);
-        if (extension != null) {
-            return extension;
-        }
-
-        // Look through common vendor prefixes
-        var capitalized = name.substr(0, 1).toUpperCase() + name.substr(1);
-        for (prefix in [ "webkit", "moz", "ms", "o", "khtml" ]) {
-            var extension = Reflect.field(obj, prefix + capitalized);
-            if (extension != null) {
-                return extension;
-            }
-        }
-
-        // Not found
-        return null;
     }
 
     private static var _instance :HtmlAppDriver;

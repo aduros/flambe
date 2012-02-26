@@ -15,16 +15,13 @@ import flambe.util.Logger;
 import flambe.util.Promise;
 import flambe.util.Signal1;
 
-// import flambe.Log;
-
 #if (!flash && !html)
 #error "Platform not supported!"
 #end
 
 class System
 {
-    public static var root (default, null) :Entity;
-    public static var driver (default, null) :AppDriver;
+    public static var root /*(default, null)*/ = new Entity();
 
     public static var stage (getStage, null) :Stage;
 
@@ -43,59 +40,64 @@ class System
      * Emitted when an uncaught exception occurs, if the platform supports it. You can wire this up
      * to your telemetry reporting service of choice.
      */
-    public static var uncaughtError (default, null) :Signal1<String>;
+    public static var uncaughtError /*(default, null)*/ = new Signal1<String>();
+
+    inline public static function init ()
+    {
+        if (!_calledInit) {
+            _driver.init();
+            _calledInit = true;
+        }
+    }
 
     // A bunch of short-hands to driver functions
 
     inline public static function loadAssetPack (manifest :Manifest) :Promise<AssetPack>
     {
-        return driver.loadAssetPack(manifest);
+        return _driver.loadAssetPack(manifest);
     }
 
     inline public static function callNative (funcName :String, ?params :Array<Dynamic>) :Dynamic
     {
-        return driver.callNative(funcName, params);
+        return _driver.callNative(funcName, params);
     }
 
     inline public static function logger (tag :String) :Logger
     {
-        return new Logger(driver.createLogHandler(tag));
+        return new Logger(_driver.createLogHandler(tag));
     }
 
     inline private static function getStage () :Stage
     {
-        return driver.stage;
+        return _driver.stage;
     }
 
     inline private static function getStorage () :Storage
     {
-        return driver.storage;
+        return _driver.storage;
     }
 
     inline private static function getPointer () :Pointer
     {
-        return driver.pointer;
+        return _driver.pointer;
     }
 
     inline private static function getKeyboard () :Keyboard
     {
-        return driver.keyboard;
+        return _driver.keyboard;
     }
 
     inline private static function getLocale () :String
     {
-        return driver.locale;
+        return _driver.locale;
     }
 
-    private static var _static_init = (function () {
-        root = new Entity();
-        uncaughtError = new Signal1();
-
+    private static var _driver =
 #if flash
-        driver = flambe.platform.flash.FlashAppDriver.getInstance();
+        flambe.platform.flash.FlashAppDriver.getInstance();
 #elseif html
-        driver = flambe.platform.html.HtmlAppDriver.getInstance();
+        flambe.platform.html.HtmlAppDriver.getInstance();
 #end
-        return false;
-    })();
+
+    private static var _calledInit = false;
 }

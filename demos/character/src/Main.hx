@@ -64,6 +64,8 @@ class Main
 
     private static function main ()
     {
+        System.init();
+
         var loader = System.loadAssetPack(Manifest.build("bootstrap"));
         loader.success.connect(onSuccess);
         loader.error.connect(function (message) {

@@ -11,6 +11,8 @@ class Main
 {
     private static function main ()
     {
+        System.init();
+
         var loader = System.loadAssetPack(Manifest.build("bootstrap"));
         loader.success.connect(function (pack) {
             ShooterCtx.pack = pack;

@@ -34,4 +34,6 @@ interface AppDriver
     function callNative (funcName :String, params :Array<Dynamic>) :Dynamic;
 
     function createLogHandler (tag :String) :LogHandler;
+
+    function init () :Void;
 }

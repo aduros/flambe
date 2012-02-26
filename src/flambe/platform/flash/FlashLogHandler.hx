@@ -12,6 +12,7 @@ class FlashLogHandler
     public function new (tag :String)
     {
         _tagPrefix = " " + tag + ": ";
+        _trace = untyped __global__["trace"];
     }
 
     public function log (level :LogLevel, message :String)
@@ -22,10 +23,9 @@ class FlashLogHandler
             case Error: "ERROR";
         }
 
-        nativeTrace(levelPrefix + _tagPrefix + message);
+        _trace(levelPrefix + _tagPrefix + message);
     }
 
-    private static var nativeTrace :String -> Void = untyped __global__["trace"];
-
     private var _tagPrefix :String;
+    private var _trace :String -> Void;
 }

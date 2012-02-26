@@ -7,8 +7,11 @@ package flambe.platform;
 class DummyStorage
     implements Storage
 {
+    private static var log = Log.log; // http://code.google.com/p/haxe/issues/detail?id=365
+
     public function new ()
     {
+        log.warn("Using non-persistent storage");
         clear();
     }
 

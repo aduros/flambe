@@ -19,6 +19,8 @@ import flambe.display.Texture;
 class Stage3DRenderer
     implements Renderer
 {
+    private static var log = Log.log; // http://code.google.com/p/haxe/issues/detail?id=365
+
     public function new ()
     {
         _textures = [];
@@ -62,7 +64,7 @@ class Stage3DRenderer
             }
         }
 
-        // No Stage3Ds available!
+        log.warn("No free Stage3Ds available");
         onError(null);
     }
 
@@ -99,6 +101,8 @@ class Stage3DRenderer
         var stage3D :Stage3D = event.target;
         _context3D = stage3D.context3D;
 
+        log.info("Created new Stage3D context", ["driver", _context3D.driverInfo]);
+
         // if (_context3D.driverInfo.indexOf("Software") != -1) {
         //     var ref = _context3D;
         //     onError(null);
@@ -115,7 +119,7 @@ class Stage3DRenderer
         onResize(null);
     }
 
-    private function onError (_)
+    private function onError (event :ErrorEvent)
     {
         // The actual Stage3D will live on, so free up these listeners
         if (_stage3D != null) {
@@ -133,6 +137,9 @@ class Stage3DRenderer
         _drawCtx = null;
         _context3D = null;
         _stage3D = null;
+
+        log.warn("Stage3D error, falling back to BitmapRenderer",
+            (event != null) ? ["error", event.text] : null);
 
         // Fall back to software renderering
         FlashAppDriver.getInstance().renderer = new BitmapRenderer();

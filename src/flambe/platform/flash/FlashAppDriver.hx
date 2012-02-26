@@ -31,6 +31,8 @@ import flambe.util.Promise;
 class FlashAppDriver
     implements AppDriver
 {
+    private static var log = Log.log; // http://code.google.com/p/haxe/issues/detail?id=365
+
     public var stage (getStage, null) :Stage;
     public var storage (getStorage, null) :Storage;
     public var pointer (getPointer, null) :Pointer;
@@ -50,6 +52,12 @@ class FlashAppDriver
 
     private function new ()
     {
+    }
+
+    public function init ()
+    {
+        log.info("Initializing Flash platform");
+
         var stage = Lib.current.stage;
 
         _stage = new FlashStage(stage);

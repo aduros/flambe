@@ -26,6 +26,8 @@ import flambe.util.Signal1;
 class HtmlAppDriver
     implements AppDriver
 {
+    private static var log :Logger; // This needs to be initialized later
+
     public var stage (getStage, null) :Stage;
     public var storage (getStorage, null) :Storage;
     public var pointer (getPointer, null) :Pointer;
@@ -45,6 +47,13 @@ class HtmlAppDriver
 
     private function new ()
     {
+    }
+
+    public function init ()
+    {
+        log = Log.log;
+        log.info("Initializing HTML platform");
+
 #if debug
         haxe.Firebug.redirectTraces();
 #end
@@ -60,7 +69,8 @@ class HtmlAppDriver
             canvas = Lib.document.getElementById("flambe-canvas");
         }
         if (canvas == null) {
-            throw "Could not find a Flambe canvas! Are you not embedding with flambe.js?";
+            log.error("Could not find a Flambe canvas! Are you not embedding with flambe.js?");
+            return;
         }
 
         _stage = new HtmlStage(canvas);
@@ -81,6 +91,7 @@ class HtmlAppDriver
             };
             requestAnimationFrame(updateFrame, canvas);
         } else {
+            log.warn("No requestAnimationFrame support, falling back to setInterval");
             (untyped Lib.window).setInterval(function () {
                 update(Date.now().getTime());
             }, 1000/60);
@@ -205,6 +216,7 @@ class HtmlAppDriver
         try {
             return Reflect.callMethod(null, func, params);
         } catch (e :Dynamic) {
+            log.warn("Error calling native method", ["error", e]);
             return null;
         }
     }

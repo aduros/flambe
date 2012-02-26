@@ -15,6 +15,12 @@ import flambe.util.Logger;
 import flambe.util.Promise;
 import flambe.util.Signal1;
 
+// import flambe.Log;
+
+#if (!flash && !html)
+#error "Platform not supported!"
+#end
+
 class System
 {
     public static var root (default, null) :Entity;
@@ -38,20 +44,6 @@ class System
      * to your telemetry reporting service of choice.
      */
     public static var uncaughtError (default, null) :Signal1<String>;
-
-    public static function init ()
-    {
-        root = new Entity();
-        uncaughtError = new Signal1();
-
-#if flash
-        driver = flambe.platform.flash.FlashAppDriver.getInstance();
-#elseif html
-        driver = flambe.platform.html.HtmlAppDriver.getInstance();
-#else
-#error "Platform not supported!"
-#end
-    }
 
     // A bunch of short-hands to driver functions
 
@@ -94,4 +86,16 @@ class System
     {
         return driver.locale;
     }
+
+    private static var _static_init = (function () {
+        root = new Entity();
+        uncaughtError = new Signal1();
+
+#if flash
+        driver = flambe.platform.flash.FlashAppDriver.getInstance();
+#elseif html
+        driver = flambe.platform.html.HtmlAppDriver.getInstance();
+#end
+        return false;
+    })();
 }

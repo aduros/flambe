@@ -13,8 +13,6 @@ class Main
 {
     private static function main ()
     {
-        System.init();
-
         var loader = System.loadAssetPack(Manifest.build("bootstrap"));
         // Add listeners
         loader.success.connect(onSuccess);

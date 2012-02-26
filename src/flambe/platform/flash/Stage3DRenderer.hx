@@ -142,7 +142,7 @@ class Stage3DRenderer
             (event != null) ? ["error", event.text] : null);
 
         // Fall back to software renderering
-        FlashAppDriver.getInstance().renderer = new BitmapRenderer();
+        FlashAppDriver.instance.renderer = new BitmapRenderer();
     }
 
     private function onResize (_)

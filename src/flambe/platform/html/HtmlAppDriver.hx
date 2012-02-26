@@ -37,13 +37,7 @@ class HtmlAppDriver
     public var mainLoop (default, null) :MainLoop;
     public var renderer :Renderer;
 
-    public static function getInstance () :HtmlAppDriver
-    {
-        if (_instance == null) {
-            _instance = new HtmlAppDriver();
-        }
-        return _instance;
-    }
+    public static var instance /*(default, null)*/ = new HtmlAppDriver();
 
     private function new ()
     {

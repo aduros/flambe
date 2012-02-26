@@ -42,13 +42,7 @@ class FlashAppDriver
     public var mainLoop (default, null) :MainLoop;
     public var renderer :Renderer;
 
-    public static function getInstance () :FlashAppDriver
-    {
-        if (_instance == null) {
-            _instance = new FlashAppDriver();
-        }
-        return _instance;
-    }
+    public static var instance /*(default, null)*/ = new FlashAppDriver();
 
     private function new ()
     {

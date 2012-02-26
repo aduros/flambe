@@ -94,9 +94,9 @@ class System
 
     private static var _driver =
 #if flash
-        flambe.platform.flash.FlashAppDriver.getInstance();
+        flambe.platform.flash.FlashAppDriver.instance;
 #elseif html
-        flambe.platform.html.HtmlAppDriver.getInstance();
+        flambe.platform.html.HtmlAppDriver.instance;
 #end
 
     private static var _calledInit = false;

@@ -42,7 +42,7 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
                 dispatcher.addEventListener(Event.COMPLETE, function (_) {
                     var bitmap :Bitmap = cast loader.content;
                     var texture = new FlashTexture(bitmap.bitmapData);
-                    var renderer = FlashAppDriver.getInstance().renderer;
+                    var renderer = FlashAppDriver.instance.renderer;
                     renderer.uploadTexture(texture);
                     handleLoad(entry, texture);
                 });

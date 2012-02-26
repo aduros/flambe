@@ -136,7 +136,7 @@ private class FlashPlayback
         _ended = false;
 
         if (!_tickableAdded) {
-            FlashAppDriver.getInstance().mainLoop.addTickable(this);
+            FlashAppDriver.instance.mainLoop.addTickable(this);
             _tickableAdded = true;
         }
     }

@@ -14,9 +14,9 @@ class Log
     // avoid System here due to static initializer dependency issues.
     public static var log = new Logger(
 #if flash
-        flambe.platform.flash.FlashAppDriver.getInstance()
+        flambe.platform.flash.FlashAppDriver.instance
 #else
-        flambe.platform.html.HtmlAppDriver.getInstance()
+        flambe.platform.html.HtmlAppDriver.instance
 #end
         .createLogHandler("flambe"));
 }

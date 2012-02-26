@@ -39,7 +39,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                         texture.image = image;
                     }
 
-                    var renderer = HtmlAppDriver.getInstance().renderer;
+                    var renderer = HtmlAppDriver.instance.renderer;
                     renderer.uploadTexture(texture);
                     handleLoad(entry, texture);
                 };

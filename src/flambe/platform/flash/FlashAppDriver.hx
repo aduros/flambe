@@ -31,7 +31,7 @@ import flambe.util.Promise;
 class FlashAppDriver
     implements AppDriver
 {
-    private static var log = Log.log; // http://code.google.com/p/haxe/issues/detail?id=365
+    private static var log :Logger; // This needs to be initialized later
 
     public var stage (getStage, null) :Stage;
     public var storage (getStorage, null) :Storage;
@@ -56,6 +56,7 @@ class FlashAppDriver
 
     public function init ()
     {
+        log = Log.log;
         log.info("Initializing Flash platform");
 
         var stage = Lib.current.stage;

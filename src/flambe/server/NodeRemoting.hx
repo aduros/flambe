@@ -7,13 +7,25 @@ package flambe.server;
 import haxe.remoting.Context;
 import haxe.Serializer;
 
+import flambe.util.Logger;
+
 class NodeRemoting
 {
     private static var querystring = Node.require("querystring");
 
-    public function new (ctx :Context)
+    public function new (ctx :Context, ?logger :Logger)
     {
         _ctx = ctx;
+        _logger = logger;
+    }
+
+    // Called when an error occured while handling a remoting request
+    public function onError (error :Dynamic)
+    {
+        if (_logger != null) {
+            _logger.warn("Remoting exception",
+                ["error", (error.stack != null) ? error.stack : error]);
+        }
     }
 
     public function handle (req :Dynamic, res :Dynamic)
@@ -28,16 +40,13 @@ class NodeRemoting
             var relay = new NodeRelay(function (data :Dynamic) {
                 res.end("hxr" + Serializer.run(data));
             });
-            relay.onError = function (err :Dynamic) {
-                var message = (err.message != null) ? err.message : err;
-                var stack = err.stack;
-
-                Node.log("Remoting exception: " +
-                    (err.stack != null ? err.stack : message));
-
+            relay.onError = function (error :Dynamic) {
+                var message = (error.message != null) ? error.message : error;
                 var s = new haxe.Serializer();
                 s.serializeException(message);
                 res.end("hxr" + s.toString());
+
+                onError(error);
             };
 
             res.setHeader("Content-Type", "text/plain");
@@ -59,4 +68,5 @@ class NodeRemoting
     }
 
     private var _ctx :Context;
+    private var _logger :Logger;
 }

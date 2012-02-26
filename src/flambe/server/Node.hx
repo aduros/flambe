@@ -4,6 +4,8 @@
 
 package flambe.server;
 
+import flambe.util.Logger;
+
 // TODO(bruno): Use one of the nodejs externs on haxelib
 class Node
 {
@@ -11,12 +13,24 @@ class Node
     public static var console (_console, null) :Dynamic;
     public static var process (_process, null) :Dynamic;
 
+    // TODO(bruno): Use haxe's JSON API
     public static var stringify :Dynamic -> String = untyped JSON.stringify;
     public static var parse :String -> Dynamic = untyped JSON.parse;
 
-    public static function log (message :String)
+    // FIXME(bruno): Multiple loggers with different tags is not supported
+    public static function logger (tag :String) :Logger
     {
-        console.log(message);
+        var handler :LogHandler = new flambe.platform.html.HtmlLogHandler(tag);
+#if !debug
+        // Try to log to the syslog in production builds
+        try {
+            var syslog = require("node-syslog");
+            handler = new SystemLogHander(syslog, tag);
+        } catch (error :Dynamic) {
+            // node-syslog probably not installed, include it in your npmLibs
+        }
+#end
+        return new Logger(handler);
     }
 
     inline public static function newBuffer (?data :String, ?encoding :String) :Dynamic

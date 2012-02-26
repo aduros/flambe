@@ -10,6 +10,7 @@ import flambe.display.Texture;
 import flambe.Entity;
 import flambe.input.Keyboard;
 import flambe.input.Pointer;
+import flambe.util.Logger;
 import flambe.util.Promise;
 
 interface AppDriver
@@ -31,4 +32,6 @@ interface AppDriver
     function loadAssetPack (manifest :Manifest) :Promise<AssetPack>;
 
     function callNative (funcName :String, params :Array<Dynamic>) :Dynamic;
+
+    function createLogHandler (tag :String) :LogHandler;
 }

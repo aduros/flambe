@@ -6,11 +6,12 @@ package flambe;
 
 import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
-import flambe.input.Pointer;
 import flambe.input.Keyboard;
+import flambe.input.Pointer;
 import flambe.platform.AppDriver;
 import flambe.platform.Stage;
 import flambe.platform.Storage;
+import flambe.util.Logger;
 import flambe.util.Promise;
 import flambe.util.Signal1;
 
@@ -62,6 +63,11 @@ class System
     inline public static function callNative (funcName :String, ?params :Array<Dynamic>) :Dynamic
     {
         return driver.callNative(funcName, params);
+    }
+
+    inline public static function logger (tag :String) :Logger
+    {
+        return new Logger(driver.createLogHandler(tag));
     }
 
     inline private static function getStage () :Stage

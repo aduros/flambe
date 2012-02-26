@@ -19,6 +19,7 @@ import flambe.platform.BasicKeyboard;
 import flambe.platform.BasicPointer;
 import flambe.platform.MainLoop;
 import flambe.System;
+import flambe.util.Logger;
 import flambe.util.Promise;
 import flambe.util.Signal1;
 
@@ -206,6 +207,16 @@ class HtmlAppDriver
         } catch (e :Dynamic) {
             return null;
         }
+    }
+
+    public function createLogHandler (tag :String) :LogHandler
+    {
+#if !flambe_disable_logging
+        if (HtmlLogHandler.isSupported()) {
+            return new HtmlLogHandler(tag);
+        }
+#end
+        return null;
     }
 
     private function update (now :Float)

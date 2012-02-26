@@ -25,6 +25,7 @@ import flambe.platform.AppDriver;
 import flambe.platform.BasicKeyboard;
 import flambe.platform.BasicPointer;
 import flambe.platform.MainLoop;
+import flambe.util.Logger;
 import flambe.util.Promise;
 
 class FlashAppDriver
@@ -127,6 +128,15 @@ class FlashAppDriver
         }
         var args = [ cast funcName ].concat(params);
         return Reflect.callMethod(null, ExternalInterface.call, args);
+    }
+
+    public function createLogHandler (tag :String) :LogHandler
+    {
+#if !flambe_disable_logging
+        return new FlashLogHandler(tag);
+#else
+        return null;
+#end
     }
 
     private function onMouseDown (event :MouseEvent)

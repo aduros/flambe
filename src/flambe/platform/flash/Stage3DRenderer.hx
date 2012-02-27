@@ -24,6 +24,7 @@ class Stage3DRenderer
     public function new ()
     {
         _textures = [];
+        _events = new EventGroup();
     }
 
     public function uploadTexture (texture :Texture)
@@ -51,14 +52,14 @@ class Stage3DRenderer
     {
         var stage = Lib.current.stage;
 
-        stage.addEventListener(Event.RESIZE, onResize);
-
         // Use the first available Stage3D
         for (stage3D in stage.stage3Ds) {
             if (stage3D.context3D == null) {
+                _events.addListener(stage, Event.RESIZE, onResize);
+
                 _stage3D = stage3D;
-                _stage3D.addEventListener(Event.CONTEXT3D_CREATE, onContext3DCreate);
-                _stage3D.addEventListener(ErrorEvent.ERROR, onError);
+                _events.addListener(_stage3D, Event.CONTEXT3D_CREATE, onContext3DCreate);
+                _events.addDisposingListener(_stage3D, ErrorEvent.ERROR, onError);
                 _stage3D.requestContext3D();
                 return;
             }
@@ -121,14 +122,7 @@ class Stage3DRenderer
 
     private function onError (event :ErrorEvent)
     {
-        // The actual Stage3D will live on, so free up these listeners
-        if (_stage3D != null) {
-            _stage3D.removeEventListener(Event.CONTEXT3D_CREATE, onContext3DCreate);
-            _stage3D.removeEventListener(ErrorEvent.ERROR, onError);
-        }
-        Lib.current.stage.removeEventListener(Event.RESIZE, onResize);
-
-        // Free up some Textures that will no longer be needed
+        // Free up any Stage3D textures that will no longer be needed
         for (texture in _textures) {
             texture.nativeTexture = null;
         }
@@ -165,6 +159,8 @@ class Stage3DRenderer
     private var _drawCtx :Stage3DDrawingContext;
     private var _context3D :Context3D;
     private var _stage3D :Stage3D;
+
+    private var _events :EventGroup;
 
     private var _textures :Array<FlashTexture>;
 }

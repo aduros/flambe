@@ -32,56 +32,59 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
 
     override private function loadEntry (entry :AssetEntry)
     {
-        var dispatcher :IEventDispatcher = null;
         var req = new URLRequest(entry.url);
+        var dispatcher :IEventDispatcher;
+        var onComplete :Event -> Void;
 
         switch (entry.type) {
             case Image:
                 var loader = new Loader();
                 dispatcher = loader.contentLoaderInfo;
-                dispatcher.addEventListener(Event.COMPLETE, function (_) {
+                onComplete = function (_) {
                     var bitmap :Bitmap = cast loader.content;
                     var texture = new FlashTexture(bitmap.bitmapData);
                     var renderer = FlashAppDriver.instance.renderer;
                     renderer.uploadTexture(texture);
                     handleLoad(entry, texture);
-                });
+                };
+
                 var ctx = new LoaderContext();
                 ctx.checkPolicyFile = true;
                 try {
                     loader.load(req, ctx);
                 } catch (error :Error) {
                     handleError(error.message);
+                    return;
                 }
 
             case Audio:
                 var sound = new Sound(req);
                 dispatcher = sound;
-                dispatcher.addEventListener(Event.COMPLETE, function (_) {
+                onComplete = function (_) {
                     handleLoad(entry, new FlashSound(sound));
-                });
+                };
 
             case Data:
                 var urlLoader = new URLLoader();
                 dispatcher = urlLoader;
-                dispatcher.addEventListener(Event.COMPLETE, function (_) {
+                onComplete = function (_) {
                     handleLoad(entry, urlLoader.data);
-                });
+                };
                 try {
                     urlLoader.load(req);
                 } catch (error :Error) {
                     handleError(error.message);
+                    return;
                 }
         }
 
-        dispatcher.addEventListener(Event.COMPLETE, function (_) {
-            dispatcher = null;
-        });
-        dispatcher.addEventListener(ProgressEvent.PROGRESS, function (event :ProgressEvent) {
+        var events = new EventGroup();
+        events.addListener(dispatcher, ProgressEvent.PROGRESS, function (event :ProgressEvent) {
             handleProgress(entry, cast event.bytesLoaded);
         });
-        dispatcher.addEventListener(IOErrorEvent.IO_ERROR, onError);
-        dispatcher.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onError);
+        events.addDisposingListener(dispatcher, Event.COMPLETE, onComplete);
+        events.addDisposingListener(dispatcher, IOErrorEvent.IO_ERROR, onError);
+        events.addDisposingListener(dispatcher, SecurityErrorEvent.SECURITY_ERROR, onError);
     }
 
     override private function getAudioFormats () :Array<String>

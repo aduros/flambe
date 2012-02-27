@@ -27,6 +27,9 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
             case Image:
                 var image :Image = untyped __js__ ("new Image()");
                 image.onload = function (_) {
+                    image.onload = null;
+                    image.onerror = null;
+
                     var texture = new HtmlTexture();
                     if (CANVAS_TEXTURES) {
                         var canvas :Dynamic = Lib.document.createElement("canvas");
@@ -46,6 +49,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                 image.onerror = function (_) {
                     handleError("Failed to load image " + entry.url);
                 };
+
                 image.src = entry.url;
 
             case Audio:
@@ -61,21 +65,16 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                 }
                 _mediaElements.set(ref, audio);
 
-                var onCanPlayThrough = null;
-                onCanPlayThrough = function () {
-                    // Firefox fires this event multiple times during loading, so only handle it
-                    // the first time...
-                    audio.removeEventListener("canplaythrough", onCanPlayThrough, false);
-
+                var events = new EventGroup();
+                events.addDisposingListener(audio, "canplaythrough", function (_) {
                     _mediaElements.remove(ref);
                     handleLoad(entry, new HtmlSound(audio));
-                };
-
-                audio.addEventListener("canplaythrough", onCanPlayThrough, false);
-                audio.addEventListener("error", function (_) {
+                });
+                events.addDisposingListener(audio, "error", function (_) {
                     _mediaElements.remove(ref);
                     handleError("Failed to load audio " + entry.url + ", code=" + audio.error.code);
-                }, false);
+                });
+
 
                 // TODO(bruno): Handle progress events
                 audio.src = entry.url;

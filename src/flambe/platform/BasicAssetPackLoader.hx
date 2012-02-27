@@ -24,12 +24,10 @@ class BasicAssetPackLoader
     {
         promise = new Promise();
         _manifest = manifest;
-
-        var entries = manifest.getEntries();
         _assets = new Hash();
-
         _bytesLoaded = new Hash();
 
+        var entries = manifest.getEntries();
         if (entries.length == 0) {
             // There's nothing to load, just send them an empty pack
             handleSuccess();
@@ -55,8 +53,8 @@ class BasicAssetPackLoader
                 var placeholder = createPlaceholder(bestEntry);
 
                 if (placeholder != null) {
-                    log.warn("Using placeholder asset",
-                        ["type", bestEntry.type, "name", bestEntry.name]);
+                    log.warn("Using an asset placeholder",
+                        ["name", bestEntry.name, "type", bestEntry.type]);
                     handleLoad(bestEntry, placeholder);
 
                 } else {
@@ -94,7 +92,11 @@ class BasicAssetPackLoader
         return entries[0];
     }
 
-    private function createPlaceholder (entry :AssetEntry)
+    /**
+     * If the asset isn't supported by the environment, return a placeholder instead. If null is
+     * returned, the asset is supported and we should go ahead and load it.
+     */
+    private function createPlaceholder (entry :AssetEntry) :Dynamic
     {
         switch (entry.type) {
             case Audio:

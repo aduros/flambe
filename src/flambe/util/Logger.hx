@@ -29,10 +29,10 @@ class Logger
 
 #if flambe_disable_logging
     // In release builds, logging calls are completely stripped out
-    inline public function info (?text, ?args) { }
-    inline public function warn (?text, ?args) { }
-    inline public function error (?text, ?args) { }
-    inline public function log (level, ?text, ?args) { }
+    inline public function info (?text :String, ?args :Array<Dynamic>) { }
+    inline public function warn (?text :String, ?args :Array<Dynamic>) { }
+    inline public function error (?text :String, ?args :Array<Dynamic>) { }
+    inline public function log (level :LogLevel, ?text :String, ?args :Array<Dynamic>) { }
 
 #else
     public function info (?text :String, ?args :Array<Dynamic>)

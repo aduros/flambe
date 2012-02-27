@@ -53,18 +53,30 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                 var audio :Dynamic = Lib.document.createElement("audio");
                 audio.preload = "auto"; // Hint that we want to preload the entire file
 
+                // Maintain a hard reference to the audio during loading to prevent GC on some
+                // browsers
+                var ref = ++_mediaRefCount;
+                if (_mediaElements == null) {
+                    _mediaElements = new IntHash();
+                }
+                _mediaElements.set(ref, audio);
+
                 var onCanPlayThrough = null;
                 onCanPlayThrough = function () {
                     // Firefox fires this event multiple times during loading, so only handle it
                     // the first time...
                     audio.removeEventListener("canplaythrough", onCanPlayThrough, false);
 
+                    _mediaElements.remove(ref);
                     handleLoad(entry, new HtmlSound(audio));
                 };
+
                 audio.addEventListener("canplaythrough", onCanPlayThrough, false);
                 audio.addEventListener("error", function (_) {
+                    _mediaElements.remove(ref);
                     handleError("Failed to load audio " + entry.url + ", code=" + audio.error.code);
                 }, false);
+
                 // TODO(bruno): Handle progress events
                 audio.src = entry.url;
                 audio.load();
@@ -136,4 +148,12 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
     })();
 
     private static var _audioFormats :Array<String>;
+
+    /**
+     * Media elements get GCed during loading in Chrome and IE9. The spec is clear that elements
+     * shouldn't be GCed while playing, but vague about about GCing while loading. So, maintain a
+     * hard reference to all media elements being loaded to prevent GC.
+     */
+    private static var _mediaElements :IntHash<Dynamic>;
+    private static var _mediaRefCount = 0;
 }

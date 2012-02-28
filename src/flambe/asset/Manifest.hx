@@ -115,8 +115,8 @@ class Manifest
 
                 var base = crossOriginBase;
 #if js
-                if (type != Image) {
-                    // Only images can be loaded across origins without CORS.
+                if (type == Data) {
+                    // Without CORS, readable data must be loaded from the same origin
                     // TODO(bruno): If Flambe ever gets an API to read pixels out of a texture,
                     // sameOriginBase must be used for images too.
                     base = sameOriginBase;

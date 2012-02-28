@@ -26,13 +26,15 @@ def configure(ctx):
 def apply_flambe(ctx):
     Utils.def_attrs(ctx, platforms="flash html", app="default",
         classpath="", flags="", libs="", assetBase=None,
-        airCert="etc/air-cert.pfx", airDesc="etc/air-desc.xml", airPassword=None)
+        airCert="etc/air-cert.pfx", airDesc="etc/air-desc.xml", airPassword=None,
+        iosProfile="etc/ios.mobileprovision")
 
     classpath=["src", FLAMBE_ROOT+"/src"] + Utils.to_list(ctx.classpath)
     flags = ["-main", ctx.main] + Utils.to_list(ctx.flags)
     libs = ["hxJson2", "format"] + Utils.to_list(ctx.libs)
     platforms = Utils.to_list(ctx.platforms)
     debug = ctx.env.debug
+    air = "android" in platforms or "ios" in platforms
 
     assetDir = ctx.path.find_dir("assets")
     assetList = [] if assetDir is None else assetDir.ant_glob("**/*")
@@ -94,19 +96,12 @@ def apply_flambe(ctx):
             ctx.bld.install_files(installPrefix + "web", js + ".map")
         ctx.bld.install_files(installPrefix + "web", js)
 
-    if "android" in platforms:
+    if air:
         swf = buildPrefix + "app-air.swf"
         ctx.bld(features="haxe", classpath=classpath,
             flags=flags + flash_flags + "-D air".split(),
             libs=libs,
             target=swf)
-        apk = buildPrefix + "app-android.apk"
-        outputs.append(apk)
-
-        adb = ctx.env.ADB
-        if not adb:
-            ctx.bld.fatal("adb from the Android SDK is required, " + \
-                "ensure it's in your $PATH and re-run waf configure.")
 
         adt = ctx.env.ADT
         if not adt:
@@ -125,42 +120,74 @@ def apply_flambe(ctx):
         if not airPassword:
             ctx.bld.fatal("You must specify the airPassword to your certificate.")
 
-        # Derive the location of the Android SDK from adb's path
-        androidRoot = adb[0:adb.rindex("/platform-tools/adb")]
+        airApps = []
 
-        apkType = "apk-debug" if debug else "apk-captive-runtime"
-        rule = ("%s -package -target %s " +
-            "-storetype pkcs12 -keystore %s -storepass %s " +
-            "\"${TGT}\" %s " +
-            "-platformsdk %s ") % (
-                quote(adt), apkType, quote(airCert.abspath()), quote(airPassword),
-                quote(airDesc.abspath()), quote(androidRoot))
+        if "android" in platforms:
+            adb = ctx.env.ADB
+            if not adb:
+                ctx.bld.fatal("adb from the Android SDK is required, " + \
+                    "ensure it's in your $PATH and re-run waf configure.")
 
-        # Include the swf in the APK
-        rule += "-C %s %s " % (quote(buildPrefix), "app-air.swf")
+            # Derive the location of the Android SDK from adb's path
+            androidRoot = adb[0:adb.rindex("/platform-tools/adb")]
 
-        # Include the assets in the APK
-        if assetDir is not None:
-            # Exclude assets Flash will never use
-            airAssets = assetDir.ant_glob("**/*", excl="**/*.(ogg|wav|m4a)")
-            rule += "-C %s %s " % (
-                quote(ctx.path.abspath()),
-                " ".join([ quote(asset.nice_path()) for asset in airAssets ]))
+            apkType = "apk-debug" if debug else "apk-captive-runtime"
+            rule = ("%s -package -target %s " +
+                "-storetype pkcs12 -keystore %s -storepass %s " +
+                "\"${TGT}\" %s " +
+                "-platformsdk %s ") % (
+                    quote(adt), apkType, quote(airCert.abspath()), quote(airPassword),
+                    quote(airDesc.abspath()), quote(androidRoot))
 
-        ctx.bld(rule=rule, target=apk, source=swf)
-        ctx.bld.add_manual_dependency(apk, airCert);
-        ctx.bld.add_manual_dependency(apk, airDesc);
-        ctx.bld.install_files(installPrefix + "apps", apk)
+            if ctx.bld.cmd == "install":
+                # Install the APK if there's a device plugged in
+                def install_apk(ctx):
+                    state = ctx.cmd_and_log("%s get-state" % quote(adb), quiet=Context.STDOUT)
+                    if state == "device\n":
+                        ctx.to_log("Installing APK to device...\n")
+                        ctx.exec_command("%s install -rs %s" %
+                            (quote(adb), quote(installPrefix + "apps/app-android.apk")))
+                ctx.bld.add_post_fun(install_apk)
 
-        if ctx.bld.cmd == "install":
-            # Install the APK if there's a device plugged in
-            def install_apk(ctx):
-                state = ctx.cmd_and_log("%s get-state" % quote(adb), quiet=Context.STDOUT)
-                if state == "device\n":
-                    ctx.to_log("Installing APK to device...\n")
-                    ctx.exec_command("%s install -rs %s" %
-                        (quote(adb), quote(installPrefix + "apps/app-android.apk")))
-            ctx.bld.add_post_fun(install_apk)
+            airApps.append((buildPrefix + "app-android.apk", rule))
+
+        if "ios" in platforms:
+            iosProfile = ctx.path.find_resource(ctx.iosProfile)
+            if not iosProfile:
+                ctx.bld.fatal("Could not find iOS provisioning profile at %s." % ctx.iosProfile)
+
+            # TODO(bruno): Add -connect [host] for debug builds, if fdb is present
+            # TODO(bruno): Handle final app store packaging
+            # TODO(bruno): Is there a way to install an IPA from the command line? (sans jailbreak)
+            ipaType = "ipa-debug" if debug else "ipa-ad-hoc"
+            rule = ("%s -package -target %s -provisioning-profile %s " +
+                "-storetype pkcs12 -keystore %s -storepass %s " +
+                "\"${TGT}\" %s ") % (
+                    quote(adt), ipaType, quote(iosProfile.abspath()),
+                    quote(airCert.abspath()), quote(airPassword), quote(airDesc.abspath()))
+
+            airApps.append((buildPrefix + "app-ios.ipa", rule))
+
+
+        # Build all our AIR apps, appending common configuration
+        for target, rule in airApps:
+            outputs.append(target)
+
+            # Include the swf
+            rule += "-C %s %s " % (quote(buildPrefix), "app-air.swf")
+
+            # Include the assets
+            if assetDir is not None:
+                # Exclude assets Flash will never use
+                airAssets = assetDir.ant_glob("**/*", excl="**/*.(ogg|wav|m4a)")
+                rule += "-C %s %s " % (
+                    quote(ctx.path.abspath()),
+                    " ".join([ quote(asset.nice_path()) for asset in airAssets ]))
+
+            ctx.bld(rule=rule, target=target, source=swf)
+            ctx.bld.add_manual_dependency(target, airCert);
+            ctx.bld.add_manual_dependency(target, airDesc);
+            ctx.bld.install_files(installPrefix + "apps", target)
 
     # Common web stuff
     if "flash" in platforms or "html" in platforms:

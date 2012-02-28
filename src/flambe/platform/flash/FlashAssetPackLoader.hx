@@ -36,7 +36,7 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
         var dispatcher :IEventDispatcher;
         var onComplete :Event -> Void;
 
-        switch (entry.type) {
+        try switch (entry.type) {
             case Image:
                 var loader = new Loader();
                 dispatcher = loader.contentLoaderInfo;
@@ -50,12 +50,7 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
 
                 var ctx = new LoaderContext();
                 ctx.checkPolicyFile = true;
-                try {
-                    loader.load(req, ctx);
-                } catch (error :Error) {
-                    handleError(error.message);
-                    return;
-                }
+                loader.load(req, ctx);
 
             case Audio:
                 var sound = new Sound(req);
@@ -70,12 +65,11 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
                 onComplete = function (_) {
                     handleLoad(entry, urlLoader.data);
                 };
-                try {
-                    urlLoader.load(req);
-                } catch (error :Error) {
-                    handleError(error.message);
-                    return;
-                }
+                urlLoader.load(req);
+
+        } catch (error :Error) {
+            handleError(error.message);
+            return;
         }
 
         var events = new EventGroup();

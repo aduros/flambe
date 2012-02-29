@@ -63,9 +63,9 @@ class Promise<A>
     {
         if (hasResult) {
             fn(_result);
-        } else {
-            success.connect(fn).once();
+            return null;
         }
+        return success.connect(fn).once();
     }
 
     inline private function getProgress () :Float

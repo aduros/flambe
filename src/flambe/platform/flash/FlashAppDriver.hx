@@ -6,9 +6,9 @@ package flambe.platform.flash;
 
 import flash.display.Sprite;
 import flash.events.Event;
-import flash.events.IEventDispatcher;
 import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
+import flash.events.UncaughtErrorEvent;
 import flash.external.ExternalInterface;
 import flash.Lib;
 import flash.net.SharedObject;
@@ -76,12 +76,8 @@ class FlashAppDriver
         stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
         stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
 
-        // Handle uncaught errors
-        var loaderInfo = Lib.current.loaderInfo;
-        if (Reflect.hasField(loaderInfo, "uncaughtErrorEvents")) {
-            var dispatcher :IEventDispatcher = Reflect.field(loaderInfo, "uncaughtErrorEvents");
-            dispatcher.addEventListener("uncaughtError", onUncaughtError);
-        }
+        Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(
+            UncaughtErrorEvent.UNCAUGHT_ERROR, onUncaughtError);
 
         _lastUpdate = Lib.getTimer();
     }
@@ -183,11 +179,9 @@ class FlashAppDriver
         mainLoop.render(renderer);
     }
 
-    private function onUncaughtError (event :Event)
+    private function onUncaughtError (event :UncaughtErrorEvent)
     {
-        // More reflection here because I don't want to require Flash 10.1...
-        var error = Reflect.field(event, "error");
-        System.uncaughtError.emit(FlashUtil.getErrorMessage(error));
+        System.uncaughtError.emit(FlashUtil.getErrorMessage(event.error));
     }
 
     private static var _instance :FlashAppDriver;

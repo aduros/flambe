@@ -45,8 +45,10 @@ def apply_flambe(ctx):
     closure = ctx.bld.path.find_resource(FLAMBE_ROOT+"/tools/closure.jar")
 
     # Don't forget to change flambe.js when changing -swf-version!
-    flash_flags = "-swf-version 10 -swf-header 640:480:60:ffffff".split()
-    html_flags = "-D html --js-contain".split()
+    flashVersion = 10.1
+    flashFlags = ("-swf-version %s -swf-header 640:480:60:ffffff" % flashVersion).split()
+
+    htmlFlags = "-D html --js-contain".split()
 
     # The files that are built and should be installed
     outputs = []
@@ -67,7 +69,7 @@ def apply_flambe(ctx):
         swf = buildPrefix + "app-flash.swf"
         outputs.append(swf)
         ctx.bld(features="haxe", classpath=classpath,
-            flags=flags + flash_flags,
+            flags=flags + flashFlags,
             libs=libs,
             target=swf)
         ctx.bld.install_files(installPrefix + "web", swf)
@@ -77,7 +79,7 @@ def apply_flambe(ctx):
         js = buildPrefix + "app-html.js"
         outputs.append(js)
         ctx.bld(features="haxe", classpath=classpath,
-            flags=flags + html_flags,
+            flags=flags + htmlFlags,
             libs=libs,
             target=js if debug else uncompressed)
         if not debug:
@@ -97,9 +99,11 @@ def apply_flambe(ctx):
         ctx.bld.install_files(installPrefix + "web", js)
 
     if air:
+        # TODO(bruno): Always use the very latest SWF version here, since we need Stage3D and we
+        # use a bundled runtime anyways
         swf = buildPrefix + "app-air.swf"
         ctx.bld(features="haxe", classpath=classpath,
-            flags=flags + flash_flags + "-D air".split(),
+            flags=flags + flashFlags + "-D air".split(),
             libs=libs,
             target=swf)
 
@@ -168,7 +172,6 @@ def apply_flambe(ctx):
 
             airApps.append((buildPrefix + "app-ios.ipa", rule))
 
-
         # Build all our AIR apps, appending common configuration
         for target, rule in airApps:
             outputs.append(target)
@@ -194,8 +197,8 @@ def apply_flambe(ctx):
         # Compile the embedder script
         embedder = buildPrefix + "flambe.js"
         scripts = ctx.bld.path.find_dir(FLAMBE_ROOT+"/tools/embedder").ant_glob("*.js")
-        ctx.bld(rule="%s -jar %s %s --js_output_file \"${TGT}\"" %
-            (quote(ctx.env.JAVA), quote(closure.abspath()),
+        ctx.bld(rule="%s -jar %s -D flambe.FLASH_VERSION=%s --js_output_file \"${TGT}\" %s" %
+            (quote(ctx.env.JAVA), quote(closure.abspath()), flashVersion,
             " ".join(["--js " + quote(script.abspath()) for script in scripts]),
             ), target=embedder)
         for script in scripts:

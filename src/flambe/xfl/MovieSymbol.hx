@@ -102,6 +102,8 @@ class MovieKeyframe
     public var scaleY (default, null) :Float;
     public var rotation (default, null) :Float;
 
+    public var alpha (default, null) :Float;
+
     public function new (reader :Fast, flipbook :Bool)
     {
         index = reader.getIntAttr("index");
@@ -113,6 +115,7 @@ class MovieKeyframe
         scaleX = 1;
         scaleY = 1;
         rotation = 0;
+        alpha = 1;
 
         if (flipbook) {
             return; // Purely labelled frame
@@ -126,24 +129,27 @@ class MovieKeyframe
         reader = reader.node.DOMSymbolInstance;
         symbolName = reader.att.libraryItemName;
 
-        if (!reader.hasNode.matrix) {
-            return;
+        if (reader.hasNode.matrix) {
+            var matrixElement = reader.node.matrix.node.Matrix;
+            x = matrixElement.getFloatAttr("tx");
+            y = matrixElement.getFloatAttr("ty");
+
+            var matrix = new Matrix();
+            matrix.m00 = matrixElement.getFloatAttr("a", 1);
+            matrix.m10 = matrixElement.getFloatAttr("b");
+            matrix.m01 = matrixElement.getFloatAttr("c");
+            matrix.m11 = matrixElement.getFloatAttr("d", 1);
+
+            scaleX = Math.sqrt(matrix.m00*matrix.m00 + matrix.m10*matrix.m10);
+            scaleY = Math.sqrt(matrix.m01*matrix.m01 + matrix.m11*matrix.m11);
+
+            var p = matrix.transformPoint(1, 0);
+            rotation = FMath.toDegrees(Math.atan2(p.y, p.x));
         }
 
-        reader = reader.node.matrix.node.Matrix;
-        x = reader.getFloatAttr("tx");
-        y = reader.getFloatAttr("ty");
-
-        var matrix = new flambe.math.Matrix();
-        matrix.m00 = reader.getFloatAttr("a", 1);
-        matrix.m10 = reader.getFloatAttr("b");
-        matrix.m01 = reader.getFloatAttr("c");
-        matrix.m11 = reader.getFloatAttr("d", 1);
-
-        scaleX = Math.sqrt(matrix.m00*matrix.m00 + matrix.m10*matrix.m10);
-        scaleY = Math.sqrt(matrix.m01*matrix.m01 + matrix.m11*matrix.m11);
-
-        var p = matrix.transformPoint(1, 0);
-        rotation = FMath.toDegrees(Math.atan2(p.y, p.x));
+        if (reader.hasNode.color) {
+            var colorElement = reader.node.color.node.Color;
+            alpha = colorElement.getFloatAttr("alphaMultiplier", 1);
+        }
     }
 }

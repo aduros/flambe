@@ -154,6 +154,7 @@ private class LayerSprite extends Sprite
             scaleX._ = kf.scaleX;
             scaleY._ = kf.scaleY;
             rotation._ = kf.rotation;
+            alpha._ = kf.alpha;
 
         } else {
             var interp = (frame - kf.index)/kf.duration;
@@ -163,6 +164,7 @@ private class LayerSprite extends Sprite
             scaleX._ = kf.scaleX + (nextKf.scaleX - kf.scaleX) * interp;
             scaleY._ = kf.scaleY + (nextKf.scaleY - kf.scaleY) * interp;
             rotation._ = kf.rotation + (nextKf.rotation - kf.rotation) * interp;
+            alpha._ = kf.alpha + (nextKf.alpha - kf.alpha) * interp;
         }
     }
 

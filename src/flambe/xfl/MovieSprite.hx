@@ -22,7 +22,7 @@ class MovieSprite extends Sprite
         _goingToFrame = false;
         _frame = 0;
         _elapsed = 0;
-        goto(1, true, false);
+        goto(1);
     }
 
     override public function onAdded ()
@@ -45,44 +45,38 @@ class MovieSprite extends Sprite
             _elapsed = _elapsed % _duration;
         }
 
-        var newFrame = Std.int(_elapsed * 30/1000);
-        var overDuration = dt >= _duration;
+        var newFrame = _elapsed * 30/1000;
 
-        // TODO(bruno): Handle _stopFrame?
-
-        goto(newFrame, false, overDuration);
+        goto(newFrame);
     }
 
-    private function goto (newFrame :Int, fromSkip :Bool, overDuration :Bool)
+    private function goto (newFrame :Float)
     {
         if (_goingToFrame) {
             _pendingFrame = newFrame;
             return;
         }
-        _goingToFrame = true; // TODO(bruno): Why is this necessary?
+        _goingToFrame = true;
 
-        var differentFrame = newFrame != _frame;
         var wrapped = newFrame < _frame;
-        if (differentFrame) {
-            if (wrapped) {
-                for (layer in _layers) {
-                    layer.changedKeyframe = true;
-                    layer.keyframeIdx = 0;
-                }
-            }
+        if (wrapped) {
             for (layer in _layers) {
-                layer.composeFrame(newFrame);
+                layer.changedKeyframe = true;
+                layer.keyframeIdx = 0;
             }
         }
+        for (layer in _layers) {
+            layer.composeFrame(newFrame);
+        }
 
-        var oldFrame = _frame;
+        // var oldFrame = _frame;
         _frame = newFrame;
 
         _goingToFrame = false;
         if (_pendingFrame != -1) {
             newFrame = _pendingFrame;
             _pendingFrame = -1;
-            goto(newFrame, true, false);
+            goto(newFrame);
         }
     }
 
@@ -92,9 +86,9 @@ class MovieSprite extends Sprite
     private var _duration :Float;
     private var _elapsed :Float;
 
-    private var _frame :Int;
+    private var _frame :Float;
     private var _goingToFrame :Bool;
-    private var _pendingFrame :Int;
+    private var _pendingFrame :Float;
 }
 
 private class LayerSprite extends Sprite
@@ -134,9 +128,11 @@ private class LayerSprite extends Sprite
 
     // TODO(bruno): onRemove
 
-    public function composeFrame (frame :Int)
+    public function composeFrame (frameFloat :Float)
     {
-        while (keyframeIdx < _keyframes.length - 1 && _keyframes[keyframeIdx + 1].index <= frame) {
+        var frameInt = Std.int(frameFloat);
+        while (keyframeIdx < _keyframes.length - 1
+                && _keyframes[keyframeIdx + 1].index <= frameInt) {
             ++keyframeIdx;
             changedKeyframe = true;
         }
@@ -148,7 +144,7 @@ private class LayerSprite extends Sprite
 
         var kf = _keyframes[keyframeIdx];
 
-        if (keyframeIdx == _keyframes.length - 1 || kf.index == frame) {
+        if (keyframeIdx == _keyframes.length - 1 || kf.index == frameInt) {
             x._ = kf.x;
             y._ = kf.y;
             scaleX._ = kf.scaleX;
@@ -157,7 +153,7 @@ private class LayerSprite extends Sprite
             alpha._ = kf.alpha;
 
         } else {
-            var interp = (frame - kf.index)/kf.duration;
+            var interp = (frameFloat - kf.index)/kf.duration;
             var nextKf = _keyframes[keyframeIdx + 1];
             x._ = kf.x + (nextKf.x - kf.x) * interp;
             y._ = kf.y + (nextKf.y - kf.y) * interp;

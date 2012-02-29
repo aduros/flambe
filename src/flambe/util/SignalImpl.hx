@@ -32,6 +32,7 @@ class SignalImpl
         var idx = _connections.indexOf(connection);
         if (idx >= 0) {
             connection._internal_signal = null;
+            connection._internal_listener = null;
             _connections = _connections.copy();
             _connections.splice(idx, 1);
             return true;
@@ -41,8 +42,9 @@ class SignalImpl
 
     public function disconnectAll ()
     {
-        for (ii in 0..._connections.length) {
-            _connections[ii]._internal_signal = null;
+        for (connection in _connections) {
+            connection._internal_signal = null;
+            connection._internal_listener = null;
         }
         _connections = [];
     }
@@ -51,9 +53,17 @@ class SignalImpl
     {
         var snapshot = _connections;
         for (connection in snapshot) {
-            Reflect.callMethod(null, connection._internal_listener, args);
-            if (!connection.stayInList) {
-                connection.dispose();
+            var listener = connection._internal_listener;
+
+            // If the connection wasn't already disposed
+            if (listener != null) {
+
+                Reflect.callMethod(null, listener, args);
+
+                // If this a once() connection, make sure it's removed
+                if (!connection.stayInList) {
+                    connection.dispose();
+                }
             }
         }
     }

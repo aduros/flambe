@@ -129,6 +129,11 @@ class MovieKeyframe
         reader = reader.node.DOMSymbolInstance;
         symbolName = reader.att.libraryItemName;
 
+        // FIXME: Flump puts the exported for AS name in the atlas, but the XFL references the name of the
+        // item in the library. They aren't necessarily the same. Spaces in library item names get
+        // trimmed by Flash when it creates a matching export name.
+        symbolName = StringTools.replace(symbolName, " ", "");
+
         if (reader.hasNode.matrix) {
             var matrixElement = reader.node.matrix.node.Matrix;
             x = matrixElement.getFloatAttr("tx");

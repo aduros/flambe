@@ -33,19 +33,23 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
     override private function loadEntry (entry :AssetEntry)
     {
         var req = new URLRequest(entry.url);
+
+        // The dispatcher to listen for progress, completion and error events
         var dispatcher :IEventDispatcher;
-        var onComplete :Event -> Void;
+
+        // The function called to create the asset after its content loads
+        var create :Void -> Dynamic;
 
         try switch (entry.type) {
             case Image:
                 var loader = new Loader();
                 dispatcher = loader.contentLoaderInfo;
-                onComplete = function (_) {
+                create = function () {
                     var bitmap :Bitmap = cast loader.content;
                     var texture = new FlashTexture(bitmap.bitmapData);
                     var renderer = FlashAppDriver.instance.renderer;
                     renderer.uploadTexture(texture);
-                    handleLoad(entry, texture);
+                    return texture;
                 };
 
                 var ctx = new LoaderContext();
@@ -56,17 +60,12 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
             case Audio:
                 var sound = new Sound(req);
                 dispatcher = sound;
-                onComplete = function (_) {
-                    handleLoad(entry, new FlashSound(sound));
-                };
+                create = function () return new FlashSound(sound);
 
             case Data:
-                var urlLoader = new URLLoader();
+                var urlLoader = new URLLoader(req);
                 dispatcher = urlLoader;
-                onComplete = function (_) {
-                    handleLoad(entry, urlLoader.data);
-                };
-                urlLoader.load(req);
+                create = function () return urlLoader.data;
 
         } catch (error :Error) {
             handleError(error.message);
@@ -77,7 +76,16 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
         events.addListener(dispatcher, ProgressEvent.PROGRESS, function (event :ProgressEvent) {
             handleProgress(entry, cast event.bytesLoaded);
         });
-        events.addDisposingListener(dispatcher, Event.COMPLETE, onComplete);
+        events.addDisposingListener(dispatcher, Event.COMPLETE, function (_) {
+            var asset;
+            try {
+                asset = create();
+            } catch (error :Error) {
+                handleError(error.message);
+                return;
+            }
+            handleLoad(entry, asset);
+        });
         events.addDisposingListener(dispatcher, IOErrorEvent.IO_ERROR, onError);
         events.addDisposingListener(dispatcher, SecurityErrorEvent.SECURITY_ERROR, onError);
     }

@@ -37,7 +37,7 @@ class MovieSymbol
         for (layerElement in layerElements) {
             var layer = new MovieLayer(layerElement);
             frames = cast Math.max(layer.frames, frames);
-            layers.push(layer);
+            layers.unshift(layer);
         }
     }
 

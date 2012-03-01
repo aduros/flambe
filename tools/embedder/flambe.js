@@ -7,8 +7,8 @@
  */
 var flambe = {};
 
-/** @define {number} */
-flambe.FLASH_VERSION = 10.1;
+/** @define {string} */
+flambe.FLASH_VERSION = "10.1";
 
 /**
  * Embed a Flambe game into the page.

@@ -4,13 +4,11 @@
 
 package flambe.xfl;
 
-import haxe.xml.Fast;
-
 import flambe.display.Sprite;
 import flambe.math.FMath;
 import flambe.math.Matrix;
 
-using flambe.util.Xmls;
+import flambe.xfl.Format;
 
 class MovieSymbol
     implements Symbol
@@ -21,23 +19,17 @@ class MovieSymbol
     /** The total number of frames in this movie. */
     public var frames (default, null) :Int;
 
-    public function new (reader :Fast)
+    public function new (reader :MovieFormat)
     {
-        var symbolElement = reader.node.DOMSymbolItem;
-        _name = symbolElement.att.name;
-
-        var layerElements = symbolElement
-            .node.timeline
-            .node.DOMTimeline
-            .node.layers
-            .nodes.DOMLayer;
+        _name = reader.symbol;
+        trace(reader.symbol);
 
         frames = 0;
         layers = [];
-        for (layerElement in layerElements) {
-            var layer = new MovieLayer(layerElement);
+        for (layerObject in reader.layers) {
+            var layer = new MovieLayer(layerObject);
             frames = cast Math.max(layer.frames, frames);
-            layers.unshift(layer);
+            layers.push(layer);
         }
     }
 
@@ -66,14 +58,14 @@ class MovieLayer
     /** True if this layer contains keyframes with at least two different symbols. */
     public var multipleSymbols :Bool;
 
-    public function new (reader :Fast)
+    public function new (reader :LayerFormat)
     {
-        name = reader.att.name;
+        name = reader.name;
         multipleSymbols = false;
 
         keyframes = [];
-        for (element in reader.node.frames.nodes.DOMFrame) {
-            keyframes.push(new MovieKeyframe(element, false));
+        for (keyframeObject in reader.keyframes) {
+            keyframes.push(new MovieKeyframe(keyframeObject, false));
         }
     }
 
@@ -104,11 +96,12 @@ class MovieKeyframe
 
     public var alpha (default, null) :Float;
 
-    public function new (reader :Fast, flipbook :Bool)
+    public function new (reader :KeyframeFormat, flipbook :Bool)
     {
-        index = reader.getIntAttr("index");
-        duration = reader.getIntAttr("duration", 1);
-        label = reader.getStringAttr("name");
+        index = reader.index;
+        duration = reader.duration;
+        label = reader.label;
+        symbolName = reader.ref;
 
         x = 0;
         y = 0;
@@ -121,40 +114,19 @@ class MovieKeyframe
             return; // Purely labelled frame
         }
 
-        reader = reader.node.elements;
-        if (!reader.hasNode.DOMSymbolInstance) {
+        if (symbolName == null) {
             return;
         }
 
-        reader = reader.node.DOMSymbolInstance;
-        symbolName = reader.att.libraryItemName;
+        var t = reader.t;
+        x = t[0];
+        y = t[1];
+        scaleX = t[2];
+        scaleY = t[3];
+        rotation = FMath.toDegrees(t[4]);
 
-        // FIXME: Flump puts the exported for AS name in the atlas, but the XFL references the name of the
-        // item in the library. They aren't necessarily the same. Spaces in library item names get
-        // trimmed by Flash when it creates a matching export name.
-        symbolName = StringTools.replace(symbolName, " ", "");
-
-        if (reader.hasNode.matrix) {
-            var matrixElement = reader.node.matrix.node.Matrix;
-            x = matrixElement.getFloatAttr("tx");
-            y = matrixElement.getFloatAttr("ty");
-
-            var matrix = new Matrix();
-            matrix.m00 = matrixElement.getFloatAttr("a", 1);
-            matrix.m10 = matrixElement.getFloatAttr("b");
-            matrix.m01 = matrixElement.getFloatAttr("c");
-            matrix.m11 = matrixElement.getFloatAttr("d", 1);
-
-            scaleX = Math.sqrt(matrix.m00*matrix.m00 + matrix.m10*matrix.m10);
-            scaleY = Math.sqrt(matrix.m01*matrix.m01 + matrix.m11*matrix.m11);
-
-            var p = matrix.transformPoint(1, 0);
-            rotation = FMath.toDegrees(Math.atan2(p.y, p.x));
-        }
-
-        if (reader.hasNode.color) {
-            var colorElement = reader.node.color.node.Color;
-            alpha = colorElement.getFloatAttr("alphaMultiplier", 1);
+        if (reader.a != null) {
+            alpha = reader.a;
         }
     }
 }

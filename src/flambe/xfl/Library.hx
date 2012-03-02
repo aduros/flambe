@@ -4,12 +4,9 @@
 
 package flambe.xfl;
 
-import haxe.xml.Fast;
-
 import flambe.asset.AssetPack;
 import flambe.display.Sprite;
-
-using flambe.util.Xmls;
+import flambe.xfl.Format;
 
 class Library
 {
@@ -19,21 +16,20 @@ class Library
     {
         _symbols = new Hash();
 
-        var xml = Xml.parse(pack.loadFile(baseDir + "/resources.xml")).firstChild();
-        var reader = new Fast(xml);
+        var reader :Format = Json.parse(pack.loadFile(baseDir + "/resources.json"));
 
         var movies = [];
-        for (movieElement in reader.nodes.movie) {
-            var movie = new MovieSymbol(movieElement);
+        for (movieObject in reader.movies) {
+            var movie = new MovieSymbol(movieObject);
             movies.push(movie);
             _symbols.set(movie.name, movie);
         }
 
-        for (atlasElement in reader.nodes.atlas) {
+        for (atlasObject in reader.atlases) {
             // TODO(bruno): Should textures be relative to baseDir?
-            var atlas = pack.loadTexture(atlasElement.att.filename);
-            for (textureElement in atlasElement.nodes.texture) {
-                var bitmap = new BitmapSymbol(textureElement, atlas);
+            var atlas = pack.loadTexture(atlasObject.file);
+            for (textureObject in atlasObject.textures) {
+                var bitmap = new BitmapSymbol(textureObject, atlas);
                 _symbols.set(bitmap.name, bitmap);
             }
         }
@@ -79,3 +75,13 @@ class Library
 
     private var _symbols :Hash<Symbol>;
 }
+
+// TODO(bruno): Temporary hack for native JSON parsing until it becomes available in the next
+// version of haxe
+#if (flash_10_3 || js)
+@:native("JSON") extern private class Json {
+    public static function parse (text :String) :Dynamic;
+}
+#else
+typedef Json = hxjson2.JSON;
+#end

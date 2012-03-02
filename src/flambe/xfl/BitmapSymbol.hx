@@ -4,12 +4,9 @@
 
 package flambe.xfl;
 
-import haxe.xml.Fast;
-
 import flambe.display.Sprite;
 import flambe.display.Texture;
-
-using flambe.util.Xmls;
+import flambe.xfl.Format;
 
 class BitmapSymbol
     implements Symbol
@@ -23,17 +20,20 @@ class BitmapSymbol
     public var anchorX (default, null) :Float;
     public var anchorY (default, null) :Float;
 
-    public function new (reader :Fast, atlas :Texture)
+    public function new (reader, atlas :Texture)
     {
-        _name = reader.att.name;
-
+        _name = reader.name;
         this.atlas = atlas;
-        x = reader.getFloatAttr("xAtlas");
-        y = reader.getFloatAttr("yAtlas");
-        width = reader.getFloatAttr("wAtlas");
-        height = reader.getFloatAttr("hAtlas");
-        anchorX = -reader.getFloatAttr("xOffset");
-        anchorY = -reader.getFloatAttr("yOffset");
+
+        var rect = reader.rect;
+        x = rect[0];
+        y = rect[1];
+        width = rect[2];
+        height = rect[3];
+
+        var offset = reader.offset;
+        anchorX = offset[0];
+        anchorY = offset[1];
     }
 
     public function createSprite () :Sprite

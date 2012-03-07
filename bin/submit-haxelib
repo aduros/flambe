@@ -1,0 +1,29 @@
+#!/bin/sh
+#
+# Bag and tag a release to haxelib
+
+if [ $# -lt 1 ]; then
+    echo "Usage: $0 VERSION"
+    exit 1
+fi
+
+VERSION=$1
+ARCHIVE=/tmp/haxelib.zip
+
+rm -f $ARCHIVE
+git ls-files tools src LICENSE.txt | zip $ARCHIVE -@
+
+# Process the haxelib.xml template and add it to the zip
+sed -e s/{{VERSION}}/$VERSION/ etc/haxelib.xml > /tmp/haxelib.xml
+zip -j $ARCHIVE /tmp/haxelib.xml
+
+# Now would be a good time to double-check everything works
+haxelib test $ARCHIVE
+
+read -p "Submit Flambe $VERSION to haxelib [Y/n]? " CONFIRM
+case "$CONFIRM" in
+    "Y" | "y" | "")
+        git tag $VERSION
+        haxelib submit $ARCHIVE
+        ;;
+esac

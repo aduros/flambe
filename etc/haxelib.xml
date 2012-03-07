@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="flambe" url="https://github.com/aduros/flambe" license="BSD">
+
+  <user name="aduros"/>
+  <description>
+    Flambe is a fast, expressive, and cross-platform engine for Flash and HTML5 games.
+  </description>
+
+  <depends name="format"/>
+  <depends name="hxJson2"/> <!-- TODO(bruno): Remove this dependency after next haXe release -->
+
+  <version name="{{VERSION}}">See https://github.com/aduros/flambe/wiki/changelog</version>
+
+  <tag v="android"/>
+  <tag v="cross"/>
+  <tag v="flash"/>
+  <tag v="game"/>
+  <tag v="html5"/>
+  <tag v="ios"/>
+  <tag v="javascript"/>
+  <tag v="js"/>
+  <tag v="nodejs"/>
+
+</project>

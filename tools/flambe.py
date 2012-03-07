@@ -4,14 +4,16 @@ from waflib import *
 from waflib.TaskGen import *
 import os
 
-# Waf hates absolute paths for some reason
 FLAMBE_ROOT = os.path.dirname(__file__) + "/.."
-
 SERVER_CONFIG = "/tmp/flambe-server.py"
 
 def options(ctx):
-    ctx.add_option("--debug", action="store_true", default=False,
-        help="Build a development version")
+    group = ctx.add_option_group("flambe options")
+    group.add_option("--debug", action="store_true", help="Build a debug version for development")
+    group.add_option("--no-flash", action="store_true", help="Skip all Flash builds")
+    group.add_option("--no-html", action="store_true", help="Skip all HTML builds")
+    group.add_option("--no-android", action="store_true", help="Skip all Android builds")
+    group.add_option("--no-ios", action="store_true", help="Skip all iOS builds")
 
 def configure(ctx):
     ctx.load("haxe", tooldir=FLAMBE_ROOT+"/tools")
@@ -19,8 +21,12 @@ def configure(ctx):
     ctx.find_program("npm", var="NPM", mandatory=False)
     ctx.find_program("adt", var="ADT", mandatory=False)
     ctx.find_program("adb", var="ADB", mandatory=False)
+
     ctx.env.debug = ctx.options.debug
-    ctx.env.has_android = bool(ctx.env.ADT and ctx.env.ADB)
+    ctx.env.has_flash = (not ctx.options.no_flash)
+    ctx.env.has_html = (not ctx.options.no_html)
+    ctx.env.has_android = (not ctx.options.no_android) and bool(ctx.env.ADT and ctx.env.ADB)
+    ctx.env.has_ios = False # (not ctx.options.no_ios) and bool(ctx.env.ADT)
 
 @feature("flambe")
 def apply_flambe(ctx):
@@ -29,12 +35,18 @@ def apply_flambe(ctx):
         airCert="etc/air-cert.pfx", airDesc="etc/air-desc.xml", airPassword=None,
         iosProfile="etc/ios.mobileprovision")
 
-    classpath=["src", FLAMBE_ROOT+"/src"] + Utils.to_list(ctx.classpath)
+    classpath = [ ctx.path.find_dir("src"), ctx.bld.root.find_dir(FLAMBE_ROOT+"/src") ] + \
+        Utils.to_list(ctx.classpath) # The classpath option should be a list of nodes
     flags = ["-main", ctx.main] + Utils.to_list(ctx.flags)
     libs = ["hxJson2", "format"] + Utils.to_list(ctx.libs)
     platforms = Utils.to_list(ctx.platforms)
     debug = ctx.env.debug
-    air = "android" in platforms or "ios" in platforms
+
+    # Figure out what should be built
+    buildFlash = "flash" in platforms and ctx.env.has_flash
+    buildHtml = "html" in platforms and ctx.env.has_html
+    buildAndroid = "android" in platforms and ctx.env.has_android
+    buildIOS = "ios" in platforms and ctx.env.has_ios
 
     assetDir = ctx.path.find_dir("assets")
     assetList = [] if assetDir is None else assetDir.ant_glob("**/*")
@@ -42,7 +54,7 @@ def apply_flambe(ctx):
     installPrefix = "deploy/" + ctx.app + "/"
     buildPrefix = ctx.app + "/"
 
-    closure = ctx.bld.path.find_resource(FLAMBE_ROOT+"/tools/closure.jar")
+    closure = ctx.bld.root.find_resource(FLAMBE_ROOT+"/tools/closure.jar")
 
     # Don't forget to change flambe.js when changing -swf-version!
     flashVersion = 10.1
@@ -65,7 +77,7 @@ def apply_flambe(ctx):
             "addMetadata(\"@assetBase('%s')\", \"flambe.asset.Manifest\")" % ctx.assetBase,
         ]
 
-    if "flash" in platforms:
+    if buildFlash:
         swf = buildPrefix + "app-flash.swf"
         outputs.append(swf)
         ctx.bld(features="haxe", classpath=classpath,
@@ -74,7 +86,7 @@ def apply_flambe(ctx):
             target=swf)
         ctx.bld.install_files(installPrefix + "web", swf)
 
-    if "html" in platforms:
+    if buildHtml:
         uncompressed = buildPrefix + "app-html.uncompressed.js"
         js = buildPrefix + "app-html.js"
         outputs.append(js)
@@ -98,7 +110,7 @@ def apply_flambe(ctx):
             ctx.bld.install_files(installPrefix + "web", js + ".map")
         ctx.bld.install_files(installPrefix + "web", js)
 
-    if air:
+    if buildAndroid or buildIOS:
         # TODO(bruno): Always use the very latest SWF version here, since we need Stage3D and we
         # use a bundled runtime anyways
         swf = buildPrefix + "app-air.swf"
@@ -126,7 +138,7 @@ def apply_flambe(ctx):
 
         airApps = []
 
-        if "android" in platforms:
+        if buildAndroid:
             adb = ctx.env.ADB
             if not adb:
                 ctx.bld.fatal("adb from the Android SDK is required, " + \
@@ -155,7 +167,7 @@ def apply_flambe(ctx):
 
             airApps.append((buildPrefix + "app-android.apk", rule))
 
-        if "ios" in platforms:
+        if buildIOS:
             iosProfile = ctx.path.find_resource(ctx.iosProfile)
             if not iosProfile:
                 ctx.bld.fatal("Could not find iOS provisioning profile at %s." % ctx.iosProfile)
@@ -193,10 +205,10 @@ def apply_flambe(ctx):
             ctx.bld.install_files(installPrefix + "apps", target)
 
     # Common web stuff
-    if "flash" in platforms or "html" in platforms:
+    if buildFlash or buildHtml:
         # Compile the embedder script
         embedder = buildPrefix + "flambe.js"
-        scripts = ctx.bld.path.find_dir(FLAMBE_ROOT+"/tools/embedder").ant_glob("*.js")
+        scripts = ctx.bld.root.find_dir(FLAMBE_ROOT+"/tools/embedder").ant_glob("*.js")
         ctx.bld(rule="%s -jar %s -D flambe.FLASH_VERSION=\\'%s\\' --js_output_file \"${TGT}\" %s" %
             (quote(ctx.env.JAVA), quote(closure.abspath()), flashVersion,
             " ".join(["--js " + quote(script.abspath()) for script in scripts]),
@@ -208,7 +220,7 @@ def apply_flambe(ctx):
         # Install the default index.html if necessary
         if ctx.bld.path.find_dir("web") == None:
             ctx.bld.install_files(installPrefix + "web",
-                ctx.bld.path.find_resource(FLAMBE_ROOT+"/tools/embedder/index.html"))
+                ctx.bld.root.find_resource(FLAMBE_ROOT+"/tools/embedder/index.html"))
 
         # Install the assets
         if assetDir is not None:
@@ -258,7 +270,6 @@ def apply_flambe_server(ctx):
     if ctx.env.debug:
         flags += "-D debug --no-opt --no-inline".split()
     else:
-        #flags += "--dead-code-elimination --no-traces".split()
         flags += "--no-traces".split()
 
     server = buildPrefix + "server.js"

@@ -84,6 +84,6 @@ def apply_haxe(self):
         flags += ["-lib", lib]
 
     task = self.create_task("haxe", inputs, outputs)
-    task.classpath = [self.path.find_node(cp) for cp in classpath]
+    task.classpath = classpath
     task.env.flags = flags
     self.haxe_task = task

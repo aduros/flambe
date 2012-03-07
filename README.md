@@ -23,7 +23,7 @@ Flambe uses bleeding edge features in Three Rings' [haXe fork](https://github.co
 so you will need to use that if you want to try out Flambe. This requirement will be removed once
 things stabilize later.
 
-Pick up [Waf](https://code.google.com/p/waf/), cd into one of the demos, and:
+Pick up [Waf](https://code.google.com/p/waf/), cd into one of the [demos](https://github.com/aduros/flambe-demos), and:
 
     waf configure --debug
     waf install

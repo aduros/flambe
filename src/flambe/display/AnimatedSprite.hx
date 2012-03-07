@@ -8,6 +8,9 @@ import flambe.animation.Property;
 import flambe.display.SpriteSheet;
 import flambe.math.FMath;
 
+/**
+ * @deprecated Use Flump and flambe.swf instead. This will be removed in a future version.
+ */
 class AnimatedSprite extends Sprite
 {
     public var sheet (default, null) :SpriteSheet;

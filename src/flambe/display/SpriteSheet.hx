@@ -10,6 +10,9 @@ import flambe.asset.AssetPack;
 import flambe.display.Texture;
 import flambe.math.FMath;
 
+/**
+ * @deprecated Use Flump and flambe.swf instead. This will be removed in a future version.
+ */
 class SpriteSheet
 {
     public var name (default, null) :String;

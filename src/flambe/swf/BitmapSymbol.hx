@@ -2,11 +2,11 @@
 // Flambe - Rapid game development
 // https://github.com/aduros/flambe/blob/master/LICENSE.txt
 
-package flambe.xfl;
+package flambe.swf;
 
 import flambe.display.Sprite;
 import flambe.display.Texture;
-import flambe.xfl.Format;
+import flambe.swf.Format;
 
 class BitmapSymbol
     implements Symbol

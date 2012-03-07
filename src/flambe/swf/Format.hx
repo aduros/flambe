@@ -2,7 +2,7 @@
 // Flambe - Rapid game development
 // https://github.com/aduros/flambe/blob/master/LICENSE.txt
 
-package flambe.xfl;
+package flambe.swf;
 
 // Documents Flump's JSON format and adds some type-safety to parsing
 

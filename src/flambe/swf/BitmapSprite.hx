@@ -2,7 +2,7 @@
 // Flambe - Rapid game development
 // https://github.com/aduros/flambe/blob/master/LICENSE.txt
 
-package flambe.xfl;
+package flambe.swf;
 
 import flambe.display.DrawingContext;
 import flambe.display.Sprite;

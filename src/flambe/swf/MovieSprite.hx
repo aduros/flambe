@@ -2,10 +2,10 @@
 // Flambe - Rapid game development
 // https://github.com/aduros/flambe/blob/master/LICENSE.txt
 
-package flambe.xfl;
+package flambe.swf;
 
 import flambe.display.Sprite;
-import flambe.xfl.MovieSymbol;
+import flambe.swf.MovieSymbol;
 
 class MovieSprite extends Sprite
 {

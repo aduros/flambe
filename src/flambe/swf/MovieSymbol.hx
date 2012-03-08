@@ -94,6 +94,9 @@ class MovieKeyframe
     public var scaleY (default, null) :Float;
     public var rotation (default, null) :Float;
 
+    public var pivotX (default, null) :Float;
+    public var pivotY (default, null) :Float;
+
     public var alpha (default, null) :Float;
 
     public function new (reader :KeyframeFormat, flipbook :Bool)
@@ -125,8 +128,12 @@ class MovieKeyframe
         scaleY = t[3];
         rotation = FMath.toDegrees(t[4]);
 
-        if (reader.a != null) {
-            alpha = reader.a;
+        var pivot = reader.pivot;
+        pivotX = pivot[0];
+        pivotY = pivot[1];
+
+        if (reader.alpha != null) {
+            alpha = reader.alpha;
         }
     }
 }

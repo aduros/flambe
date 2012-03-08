@@ -7,6 +7,14 @@ package flambe.swf;
 // Documents Flump's JSON format and adds some type-safety to parsing
 
 typedef Format = {
+    // The file format version number
+    version: Int,
+
+    // A checksum of the original XFL library used to generate this file, used by the exporter tool
+    // to detect modifications
+    checksum: String,
+
+    // All the movies and atlases in the library
     movies: Array<MovieFormat>,
     atlases: Array<AtlasFormat>,
 }
@@ -41,8 +49,11 @@ typedef KeyframeFormat = {
     // Optional: Symbol transform properties [ x, y, scaleX, scaleY, rotation (radians) ]
     t: Null<Array<Float>>,
 
+    // Optional: Symbol transform properties [ x, y, scaleX, scaleY, rotation (radians) ]
+    pivot: Null<Array<Float>>,
+
     // Optional: Symbol alpha
-    a: Null<Float>,
+    alpha: Null<Float>,
 
     // Optional: The frame label that was added to this keyframe in Flash
     label: Null<String>,

@@ -162,6 +162,10 @@ private class LayerSprite extends Sprite
             rotation._ = kf.rotation + (nextKf.rotation - kf.rotation) * interp;
             alpha._ = kf.alpha + (nextKf.alpha - kf.alpha) * interp;
         }
+
+        // TODO(bruno): Should this be interpolated?
+        anchorX._ = kf.pivotX;
+        anchorY._ = kf.pivotY;
     }
 
     private var _keyframes :Array<MovieKeyframe>;

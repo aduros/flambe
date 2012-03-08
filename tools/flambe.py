@@ -56,11 +56,7 @@ def apply_flambe(ctx):
 
     closure = ctx.bld.root.find_resource(FLAMBE_ROOT+"/tools/closure.jar")
 
-    # Don't forget to change flambe.js when changing -swf-version!
-    flashVersion = 10.1
-    flashFlags = ("-swf-version %s -swf-header 640:480:60:ffffff" % flashVersion).split()
-
-    htmlFlags = "-D html --js-contain".split()
+    flashVersion = "10.1"
 
     # The files that are built and should be installed
     outputs = []
@@ -78,8 +74,11 @@ def apply_flambe(ctx):
         ]
 
     if buildFlash:
+        flashFlags = ["-swf-version", flashVersion]
+
         swf = buildPrefix + "app-flash.swf"
         outputs.append(swf)
+
         ctx.bld(features="haxe", classpath=classpath,
             flags=flags + flashFlags,
             libs=libs,
@@ -87,9 +86,12 @@ def apply_flambe(ctx):
         ctx.bld.install_files(installPrefix + "web", swf)
 
     if buildHtml:
+        htmlFlags = "-D html --js-contain".split()
+
         uncompressed = buildPrefix + "app-html.uncompressed.js"
         js = buildPrefix + "app-html.js"
         outputs.append(js)
+
         ctx.bld(features="haxe", classpath=classpath,
             flags=flags + htmlFlags,
             libs=libs,
@@ -111,11 +113,13 @@ def apply_flambe(ctx):
         ctx.bld.install_files(installPrefix + "web", js)
 
     if buildAndroid or buildIOS:
-        # TODO(bruno): Always use the very latest SWF version here, since we need Stage3D and we
-        # use a bundled runtime anyways
+        # Since the captive runtime is used for apps, we can always use the latest swf version
+        airFlags = "-D air -swf-version 11.2".split()
+
         swf = buildPrefix + "app-air.swf"
+
         ctx.bld(features="haxe", classpath=classpath,
-            flags=flags + flashFlags + "-D air".split(),
+            flags=flags + airFlags,
             libs=libs,
             target=swf)
 

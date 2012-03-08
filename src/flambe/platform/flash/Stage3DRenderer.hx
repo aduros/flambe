@@ -66,7 +66,7 @@ class Stage3DRenderer
         }
 
         log.warn("No free Stage3Ds available");
-        onError(null);
+        onError();
     }
 
     private function uploadToContext3D (texture :FlashTexture)
@@ -104,12 +104,14 @@ class Stage3DRenderer
 
         log.info("Created new Stage3D context", ["driver", _context3D.driverInfo]);
 
-        // if (_context3D.driverInfo.indexOf("Software") != -1) {
-        //     var ref = _context3D;
-        //     onError(null);
-        //     ref.dispose();
-        //     return;
-        // }
+        // BitmapRenderer is faster than carrying on with a software driver
+        if (_context3D.driverInfo.indexOf("Software") != -1) {
+            log.warn("Detected a slow Stage3D driver, refusing to go on");
+            var ref = _context3D;
+            onError();
+            ref.dispose();
+            return;
+        }
 
         // Re-upload any lost textures to the GPU
         for (texture in _textures) {
@@ -120,8 +122,10 @@ class Stage3DRenderer
         onResize(null);
     }
 
-    private function onError (event :ErrorEvent)
+    private function onError (?event :ErrorEvent)
     {
+        _events.dispose();
+
         // Free up any Stage3D textures that will no longer be needed
         for (texture in _textures) {
             texture.nativeTexture = null;
@@ -132,8 +136,10 @@ class Stage3DRenderer
         _context3D = null;
         _stage3D = null;
 
-        log.warn("Stage3D error, falling back to BitmapRenderer",
-            (event != null) ? ["error", event.text] : null);
+        if (event != null) {
+            log.warn("Unexpected Stage3D error", ["error", event.text]);
+        }
+        log.warn("Falling back to BitmapRenderer");
 
         // Fall back to software renderering
         FlashAppDriver.instance.renderer = new BitmapRenderer();

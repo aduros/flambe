@@ -25,6 +25,7 @@ class FlashStage implements Stage
         resize = new Signal0();
 
         _stage.scaleMode = NO_SCALE;
+        _stage.frameRate = 60;
         _stage.showDefaultContextMenu = false;
         _stage.addEventListener(Event.RESIZE, onResize);
 

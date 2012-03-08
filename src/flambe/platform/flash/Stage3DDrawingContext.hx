@@ -318,7 +318,9 @@ class Stage3DDrawingContext
     {
         flushBatch();
         _context3D.present();
+#if flambe_debug_renderer
         trace("==================");
+#end
     }
 
     public function resize (width :Int, height :Int)
@@ -365,7 +367,9 @@ class Stage3DDrawingContext
         }
         _batchVerts = _context3D.createVertexBuffer(4*newSize, ELEMENTS_PER_VERTEX);
 
+#if flambe_debug_renderer
         trace("Expanded batch to " + newSize);
+#end
     }
 
     private function flushBatch ()
@@ -374,7 +378,9 @@ class Stage3DDrawingContext
             return;
         }
 
+#if flambe_debug_renderer
         trace("Flushing batch of " + _quads + " quads");
+#end
 
         if (_nextBlendMode != null) {
             switch (_nextBlendMode) {

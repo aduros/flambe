@@ -153,6 +153,12 @@ private class DrawVisitor
             drawCtx.scale(scaleX, scaleY);
         }
 
+        var anchorX = sprite.anchorX._;
+        var anchorY = sprite.anchorY._;
+        if (anchorX != 0 || anchorY != 0) {
+            drawCtx.translate(-anchorX, -anchorY);
+        }
+
         sprite.draw(drawCtx);
 
         return true;

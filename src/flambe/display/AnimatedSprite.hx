@@ -80,8 +80,8 @@ class AnimatedSprite extends Sprite
         }
         var frameData = animation.frames[frame];
         ctx.drawSubImage(sheet.texture,
-            -anchorX._ - animation.anchorX + frameData.offsetX,
-            -anchorY._ - animation.anchorY + frameData.offsetY,
+            - animation.anchorX + frameData.offsetX,
+            - animation.anchorY + frameData.offsetY,
             frameData.x, frameData.y, frameData.width, frameData.height);
     }
 

@@ -22,7 +22,7 @@ class FillSprite extends Sprite
 
     override public function draw (ctx :DrawingContext)
     {
-        ctx.fillRect(color._, -anchorX._, -anchorY._, width._, height._);
+        ctx.fillRect(color._, 0, 0, width._, height._);
     }
 
     override public function getNaturalWidth () :Float

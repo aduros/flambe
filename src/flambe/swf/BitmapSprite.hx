@@ -19,8 +19,7 @@ class BitmapSprite extends Sprite
 
     override public function draw (ctx :DrawingContext)
     {
-        ctx.drawSubImage(_symbol.atlas, -anchorX._, -anchorY._,
-            _symbol.x, _symbol.y, _symbol.width, _symbol.height);
+        ctx.drawSubImage(_symbol.atlas, 0, 0, _symbol.x, _symbol.y, _symbol.width, _symbol.height);
     }
 
     override public function getNaturalWidth () :Float

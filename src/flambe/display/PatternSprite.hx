@@ -22,7 +22,7 @@ class PatternSprite extends Sprite
 
     override public function draw (ctx :DrawingContext)
     {
-        ctx.drawPattern(texture, -anchorX._, -anchorY._, width._, height._);
+        ctx.drawPattern(texture, 0, 0, width._, height._);
     }
 
     override public function getNaturalWidth () :Float

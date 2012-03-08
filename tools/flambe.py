@@ -239,7 +239,8 @@ def apply_flambe(ctx):
 def apply_flambe_server(ctx):
     Utils.def_attrs(ctx, app="default", classpath="", flags="", libs="", npmLibs="", include="")
 
-    classpath=["src", FLAMBE_ROOT+"/src"] + Utils.to_list(ctx.classpath)
+    classpath = [ ctx.path.find_dir("src"), ctx.bld.root.find_dir(FLAMBE_ROOT+"/src") ] + \
+        Utils.to_list(ctx.classpath) # The classpath option should be a list of nodes
     flags = ["-main", ctx.main] + Utils.to_list(ctx.flags)
     libs = Utils.to_list(ctx.libs)
     npmLibs = Utils.to_list(ctx.npmLibs)
@@ -254,7 +255,7 @@ def apply_flambe_server(ctx):
 
         cwd = ctx.path.get_bld().make_node(buildPrefix)
         for npmLib in npmLibs:
-            ctx.bld(rule="%s install %s" % (quote(ctx.env.NPM), quote(npmLib)), cwd=cwd.abspath())
+            ctx.bld(rule="%s install %s" % (quote(ctx.env.NPM), npmLib), cwd=cwd.abspath())
 
         if ctx.bld.cmd == "install":
             # Find files to install only after npm has downloaded them

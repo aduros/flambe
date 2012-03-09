@@ -221,10 +221,12 @@ def apply_flambe(ctx):
             ctx.bld.add_manual_dependency(embedder, script)
         ctx.bld.install_files(installPrefix + "web", embedder)
 
-        # Install the default index.html if necessary
+        # Install the default embedder page if necessary
         if ctx.bld.path.find_dir("web") == None:
-            ctx.bld.install_files(installPrefix + "web",
-                ctx.bld.root.find_resource(FLAMBE_ROOT+"/tools/embedder/index.html"))
+            ctx.bld.install_files(installPrefix + "web", [
+                ctx.bld.root.find_resource(FLAMBE_ROOT+"/tools/embedder/index.html"),
+                ctx.bld.root.find_resource(FLAMBE_ROOT+"/tools/embedder/logo.png"),
+            ])
 
         # Install the assets
         if assetDir is not None:

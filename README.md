@@ -1,4 +1,4 @@
-Flambe
+![Flambe](https://raw.github.com/aduros/flambe/master/tools/embedder/logo.png) Flambe
 ======
 
 Flambe is an engine and asset pipeline for cross-platform multiplayer games.

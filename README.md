@@ -40,4 +40,4 @@ have it plugged in.
 What now, you ask? Documentation is slim, but the demos should be instructive. Once the dust
 settles, I'll write some proper docs and a series of tutorials.
 
-Are things not working? I'd be happy to help, send a message to ah.duros at gmail!
+Are things not working? I'd be happy to help, [send me a message](https://github.com/aduros)!

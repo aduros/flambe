@@ -19,9 +19,8 @@ TODO! But for now, here are some philosophies I have been following for this pro
 Building
 --------
 
-Flambe uses bleeding edge features in Three Rings' [haXe fork](https://github.com/threerings/haxe),
-so you will need to use that if you want to try out Flambe. This requirement will be removed once
-things stabilize later.
+Flambe uses bleeding edge features in haXe, so you'll probably need a nightly build if you want to
+try it out. This requirement will be removed once haXe 2.09 is released.
 
 Pick up [Waf](https://code.google.com/p/waf/), cd into one of the [demos](https://github.com/aduros/flambe-demos), and:
 

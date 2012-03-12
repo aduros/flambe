@@ -154,6 +154,21 @@ private class LayerSprite extends Sprite
 
         } else {
             var interp = (frameFloat - kf.index)/kf.duration;
+            var ease = kf.ease;
+            if (ease != 0) {
+                var t;
+                if (ease < 0) {
+                    // Ease in
+                    var inv = 1 - interp;
+                    t = 1 - inv*inv;
+                    ease = -ease;
+                } else {
+                    // Ease out
+                    t = interp*interp;
+                }
+                interp = ease*t + (1 - ease)*interp;
+            }
+
             var nextKf = _keyframes[keyframeIdx + 1];
             x._ = kf.x + (nextKf.x - kf.x) * interp;
             y._ = kf.y + (nextKf.y - kf.y) * interp;
@@ -163,9 +178,9 @@ private class LayerSprite extends Sprite
             alpha._ = kf.alpha + (nextKf.alpha - kf.alpha) * interp;
         }
 
-        // TODO(bruno): Should this be interpolated?
         anchorX._ = kf.pivotX;
         anchorY._ = kf.pivotY;
+        visible._ = kf.visible;
     }
 
     private var _keyframes :Array<MovieKeyframe>;

@@ -37,26 +37,35 @@ typedef LayerFormat = {
 }
 
 typedef KeyframeFormat = {
-    // The frame in the timeline that this keyframe is on
-    index: Int,
-
     // The number of frames until the next keyframe
     duration: Int,
 
     // Optional: The name of the symbol that should be shown at this keyframe
     ref: Null<String>,
 
-    // Optional: Symbol transform properties [ x, y, scaleX, scaleY, rotation (radians) ]
-    t: Null<Array<Float>>,
+    // Optional: Transform [x, y] properties. Defaults to [0, 0]
+    loc: Null<Array<Float>>,
 
-    // Optional: Symbol transform properties [ x, y, scaleX, scaleY, rotation (radians) ]
+    // Optional: Transform [scaleX, scaleY] properties. Defaults to [1, 1]
+    scale: Null<Array<Float>>,
+
+    // Optional: Transform rotation in radians. Defaults to 0
+    rotation: Null<Float>,
+
+    // Optional: The anchor point [x, y]. Defaults to [0, 0]
     pivot: Null<Array<Float>>,
 
-    // Optional: Symbol alpha
+    // Optional: Symbol alpha. Defaults to 1.0
     alpha: Null<Float>,
 
     // Optional: The frame label that was added to this keyframe in Flash
     label: Null<String>,
+
+    // Optional: Whether this keyframe should be displayed. Defaults to true
+    visible: Null<Bool>,
+
+    // Optional: Easing factor to tween this keyframe's properties, from -1.0 to 1.0. Defaults to 0
+    ease: Null<Float>,
 }
 
 typedef AtlasFormat = {

@@ -64,8 +64,10 @@ class MovieLayer
         multipleSymbols = false;
 
         keyframes = [];
+        var prevKf = null;
         for (keyframeObject in reader.keyframes) {
-            keyframes.push(new MovieKeyframe(keyframeObject, false));
+            prevKf = new MovieKeyframe(keyframeObject, prevKf, false);
+            keyframes.push(prevKf);
         }
     }
 
@@ -99,9 +101,14 @@ class MovieKeyframe
 
     public var alpha (default, null) :Float;
 
-    public function new (reader :KeyframeFormat, flipbook :Bool)
+    public var visible (default, null) :Bool;
+
+    public var ease (default, null) :Float;
+
+    public function new (reader :KeyframeFormat, prevKf :MovieKeyframe, flipbook :Bool)
     {
-        index = reader.index;
+        index = (prevKf != null) ? prevKf.index + prevKf.duration : 0;
+
         duration = reader.duration;
         label = reader.label;
         symbolName = reader.ref;
@@ -111,7 +118,11 @@ class MovieKeyframe
         scaleX = 1;
         scaleY = 1;
         rotation = 0;
+        pivotX = 0;
+        pivotY = 0;
         alpha = 1;
+        visible = true;
+        ease = 0;
 
         if (flipbook) {
             return; // Purely labelled frame
@@ -121,19 +132,38 @@ class MovieKeyframe
             return;
         }
 
-        var t = reader.t;
-        x = t[0];
-        y = t[1];
-        scaleX = t[2];
-        scaleY = t[3];
-        rotation = FMath.toDegrees(t[4]);
+        var loc = reader.loc;
+        if (loc != null) {
+            x = loc[0];
+            y = loc[1];
+        }
+
+        var scale = reader.scale;
+        if (scale != null) {
+            scaleX = scale[0];
+            scaleY = scale[1];
+        }
+
+        if (reader.rotation != null) {
+            rotation = FMath.toDegrees(reader.rotation);
+        }
 
         var pivot = reader.pivot;
-        pivotX = pivot[0];
-        pivotY = pivot[1];
+        if (pivot != null) {
+            pivotX = pivot[0];
+            pivotY = pivot[1];
+        }
 
         if (reader.alpha != null) {
             alpha = reader.alpha;
+        }
+
+        if (reader.visible != null) {
+            visible = reader.visible;
+        }
+
+        if (reader.ease != null) {
+            ease = reader.ease;
         }
     }
 }

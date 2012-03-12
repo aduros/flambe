@@ -4,7 +4,7 @@
 
 package flambe.display;
 
-import hxjson2.JSONDecoder;
+import haxe.Json;
 
 import flambe.asset.AssetPack;
 import flambe.display.Texture;
@@ -27,7 +27,7 @@ class SpriteSheet
 
         _animations = new Hash();
 
-        var json = new JSONDecoder(pack.loadFile(name + ".json"), true).getValue();
+        var json = Json.parse(pack.loadFile(name + ".json"));
         var animations :Array<Dynamic> = json.animations;
         for (animData in animations) {
             var anim = new Animation();

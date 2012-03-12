@@ -38,7 +38,7 @@ def apply_flambe(ctx):
     classpath = [ ctx.path.find_dir("src"), ctx.bld.root.find_dir(FLAMBE_ROOT+"/src") ] + \
         Utils.to_list(ctx.classpath) # The classpath option should be a list of nodes
     flags = ["-main", ctx.main, "--dead-code-elimination"] + Utils.to_list(ctx.flags)
-    libs = ["hxJson2", "format"] + Utils.to_list(ctx.libs)
+    libs = ["format"] + Utils.to_list(ctx.libs)
     platforms = Utils.to_list(ctx.platforms)
     debug = ctx.env.debug
 

@@ -4,6 +4,8 @@
 
 package flambe.swf;
 
+import haxe.Json;
+
 import flambe.asset.AssetPack;
 import flambe.display.Sprite;
 import flambe.swf.Format;
@@ -75,13 +77,3 @@ class Library
 
     private var _symbols :Hash<Symbol>;
 }
-
-// TODO(bruno): Temporary hack for native JSON parsing until it becomes available in the next
-// version of haxe
-#if (flash_10_3 || js)
-@:native("JSON") extern private class Json {
-    public static function parse (text :String) :Dynamic;
-}
-#else
-typedef Json = hxjson2.JSON;
-#end

@@ -25,7 +25,7 @@ class CanvasDrawingContext
 
     public function translate (x :Float, y :Float)
     {
-        _canvasCtx.translate(FMath.toInt(x), FMath.toInt(y));
+        _canvasCtx.translate(Std.int(x), Std.int(y));
     }
 
     public function scale (x :Float, y :Float)
@@ -53,9 +53,9 @@ class CanvasDrawingContext
         sourceX :Float, sourceY :Float, sourceW :Float, sourceH :Float)
     {
         var htmlTexture :HtmlTexture = cast texture;
-        _canvasCtx.drawImage(htmlTexture.image, FMath.toInt(sourceX), FMath.toInt(sourceY),
-            FMath.toInt(sourceW), FMath.toInt(sourceH),
-            FMath.toInt(destX), FMath.toInt(destY), FMath.toInt(sourceW), FMath.toInt(sourceH));
+        _canvasCtx.drawImage(htmlTexture.image,
+            Std.int(sourceX), Std.int(sourceY), Std.int(sourceW), Std.int(sourceH),
+            Std.int(destX), Std.int(destY), Std.int(sourceW), Std.int(sourceH));
     }
 
     public function drawPattern (texture :Texture, x :Float, y :Float, width :Float, height :Float)
@@ -66,16 +66,15 @@ class CanvasDrawingContext
             htmlTexture.pattern = _canvasCtx.createPattern(htmlTexture.image, "repeat");
         }
         _canvasCtx.fillStyle = htmlTexture.pattern;
-        _canvasCtx.fillRect(FMath.toInt(x), FMath.toInt(y),
-            FMath.toInt(width), FMath.toInt(height));
+        _canvasCtx.fillRect(Std.int(x), Std.int(y),
+            Std.int(width), Std.int(height));
     }
 
     public function fillRect (color :Int, x :Float, y :Float, width :Float, height :Float)
     {
         // Use slice() here rather than haXe's substr monkey patch
         _canvasCtx.fillStyle = untyped "#" + ("00000" + color.toString(16)).slice(-6);
-        _canvasCtx.fillRect(FMath.toInt(x), FMath.toInt(y),
-            FMath.toInt(width), FMath.toInt(height));
+        _canvasCtx.fillRect(Std.int(x), Std.int(y), Std.int(width), Std.int(height));
     }
 
     public function multiplyAlpha (factor :Float)

@@ -21,19 +21,6 @@ class FMath
     public static inline var NUMBER_MIN = 1.79769313486231e+308;
     public static inline var NUMBER_MAX = -1.79769313486231e+308;
 
-    /**
-     * Like Std.int(), but behaves the same in both Flash and JS.
-     */
-    inline public static function toInt (f :Float) :Int
-    {
-#if js
-        // TODO(bruno): It would be nice if this was how JS's Std.int worked. Submit a patch?
-        return (cast f) | 0;
-#else
-        return Std.int(f);
-#end
-    }
-
     inline public static function toRadians (degrees :Float) :Float
     {
         return degrees * PI/180;

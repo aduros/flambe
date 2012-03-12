@@ -6,7 +6,6 @@ package flambe.display;
 
 import flambe.animation.Property;
 import flambe.display.SpriteSheet;
-import flambe.math.FMath;
 
 /**
  * @deprecated Use Flump and flambe.swf instead. This will be removed in a future version.
@@ -54,7 +53,7 @@ class AnimatedSprite extends Sprite
 
         if (animation != null && !paused) {
             _elapsed += dt*speed._;
-            var framesElapsed = FMath.toInt(_elapsed / animation.delay);
+            var framesElapsed = Std.int(_elapsed / animation.delay);
             if (framesElapsed > 0) {
                 _elapsed -= framesElapsed*animation.delay;
                 _frame += framesElapsed;

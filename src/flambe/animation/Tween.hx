@@ -5,7 +5,6 @@
 package flambe.animation;
 
 import flambe.animation.Easing;
-import flambe.math.FMath;
 
 class Tween
     implements Behavior<Float>
@@ -14,7 +13,7 @@ class Tween
     {
         _from = from;
         _to = to;
-        _duration = FMath.toInt(1000*seconds);
+        _duration = Std.int(1000*seconds);
         _elapsed = 0;
         _easing = (easing != null) ? easing : Easing.linear;
     }

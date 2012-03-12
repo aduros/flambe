@@ -6,7 +6,6 @@ package flambe.script;
 
 import flambe.animation.Jitter;
 import flambe.display.Sprite;
-import flambe.math.FMath;
 
 /**
  * Shakes an entity's sprite by jittering its X and Y for a set duration.
@@ -18,7 +17,7 @@ class Shake
     {
         _strengthX = strengthX;
         _strengthY = strengthY;
-        _duration = FMath.toInt(1000*seconds);
+        _duration = Std.int(1000*seconds);
         _elapsed = 0;
     }
 

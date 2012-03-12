@@ -8,7 +8,6 @@ import haxe.Json;
 
 import flambe.asset.AssetPack;
 import flambe.display.Texture;
-import flambe.math.FMath;
 
 /**
  * @deprecated Use Flump and flambe.swf instead. This will be removed in a future version.
@@ -32,8 +31,8 @@ class SpriteSheet
         for (animData in animations) {
             var anim = new Animation();
             anim.name = animData.name;
-            anim.anchorX = -FMath.toInt(animData.bounds[0]);
-            anim.anchorY = -FMath.toInt(animData.bounds[1]);
+            anim.anchorX = -Std.int(animData.bounds[0]);
+            anim.anchorY = -Std.int(animData.bounds[1]);
             anim.delay = 1000 / animData.frameRate;
             anim.loop = (animData.loop != 0);
             anim.frames = [];

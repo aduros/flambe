@@ -5,7 +5,6 @@
 package flambe.debug;
 
 import flambe.display.TextSprite;
-import flambe.math.FMath;
 
 /**
  * A component that uses its entity's TextSprite to display an FPS log.
@@ -23,7 +22,7 @@ class FpsDisplay
         _fpsTime += dt;
         if (_fpsTime > 1000) {
             var fps = 1000 * _fpsFrames/_fpsTime;
-            var text = "FPS: " + FMath.toInt(fps*100) / 100;
+            var text = "FPS: " + Std.int(fps*100) / 100;
 
             // Use our owner's TextSprite if available, otherwise just log it
             var sprite = owner.get(TextSprite);

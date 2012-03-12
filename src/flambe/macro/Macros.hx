@@ -23,7 +23,8 @@ class Macros
     public static function toExpr (object :Dynamic) :Expr
     {
         var pos = Context.currentPos();
-        if (object.getEnum() == ExprDef) {
+        var e :EnumValue = cast object;
+        if (e.getEnum() == ExprDef) {
             return { expr: object, pos: pos };
         }
         return Context.makeExpr(object, pos);

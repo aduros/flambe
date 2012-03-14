@@ -139,6 +139,7 @@ private class LayerSprite extends Sprite
 
         if (changedKeyframe && _sprites != null) {
             // TODO(bruno): Test multi-symbol layers
+            throw "Multiple symbols on a layer are not yet supported";
             _content.add(_sprites[keyframeIdx]);
         }
 

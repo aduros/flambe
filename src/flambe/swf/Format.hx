@@ -80,7 +80,7 @@ typedef TextureFormat = {
     // The symbol name of this texture
     name: String,
 
-    // The origin point relative to top-left of the texture rectangle
+    // The top-left of the texture rectangle relative to the origin transformation point
     offset: Array<Float>,
 
     // The rectangle bounding the texture in its atlas

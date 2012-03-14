@@ -20,7 +20,7 @@ class BitmapSymbol
     public var anchorX (default, null) :Float;
     public var anchorY (default, null) :Float;
 
-    public function new (reader, atlas :Texture)
+    public function new (reader :TextureFormat, atlas :Texture)
     {
         _name = reader.name;
         this.atlas = atlas;
@@ -32,8 +32,10 @@ class BitmapSymbol
         height = rect[3];
 
         var offset = reader.offset;
-        anchorX = offset[0];
-        anchorY = offset[1];
+        if (offset != null) {
+            anchorX = -offset[0];
+            anchorY = -offset[1];
+        }
     }
 
     public function createSprite () :Sprite

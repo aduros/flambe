@@ -22,7 +22,6 @@ class MovieSymbol
     public function new (reader :MovieFormat)
     {
         _name = reader.symbol;
-        trace(reader.symbol);
 
         frames = 0;
         layers = [];

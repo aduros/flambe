@@ -23,9 +23,8 @@ class BasicAssetPackLoader
     public function new (manifest :Manifest)
     {
         promise = new Promise();
-        _manifest = manifest;
-        _assets = new Hash();
         _bytesLoaded = new Hash();
+        _pack = new BasicAssetPack(manifest);
 
         var entries = manifest.getEntries();
         if (entries.length == 0) {
@@ -125,7 +124,12 @@ class BasicAssetPackLoader
 
     private function handleLoad (entry :AssetEntry, asset :Dynamic)
     {
-        _assets.set(entry.name, asset);
+        var name = entry.name;
+        switch (entry.type) {
+            case Image: _pack.textures.set(name, asset);
+            case Audio: _pack.sounds.set(name, asset);
+            case Data: _pack.files.set(name, asset);
+        }
 
         _assetsRemaining -= 1;
         if (_assetsRemaining <= 0) {
@@ -147,7 +151,7 @@ class BasicAssetPackLoader
     private function handleSuccess ()
     {
         log.info("Finished loading asset pack");
-        promise.result = new BasicAssetPack(_manifest, _assets);
+        promise.result = _pack;
     }
 
     private function handleError (message :String)
@@ -156,14 +160,13 @@ class BasicAssetPackLoader
         promise.error.emit(message);
     }
 
-    private var _manifest :Manifest;
-    private var _assets :Hash<Dynamic>;
-
     // How many assets are still loading
     private var _assetsRemaining :Int;
 
     // How many bytes of each asset have been loaded
     private var _bytesLoaded :Hash<Int>;
+
+    private var _pack :BasicAssetPack;
 }
 
 // A simple AssetPack backed by a Hash
@@ -172,25 +175,43 @@ private class BasicAssetPack
 {
     public var manifest (getManifest, null) :Manifest;
 
-    public function new (manifest :Manifest, contents :Hash<Dynamic>)
+    public var textures :Hash<Texture>;
+    public var sounds :Hash<Sound>;
+    public var files :Hash<String>;
+
+    public function new (manifest :Manifest)
     {
         _manifest = manifest;
-        _contents = contents;
+        textures = new Hash();
+        sounds = new Hash();
+        files = new Hash();
     }
 
-    public function loadTexture (file :String) :Texture
+    public function loadTexture (name :String) :Texture
     {
-        return cast _contents.get(file);
+        var texture = textures.get(name);
+        if (texture == null) {
+            throw "Missing texture: " + name;
+        }
+        return texture;
     }
 
-    public function loadSound (file :String) :Sound
+    public function loadSound (name :String) :Sound
     {
-        return cast _contents.get(file);
+        var sound = sounds.get(name);
+        if (sound == null) {
+            throw "Missing sound: " + name;
+        }
+        return sound;
     }
 
-    public function loadFile (file :String) :String
+    public function loadFile (name :String) :String
     {
-        return cast _contents.get(file);
+        var file = files.get(name);
+        if (file == null) {
+            throw "Missing file: " + name;
+        }
+        return file;
     }
 
     public function getManifest () :Manifest
@@ -199,5 +220,4 @@ private class BasicAssetPack
     }
 
     private var _manifest :Manifest;
-    private var _contents :Hash<Dynamic>;
 }

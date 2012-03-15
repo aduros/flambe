@@ -5,14 +5,13 @@
 package flambe.script;
 
 import flambe.Entity;
-import flambe.math.FMath;
 
 class Delay
     implements Action
 {
     public function new (seconds :Float)
     {
-        _duration = FMath.toInt(1000*seconds);
+        _duration = Std.int(1000*seconds);
         _elapsed = 0;
     }
 

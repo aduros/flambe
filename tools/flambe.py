@@ -105,7 +105,7 @@ def apply_flambe(ctx):
                  */
                 %%output%%""")
             ctx.bld(rule=("%s -jar %s --js \"${SRC}\" --js_output_file \"${TGT}\" " +
-                "--output_wrapper %s --warning_level QUIET") %
+                "--output_wrapper %s --warning_level QUIET --language_in ES5_STRICT") %
                     (quote(ctx.env.JAVA), quote(closure.abspath()), quote(wrapper)),
                 source=uncompressed, target=js)
         else:

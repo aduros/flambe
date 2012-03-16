@@ -35,6 +35,9 @@ class BitmapSymbol
         if (offset != null) {
             anchorX = -offset[0];
             anchorY = -offset[1];
+        } else {
+            anchorX = 0;
+            anchorY = 0;
         }
     }
 

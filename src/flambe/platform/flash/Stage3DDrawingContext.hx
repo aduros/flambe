@@ -385,7 +385,7 @@ class Stage3DDrawingContext
         if (_nextBlendMode != null) {
             switch (_nextBlendMode) {
             case Normal:
-                _context3D.setBlendFactors(SOURCE_ALPHA, ONE_MINUS_SOURCE_ALPHA);
+                _context3D.setBlendFactors(ONE, ONE_MINUS_SOURCE_ALPHA);
             case Add:
                 _context3D.setBlendFactors(ONE, ONE);
             }

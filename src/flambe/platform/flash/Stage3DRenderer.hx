@@ -104,6 +104,7 @@ class Stage3DRenderer
 
         log.info("Created new Stage3D context", ["driver", _context3D.driverInfo]);
 
+#if !flambe_debug_renderer
         // BitmapRenderer is faster than carrying on with a software driver
         if (_context3D.driverInfo.indexOf("Software") != -1) {
             log.warn("Detected a slow Stage3D driver, refusing to go on");
@@ -112,6 +113,7 @@ class Stage3DRenderer
             ref.dispose();
             return;
         }
+#end
 
         // Re-upload any lost textures to the GPU
         for (texture in _textures) {

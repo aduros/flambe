@@ -28,7 +28,7 @@ class Stage3DDrawingContext
     public function new (context3D :Context3D)
     {
         _context3D = context3D;
-#if flambe_dev
+#if flambe_debug_renderer
         _context3D.enableErrorChecking = true;
 #end
 

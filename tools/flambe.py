@@ -305,6 +305,7 @@ def server(ctx):
     from subprocess import Popen
     print("Restart the server using `waf restart_server`.")
     while True:
+        print("")
         conf = ConfigSet.ConfigSet(SERVER_CONFIG)
         p = Popen(["node", conf.script])
         conf.pid = p.pid

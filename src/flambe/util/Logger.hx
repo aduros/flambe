@@ -69,7 +69,26 @@ class Logger
                     if (ii > 0) {
                         text += ", ";
                     }
-                    text += args[ii] + "=" + args[ii+1];
+                    var name = args[ii];
+                    var value :Dynamic = args[ii + 1];
+
+                    // Replace throwables with their stack trace
+#if flash
+                    if (Std.is(value, flash.errors.Error)) {
+                        var stack :String = cast(value, flash.errors.Error).getStackTrace();
+                        if (stack != null) {
+                            value = stack;
+                        }
+                    }
+#elseif js
+                    if (Std.is(value, untyped __js__("Error"))) {
+                        var stack :Dynamic = value.stack;
+                        if (stack != null) {
+                            value = stack;
+                        }
+                    }
+#end
+                    text += name + "=" + value;
                     ii += 2;
                 }
                 text += "]";

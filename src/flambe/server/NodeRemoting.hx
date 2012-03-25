@@ -23,8 +23,7 @@ class NodeRemoting
     public function onError (error :Dynamic)
     {
         if (_logger != null) {
-            _logger.warn("Remoting exception",
-                ["error", (error.stack != null) ? error.stack : error]);
+            _logger.warn("Remoting exception", ["error", error]);
         }
     }
 

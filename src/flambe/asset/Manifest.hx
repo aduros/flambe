@@ -136,9 +136,19 @@ class Manifest
     private static function supportsCrossOrigin () :Bool
     {
 #if js
+        // CORS in the stock Android browser is buggy. If your game is contained in an iframe, XHR
+        // will work the first time. If the response had an Expires header, on subsequent page loads
+        // instead of retrieving it from the cache, it will fail with error code 0.
+        // http://stackoverflow.com/questions/6090816/android-cors-requests-work-only-once
+        var blacklist = ~/\b(Android)\b/;
+        if (blacklist.match(js.Lib.window.navigator.userAgent)) {
+            return false;
+        }
+
         var xhr :Dynamic = new js.XMLHttpRequest();
         return (xhr.withCredentials != null);
 #else
+        // Assumes you have a valid crossdomain.xml
         return true;
 #end
     }

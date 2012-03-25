@@ -85,7 +85,9 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                 http.onData = function (data) {
                     handleLoad(entry, data);
                 };
-                http.onError = handleError;
+                http.onError = function (error) {
+                    handleError("Failed to load data " + entry.url + ", error=" + error);
+                };
                 http.request(false);
         }
     }

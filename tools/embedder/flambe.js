@@ -18,8 +18,6 @@ flambe.FLASH_VERSION = "10.1";
  */
 flambe.embed = function (urls, elementId) {
 
-    // TODO(bruno): Allow you to order the URLs array based on preference. For now the swf
-    // must be first and the JS second.
     if (typeof urls == "string") {
         urls = [ urls + "-flash.swf", urls + "-html.js" ];
     }
@@ -38,42 +36,51 @@ flambe.embed = function (urls, elementId) {
 
     var pref = args["flambe-platform"];
 
-    if ((pref == null || pref == "flash")
-            && swfobject.hasFlashPlayerVersion(flambe.FLASH_VERSION)) {
-
-        // SWFObject replaces the element it's given, so create a temporary inner element
-        // for parity with JS
-        var swf = document.createElement("div");
-        swf.id = "flambe-swf";
-        container.appendChild(swf);
-
-        swfobject.embedSWF(urls[0], swf.id, "100%", "100%", flambe.FLASH_VERSION, null, {}, {
-            allowScriptAccess: "always",
-            allowFullScreen: "true",
-            fullscreenOnSelection: "true",
-            wmode: "direct"
-        });
-        return true;
-
-    } else if (pref == null || pref == "html") {
-        var canvas = document.createElement("canvas");
-        if ("getContext" in canvas) {
-            container.appendChild(canvas);
-
-            // Expose the canvas so haXe can use it
-            flambe.canvas = canvas;
-
-            var script = document.createElement("script");
-            script.onload = function () {
-                flambe.canvas = null;
-            };
-            script.src = urls[1];
-            container.appendChild(script);
-            return true;
+    for (var ii = 0; ii < urls.length; ++ii) {
+        var url = urls[ii];
+        var ext = url.match(/\.(\w+)[\?#$]/);
+        if (ext) {
+            ext = ext[1].toLowerCase();
         }
 
-    } else {
-        throw new Error("Unrecognized platform: " + pref);
+        if (ext == "swf" && (pref == null || pref == "flash")
+                && swfobject.hasFlashPlayerVersion(flambe.FLASH_VERSION)) {
+
+            // SWFObject replaces the element it's given, so create a temporary inner element
+            // for parity with JS
+            var swf = document.createElement("div");
+            swf.id = elementId + "-swf";
+            container.appendChild(swf);
+
+            swfobject.embedSWF(url, swf.id, "100%", "100%", flambe.FLASH_VERSION, null, {}, {
+                allowScriptAccess: "always",
+                allowFullScreen: "true",
+                fullscreenOnSelection: "true",
+                wmode: "direct"
+            });
+            return true;
+
+        } else if (ext == "js" && (pref == null || pref == "html")) {
+            var canvas = document.createElement("canvas");
+            if ("getContext" in canvas) {
+                canvas.id = elementId + "-canvas";
+                container.appendChild(canvas);
+
+                // Expose the canvas so haXe can use it
+                flambe.canvas = canvas;
+
+                var script = document.createElement("script");
+                script.onload = function () {
+                    flambe.canvas = null;
+                };
+                script.src = url;
+                container.appendChild(script);
+                return true;
+            }
+
+        } else if (pref == null) {
+            throw new Error("Don't know how to embed: " + url);
+        }
     }
 
     // Nothing was embedded!

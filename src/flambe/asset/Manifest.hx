@@ -10,6 +10,7 @@ import flambe.asset.AssetEntry;
 import flambe.macro.ManifestBuilder;
 
 using flambe.util.Strings;
+using StringTools;
 
 class Manifest
 {
@@ -89,7 +90,7 @@ class Manifest
         var meta = Meta.getType(Manifest);
         if (meta.assetBase != null) {
             crossOriginBase = meta.assetBase[0];
-            if (crossOriginBase.charAt(crossOriginBase.length - 1) != "/") {
+            if (crossOriginBase.fastCodeAt(crossOriginBase.length - 1) != "/".code) {
                 // Ensure it ends with a trailing slash
                 crossOriginBase += "/";
             }

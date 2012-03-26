@@ -76,13 +76,14 @@ class ManifestBuilder
 
     public static function readDirectoryNoHidden (dir :String)
     {
-        if (dir.charAt(dir.length - 1) == "/") {
+        if (dir.fastCodeAt(dir.length - 1) == "/".code) {
             // Trim off the trailing slash. On Windows, FileSystem.exists() doesn't find directories
             // with trailing slashes?
             dir = dir.substr(0, -1);
         }
         return FileSystem.exists(dir) && FileSystem.isDirectory(dir) ?
-            FileSystem.readDirectory(dir).filter(function (file) return file.charAt(0) != ".") :
+            FileSystem.readDirectory(dir).filter(
+                function (file) return file.fastCodeAt(0) != ".".code) :
             cast [];
     }
 #end

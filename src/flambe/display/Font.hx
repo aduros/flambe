@@ -201,7 +201,7 @@ private class ConfigPair
 
     public function getString () :String
     {
-        if (_value.fastCodeAt(0) != 34) {
+        if (_value.fastCodeAt(0) != "\"".code) {
             return null;
         }
         return _value.substr(1, _value.length-2);

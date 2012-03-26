@@ -4,6 +4,8 @@
 
 package flambe.util;
 
+using StringTools;
+
 typedef ConfigSection = Hash<String>;
 
 /**
@@ -52,8 +54,9 @@ class Config
             } else if (pairPattern.match(line)) {
                 var key = pairPattern.matched(1);
                 var value = pairPattern.matched(2);
-                var quote = value.charAt(0);
-                if ((quote == "\"" || quote == "'") && value.charAt(value.length-1) == quote) {
+                var quote = value.fastCodeAt(0);
+                if ((quote == "\"".code || quote == "'".code) &&
+                        value.fastCodeAt(value.length-1) == quote) {
                     // Trim off quotes
                     value = value.substr(1, value.length-2);
                 }

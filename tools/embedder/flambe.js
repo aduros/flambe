@@ -38,47 +38,54 @@ flambe.embed = function (urls, elementId) {
 
     for (var ii = 0; ii < urls.length; ++ii) {
         var url = urls[ii];
-        var ext = url.match(/\.(\w+)[\?#$]/);
+        var ext = url.match(/\.(\w+)(\?|$)/);
         if (ext) {
             ext = ext[1].toLowerCase();
         }
 
-        if (ext == "swf" && (pref == null || pref == "flash")
-                && swfobject.hasFlashPlayerVersion(flambe.FLASH_VERSION)) {
+        switch (ext) {
+        case "swf":
+            if ((pref == null || pref == "flash")
+                    && swfobject.hasFlashPlayerVersion(flambe.FLASH_VERSION)) {
 
-            // SWFObject replaces the element it's given, so create a temporary inner element
-            // for parity with JS
-            var swf = document.createElement("div");
-            swf.id = elementId + "-swf";
-            container.appendChild(swf);
+                // SWFObject replaces the element it's given, so create a temporary inner element
+                // for parity with JS
+                var swf = document.createElement("div");
+                swf.id = elementId + "-swf";
+                container.appendChild(swf);
 
-            swfobject.embedSWF(url, swf.id, "100%", "100%", flambe.FLASH_VERSION, null, {}, {
-                allowScriptAccess: "always",
-                allowFullScreen: "true",
-                fullscreenOnSelection: "true",
-                wmode: "direct"
-            });
-            return true;
-
-        } else if (ext == "js" && (pref == null || pref == "html")) {
-            var canvas = document.createElement("canvas");
-            if ("getContext" in canvas) {
-                canvas.id = elementId + "-canvas";
-                container.appendChild(canvas);
-
-                // Expose the canvas so haXe can use it
-                flambe.canvas = canvas;
-
-                var script = document.createElement("script");
-                script.onload = function () {
-                    flambe.canvas = null;
-                };
-                script.src = url;
-                container.appendChild(script);
+                swfobject.embedSWF(url, swf.id, "100%", "100%", flambe.FLASH_VERSION, null, {}, {
+                    allowScriptAccess: "always",
+                    allowFullScreen: "true",
+                    fullscreenOnSelection: "true",
+                    wmode: "direct"
+                });
                 return true;
             }
+            break;
 
-        } else if (pref == null) {
+        case "js":
+            if (pref == null || pref == "html") {
+                var canvas = document.createElement("canvas");
+                if ("getContext" in canvas) {
+                    canvas.id = elementId + "-canvas";
+                    container.appendChild(canvas);
+
+                    // Expose the canvas so haXe can use it
+                    flambe.canvas = canvas;
+
+                    var script = document.createElement("script");
+                    script.onload = function () {
+                        flambe.canvas = null;
+                    };
+                    script.src = url;
+                    container.appendChild(script);
+                    return true;
+                }
+            }
+            break;
+
+        default:
             throw new Error("Don't know how to embed: " + url);
         }
     }

@@ -260,6 +260,7 @@ def apply_flambe_server(ctx):
                 "ensure it's in your $PATH and re-run waf configure.")
 
         cwd = ctx.path.get_bld().make_node(buildPrefix)
+        cwd.mkdir()
         for npmLib in npmLibs:
             ctx.bld(rule="%s install %s" % (quote(ctx.env.NPM), npmLib), cwd=cwd.abspath())
 

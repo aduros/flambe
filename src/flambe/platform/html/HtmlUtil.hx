@@ -10,6 +10,13 @@ class HtmlUtil
 {
     public static var VENDOR_PREFIXES = [ "webkit", "moz", "ms", "o", "khtml" ];
 
+    /**
+     * Whether the annoying scrolling address bar in some iOS and Android browsers may be hidden.
+     */
+    public static inline var SHOULD_HIDE_MOBILE_BROWSER =
+        Lib.window.top == Lib.window &&
+        ~/Mobile(\/.*)? Safari/.match(Lib.window.navigator.userAgent);
+
     public static function callLater (func :Void -> Void, delay :Int = 0)
     {
         (untyped Lib.window).setTimeout(func, delay);

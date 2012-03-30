@@ -142,7 +142,9 @@ class HtmlAppDriver
                 // We're already handling a finger
                 return;
             }
-            HtmlUtil.hideMobileBrowser();
+            if (HtmlUtil.SHOULD_HIDE_MOBILE_BROWSER) {
+                HtmlUtil.hideMobileBrowser();
+            }
 
             var touch = domEvent.changedTouches[0];
             touchId = touch.identifier;

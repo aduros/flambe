@@ -26,8 +26,7 @@ class HtmlStage
         _canvas = canvas;
         resize = new Signal0();
 
-        // If probably running iOS or Android, try to keep the address bar hidden
-        if (~/Mobile(\/.*)? Safari/.match(Lib.window.navigator.userAgent)) {
+        if (HtmlUtil.SHOULD_HIDE_MOBILE_BROWSER) {
             (untyped Lib.window).addEventListener("orientationchange", function () {
                 // Wait for the orientation change to finish... sigh
                 HtmlUtil.callLater(onOrientationChange, 200);

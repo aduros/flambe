@@ -97,6 +97,9 @@ class HtmlAppDriver
         // canvas.style.webkitTransform = "translateZ(0)";
         // canvas.style.backgroundColor = "#000";
 
+        var container = canvas.parentNode;
+        container.style.overflow = "hidden";
+
         canvas.addEventListener("mousedown", function (event) {
             event.preventDefault();
             _pointer.submitDown(createPointerEvent(event));
@@ -240,17 +243,17 @@ class HtmlAppDriver
         return _keyboard;
     }
 
-    private static function createPointerEvent (domEvent :Dynamic) :PointerEvent
+    private function createPointerEvent (domEvent :Dynamic) :PointerEvent
     {
         var rect = domEvent.target.getBoundingClientRect();
         return new PointerEvent(
-            domEvent.clientX - rect.left,
-            domEvent.clientY - rect.top);
+            _stage.devicePixelRatio*(domEvent.clientX - rect.left),
+            _stage.devicePixelRatio*(domEvent.clientY - rect.top));
     }
 
     private static var _instance :HtmlAppDriver;
 
-    private var _stage :Stage;
+    private var _stage :HtmlStage;
     private var _pointer :BasicPointer;
     private var _keyboard :BasicKeyboard;
     private var _storage :Storage;

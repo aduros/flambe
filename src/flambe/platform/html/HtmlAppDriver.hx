@@ -59,10 +59,6 @@ class HtmlAppDriver
         } catch (error :Dynamic) {
         }
         if (canvas == null) {
-            // We weren't loaded with the embedder... try to locate a #flambe-canvas
-            canvas = Lib.document.getElementById("flambe-canvas");
-        }
-        if (canvas == null) {
             log.error("Could not find a Flambe canvas! Are you not embedding with flambe.js?");
             return;
         }

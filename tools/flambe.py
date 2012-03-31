@@ -31,7 +31,7 @@ def configure(ctx):
 @feature("flambe")
 def apply_flambe(ctx):
     Utils.def_attrs(ctx, platforms="flash html", app="default",
-        classpath="", flags="", libs="", assetBase=None,
+        classpath="", flags="", libs="", assetBase=None, flashVersion="10.1",
         airCert="etc/air-cert.pfx", airDesc="etc/air-desc.xml", airPassword=None,
         iosProfile="etc/ios.mobileprovision")
 
@@ -40,6 +40,7 @@ def apply_flambe(ctx):
     flags = ["-main", ctx.main, "--dead-code-elimination"] + Utils.to_list(ctx.flags)
     libs = ["format"] + Utils.to_list(ctx.libs)
     platforms = Utils.to_list(ctx.platforms)
+    flashVersion = ctx.flashVersion
     debug = ctx.env.debug
 
     # Figure out what should be built
@@ -55,8 +56,6 @@ def apply_flambe(ctx):
     buildPrefix = ctx.app + "/"
 
     closure = ctx.bld.root.find_resource(FLAMBE_ROOT+"/tools/closure.jar")
-
-    flashVersion = "10.1"
 
     # The files that are built and should be installed
     outputs = []

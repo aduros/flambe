@@ -27,6 +27,11 @@ class ManifestBuilder
     @:macro
     public static function populate (hash :Expr)
     {
+        if (Context.defined("display")) {
+            // When running in code completion, skip out early
+            return EBlock([]).toExpr();
+        }
+
         var assetPrefix = "../assets/";
         var exprs :Array<Expr> = [];
         var hash_set = EField(hash, "set").toExpr();

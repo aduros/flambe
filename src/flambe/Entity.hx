@@ -13,37 +13,8 @@ import flambe.util.Disposable;
 using Lambda;
 
 class Entity
-#if !macro // Don't require us to implement these interfaces when running in the macro emulator
     implements Disposable
-#end
 {
-    @:macro
-    public function get (self :Expr, componentType :Expr)
-    {
-        // self.get(componentType) --> componentType.getFrom(self)
-        return {
-            expr: ECall({
-                expr: EType(componentType, "getFrom"),
-                pos: self.pos
-            }, [ self ]),
-            pos: self.pos
-        };
-    }
-
-    @:macro
-    public function has (self :Expr, componentType :Expr)
-    {
-        // self.has(componentType) --> componentType.hasIn(self)
-        return {
-            expr: ECall({
-                expr: EType(componentType, "hasIn"),
-                pos: self.pos
-            }, [ self ]),
-            pos: self.pos
-        };
-    }
-
-#if !macro
     public var parent (default, null) :Entity;
 
     public function new ()
@@ -90,6 +61,38 @@ class Entity
             comp.onRemoved();
             comp._internal_setOwner(null);
         }
+    }
+
+    /**
+     * Gets a component of a given class from this Entity.
+     */
+    @:macro
+    public function get<A> (self :Expr, componentClass :ExprRequire<Class<A>>) :ExprRequire<A>
+    {
+        // Rewrites self.get(ComponentClass) to ComponentClass.getFrom(self)
+        return {
+            expr: ECall({
+                expr: EType(componentClass, "getFrom"),
+                pos: self.pos
+            }, [ self ]),
+            pos: self.pos
+        };
+    }
+
+    /**
+     * Checks if this entity has a component of the given class.
+     */
+    @:macro
+    public function has<A> (self :Expr, componentClass :ExprRequire<Class<A>>) :ExprRequire<Bool>
+    {
+        // Rewrites self.has(ComponentClass) to ComponentClass.hasIn(self)
+        return {
+            expr: ECall({
+                expr: EType(componentClass, "hasIn"),
+                pos: self.pos
+            }, [ self ]),
+            pos: self.pos
+        };
     }
 
     inline public function getComponent (name :String) :Component
@@ -192,5 +195,4 @@ class Entity
 
     private var _parent :Entity;
     private var _children :Array<Entity>;
-#end // if !macro
 }

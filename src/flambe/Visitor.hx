@@ -4,8 +4,6 @@
 
 package flambe;
 
-import flambe.display.Sprite;
-
 interface Visitor
 {
     /**

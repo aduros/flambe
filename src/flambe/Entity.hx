@@ -52,7 +52,7 @@ class Entity
 #if flash
             untyped __delete__(_compMap, name);
 #elseif js
-            untyped __js__("delete")(_compMap.name);
+            untyped __js__("delete")(_compMap[name]);
 #end
             var idx = _comps.indexOf(comp);
             if (idx >= 0) {

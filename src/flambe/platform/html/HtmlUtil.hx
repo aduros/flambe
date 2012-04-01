@@ -13,7 +13,7 @@ class HtmlUtil
     /**
      * Whether the annoying scrolling address bar in some iOS and Android browsers may be hidden.
      */
-    public static inline var SHOULD_HIDE_MOBILE_BROWSER =
+    public static var SHOULD_HIDE_MOBILE_BROWSER =
         Lib.window.top == Lib.window &&
         ~/Mobile(\/.*)? Safari/.match(Lib.window.navigator.userAgent);
 

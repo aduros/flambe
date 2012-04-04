@@ -212,7 +212,7 @@ def apply_flambe(ctx):
         # Compile the embedder script
         embedder = buildPrefix + "flambe.js"
         scripts = ctx.bld.root.find_dir(FLAMBE_ROOT+"/tools/embedder").ant_glob("*.js")
-        ctx.bld(rule="%s -jar %s -D flambe.FLASH_VERSION=\\'%s\\' --js_output_file \"${TGT}\" %s" %
+        ctx.bld(rule="%s -jar %s -D flambe.FLASH_VERSION='%s' --js_output_file \"${TGT}\" %s" %
             (quote(ctx.env.JAVA), quote(closure.abspath()), flashVersion,
             " ".join(["--js " + quote(script.abspath()) for script in scripts]),
             ), target=embedder)

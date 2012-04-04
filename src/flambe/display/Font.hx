@@ -10,6 +10,8 @@ using StringTools;
 
 class Font
 {
+    private static var log = Log.log; // http://code.google.com/p/haxe/issues/detail?id=365
+
     public var name (default, null) :String;
     public var size (default, null) :Int;
 
@@ -118,13 +120,22 @@ class Font
         return lines;
     }
 
-    /** Get the list of Glyphs that make up a string. */
+    /**
+     * Get the list of Glyphs that make up a string. Characters without glyphs in this font will be
+     * missing from the list.
+     */
     public function getGlyphs (text :String) :Array<Glyph>
     {
         var list = [];
         for (ii in 0...text.length) {
             var charCode = text.fastCodeAt(ii);
-            list.push(_glyphs.get(charCode));
+            var glyph = _glyphs.get(charCode);
+            if (glyph != null) {
+                list.push(glyph);
+            } else {
+                log.warn("Requested a missing character from font",
+                    ["font", name, "charCode", charCode]);
+            }
         }
         return list;
     }

@@ -153,6 +153,20 @@ class Entity
         }
     }
 
+    public function disposeChildren ()
+    {
+        var ii = 0;
+        while (ii < _children.length) {
+            var child = _children[ii];
+            if (child != null) {
+                _children[ii] = null;
+                child.parent = null;
+                child.dispose();
+            }
+            ++ii;
+        }
+    }
+
     public function dispose ()
     {
         if (parent != null) {
@@ -172,17 +186,7 @@ class Entity
             ++ii;
         }
 
-        // Dispose children
-        var ii = 0;
-        while (ii < _children.length) {
-            var child = _children[ii];
-            if (child != null) {
-                _children[ii] = null;
-                child.parent = null;
-                child.dispose();
-            }
-            ++ii;
-        }
+        disposeChildren();
     }
 
     /**

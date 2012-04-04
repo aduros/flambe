@@ -77,7 +77,48 @@ class Font
         }
     }
 
-    // Get the list of Glyphs that make up a string
+    /**
+     * Splits text into multiple lines that fit into a given width when displayed using this font.
+     */
+    public function splitLines (text :String, maxWidth :Float) :Array<String>
+    {
+        var glyphs = getGlyphs(text);
+        var line = "";
+        var lines = [];
+        var x = 0;
+        var ii = 0;
+        var lastSpaceIdx = -1;
+
+        while (ii < glyphs.length) {
+            var glyph = glyphs[ii];
+            if (x + glyph.width > maxWidth) {
+                // Ran off the edge, add a line
+                x = 0;
+                var space = line.lastIndexOf(" ");
+                if (space >= 0) {
+                    // Backtrack to the beginning of the last word
+                    lines.push(line.substr(0, space));
+                    ii = lastSpaceIdx + 1;
+                } else {
+                    lines.push(line);
+                }
+                line = "";
+
+            } else {
+                if (glyph.charCode == " ".code) {
+                    lastSpaceIdx = ii;
+                }
+                line += String.fromCharCode(glyph.charCode);
+                x += glyph.xAdvance;
+                ++ii;
+            }
+        }
+        lines.push(line);
+
+        return lines;
+    }
+
+    /** Get the list of Glyphs that make up a string. */
     public function getGlyphs (text :String) :Array<Glyph>
     {
         var list = [];

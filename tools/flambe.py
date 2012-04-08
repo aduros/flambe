@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 from waflib import *
 from waflib.TaskGen import *
 import os
@@ -17,7 +15,7 @@ def options(ctx):
 
 def configure(ctx):
     ctx.load("haxe", tooldir=FLAMBE_ROOT+"/tools")
-    ctx.find_program("java", var="JAVA")
+    ctx.load("closure", tooldir=FLAMBE_ROOT+"/tools")
     ctx.find_program("npm", var="NPM", mandatory=False)
     ctx.find_program("adt", var="ADT", mandatory=False)
     ctx.find_program("adb", var="ADB", mandatory=False)
@@ -54,8 +52,6 @@ def apply_flambe(ctx):
 
     installPrefix = "deploy/" + ctx.app + "/"
     buildPrefix = ctx.app + "/"
-
-    closure = ctx.bld.root.find_resource(FLAMBE_ROOT+"/tools/closure.jar")
 
     # The files that are built and should be installed
     outputs = []
@@ -96,17 +92,8 @@ def apply_flambe(ctx):
             libs=libs,
             target=js if debug else uncompressed)
         if not debug:
-            import textwrap
-            wrapper = textwrap.dedent("""\
-                /**
-                 * Cooked with Flambe
-                 * https://github.com/aduros/flambe
-                 */
-                %%output%%""")
-            ctx.bld(rule=("%s -jar %s --js \"${SRC}\" --js_output_file \"${TGT}\" " +
-                "--output_wrapper %s --warning_level QUIET --language_in ES5_STRICT") %
-                    (quote(ctx.env.JAVA), quote(closure.abspath()), quote(wrapper)),
-                source=uncompressed, target=js)
+            ctx.bld(features="closure", source=js, target=uncompressed,
+                flags="--warning_level QUIET --language_in ES5_STRICT")
         else:
             ctx.bld.install_files(installPrefix + "web", js + ".map")
         ctx.bld.install_files(installPrefix + "web", js)
@@ -212,12 +199,9 @@ def apply_flambe(ctx):
         # Compile the embedder script
         embedder = buildPrefix + "flambe.js"
         scripts = ctx.bld.root.find_dir(FLAMBE_ROOT+"/tools/embedder").ant_glob("*.js")
-        ctx.bld(rule="%s -jar %s -D flambe.FLASH_VERSION='%s' --js_output_file \"${TGT}\" %s" %
-            (quote(ctx.env.JAVA), quote(closure.abspath()), flashVersion,
-            " ".join(["--js " + quote(script.abspath()) for script in scripts]),
-            ), target=embedder)
-        for script in scripts:
-            ctx.bld.add_manual_dependency(embedder, script)
+
+        ctx.bld(features="closure", source=scripts, target=embedder,
+            flags="-D flambe.FLASH_VERSION='%s'" % flashVersion)
         ctx.bld.install_files(installPrefix + "web", embedder)
 
         # Install the default embedder page if necessary

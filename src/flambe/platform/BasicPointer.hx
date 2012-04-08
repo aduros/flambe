@@ -64,7 +64,6 @@ class BasicPointer
         _isDown = true;
         _x = event.viewX;
         _y = event.viewY;
-        down.emit(event);
 
         var entity = getEntityUnderPoint(event.viewX, event.viewY);
         while (entity != null) {
@@ -74,6 +73,7 @@ class BasicPointer
             }
             entity = entity.parent;
         }
+        down.emit(event);
     }
 
     /**
@@ -83,7 +83,6 @@ class BasicPointer
     {
         _x = event.viewX;
         _y = event.viewY;
-        move.emit(event);
 
         var entity = getEntityUnderPoint(event.viewX, event.viewY);
         while (entity != null) {
@@ -93,6 +92,7 @@ class BasicPointer
             }
             entity = entity.parent;
         }
+        move.emit(event);
     }
 
     /**
@@ -107,7 +107,6 @@ class BasicPointer
         _isDown = false;
         _x = event.viewX;
         _y = event.viewY;
-        up.emit(event);
 
         var entity = getEntityUnderPoint(event.viewX, event.viewY);
         while (entity != null) {
@@ -117,6 +116,7 @@ class BasicPointer
             }
             entity = entity.parent;
         }
+        up.emit(event);
     }
 
     /**

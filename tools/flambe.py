@@ -92,7 +92,7 @@ def apply_flambe(ctx):
             libs=libs,
             target=js if debug else uncompressed)
         if not debug:
-            ctx.bld(features="closure", source=js, target=uncompressed,
+            ctx.bld(features="closure", source=uncompressed, target=js,
                 flags="--warning_level QUIET --language_in ES5_STRICT")
         else:
             ctx.bld.install_files(installPrefix + "web", js + ".map")

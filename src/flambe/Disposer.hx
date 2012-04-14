@@ -21,9 +21,9 @@ class Disposer extends Component
         _disposables.push(disposable);
     }
 
-    public function remove (disposable :Disposable)
+    public function remove (disposable :Disposable) :Bool
     {
-        _disposables.remove(disposable);
+        return _disposables.remove(disposable);
     }
 
     public function connect0 (signal :Signal0, listener :Listener0)

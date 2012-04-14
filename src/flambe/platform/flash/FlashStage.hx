@@ -72,6 +72,11 @@ class FlashStage implements Stage
         }
     }
 
+    public function requestResize (width :Int, height :Int)
+    {
+        // Not supported
+    }
+
     private function onMouseDown (_)
     {
         _stage.displayState = FULL_SCREEN;

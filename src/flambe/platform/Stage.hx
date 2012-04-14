@@ -14,4 +14,9 @@ interface Stage
     var resize (default, null) :Signal0;
 
     function lockOrientation (orient :Orientation) :Void;
+
+    /**
+     * Request that the stage be resized to a certain size.
+     */
+    function requestResize (width :Int, height :Int) :Void;
 }

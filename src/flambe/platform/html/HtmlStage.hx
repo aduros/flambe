@@ -26,14 +26,6 @@ class HtmlStage
         _canvas = canvas;
         resize = new Signal0();
 
-        if (HtmlUtil.SHOULD_HIDE_MOBILE_BROWSER) {
-            (untyped Lib.window).addEventListener("orientationchange", function () {
-                // Wait for the orientation change to finish... sigh
-                HtmlUtil.callLater(onOrientationChange, 200);
-            }, false);
-            onOrientationChange();
-        }
-
         devicePixelRatio = (untyped window).devicePixelRatio;
         if (devicePixelRatio == null) {
             devicePixelRatio = 1;
@@ -47,8 +39,18 @@ class HtmlStage
             HtmlUtil.setVendorStyle(_canvas, "transform", "scale(" + (1/devicePixelRatio) + ")");
         }
 
-        (untyped Lib.window).addEventListener("resize", onResize, false);
-        onResize();
+#if !flambe_disable_autoresize
+        if (HtmlUtil.SHOULD_HIDE_MOBILE_BROWSER) {
+            (untyped Lib.window).addEventListener("orientationchange", function () {
+                // Wait for the orientation change to finish... sigh
+                HtmlUtil.callLater(onOrientationChange, 200);
+            }, false);
+            onOrientationChange();
+        }
+
+        (untyped Lib.window).addEventListener("resize", onWindowResize, false);
+        onWindowResize();
+#end
     }
 
     public function getWidth () :Int
@@ -66,25 +68,38 @@ class HtmlStage
         // Nothing until mobile browsers support it
     }
 
-    public function requestResize (width :Float, height :Float)
+    public function requestResize (width :Int, height :Int)
+    {
+        if (resizeCanvas(width, height)) {
+            // Fit the container to the requested canvas size
+            var container = _canvas.parentNode;
+            container.style.width = width + "px";
+            container.style.height = height + "px";
+        }
+    }
+
+    private function onWindowResize ()
+    {
+        // Resize the canvas to match its container's bounds
+        var container = _canvas.parentNode;
+        var rect = container.getBoundingClientRect();
+        resizeCanvas(rect.width, rect.height);
+    }
+
+    private function resizeCanvas (width :Float, height :Float) :Bool
     {
         // Take device scaling into account...
         var scaledWidth = devicePixelRatio*width;
         var scaledHeight = devicePixelRatio*height;
 
-        if (_canvas.width != scaledWidth || _canvas.height != scaledHeight) {
-            _canvas.width = scaledWidth;
-            _canvas.height = scaledHeight;
-            resize.emit();
+        if (_canvas.width == scaledWidth && _canvas.height == scaledHeight) {
+            return false;
         }
-    }
 
-    private function onResize ()
-    {
-        // Resize the canvas to match its container's bounds
-        var container = _canvas.parentNode;
-        var rect = container.getBoundingClientRect();
-        requestResize(rect.width, rect.height);
+        _canvas.width = scaledWidth;
+        _canvas.height = scaledHeight;
+        resize.emit();
+        return true;
     }
 
     // Voodoo hacks required to move the address bar out of the way on Android and iOS
@@ -108,7 +123,7 @@ class HtmlStage
                 // Fit the page to the new screen size
                 htmlStyle.height = Lib.window.innerHeight + "px";
 
-                onResize();
+                onWindowResize();
             }, 100);
         });
     }

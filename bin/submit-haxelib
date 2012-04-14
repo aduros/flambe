@@ -10,6 +10,9 @@ fi
 VERSION=$1
 ARCHIVE=/tmp/haxelib.zip
 
+FLAMBE_ROOT=`readlink -f $(dirname $0)/..`
+cd $FLAMBE_ROOT
+
 rm -f $ARCHIVE
 git ls-files tools src LICENSE.txt | zip $ARCHIVE -@
 

@@ -17,7 +17,7 @@ class HtmlStorage
     public function set (key :String, value :String) :Bool
     {
         try {
-            _storage.setItem(key, value);
+            _storage.setItem(PREFIX + key, value);
         } catch (error :Dynamic) {
             // Browser may throw QUOTA_EXCEEDED_ERR
             return false;
@@ -27,18 +27,21 @@ class HtmlStorage
 
     public function get (key :String) :String
     {
-        return _storage.getItem(key);
+        return _storage.getItem(PREFIX + key);
     }
 
     public function remove (key :String)
     {
-        _storage.removeItem(key);
+        _storage.removeItem(PREFIX + key);
     }
 
     public function clear ()
     {
         _storage.clear();
     }
+
+    // Prefix localStorage keys to prevent collisions with other JS on the page
+    private static inline var PREFIX = "flambe:";
 
     private var _storage :Dynamic;
 }

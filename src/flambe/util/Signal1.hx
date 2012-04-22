@@ -37,6 +37,20 @@ class Signal1<A>
         }
     }
 
+    public function clone () :Signal1<A>
+    {
+        var copy = new Signal1<A>();
+        if (_impl != null) {
+            copy._impl = _impl.clone();
+        }
+        return copy;
+    }
+
+    public function hasListeners () :Bool
+    {
+        return _impl != null && _impl.hasListeners();
+    }
+
     private function createImpl () :SignalImpl
     {
         return new SignalImpl();

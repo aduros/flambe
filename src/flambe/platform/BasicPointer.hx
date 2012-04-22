@@ -65,15 +65,25 @@ class BasicPointer
         _x = event.viewX;
         _y = event.viewY;
 
+        // Take a snapshot of the entire event bubbling chain
+        var chain = [];
         var entity = getEntityUnderPoint(event.viewX, event.viewY);
         while (entity != null) {
             var sprite = entity.get(Sprite);
             if (sprite != null) {
-                sprite.pointerDown.emit(event);
+                var signal = sprite.pointerDown;
+                if (signal.hasListeners()) {
+                    chain.push(signal.clone());
+                }
             }
             entity = entity.parent;
         }
-        down.emit(event);
+        chain.push(down.clone());
+
+        // Finally, emit the event up the chain
+        for (signal in chain) {
+            signal.emit(event);
+        }
     }
 
     /**
@@ -84,15 +94,25 @@ class BasicPointer
         _x = event.viewX;
         _y = event.viewY;
 
+        // Take a snapshot of the entire event bubbling chain
+        var chain = [];
         var entity = getEntityUnderPoint(event.viewX, event.viewY);
         while (entity != null) {
             var sprite = entity.get(Sprite);
             if (sprite != null) {
-                sprite.pointerMove.emit(event);
+                var signal = sprite.pointerMove;
+                if (signal.hasListeners()) {
+                    chain.push(signal.clone());
+                }
             }
             entity = entity.parent;
         }
-        move.emit(event);
+        chain.push(move.clone());
+
+        // Finally, emit the event up the chain
+        for (signal in chain) {
+            signal.emit(event);
+        }
     }
 
     /**
@@ -108,15 +128,25 @@ class BasicPointer
         _x = event.viewX;
         _y = event.viewY;
 
+        // Take a snapshot of the entire event bubbling chain
+        var chain = [];
         var entity = getEntityUnderPoint(event.viewX, event.viewY);
         while (entity != null) {
             var sprite = entity.get(Sprite);
             if (sprite != null) {
-                sprite.pointerUp.emit(event);
+                var signal = sprite.pointerUp;
+                if (signal.hasListeners()) {
+                    chain.push(signal.clone());
+                }
             }
             entity = entity.parent;
         }
-        up.emit(event);
+        chain.push(up.clone());
+
+        // Finally, emit the event up the chain
+        for (signal in chain) {
+            signal.emit(event);
+        }
     }
 
     /**

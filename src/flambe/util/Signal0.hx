@@ -37,6 +37,20 @@ class Signal0
         }
     }
 
+    public function clone () :Signal0
+    {
+        var copy = new Signal0();
+        if (_impl != null) {
+            copy._impl = _impl.clone();
+        }
+        return copy;
+    }
+
+    public function hasListeners () :Bool
+    {
+        return _impl != null && _impl.hasListeners();
+    }
+
     private function createImpl () :SignalImpl
     {
         return new SignalImpl();

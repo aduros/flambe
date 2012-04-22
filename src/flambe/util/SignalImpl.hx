@@ -68,5 +68,17 @@ class SignalImpl
         }
     }
 
+    inline public function hasListeners () :Bool
+    {
+        return _connections.length > 0;
+    }
+
+    public function clone () :SignalImpl
+    {
+        var copy = new SignalImpl();
+        copy._connections = _connections.copy();
+        return copy;
+    }
+
     private var _connections :Array<SignalConnection>;
 }

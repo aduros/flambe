@@ -28,7 +28,7 @@ def configure(ctx):
 
 @feature("flambe")
 def apply_flambe(ctx):
-    Utils.def_attrs(ctx, platforms="flash html", app="default",
+    Utils.def_attrs(ctx, platforms="flash html",
         classpath="", flags="", libs="", assetBase=None, flashVersion="10.1",
         airCert="etc/air-cert.pfx", airDesc="etc/air-desc.xml", airPassword=None,
         iosProfile="etc/ios.mobileprovision")
@@ -50,8 +50,8 @@ def apply_flambe(ctx):
     assetDir = ctx.path.find_dir("assets")
     assetList = [] if assetDir is None else assetDir.ant_glob("**/*")
 
-    installPrefix = "deploy/" + ctx.app + "/"
-    buildPrefix = ctx.app + "/"
+    installPrefix = "deploy/"
+    buildPrefix = (ctx.name if ctx.name else "main") + "-"
 
     # The files that are built and should be installed
     outputs = []
@@ -71,20 +71,20 @@ def apply_flambe(ctx):
     if buildFlash:
         flashFlags = ["-swf-version", flashVersion]
 
-        swf = buildPrefix + "app-flash.swf"
+        swf = buildPrefix + "flash.swf"
         outputs.append(swf)
 
         ctx.bld(features="haxe", classpath=classpath,
             flags=flags + flashFlags,
             libs=libs,
             target=swf)
-        ctx.bld.install_files(installPrefix + "web", swf)
+        ctx.bld.install_files(installPrefix + "web/targets", swf)
 
     if buildHtml:
         htmlFlags = "-D html --js-modern".split()
 
-        uncompressed = buildPrefix + "app-html.uncompressed.js"
-        js = buildPrefix + "app-html.js"
+        uncompressed = buildPrefix + "html.uncompressed.js"
+        js = buildPrefix + "html.js"
         outputs.append(js)
 
         ctx.bld(features="haxe", classpath=classpath,
@@ -95,14 +95,14 @@ def apply_flambe(ctx):
             ctx.bld(features="closure", source=uncompressed, target=js,
                 flags="--warning_level QUIET --language_in ES5_STRICT")
         else:
-            ctx.bld.install_files(installPrefix + "web", js + ".map")
-        ctx.bld.install_files(installPrefix + "web", js)
+            ctx.bld.install_files(installPrefix + "web/targets", js + ".map")
+        ctx.bld.install_files(installPrefix + "web/targets", js)
 
     if buildAndroid or buildIOS:
         # Since the captive runtime is used for apps, we can always use the latest swf version
         airFlags = "-D air -swf-version 11.2".split()
 
-        swf = buildPrefix + "app-air.swf"
+        swf = buildPrefix + "air.swf"
 
         ctx.bld(features="haxe", classpath=classpath,
             flags=flags + airFlags,
@@ -152,10 +152,10 @@ def apply_flambe(ctx):
                     if state == "device\n":
                         ctx.to_log("Installing APK to device...\n")
                         ctx.exec_command("%s install -rs %s" %
-                            (quote(adb), quote(installPrefix + "apps/app-android.apk")))
+                            (quote(adb), quote(installPrefix + "packages/" + buildPrefix + "android.apk")))
                 ctx.bld.add_post_fun(install_apk)
 
-            airApps.append((buildPrefix + "app-android.apk", rule))
+            airApps.append((buildPrefix + "android.apk", rule))
 
         if buildIOS:
             iosProfile = ctx.path.find_resource(ctx.iosProfile)
@@ -172,32 +172,32 @@ def apply_flambe(ctx):
                     quote(adt), ipaType, quote(iosProfile.abspath()),
                     quote(airCert.abspath()), quote(airPassword), quote(airDesc.abspath()))
 
-            airApps.append((buildPrefix + "app-ios.ipa", rule))
+            airApps.append((buildPrefix + "ios.ipa", rule))
 
         # Build all our AIR apps, appending common configuration
         for target, rule in airApps:
             outputs.append(target)
 
             # Include the swf
-            rule += "-C %s %s " % (quote(buildPrefix), "app-air.swf")
+            rule += swf
 
             # Include the assets
             if assetDir is not None:
                 # Exclude assets Flash will never use
                 airAssets = assetDir.ant_glob("**/*", excl="**/*.(ogg|wav|m4a)")
-                rule += "-C %s %s " % (
+                rule += " -C %s %s" % (
                     quote(ctx.path.abspath()),
                     " ".join([ quote(asset.nice_path()) for asset in airAssets ]))
 
             ctx.bld(rule=rule, target=target, source=swf)
             ctx.bld.add_manual_dependency(target, airCert);
             ctx.bld.add_manual_dependency(target, airDesc);
-            ctx.bld.install_files(installPrefix + "apps", target)
+            ctx.bld.install_files(installPrefix + "packages", target)
 
     # Common web stuff
     if buildFlash or buildHtml:
         # Compile the embedder script
-        embedder = buildPrefix + "flambe.js"
+        embedder = "flambe.js"
         scripts = ctx.bld.root.find_dir(FLAMBE_ROOT+"/tools/embedder").ant_glob("*.js")
 
         ctx.bld(features="closure", source=scripts, target=embedder,
@@ -226,7 +226,7 @@ def apply_flambe(ctx):
 
 @feature("flambe-server")
 def apply_flambe_server(ctx):
-    Utils.def_attrs(ctx, app="default", classpath="", flags="", libs="", npmLibs="", include="")
+    Utils.def_attrs(ctx, classpath="", flags="", libs="", npmLibs="", include="")
 
     classpath = [ ctx.path.find_dir("src"), ctx.bld.root.find_dir(FLAMBE_ROOT+"/src") ] + \
         Utils.to_list(ctx.classpath) # The classpath option should be a list of nodes
@@ -234,8 +234,8 @@ def apply_flambe_server(ctx):
     libs = Utils.to_list(ctx.libs)
     npmLibs = Utils.to_list(ctx.npmLibs)
     include = Utils.to_list(ctx.include)
-    installPrefix = "deploy/" + ctx.app + "/server/"
-    buildPrefix = ctx.app + "/"
+    buildPrefix = (ctx.name if ctx.name else "main") + "-server/"
+    installPrefix = "deploy/" + buildPrefix;
 
     if npmLibs:
         if not ctx.env.NPM:

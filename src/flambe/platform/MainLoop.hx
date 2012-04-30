@@ -109,13 +109,32 @@ private class DrawVisitor
 
     public function enterEntity (entity :Entity) :Bool
     {
+        var didDraw = drawSprite(entity);
+
+        // Also recurse into a Director's visible scenes
         var director = entity.get(Director);
-        if (director != null) {
+        if (director != null && didDraw) {
             for (scene in director.visibleScenes) {
                 scene.visit(this, false, true);
             }
         }
 
+        return didDraw;
+    }
+
+    public function leaveEntity (entity :Entity)
+    {
+        if (entity.has(Sprite)) {
+            drawCtx.restore();
+        }
+    }
+
+    public function acceptComponent (component :Component)
+    {
+    }
+
+    private function drawSprite (entity :Entity) :Bool
+    {
         var sprite = entity.get(Sprite);
         if (sprite == null) {
             return true;
@@ -160,18 +179,6 @@ private class DrawVisitor
         }
 
         sprite.draw(drawCtx);
-
         return true;
-    }
-
-    public function leaveEntity (entity :Entity)
-    {
-        if (entity.has(Sprite)) {
-            drawCtx.restore();
-        }
-    }
-
-    public function acceptComponent (component :Component)
-    {
     }
 }

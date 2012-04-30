@@ -64,6 +64,7 @@ class Director extends Component
             }
         }
 
+        scene._internal_setParent(owner);
         scenes.push(scene);
         invalidateVisibility();
     }

@@ -169,7 +169,15 @@ class Sprite extends Component
 
     private function getParentSprite () :Sprite
     {
-        return (owner.parent == null) ? null : owner.parent.get(Sprite);
+        var entity = owner.parent;
+        while (entity != null) {
+            var sprite = entity.get(Sprite);
+            if (sprite != null) {
+                return sprite;
+            }
+            entity = entity.parent;
+        }
+        return null;
     }
 
     private function updateViewMatrix ()

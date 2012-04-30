@@ -189,6 +189,11 @@ class Entity
         disposeChildren();
     }
 
+    inline public function _internal_setParent (parent :Entity)
+    {
+        this.parent = parent;
+    }
+
     /**
      * Maps String -> Component. Usually you would use a haXe Hash here, but I'm dropping down to plain
      * Object/Dictionary for the quickest possible lookups in this critical part of Flambe.

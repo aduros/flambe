@@ -187,28 +187,28 @@ private class BasicAssetPack
         files = new Hash();
     }
 
-    public function loadTexture (name :String) :Texture
+    public function loadTexture (name :String, required :Bool = true) :Texture
     {
         var texture = textures.get(name);
-        if (texture == null) {
+        if (texture == null && required) {
             throw "Missing texture: " + name;
         }
         return texture;
     }
 
-    public function loadSound (name :String) :Sound
+    public function loadSound (name :String, required :Bool = true) :Sound
     {
         var sound = sounds.get(name);
-        if (sound == null) {
+        if (sound == null && required) {
             throw "Missing sound: " + name;
         }
         return sound;
     }
 
-    public function loadFile (name :String) :String
+    public function loadFile (name :String, required :Bool = true) :String
     {
         var file = files.get(name);
-        if (file == null) {
+        if (file == null && required) {
             throw "Missing file: " + name;
         }
         return file;

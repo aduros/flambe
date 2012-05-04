@@ -4,8 +4,8 @@
 
 package flambe.display;
 
-import flambe.animation.Property;
 import flambe.display.SpriteSheet;
+import flambe.util.Value;
 
 /**
  * @deprecated Use Flump and flambe.swf instead. This will be removed in a future version.
@@ -16,14 +16,14 @@ class AnimatedSprite extends Sprite
     public var animation (default, null) :Animation;
     public var frame (getFrame, setFrame) :Int;
 
-    public var speed (default, null) :PFloat;
+    public var speed (default, null) :Value<Float>;
     public var paused (default, null) :Bool;
 
     public function new (sheet :SpriteSheet)
     {
         super();
         this.sheet = sheet;
-        this.speed = new PFloat(1);
+        this.speed = new Value<Float>(1);
     }
 
     public function play (name :String)

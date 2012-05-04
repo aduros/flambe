@@ -4,17 +4,17 @@
 
 package flambe.script;
 
+import flambe.animation.AnimatedFloat;
 import flambe.animation.Easing;
-import flambe.animation.Property;
 import flambe.animation.Tween;
 import flambe.Entity;
 
 class AnimateTo
     implements Action
 {
-    public function new (property :PFloat, to :Float, seconds :Float, easing :EasingFunction)
+    public function new (value :AnimatedFloat, to :Float, seconds :Float, easing :EasingFunction)
     {
-        _property = property;
+        _value = value;
         _to = to;
         _seconds = seconds;
         _easing = easing;
@@ -23,11 +23,11 @@ class AnimateTo
     public function update (dt :Int, actor :Entity) :Bool
     {
         if (_tween == null) {
-            _tween = new Tween(_property._, _to, _seconds, _easing);
-            _property.behavior = _tween;
-            _property.update(dt); // Fake an update to account for this frame
+            _tween = new Tween(_value._, _to, _seconds, _easing);
+            _value.behavior = _tween;
+            _value.update(dt); // Fake an update to account for this frame
         }
-        if (_property.behavior != _tween) {
+        if (_value.behavior != _tween) {
             _tween = null;
             return true;
         }
@@ -36,7 +36,7 @@ class AnimateTo
 
     private var _tween :Tween;
 
-    private var _property :PFloat;
+    private var _value :AnimatedFloat;
     private var _to :Float;
     private var _seconds :Float;
     private var _easing :EasingFunction;

@@ -7,7 +7,7 @@ package flambe.animation;
 import flambe.animation.Easing;
 
 class Tween
-    implements Behavior<Float>
+    implements Behavior
 {
     public function new (from :Float, to :Float, seconds :Float, ?easing :EasingFunction)
     {

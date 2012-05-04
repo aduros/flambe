@@ -8,7 +8,7 @@ import flash.events.Event;
 import flash.media.SoundChannel;
 import flash.media.SoundTransform;
 
-import flambe.animation.Property;
+import flambe.animation.AnimatedFloat;
 import flambe.math.FMath;
 import flambe.platform.Tickable;
 import flambe.sound.Playback;
@@ -45,7 +45,7 @@ private class FlashPlayback
     implements Playback,
     implements Tickable
 {
-    public var volume (default, null) :PFloat;
+    public var volume (default, null) :AnimatedFloat;
     public var paused (isPaused, setPaused) :Bool;
     public var ended (isEnded, null) :Bool;
     public var position (getPosition, null) :Float;
@@ -55,15 +55,15 @@ private class FlashPlayback
     {
         _sound = sound;
         _loops = loops;
-        this.volume = new PFloat(volume, onVolumeUpdated);
+        this.volume = new AnimatedFloat(volume, onVolumeChanged);
 
         playAudio(0, new SoundTransform(volume));
     }
 
-    public function onVolumeUpdated (volume :PFloat)
+    public function onVolumeChanged (volume :Float, _)
     {
         var soundTransform = _channel.soundTransform;
-        soundTransform.volume = volume._;
+        soundTransform.volume = volume;
         _channel.soundTransform = soundTransform; // Magic setter
     }
 

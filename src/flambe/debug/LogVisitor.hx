@@ -4,9 +4,6 @@
 
 package flambe.debug;
 
-import flambe.animation.Property;
-import flambe.display.Sprite;
-
 /**
  * An visitor that traces out an entity hierarchy, for debugging.
  */

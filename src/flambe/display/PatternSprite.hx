@@ -4,20 +4,20 @@
 
 package flambe.display;
 
-import flambe.animation.Property;
+import flambe.animation.AnimatedFloat;
 
 class PatternSprite extends Sprite
 {
     public var texture :Texture;
-    public var width (default, null) :PFloat;
-    public var height (default, null) :PFloat;
+    public var width (default, null) :AnimatedFloat;
+    public var height (default, null) :AnimatedFloat;
 
     public function new (texture :Texture)
     {
         super();
         this.texture = texture;
-        this.width = new PFloat(texture.width);
-        this.height = new PFloat(texture.height);
+        this.width = new AnimatedFloat(texture.width);
+        this.height = new AnimatedFloat(texture.height);
     }
 
     override public function draw (ctx :DrawingContext)

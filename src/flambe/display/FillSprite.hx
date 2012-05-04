@@ -4,20 +4,21 @@
 
 package flambe.display;
 
-import flambe.animation.Property;
+import flambe.animation.AnimatedFloat;
+import flambe.util.Value;
 
 class FillSprite extends Sprite
 {
-    public var color (default, null) :PColor;
-    public var width (default, null) :PFloat;
-    public var height (default, null) :PFloat;
+    public var color (default, null) :Value<Int>;
+    public var width (default, null) :AnimatedFloat;
+    public var height (default, null) :AnimatedFloat;
 
     public function new (color :Int, width :Float, height :Float)
     {
         super();
-        this.color = new PInt(color);
-        this.width = new PFloat(width);
-        this.height = new PFloat(height);
+        this.color = new Value<Int>(color);
+        this.width = new AnimatedFloat(width);
+        this.height = new AnimatedFloat(height);
     }
 
     override public function draw (ctx :DrawingContext)
@@ -38,7 +39,6 @@ class FillSprite extends Sprite
     override public function onUpdate (dt :Int)
     {
         super.onUpdate(dt);
-        color.update(dt);
         width.update(dt);
         height.update(dt);
     }

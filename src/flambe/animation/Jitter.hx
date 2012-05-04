@@ -5,7 +5,7 @@
 package flambe.animation;
 
 class Jitter
-    implements Behavior<Float>
+    implements Behavior
 {
     public var base (default, null) :Float;
     public var strength (default, null) :Float;

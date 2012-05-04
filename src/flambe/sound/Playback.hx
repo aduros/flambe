@@ -4,7 +4,7 @@
 
 package flambe.sound;
 
-import flambe.animation.Property;
+import flambe.animation.AnimatedFloat;
 import flambe.util.Disposable;
 
 interface Playback
@@ -13,7 +13,7 @@ interface Playback
     /**
      * The volume of the sound being played, between 0 and 1 (inclusive).
      */
-    var volume (default, null) :PFloat;
+    var volume (default, null) :AnimatedFloat;
 
     var paused (isPaused, setPaused) :Bool;
 

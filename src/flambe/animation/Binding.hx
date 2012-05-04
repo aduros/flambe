@@ -4,18 +4,20 @@
 
 package flambe.animation;
 
-typedef BindingFunction<A> = A -> A;
+import flambe.util.Value;
 
-class Binding<A>
-    implements Behavior<A>
+typedef BindingFunction = Float -> Float;
+
+class Binding
+    implements Behavior
 {
-    public function new (target :Property<A>, ?fn :BindingFunction<A>)
+    public function new (target :Value<Float>, ?fn :BindingFunction)
     {
         _target = target;
         _fn = fn;
     }
 
-    public function update (dt :Int) :A
+    public function update (dt :Int) :Float
     {
         var value = _target._;
         // TODO: Be lazy and only call _fn when the value is changed?
@@ -31,6 +33,6 @@ class Binding<A>
         return false;
     }
 
-    private var _target :Property<A>;
-    private var _fn :BindingFunction<A>;
+    private var _target :Value<Float>;
+    private var _fn :BindingFunction;
 }

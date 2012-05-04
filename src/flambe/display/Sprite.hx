@@ -4,27 +4,28 @@
 
 package flambe.display;
 
-import flambe.animation.Property;
+import flambe.animation.AnimatedFloat;
 import flambe.display.Sprite;
 import flambe.input.PointerEvent;
 import flambe.math.FMath;
 import flambe.math.Matrix;
 import flambe.util.Signal1;
+import flambe.util.Value;
 
 class Sprite extends Component
 {
-    public var x (default, null) :PFloat;
-    public var y (default, null) :PFloat;
-    public var rotation (default, null) :PFloat;
-    public var scaleX (default, null) :PFloat;
-    public var scaleY (default, null) :PFloat;
+    public var x (default, null) :AnimatedFloat;
+    public var y (default, null) :AnimatedFloat;
+    public var rotation (default, null) :AnimatedFloat;
+    public var scaleX (default, null) :AnimatedFloat;
+    public var scaleY (default, null) :AnimatedFloat;
 
-    public var anchorX (default, null) :PFloat;
-    public var anchorY (default, null) :PFloat;
+    public var anchorX (default, null) :AnimatedFloat;
+    public var anchorY (default, null) :AnimatedFloat;
 
-    public var alpha (default, null) :PFloat;
+    public var alpha (default, null) :AnimatedFloat;
     public var blendMode :BlendMode;
-    public var visible (default, null) :PBool;
+    public var visible (default, null) :Value<Bool>;
 
     public var pointerDown (getPointerDown, null) :Signal1<PointerEvent>;
     public var pointerMove (getPointerMove, null) :Signal1<PointerEvent>;
@@ -32,16 +33,19 @@ class Sprite extends Component
 
     public function new ()
     {
-        x = new PFloat(0, dirtyMatrix);
-        y = new PFloat(0, dirtyMatrix);
-        rotation = new PFloat(0, dirtyMatrix);
-        scaleX = new PFloat(1, dirtyMatrix);
-        scaleY = new PFloat(1, dirtyMatrix);
+        var dirtyMatrix = function (_,_) {
+            _localMatrixDirty = true;
+        };
+        x = new AnimatedFloat(0, dirtyMatrix);
+        y = new AnimatedFloat(0, dirtyMatrix);
+        rotation = new AnimatedFloat(0, dirtyMatrix);
+        scaleX = new AnimatedFloat(1, dirtyMatrix);
+        scaleY = new AnimatedFloat(1, dirtyMatrix);
 
-        alpha = new PFloat(1);
-        anchorX = new PFloat(0, dirtyMatrix);
-        anchorY = new PFloat(0, dirtyMatrix);
-        visible = new PBool(true);
+        alpha = new AnimatedFloat(1);
+        anchorX = new AnimatedFloat(0, dirtyMatrix);
+        anchorY = new AnimatedFloat(0, dirtyMatrix);
+        visible = new Value<Bool>(true);
         blendMode = null;
 
         _localMatrixDirty = false;
@@ -126,7 +130,6 @@ class Sprite extends Component
         alpha.update(dt);
         anchorX.update(dt);
         anchorY.update(dt);
-        visible.update(dt);
     }
 
     public function draw (ctx :DrawingContext)
@@ -147,11 +150,6 @@ class Sprite extends Component
         if (_listenerCount > 0) {
             _internal_interactiveSprites.remove(this);
         }
-    }
-
-    private function dirtyMatrix (_)
-    {
-        _localMatrixDirty = true;
     }
 
     private function isMatrixDirty () :Bool

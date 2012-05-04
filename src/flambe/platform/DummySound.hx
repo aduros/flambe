@@ -4,7 +4,7 @@
 
 package flambe.platform;
 
-import flambe.animation.Property;
+import flambe.animation.AnimatedFloat;
 import flambe.sound.Playback;
 import flambe.sound.Sound;
 
@@ -53,7 +53,7 @@ class DummySound
 class DummyPlayback
     implements Playback
 {
-    public var volume (default, null) :PFloat;
+    public var volume (default, null) :AnimatedFloat;
     public var paused (isPaused, setPaused) :Bool;
     public var ended (isEnded, null) :Bool;
     public var position (getPosition, null) :Float;
@@ -62,7 +62,7 @@ class DummyPlayback
     public function new (sound :Sound)
     {
         _sound = sound;
-        this.volume = new PFloat(0); // A little quirky? All DummyPlaybacks share the same volume
+        this.volume = new AnimatedFloat(0); // A little quirky? All DummyPlaybacks share the same volume
     }
 
     public function getSound () :Sound

@@ -6,7 +6,7 @@ package flambe.platform.html;
 
 import js.Lib;
 
-import flambe.animation.Property;
+import flambe.animation.AnimatedFloat;
 import flambe.platform.Tickable;
 import flambe.sound.Playback;
 import flambe.sound.Sound;
@@ -42,7 +42,7 @@ private class HtmlPlayback
     implements Playback,
     implements Tickable
 {
-    public var volume (default, null) :PFloat;
+    public var volume (default, null) :AnimatedFloat;
     public var paused (isPaused, setPaused) :Bool;
     public var ended (isEnded, null) :Bool;
     public var position (getPosition, null) :Float;
@@ -52,8 +52,8 @@ private class HtmlPlayback
     {
         _sound = sound;
         _tickableAdded = false;
-        this.volume = new PFloat(volume, function (v) {
-            _clone.volume = v._;
+        this.volume = new AnimatedFloat(volume, function (v, _) {
+            _clone.volume = v;
         });
 
         // Create a copy of the original sound's element. Note that cloneNode() doesn't work in IE

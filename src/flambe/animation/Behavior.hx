@@ -4,8 +4,8 @@
 
 package flambe.animation;
 
-interface Behavior<A>
+interface Behavior
 {
-    function update (dt :Int) :A;
+    function update (dt :Int) :Float;
     function isComplete () :Bool;
 }

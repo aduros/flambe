@@ -31,7 +31,8 @@ class BitmapDrawingContext
         _shape = new Shape();
         _pixel = new BitmapData(1, 1, false);
         _scratchRect = new Rectangle();
-        _scratchPoint =  new Point();
+        _scratchPoint = new Point();
+        _scratchMatrix = new Matrix();
     }
 
     public function save ()
@@ -154,13 +155,17 @@ class BitmapDrawingContext
             }
 
         } else {
-            // Fall back to slowpoke draw()
-            var localMatrix = new Matrix();
-            localMatrix.scale(width, height);
-            localMatrix.translate(x, y);
-            localMatrix.concat(matrix);
+            // Fall back to slowpoke draw() to draw a scaled and translated pixel
+            _scratchMatrix.a = width;
+            _scratchMatrix.b = 0;
+            _scratchMatrix.c = 0;
+            _scratchMatrix.d = height;
+            _scratchMatrix.tx = x;
+            _scratchMatrix.ty = y;
+            _scratchMatrix.concat(matrix);
+
             _pixel.setPixel(0, 0, color);
-            _buffer.draw(_pixel, localMatrix, state.color, state.blendMode);
+            _buffer.draw(_pixel, _scratchMatrix, state.color, state.blendMode);
         }
     }
 
@@ -278,6 +283,7 @@ class BitmapDrawingContext
     // Reusable instances to avoid tons of allocation
     private var _scratchPoint :Point;
     private var _scratchRect :Rectangle;
+    private var _scratchMatrix :Matrix;
 }
 
 private class DrawingState

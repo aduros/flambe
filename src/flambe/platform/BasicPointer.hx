@@ -8,7 +8,10 @@ import flambe.display.Sprite;
 import flambe.Entity;
 import flambe.input.Pointer;
 import flambe.input.PointerEvent;
+import flambe.scene.Director;
 import flambe.util.Signal1;
+
+using Lambda;
 
 class BasicPointer
     implements Pointer
@@ -155,7 +158,7 @@ class BasicPointer
     private static function getEntityUnderPoint (x :Float, y :Float) :Entity
     {
         for (sprite in Sprite._internal_interactiveSprites) {
-            if (sprite.contains(x, y) && isVisible(sprite.owner)) {
+            if (sprite.contains(x, y) && isClickable(sprite.owner)) {
                 return sprite.owner;
             }
         }
@@ -163,16 +166,32 @@ class BasicPointer
     }
 
     /**
-     * Checks if the entity's sprite, and all its parents' sprites, are visible.
+     * Checks if the entity's sprite, and all its parents' sprites, are clickable.
      */
-    private static function isVisible (entity :Entity) :Bool
+    private static function isClickable (entity :Entity) :Bool
     {
-        while (entity != null) {
+        while (true) {
             var sprite = entity.get(Sprite);
             if (sprite != null && !sprite.visible._) {
+                // Ignore invisible sprites
                 return false;
             }
-            entity = entity.parent;
+
+            var parent = entity.parent;
+            if (parent != null) {
+                var director = parent.get(Director);
+                if (director != null) {
+                    var idx = director.scenes.indexOf(entity);
+                    if (idx >= 0 && idx != director.scenes.length-1) {
+                        // Ignore scenes that aren't the top scene
+                        return false;
+                    }
+                }
+                entity = parent;
+
+            } else {
+                break;
+            }
         }
         return true;
     }

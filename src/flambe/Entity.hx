@@ -189,7 +189,7 @@ class Entity
         disposeChildren();
     }
 
-    inline public function _internal_setParent (parent :Entity)
+    /** @private */ inline public function _internal_setParent (parent :Entity)
     {
         this.parent = parent;
     }

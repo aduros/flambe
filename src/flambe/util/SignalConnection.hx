@@ -29,6 +29,6 @@ class SignalConnection
         }
     }
 
-    public var _internal_listener :Dynamic;
-    public var _internal_signal :SignalImpl;
+    /** @private */ public var _internal_listener :Dynamic;
+    /** @private */ public var _internal_signal :SignalImpl;
 }

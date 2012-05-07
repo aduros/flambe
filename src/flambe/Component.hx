@@ -49,7 +49,7 @@ class Component
         visitor.acceptComponent(this);
     }
 
-    inline public function _internal_setOwner (entity :Entity)
+    /** @private */ inline public function _internal_setOwner (entity :Entity)
     {
         owner = entity;
     }

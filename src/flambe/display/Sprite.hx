@@ -225,7 +225,7 @@ class Sprite extends Component
         return _pointerUp;
     }
 
-    public function _internal_onListenersAdded (count :Int)
+    /** @private */ public function _internal_onListenersAdded (count :Int)
     {
         if (_listenerCount == 0) {
             // TODO: Insert in screen depth order
@@ -234,7 +234,7 @@ class Sprite extends Component
         _listenerCount += count;
     }
 
-    public function _internal_onListenersRemoved (count :Int)
+    /** @private */ public function _internal_onListenersRemoved (count :Int)
     {
         _listenerCount -= count;
         if (_listenerCount == 0) {
@@ -246,7 +246,7 @@ class Sprite extends Component
 
     // All sprites that have input event listeners attached, in screen depth order.
     // Used to optimize picking.
-    public static var _internal_interactiveSprites :Array<Sprite> = [];
+    /** @private */ public static var _internal_interactiveSprites :Array<Sprite> = [];
 
     private var _viewMatrix :Matrix;
     private var _localMatrixDirty :Bool;

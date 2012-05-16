@@ -9,10 +9,16 @@ class DummyStorage
 {
     private static var log = Log.log; // http://code.google.com/p/haxe/issues/detail?id=365
 
+    public var supported (isSupported, null) :Bool;
+
     public function new ()
     {
-        log.warn("Using non-persistent storage");
         clear();
+    }
+
+    public function isSupported () :Bool
+    {
+        return false;
     }
 
     public function set (key :String, value :String) :Bool

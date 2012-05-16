@@ -193,7 +193,7 @@ class HtmlAppDriver
             if (localStorage == null) {
                 _storage = new HtmlStorage(localStorage);
             } else {
-                log.warn("localStorage is unavailable, falling back to unpersisted DummyStorage");
+                log.warn("localStorage is unavailable, falling back to unpersisted storage");
                 _storage = new DummyStorage();
             }
         }

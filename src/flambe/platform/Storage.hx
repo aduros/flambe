@@ -7,6 +7,12 @@ package flambe.platform;
 interface Storage
 {
     /**
+     * True if the environment supports persisted storage. Otherwise, the storage is backed by a
+     * Hash and not actually persisted between sessions.
+     */
+    var supported (isSupported, null) :Bool;
+
+    /**
      * Add a key to the storage, replacing any existing value.
      * @return True if the value was successfully persisted.
      */

@@ -98,7 +98,8 @@ class FlashAppDriver
             try {
                 _storage = new FlashStorage(SharedObject.getLocal("flambe"));
             } catch (err :Dynamic) {
-                // SharedObject.getLocal may throw an error, fall back to temporary storage
+                // SharedObject.getLocal may throw an error
+                log.warn("SharedObject is unavailable, falling back to unpersisted storage");
                 _storage = new DummyStorage();
             }
         }

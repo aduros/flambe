@@ -11,9 +11,16 @@ import flambe.platform.Storage;
 class FlashStorage
     implements Storage
 {
+    public var supported (isSupported, null) :Bool;
+
     public function new (so :SharedObject)
     {
         _so = so;
+    }
+
+    public function isSupported () :Bool
+    {
+        return true;
     }
 
     public function set (key :String, value :String) :Bool

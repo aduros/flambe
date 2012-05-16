@@ -11,9 +11,16 @@ class HtmlStorage
 {
     private static var log = Log.log; // http://code.google.com/p/haxe/issues/detail?id=365
 
+    public var supported (isSupported, null) :Bool;
+
     public function new (storage :Dynamic)
     {
         _storage = storage;
+    }
+
+    public function isSupported () :Bool
+    {
+        return true;
     }
 
     public function set (key :String, value :String) :Bool

@@ -190,7 +190,7 @@ class HtmlAppDriver
                 // Browsers may throw an error on accessing localStorage:
                 // http://dev.w3.org/html5/webstorage/#dom-localstorage
             }
-            if (localStorage == null) {
+            if (localStorage != null) {
                 _storage = new HtmlStorage(localStorage);
             } else {
                 log.warn("localStorage is unavailable, falling back to unpersisted storage");

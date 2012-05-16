@@ -6,11 +6,16 @@ package flambe.platform.flash;
 
 import flash.net.SharedObject;
 
+import haxe.Serializer;
+import haxe.Unserializer;
+
 import flambe.platform.Storage;
 
 class FlashStorage
     implements Storage
 {
+    private static var log = Log.log; // http://code.google.com/p/haxe/issues/detail?id=365
+
     public var supported (isSupported, null) :Bool;
 
     public function new (so :SharedObject)
@@ -23,15 +28,34 @@ class FlashStorage
         return true;
     }
 
-    public function set (key :String, value :String) :Bool
+    public function set (key :String, value :Dynamic) :Bool
     {
-        _so.data[untyped key] = value;
+        var encoded :String;
+        try {
+            var serializer = new Serializer();
+            serializer.useCache = true; // Allow circular references
+            serializer.serialize(value);
+            encoded = serializer.toString();
+        } catch (error :Dynamic) {
+            log.warn("Storage serialization failed", ["message", error]);
+            return false;
+        }
+
+        _so.data[untyped key] = encoded;
         return true;
     }
 
-    public function get (key :String) :String
+    public function get (key :String) :Dynamic
     {
-        return _so.data[untyped key];
+        var encoded :String = _so.data[untyped key];
+        if (encoded != null) {
+            try {
+                return Unserializer.run(encoded);
+            } catch (error :Dynamic) {
+                log.warn("Storage unserialization failed", ["message", error]);
+            }
+        }
+        return null;
     }
 
     public function remove (key :String)

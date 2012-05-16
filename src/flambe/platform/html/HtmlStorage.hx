@@ -4,6 +4,9 @@
 
 package flambe.platform.html;
 
+import haxe.Serializer;
+import haxe.Unserializer;
+
 import flambe.platform.Storage;
 
 class HtmlStorage
@@ -23,10 +26,21 @@ class HtmlStorage
         return true;
     }
 
-    public function set (key :String, value :String) :Bool
+    public function set (key :String, value :Dynamic) :Bool
     {
+        var encoded :String;
         try {
-            _storage.setItem(PREFIX + key, value);
+            var serializer = new Serializer();
+            serializer.useCache = true; // Allow circular references
+            serializer.serialize(value);
+            encoded = serializer.toString();
+        } catch (error :Dynamic) {
+            log.warn("Storage serialization failed", ["message", error]);
+            return false;
+        }
+
+        try {
+            _storage.setItem(PREFIX + key, encoded);
         } catch (error :Dynamic) {
             // setItem may throw a QuotaExceededError:
             // http://dev.w3.org/html5/webstorage/#dom-localstorage
@@ -36,13 +50,23 @@ class HtmlStorage
         return true;
     }
 
-    public function get (key :String) :String
+    public function get (key :String) :Dynamic
     {
+        var encoded :String;
         try {
-            return _storage.getItem(PREFIX + key);
+            encoded = _storage.getItem(PREFIX + key);
         } catch (error :Dynamic) {
             // This should never happen, but it sometimes does in Firefox and IE
             log.warn("localStorage.getItem failed", ["message", error.message]);
+            return null;
+        }
+
+        if (encoded != null) {
+            try {
+                return Unserializer.run(encoded);
+            } catch (error :Dynamic) {
+                log.warn("Storage unserialization failed", ["message", error]);
+            }
         }
         return null;
     }

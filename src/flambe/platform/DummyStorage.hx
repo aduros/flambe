@@ -21,13 +21,13 @@ class DummyStorage
         return false;
     }
 
-    public function set (key :String, value :String) :Bool
+    public function set (key :String, value :Dynamic) :Bool
     {
         _hash.set(key, value);
         return true;
     }
 
-    public function get (key :String) :String
+    public function get (key :String) :Dynamic
     {
         return _hash.get(key);
     }
@@ -42,5 +42,5 @@ class DummyStorage
         _hash = new Hash();
     }
 
-    private var _hash :Hash<String>;
+    private var _hash :Hash<Dynamic>;
 }

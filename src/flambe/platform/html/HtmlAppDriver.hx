@@ -63,6 +63,16 @@ class HtmlAppDriver
             return;
         }
 
+        // Allow the canvas to trap keyboard focus
+        canvas.setAttribute("tabindex", "0");
+        // ...but hide the focus rectangle
+        canvas.style.outlineStyle = "none";
+
+        // Browser optimization hints
+        canvas.setAttribute("moz-opaque", "true");
+        // canvas.style.webkitTransform = "translateZ(0)";
+        // canvas.style.backgroundColor = "#000";
+
         _stage = new HtmlStage(canvas);
         _pointer = new BasicPointer();
         _keyboard = new BasicKeyboard();
@@ -86,16 +96,6 @@ class HtmlAppDriver
                 update(Date.now().getTime());
             }, 1000/60);
         }
-
-        // Allow the canvas to trap keyboard focus
-        canvas.setAttribute("tabindex", "0");
-        // ...but hide the focus rectangle
-        canvas.style.outlineStyle = "none";
-
-        // Browser optimization hints
-        canvas.setAttribute("moz-opaque", "true");
-        // canvas.style.webkitTransform = "translateZ(0)";
-        // canvas.style.backgroundColor = "#000";
 
         var container = canvas.parentNode;
         container.style.overflow = "hidden";

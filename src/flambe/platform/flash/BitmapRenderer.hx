@@ -57,7 +57,7 @@ class BitmapRenderer
             width = height = 100;
         }
 
-        _screen = new BitmapData(width, height, false);
+        _screen = new BitmapData(width, height, false, 0xffffff);
         _drawCtx = new BitmapDrawingContext(_screen);
         _bitmap.bitmapData = _screen;
     }

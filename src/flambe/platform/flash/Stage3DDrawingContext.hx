@@ -311,7 +311,8 @@ class Stage3DDrawingContext
 
     public function willRender ()
     {
-        _context3D.clear();
+        // Context3D requires clear() be called before each frame
+        _context3D.clear(1.0, 1.0, 1.0);
     }
 
     public function didRender ()

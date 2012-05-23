@@ -16,6 +16,10 @@ class CanvasDrawingContext
     public function new (canvas :Dynamic)
     {
         _canvasCtx = canvas.getContext("2d");
+
+        // Initialize to the standard opaque white
+        _canvasCtx.fillStyle = "#ffffff";
+        _canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
     public function save ()
@@ -66,8 +70,7 @@ class CanvasDrawingContext
             htmlTexture.pattern = _canvasCtx.createPattern(htmlTexture.image, "repeat");
         }
         _canvasCtx.fillStyle = htmlTexture.pattern;
-        _canvasCtx.fillRect(Std.int(x), Std.int(y),
-            Std.int(width), Std.int(height));
+        _canvasCtx.fillRect(Std.int(x), Std.int(y), Std.int(width), Std.int(height));
     }
 
     public function fillRect (color :Int, x :Float, y :Float, width :Float, height :Float)

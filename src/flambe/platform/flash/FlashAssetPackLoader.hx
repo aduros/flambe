@@ -47,7 +47,7 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
                 create = function () {
                     var bitmap :Bitmap = cast loader.content;
                     var texture = new FlashTexture(bitmap.bitmapData);
-                    var renderer = FlashAppDriver.instance.renderer;
+                    var renderer = FlashPlatform.instance.renderer;
                     renderer.uploadTexture(texture);
                     return texture;
                 };

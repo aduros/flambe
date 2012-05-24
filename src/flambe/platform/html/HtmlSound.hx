@@ -124,7 +124,7 @@ private class HtmlPlayback
         _clone.play();
 
         if (!_tickableAdded) {
-            HtmlAppDriver.instance.mainLoop.addTickable(this);
+            HtmlPlatform.instance.mainLoop.addTickable(this);
             _tickableAdded = true;
         }
     }

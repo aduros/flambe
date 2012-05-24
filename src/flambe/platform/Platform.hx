@@ -15,7 +15,7 @@ import flambe.storage.Storage;
 import flambe.util.Logger;
 import flambe.util.Promise;
 
-interface AppDriver
+interface Platform
 {
     var stage (getStage, null) :Stage;
 

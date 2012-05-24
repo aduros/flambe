@@ -15,7 +15,7 @@ import flambe.input.Keyboard;
 import flambe.input.KeyEvent;
 import flambe.input.Pointer;
 import flambe.input.PointerEvent;
-import flambe.platform.AppDriver;
+import flambe.platform.Platform;
 import flambe.platform.BasicKeyboard;
 import flambe.platform.BasicPointer;
 import flambe.platform.MainLoop;
@@ -25,8 +25,8 @@ import flambe.util.Logger;
 import flambe.util.Promise;
 import flambe.util.Signal1;
 
-class HtmlAppDriver
-    implements AppDriver
+class HtmlPlatform
+    implements Platform
 {
     private static var log :Logger; // This needs to be initialized later
 
@@ -39,7 +39,7 @@ class HtmlAppDriver
     public var mainLoop (default, null) :MainLoop;
     public var renderer :Renderer;
 
-    public static var instance /*(default, null)*/ = new HtmlAppDriver();
+    public static var instance /*(default, null)*/ = new HtmlPlatform();
 
     private function new ()
     {
@@ -258,7 +258,7 @@ class HtmlAppDriver
             _stage.devicePixelRatio*(domEvent.clientY - rect.top));
     }
 
-    private static var _instance :HtmlAppDriver;
+    private static var _instance :HtmlPlatform;
 
     private var _stage :HtmlStage;
     private var _pointer :BasicPointer;

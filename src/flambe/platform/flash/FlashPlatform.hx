@@ -22,7 +22,7 @@ import flambe.input.Keyboard;
 import flambe.input.KeyEvent;
 import flambe.input.Pointer;
 import flambe.input.PointerEvent;
-import flambe.platform.AppDriver;
+import flambe.platform.Platform;
 import flambe.platform.BasicKeyboard;
 import flambe.platform.BasicPointer;
 import flambe.platform.MainLoop;
@@ -30,8 +30,8 @@ import flambe.storage.Storage;
 import flambe.util.Logger;
 import flambe.util.Promise;
 
-class FlashAppDriver
-    implements AppDriver
+class FlashPlatform
+    implements Platform
 {
     private static var log :Logger; // This needs to be initialized later
 
@@ -44,7 +44,7 @@ class FlashAppDriver
     public var mainLoop (default, null) :MainLoop;
     public var renderer :Renderer;
 
-    public static var instance /*(default, null)*/ = new FlashAppDriver();
+    public static var instance /*(default, null)*/ = new FlashPlatform();
 
     private function new ()
     {
@@ -186,7 +186,7 @@ class FlashAppDriver
         System.uncaughtError.emit(FlashUtil.getErrorMessage(event.error));
     }
 
-    private static var _instance :FlashAppDriver;
+    private static var _instance :FlashPlatform;
 
     private var _stage :Stage;
     private var _pointer :BasicPointer;

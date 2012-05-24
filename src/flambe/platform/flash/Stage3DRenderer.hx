@@ -144,7 +144,7 @@ class Stage3DRenderer
         log.warn("Falling back to BitmapRenderer");
 
         // Fall back to software renderering
-        FlashAppDriver.instance.renderer = new BitmapRenderer();
+        FlashPlatform.instance.renderer = new BitmapRenderer();
     }
 
     private function onResize (_)

@@ -9,7 +9,7 @@ import flambe.asset.Manifest;
 import flambe.display.Stage;
 import flambe.input.Keyboard;
 import flambe.input.Pointer;
-import flambe.platform.AppDriver;
+import flambe.platform.Platform;
 import flambe.storage.Storage;
 import flambe.util.Logger;
 import flambe.util.Promise;
@@ -45,7 +45,7 @@ class System
     inline public static function init ()
     {
         if (!_calledInit) {
-            _driver.init();
+            _platform.init();
             _calledInit = true;
         }
     }
@@ -54,49 +54,49 @@ class System
 
     inline public static function loadAssetPack (manifest :Manifest) :Promise<AssetPack>
     {
-        return _driver.loadAssetPack(manifest);
+        return _platform.loadAssetPack(manifest);
     }
 
     inline public static function callNative (funcName :String, ?params :Array<Dynamic>) :Dynamic
     {
-        return _driver.callNative(funcName, params);
+        return _platform.callNative(funcName, params);
     }
 
     inline public static function logger (tag :String) :Logger
     {
-        return new Logger(_driver.createLogHandler(tag));
+        return new Logger(_platform.createLogHandler(tag));
     }
 
     inline private static function getStage () :Stage
     {
-        return _driver.stage;
+        return _platform.stage;
     }
 
     inline private static function getStorage () :Storage
     {
-        return _driver.storage;
+        return _platform.storage;
     }
 
     inline private static function getPointer () :Pointer
     {
-        return _driver.pointer;
+        return _platform.pointer;
     }
 
     inline private static function getKeyboard () :Keyboard
     {
-        return _driver.keyboard;
+        return _platform.keyboard;
     }
 
     inline private static function getLocale () :String
     {
-        return _driver.locale;
+        return _platform.locale;
     }
 
-    private static var _driver =
+    private static var _platform :Platform =
 #if flash
-        flambe.platform.flash.FlashAppDriver.instance;
+        flambe.platform.flash.FlashPlatform.instance;
 #elseif html
-        flambe.platform.html.HtmlAppDriver.instance;
+        flambe.platform.html.HtmlPlatform.instance;
 #end
 
     private static var _calledInit = false;

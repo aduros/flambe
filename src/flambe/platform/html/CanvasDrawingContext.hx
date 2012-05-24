@@ -75,7 +75,7 @@ class CanvasDrawingContext
 
     public function fillRect (color :Int, x :Float, y :Float, width :Float, height :Float)
     {
-        // Use slice() here rather than haXe's substr monkey patch
+        // Use slice() here rather than Haxe's substr monkey patch
         _canvasCtx.fillStyle = untyped "#" + ("00000" + color.toString(16)).slice(-6);
         _canvasCtx.fillRect(Std.int(x), Std.int(y), Std.int(width), Std.int(height));
     }

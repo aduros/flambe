@@ -71,7 +71,7 @@ flambe.embed = function (urls, elementId) {
                     canvas.id = elementId + "-canvas";
                     container.appendChild(canvas);
 
-                    // Expose the canvas so haXe can use it
+                    // Expose the canvas so Haxe can use it
                     flambe.canvas = canvas;
 
                     var script = document.createElement("script");

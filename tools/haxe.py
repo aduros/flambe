@@ -1,5 +1,5 @@
 """
-Basic haXe compiler support for Waf
+Basic Haxe compiler support for Waf
 """
 
 import os, re

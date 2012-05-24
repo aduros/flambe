@@ -38,7 +38,7 @@ class Node
         return untyped __js__("new Buffer")(data, encoding);
     }
 
-    /** 'Error' isn't available in haXe, but it's the only way to get a stack trace. */
+    /** 'Error' isn't available in Haxe, but it's the only way to get a stack trace. */
     inline public static function throwError (message :String)
     {
         throw untyped __js__("new Error")(message);

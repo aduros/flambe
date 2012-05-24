@@ -3,7 +3,7 @@
 
 Flambe is an engine and asset pipeline for cross-platform multiplayer games.
 
-Written in haXe, games are compiled to Flash and HTML5, with support for mobile devices. Server-side
+Written in Haxe, games are compiled to Flash and HTML5, with support for mobile devices. Server-side
 logic compiles to JS and runs on node.js.
 
 High level overview

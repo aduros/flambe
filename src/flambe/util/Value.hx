@@ -7,7 +7,9 @@ package flambe.util;
 import flambe.util.Signal2;
 
 class Value<A>
-    implements haxe.rtti.Generic // Generate typed templates in Flash
+#if (flash || cpp || cs || java)
+    implements haxe.rtti.Generic // Generate typed templates on static targets
+#end
 {
     public var _ (get, set) :A;
     public var changed (getChanged, null) :Signal2<A,A>;

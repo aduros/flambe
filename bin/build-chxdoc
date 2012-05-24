@@ -2,6 +2,8 @@
 #
 # Generates API documentation
 
+set -e
+
 FLAMBE_ROOT=`readlink -f $(dirname $0)/..`
 CHXDOC_DIR="$FLAMBE_ROOT/chxdoc"
 

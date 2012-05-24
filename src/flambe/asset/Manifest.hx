@@ -7,7 +7,7 @@ package flambe.asset;
 import haxe.rtti.Meta;
 
 import flambe.asset.AssetEntry;
-import flambe.macro.ManifestBuilder;
+import flambe.platform.ManifestBuilder;
 
 using flambe.util.Strings;
 using StringTools;

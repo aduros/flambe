@@ -15,10 +15,6 @@ import flambe.util.Logger;
 import flambe.util.Promise;
 import flambe.util.Signal1;
 
-#if (!flash && !html)
-#error "Platform not supported!"
-#end
-
 class System
 {
     public static var root /*(default, null)*/ = new Entity();
@@ -97,6 +93,8 @@ class System
         flambe.platform.flash.FlashPlatform.instance;
 #elseif html
         flambe.platform.html.HtmlPlatform.instance;
+#else
+        null;
 #end
 
     private static var _calledInit = false;

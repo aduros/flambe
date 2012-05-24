@@ -2,9 +2,6 @@
 #
 # Generates API documentation
 
-# FIXME(bruno): The entire platform package is excluded until I can find a way to gracefully keep
-# only a few important classes. chxdoc has @private but it seems to only work for fields.
-
 FLAMBE_ROOT=`readlink -f $(dirname $0)/..`
 CHXDOC_DIR="$FLAMBE_ROOT/chxdoc"
 
@@ -16,13 +13,13 @@ rm -rf "$CHXDOC_DIR"
 # Generate intermediary haxedoc.xml
 cd "$TMP_DIR"
 haxe -xml haxedoc.xml \
-    --macro 'include("flambe", true, ["flambe.macro", "flambe.platform"])' \
+    --macro 'include("flambe", true, ["flambe.platform"])' \
     -lib format \
-    --no-output -js none -D html -cp "$FLAMBE_ROOT/src"
+    --no-output -cp "$FLAMBE_ROOT/src"
 
 # Generate the actual chxdoc directory
 chxdoc -o "$CHXDOC_DIR" haxedoc.xml \
-    --ignoreRoot=true --includeOnly='flambe.*' --exclude=flambe.macro,flambe.platform \
+    --ignoreRoot=true --includeOnly='flambe.*' --exclude=flambe.platform \
     --title="Flambe API Reference" --subtitle="Rapid game development"
 
 # Decent terminals will turn this into a clickable link

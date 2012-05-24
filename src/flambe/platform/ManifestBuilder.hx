@@ -2,7 +2,7 @@
 // Flambe - Rapid game development
 // https://github.com/aduros/flambe/blob/master/LICENSE.txt
 
-package flambe.macro;
+package flambe.platform;
 
 #if macro
 import neko.FileSystem;
@@ -13,10 +13,10 @@ import haxe.macro.Expr;
 import haxe.macro.Context;
 import haxe.macro.Type;
 
-using flambe.macro.Macros;
 using flambe.util.Strings;
 using Lambda;
 using StringTools;
+using Type;
 #end
 
 /**
@@ -24,17 +24,16 @@ using StringTools;
  */
 class ManifestBuilder
 {
-    @:macro
-    public static function populate (hash :Expr)
+    @:macro public static function populate (hash :Expr) :Expr
     {
         if (Context.defined("display")) {
             // When running in code completion, skip out early
-            return EBlock([]).toExpr();
+            return toExpr(EBlock([]));
         }
 
         var assetPrefix = "../assets/";
         var exprs :Array<Expr> = [];
-        var hash_set = EField(hash, "set").toExpr();
+        var hash_set = toExpr(EField(hash, "set"));
 
         for (packName in readDirectoryNoHidden(assetPrefix)) {
             var entries :Array<Expr> = [];
@@ -47,24 +46,26 @@ class ManifestBuilder
 
                     // Assemble the object literal for this asset
                     var entry = EObjectDecl([
-                        { field: "name", expr: name.toExpr() },
-                        { field: "md5", expr: md5.toExpr() },
-                        { field: "bytes", expr: bytes.toExpr() }
+                        { field: "name", expr: toExpr(name) },
+                        { field: "md5", expr: toExpr(md5) },
+                        { field: "bytes", expr: toExpr(bytes) }
                     ]);
-                    entries.push(entry.toExpr());
+                    entries.push(toExpr(entry));
                 }
 
                 // Build a pack with a list of file entries
-                exprs.push(ECall(hash_set, [ packName.toExpr(),
-                    EArrayDecl(entries).toExpr() ]).toExpr());
+                // exprs.push(ECall(hash_set, toExpr([ toExpr(packName),
+                //     toExpr(EArrayDecl(entries)) ])));
+                exprs.push(toExpr(ECall(hash_set, [ toExpr(packName),
+                    toExpr(EArrayDecl(entries)) ])));
             }
         }
 
-        return EBlock(exprs).toExpr();
+        return toExpr(EBlock(exprs));
     }
 
 #if macro
-    public static function readRecursive (root, dir = "")
+    private static function readRecursive (root, dir = "")
     {
         var result = [];
         for (file in readDirectoryNoHidden(root + "/" + dir)) {
@@ -79,7 +80,7 @@ class ManifestBuilder
         return result;
     }
 
-    public static function readDirectoryNoHidden (dir :String)
+    private static function readDirectoryNoHidden (dir :String)
     {
         if (dir.fastCodeAt(dir.length - 1) == "/".code) {
             // Trim off the trailing slash. On Windows, FileSystem.exists() doesn't find directories
@@ -90,6 +91,20 @@ class ManifestBuilder
             FileSystem.readDirectory(dir).filter(
                 function (file) return file.fastCodeAt(0) != ".".code) :
             cast [];
+    }
+
+    public static function toExpr (object :Dynamic) :Expr
+    {
+        var pos = Context.currentPos();
+
+        // If it's an ExprDef, use it directly
+        var e :EnumValue = cast object;
+        if (e.getEnum() == ExprDef) {
+            var exprDef = cast object;
+            return { expr: object, pos: pos };
+        }
+
+        return Context.makeExpr(object, pos);
     }
 #end
 }

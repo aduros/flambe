@@ -29,29 +29,29 @@ def configure(ctx):
 @feature("flambe")
 def apply_flambe(ctx):
     Utils.def_attrs(ctx, platforms="flash html",
-        classpath="", flags="", libs="", assetBase=None, flashVersion="10.1",
-        airCert="etc/air-cert.pfx", airDesc="etc/air-desc.xml", airPassword=None,
-        iosProfile="etc/ios.mobileprovision")
+        classpath="", flags="", libs="", asset_base=None, flash_version="10.1",
+        air_cert="etc/air-cert.pfx", air_desc="etc/air-desc.xml", air_password=None,
+        ios_profile="etc/ios.mobileprovision")
 
     classpath = [ ctx.path.find_dir("src"), ctx.bld.root.find_dir(FLAMBE_ROOT+"/src") ] + \
         Utils.to_list(ctx.classpath) # The classpath option should be a list of nodes
     flags = ["-main", ctx.main, "--dead-code-elimination"] + Utils.to_list(ctx.flags)
     libs = ["format"] + Utils.to_list(ctx.libs)
     platforms = Utils.to_list(ctx.platforms)
-    flashVersion = ctx.flashVersion
+    flash_version = ctx.flash_version
     debug = ctx.env.debug
 
     # Figure out what should be built
-    buildFlash = "flash" in platforms and ctx.env.has_flash
-    buildHtml = "html" in platforms and ctx.env.has_html
-    buildAndroid = "android" in platforms and ctx.env.has_android
-    buildIOS = "ios" in platforms and ctx.env.has_ios
+    build_flash = "flash" in platforms and ctx.env.has_flash
+    build_html = "html" in platforms and ctx.env.has_html
+    build_android = "android" in platforms and ctx.env.has_android
+    build_ios = "ios" in platforms and ctx.env.has_ios
 
-    assetDir = ctx.path.find_dir("assets")
-    assetList = [] if assetDir is None else assetDir.ant_glob("**/*")
+    asset_dir = ctx.path.find_dir("assets")
+    asset_list = [] if asset_dir is None else asset_dir.ant_glob("**/*")
 
-    installPrefix = "deploy/"
-    buildPrefix = (ctx.name if ctx.name else "main") + "-"
+    install_prefix = "deploy/"
+    build_prefix = (ctx.name if ctx.name else "main") + "-"
 
     # The files that are built and should be installed
     outputs = []
@@ -62,50 +62,50 @@ def apply_flambe(ctx):
         flags += "--no-traces -D flambe_disable_logging".split()
 
     # Inject a custom asset base URL if provided
-    if ctx.assetBase != None:
+    if ctx.asset_base != None:
         flags += [
             "--macro",
-            "addMetadata(\"@assetBase('%s')\", \"flambe.asset.Manifest\")" % ctx.assetBase,
+            "addMetadata(\"@asset_base('%s')\", \"flambe.asset.Manifest\")" % ctx.asset_base,
         ]
 
-    if buildFlash:
-        flashFlags = ["-swf-version", flashVersion]
+    if build_flash:
+        flash_flags = ["-swf-version", flash_version]
 
-        swf = buildPrefix + "flash.swf"
+        swf = build_prefix + "flash.swf"
         outputs.append(swf)
 
         ctx.bld(features="haxe", classpath=classpath,
-            flags=flags + flashFlags,
+            flags=flags + flash_flags,
             libs=libs,
             target=swf)
-        ctx.bld.install_files(installPrefix + "web/targets", swf)
+        ctx.bld.install_files(install_prefix + "web/targets", swf)
 
-    if buildHtml:
-        htmlFlags = "-D html --js-modern".split()
+    if build_html:
+        html_flags = "-D html --js-modern".split()
 
-        uncompressed = buildPrefix + "html.uncompressed.js"
-        js = buildPrefix + "html.js"
+        uncompressed = build_prefix + "html.uncompressed.js"
+        js = build_prefix + "html.js"
         outputs.append(js)
 
         ctx.bld(features="haxe", classpath=classpath,
-            flags=flags + htmlFlags,
+            flags=flags + html_flags,
             libs=libs,
             target=js if debug else uncompressed)
         if not debug:
             ctx.bld(features="closure", source=uncompressed, target=js,
                 flags="--warning_level QUIET --language_in ES5_STRICT")
         else:
-            ctx.bld.install_files(installPrefix + "web/targets", js + ".map")
-        ctx.bld.install_files(installPrefix + "web/targets", js)
+            ctx.bld.install_files(install_prefix + "web/targets", js + ".map")
+        ctx.bld.install_files(install_prefix + "web/targets", js)
 
-    if buildAndroid or buildIOS:
+    if build_android or build_ios:
         # Since the captive runtime is used for apps, we can always use the latest swf version
-        airFlags = "-D air -swf-version 11.2".split()
+        air_flags = "-D air -swf-version 11.2".split()
 
-        swf = buildPrefix + "air.swf"
+        swf = build_prefix + "air.swf"
 
         ctx.bld(features="haxe", classpath=classpath,
-            flags=flags + airFlags,
+            flags=flags + air_flags,
             libs=libs,
             target=swf)
 
@@ -114,36 +114,36 @@ def apply_flambe(ctx):
             ctx.bld.fatal("adt from the AIR SDK is required, " + \
                 "ensure it's in your $PATH and re-run waf configure.")
 
-        airCert = ctx.path.find_resource(ctx.airCert)
-        if not airCert:
-            ctx.bld.fatal("Could not find AIR certificate at %s." % ctx.airCert)
+        air_cert = ctx.path.find_resource(ctx.air_cert)
+        if not air_cert:
+            ctx.bld.fatal("Could not find AIR certificate at %s." % ctx.air_cert)
 
-        airDesc = ctx.path.find_resource(ctx.airDesc)
-        if not airCert:
-            ctx.bld.fatal("Could not find AIR descriptor at %s." % ctx.airDesc)
+        air_desc = ctx.path.find_resource(ctx.air_desc)
+        if not air_cert:
+            ctx.bld.fatal("Could not find AIR descriptor at %s." % ctx.air_desc)
 
-        airPassword = ctx.airPassword
-        if not airPassword:
-            ctx.bld.fatal("You must specify the airPassword to your certificate.")
+        air_password = ctx.air_password
+        if not air_password:
+            ctx.bld.fatal("You must specify the air_password to your certificate.")
 
-        airApps = []
+        air_apps = []
 
-        if buildAndroid:
+        if build_android:
             adb = ctx.env.ADB
             if not adb:
                 ctx.bld.fatal("adb from the Android SDK is required, " + \
                     "ensure it's in your $PATH and re-run waf configure.")
 
             # Derive the location of the Android SDK from adb's path
-            androidRoot = adb[0:adb.rindex("/platform-tools/adb")]
+            android_root = adb[0:adb.rindex("/platform-tools/adb")]
 
-            apkType = "apk-debug" if debug else "apk-captive-runtime"
+            apk_type = "apk-debug" if debug else "apk-captive-runtime"
             rule = ("%s -package -target %s " +
                 "-storetype pkcs12 -keystore %s -storepass %s " +
                 "\"${TGT}\" %s " +
                 "-platformsdk %s ") % (
-                    quote(adt), apkType, quote(airCert.abspath()), quote(airPassword),
-                    quote(airDesc.abspath()), quote(androidRoot))
+                    quote(adt), apk_type, quote(air_cert.abspath()), quote(air_password),
+                    quote(air_desc.abspath()), quote(android_root))
 
             if ctx.bld.cmd == "install":
                 # Install the APK if there's a device plugged in
@@ -152,108 +152,108 @@ def apply_flambe(ctx):
                     if state == "device\n":
                         ctx.to_log("Installing APK to device...\n")
                         ctx.exec_command("%s install -rs %s" %
-                            (quote(adb), quote(installPrefix + "packages/" + buildPrefix + "android.apk")))
+                            (quote(adb), quote(install_prefix + "packages/" + build_prefix + "android.apk")))
                 ctx.bld.add_post_fun(install_apk)
 
-            airApps.append((buildPrefix + "android.apk", rule))
+            air_apps.append((build_prefix + "android.apk", rule))
 
-        if buildIOS:
-            iosProfile = ctx.path.find_resource(ctx.iosProfile)
-            if not iosProfile:
-                ctx.bld.fatal("Could not find iOS provisioning profile at %s." % ctx.iosProfile)
+        if build_ios:
+            ios_profile = ctx.path.find_resource(ctx.ios_profile)
+            if not ios_profile:
+                ctx.bld.fatal("Could not find iOS provisioning profile at %s." % ctx.ios_profile)
 
             # TODO(bruno): Add -connect [host] for debug builds, if fdb is present
             # TODO(bruno): Handle final app store packaging
             # TODO(bruno): Is there a way to install an IPA from the command line? (sans jailbreak)
-            ipaType = "ipa-debug" if debug else "ipa-ad-hoc"
+            ipa_type = "ipa-debug" if debug else "ipa-ad-hoc"
             rule = ("%s -package -target %s -provisioning-profile %s " +
                 "-storetype pkcs12 -keystore %s -storepass %s " +
                 "\"${TGT}\" %s ") % (
-                    quote(adt), ipaType, quote(iosProfile.abspath()),
-                    quote(airCert.abspath()), quote(airPassword), quote(airDesc.abspath()))
+                    quote(adt), ipa_type, quote(ios_profile.abspath()),
+                    quote(air_cert.abspath()), quote(air_password), quote(air_desc.abspath()))
 
-            airApps.append((buildPrefix + "ios.ipa", rule))
+            air_apps.append((build_prefix + "ios.ipa", rule))
 
         # Build all our AIR apps, appending common configuration
-        for target, rule in airApps:
+        for target, rule in air_apps:
             outputs.append(target)
 
             # Include the swf
             rule += swf
 
             # Include the assets
-            if assetDir is not None:
+            if asset_dir is not None:
                 # Exclude assets Flash will never use
-                airAssets = assetDir.ant_glob("**/*", excl="**/*.(ogg|wav|m4a)")
+                air_assets = asset_dir.ant_glob("**/*", excl="**/*.(ogg|wav|m4a)")
                 rule += " -C %s %s" % (
                     quote(ctx.path.abspath()),
-                    " ".join([ quote(asset.nice_path()) for asset in airAssets ]))
+                    " ".join([ quote(asset.nice_path()) for asset in air_assets ]))
 
             ctx.bld(rule=rule, target=target, source=swf)
-            ctx.bld.add_manual_dependency(target, airCert);
-            ctx.bld.add_manual_dependency(target, airDesc);
-            ctx.bld.install_files(installPrefix + "packages", target)
+            ctx.bld.add_manual_dependency(target, air_cert);
+            ctx.bld.add_manual_dependency(target, air_desc);
+            ctx.bld.install_files(install_prefix + "packages", target)
 
     # Common web stuff
-    if buildFlash or buildHtml:
+    if build_flash or build_html:
         # Compile the embedder script
         embedder = "flambe.js"
         scripts = ctx.bld.root.find_dir(FLAMBE_ROOT+"/tools/embedder").ant_glob("*.js")
 
         ctx.bld(features="closure", source=scripts, target=embedder,
-            flags="-D flambe.FLASH_VERSION='%s'" % flashVersion)
-        ctx.bld.install_files(installPrefix + "web", embedder)
+            flags="-D flambe.FLASH_VERSION='%s'" % flash_version)
+        ctx.bld.install_files(install_prefix + "web", embedder)
 
         # Install the default embedder page if necessary
         if ctx.bld.path.find_dir("web") == None:
-            ctx.bld.install_files(installPrefix + "web", [
+            ctx.bld.install_files(install_prefix + "web", [
                 ctx.bld.root.find_resource(FLAMBE_ROOT+"/tools/embedder/index.html"),
                 ctx.bld.root.find_resource(FLAMBE_ROOT+"/tools/embedder/logo.png"),
             ])
 
         # Install the assets
-        if assetDir is not None:
-            ctx.bld.install_files(installPrefix + "web/assets", assetList,
-                cwd=assetDir, relative_trick=True)
+        if asset_dir is not None:
+            ctx.bld.install_files(install_prefix + "web/assets", asset_list,
+                cwd=asset_dir, relative_trick=True)
 
         # Also install any other files in /web
-        ctx.bld.install_files(installPrefix, ctx.path.ant_glob("web/**/*"), relative_trick=True)
+        ctx.bld.install_files(install_prefix, ctx.path.ant_glob("web/**/*"), relative_trick=True)
 
     # Force a rebuild when anything in the asset directory has been updated
-    for asset in assetList:
+    for asset in asset_list:
         for output in outputs:
             ctx.bld.add_manual_dependency(output, asset)
 
 @feature("flambe-server")
 def apply_flambe_server(ctx):
-    Utils.def_attrs(ctx, classpath="", flags="", libs="", npmLibs="", include="")
+    Utils.def_attrs(ctx, classpath="", flags="", libs="", npm_libs="", include="")
 
     classpath = [ ctx.path.find_dir("src"), ctx.bld.root.find_dir(FLAMBE_ROOT+"/src") ] + \
         Utils.to_list(ctx.classpath) # The classpath option should be a list of nodes
     flags = ["-main", ctx.main] + Utils.to_list(ctx.flags)
     libs = Utils.to_list(ctx.libs)
-    npmLibs = Utils.to_list(ctx.npmLibs)
+    npm_libs = Utils.to_list(ctx.npm_libs)
     include = Utils.to_list(ctx.include)
-    buildPrefix = (ctx.name if ctx.name else "main") + "-server/"
-    installPrefix = "deploy/" + buildPrefix;
+    build_prefix = (ctx.name if ctx.name else "main") + "-server/"
+    install_prefix = "deploy/" + build_prefix;
 
-    if npmLibs:
+    if npm_libs:
         if not ctx.env.NPM:
             ctx.bld.fatal("npm is required to specify node libraries, " + \
                 "ensure it's in your $PATH and re-run waf configure.")
 
-        cwd = ctx.path.get_bld().make_node(buildPrefix)
+        cwd = ctx.path.get_bld().make_node(build_prefix)
         cwd.mkdir()
-        for npmLib in npmLibs:
-            ctx.bld(rule="%s install %s" % (quote(ctx.env.NPM), npmLib), cwd=cwd.abspath())
+        for npm_lib in npm_libs:
+            ctx.bld(rule="%s install %s" % (quote(ctx.env.NPM), npm_lib), cwd=cwd.abspath())
 
         if ctx.bld.cmd == "install":
             # Find files to install only after npm has downloaded them
-            def installModules(ctx):
-                dir = ctx.bldnode.find_dir(buildPrefix)
+            def install_modules(ctx):
+                dir = ctx.bldnode.find_dir(build_prefix)
                 for file in dir.ant_glob("node_modules/**/*"):
-                    ctx.do_install(file.abspath(), installPrefix + file.path_from(dir))
-            ctx.bld.add_post_fun(installModules)
+                    ctx.do_install(file.abspath(), install_prefix + file.path_from(dir))
+            ctx.bld.add_post_fun(install_modules)
 
     # TODO(bruno): Use the node externs in haxelib
     flags += "-D server".split()
@@ -263,13 +263,13 @@ def apply_flambe_server(ctx):
     else:
         flags += "--no-traces".split()
 
-    server = buildPrefix + "server.js"
+    server = build_prefix + "server.js"
     ctx.bld(features="haxe", classpath=classpath, flags=flags, libs=libs, target=server)
-    ctx.bld.install_files(installPrefix, server)
+    ctx.bld.install_files(install_prefix, server)
 
     # Mark any other custom files for installation
     if include:
-        ctx.bld.install_files(installPrefix, include, relative_trick=True)
+        ctx.bld.install_files(install_prefix, include, relative_trick=True)
 
     file = SERVER_CONFIG
     conf = ConfigSet.ConfigSet()
@@ -277,7 +277,7 @@ def apply_flambe_server(ctx):
         conf.load(file)
     except (IOError):
         pass
-    conf.script = installPrefix + "server.js"
+    conf.script = install_prefix + "server.js"
     conf.store(file)
 
     # Restart the development server when installing

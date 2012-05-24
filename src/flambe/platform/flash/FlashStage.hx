@@ -9,10 +9,12 @@ import flash.events.MouseEvent;
 import flash.media.Video;
 import flash.system.Capabilities;
 
-import flambe.platform.Stage;
+import flambe.display.Orientation;
+import flambe.display.Stage;
 import flambe.util.Signal0;
 
-class FlashStage implements Stage
+class FlashStage
+    implements Stage
 {
     public var width (getWidth, null) :Int;
     public var height (getHeight, null) :Int;

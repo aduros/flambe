@@ -4,6 +4,8 @@
 
 package flambe.platform;
 
+import flambe.storage.Storage;
+
 class DummyStorage
     implements Storage
 {

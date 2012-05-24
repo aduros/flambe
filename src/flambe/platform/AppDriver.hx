@@ -6,10 +6,12 @@ package flambe.platform;
 
 import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
+import flambe.display.Stage;
 import flambe.display.Texture;
 import flambe.Entity;
 import flambe.input.Keyboard;
 import flambe.input.Pointer;
+import flambe.storage.Storage;
 import flambe.util.Logger;
 import flambe.util.Promise;
 

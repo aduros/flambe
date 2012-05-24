@@ -6,7 +6,8 @@ package flambe.platform.html;
 
 import js.Lib;
 
-import flambe.platform.Stage;
+import flambe.display.Orientation;
+import flambe.display.Stage;
 import flambe.util.Signal0;
 
 class HtmlStage

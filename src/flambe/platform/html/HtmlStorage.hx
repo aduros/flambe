@@ -7,7 +7,7 @@ package flambe.platform.html;
 import haxe.Serializer;
 import haxe.Unserializer;
 
-import flambe.platform.Storage;
+import flambe.storage.Storage;
 
 class HtmlStorage
     implements Storage

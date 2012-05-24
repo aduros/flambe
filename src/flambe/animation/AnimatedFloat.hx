@@ -27,7 +27,7 @@ class AnimatedFloat extends Value<Float>
         return super.set(value);
     }
 
-    public function update (dt :Int)
+    public function update (dt :Float)
     {
         if (_behavior != null) {
             super.set(_behavior.update(dt));

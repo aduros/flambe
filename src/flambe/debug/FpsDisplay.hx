@@ -16,12 +16,12 @@ class FpsDisplay
     {
     }
 
-    override public function onUpdate (dt)
+    override public function onUpdate (dt :Float)
     {
         ++_fpsFrames;
         _fpsTime += dt;
-        if (_fpsTime > 1000) {
-            var fps = 1000 * _fpsFrames/_fpsTime;
+        if (_fpsTime > 1) {
+            var fps = _fpsFrames/_fpsTime;
             var text = "FPS: " + Std.int(fps*100) / 100;
 
             // Use our owner's TextSprite if available, otherwise just log it
@@ -37,6 +37,5 @@ class FpsDisplay
     }
 
     private var _fpsFrames :Int;
-    private var _fpsTime :Int;
-    private var _lastTime :Int;
+    private var _fpsTime :Float;
 }

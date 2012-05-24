@@ -85,7 +85,7 @@ class HtmlAppDriver
         var requestAnimationFrame = HtmlUtil.loadExtension("requestAnimationFrame");
         if (requestAnimationFrame != null) {
             var updateFrame = null;
-            updateFrame = function (now) {
+            updateFrame = function (now :Int) {
                 update(now);
                 requestAnimationFrame(updateFrame, canvas);
             };
@@ -231,10 +231,10 @@ class HtmlAppDriver
 
     private function update (now :Float)
     {
-        var dt = now - _lastUpdate;
+        var dt = (now - _lastUpdate)/1000;
         _lastUpdate = now;
 
-        mainLoop.update(cast dt);
+        mainLoop.update(dt);
         mainLoop.render(renderer);
     }
 

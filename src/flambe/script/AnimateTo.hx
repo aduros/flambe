@@ -20,7 +20,7 @@ class AnimateTo
         _easing = easing;
     }
 
-    public function update (dt :Int, actor :Entity) :Bool
+    public function update (dt :Float, actor :Entity) :Bool
     {
         if (_tween == null) {
             _tween = new Tween(_value._, _to, _seconds, _easing);

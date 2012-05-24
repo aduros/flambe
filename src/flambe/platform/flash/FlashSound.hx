@@ -105,7 +105,7 @@ private class FlashPlayback
         return _channel.position;
     }
 
-    public function update (dt :Int) :Bool
+    public function update (dt :Float) :Bool
     {
         volume.update(dt);
 

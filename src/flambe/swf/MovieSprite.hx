@@ -18,7 +18,7 @@ class MovieSprite extends Sprite
             _layers.push(new LayerSprite(layer));
         }
 
-        _duration = 1000/30 * movie.frames;
+        _duration = movie.frames/30;
         _goingToFrame = false;
         _frame = 0;
         _elapsed = 0;
@@ -36,7 +36,7 @@ class MovieSprite extends Sprite
 
     // TODO(bruno): onRemove
 
-    override public function onUpdate (dt :Int)
+    override public function onUpdate (dt :Float)
     {
         super.onUpdate(dt);
 
@@ -45,7 +45,7 @@ class MovieSprite extends Sprite
             _elapsed = _elapsed % _duration;
         }
 
-        var newFrame = _elapsed * 30/1000;
+        var newFrame = _elapsed*30;
 
         goto(newFrame);
     }

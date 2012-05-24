@@ -19,7 +19,7 @@ class Repeat
         _remaining = count;
     }
 
-    public function update (dt :Int, actor :Entity)
+    public function update (dt :Float, actor :Entity)
     {
         if (_count == 0) {
             // Handle the special case of a 0-count Repeat

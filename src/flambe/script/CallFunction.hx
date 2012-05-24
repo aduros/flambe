@@ -14,7 +14,7 @@ class CallFunction
         _fn = fn;
     }
 
-    public function update (dt :Int, actor :Entity)
+    public function update (dt :Float, actor :Entity)
     {
         _fn();
         return true;

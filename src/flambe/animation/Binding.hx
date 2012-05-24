@@ -17,7 +17,7 @@ class Binding
         _fn = fn;
     }
 
-    public function update (dt :Int) :Float
+    public function update (dt :Float) :Float
     {
         var value = _target._;
         // TODO: Be lazy and only call _fn when the value is changed?

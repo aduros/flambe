@@ -38,7 +38,7 @@ class Sequence
         _runningActions = [];
     }
 
-    public function update (dt :Int, actor :Entity) :Bool
+    public function update (dt :Float, actor :Entity) :Bool
     {
         var action = _runningActions[_idx];
         if (action == null || action.update(dt, actor)) {

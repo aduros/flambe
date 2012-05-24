@@ -26,7 +26,7 @@ class MainLoop
         _tickables = [];
     }
 
-    public function update (dt :Int)
+    public function update (dt :Float)
     {
         // First update any tickables, folding away nulls
         var ii = 0;
@@ -77,7 +77,7 @@ class MainLoop
 private class UpdateVisitor
     implements Visitor
 {
-    public var dt :Int;
+    public var dt :Float;
 
     public function new ()
     {

@@ -36,7 +36,7 @@ class FillSprite extends Sprite
         return height._;
     }
 
-    override public function onUpdate (dt :Int)
+    override public function onUpdate (dt :Float)
     {
         super.onUpdate(dt);
         width.update(dt);

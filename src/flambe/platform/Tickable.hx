@@ -10,5 +10,5 @@ package flambe.platform;
  */
 interface Tickable
 {
-    function update (dt :Int) :Bool;
+    function update (dt :Float) :Bool;
 }

@@ -22,7 +22,7 @@ class MoveTo
         _easingY = easingY;
     }
 
-    public function update (dt :Int, actor :Entity) :Bool
+    public function update (dt :Float, actor :Entity) :Bool
     {
         var sprite = actor.get(Sprite);
         if (_tweenX == null) {

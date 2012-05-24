@@ -13,12 +13,12 @@ class Tween
     {
         _from = from;
         _to = to;
-        _duration = Std.int(1000*seconds);
+        _duration = seconds;
         _elapsed = 0;
         _easing = (easing != null) ? easing : Easing.linear;
     }
 
-    public function update (dt :Int) :Float
+    public function update (dt :Float) :Float
     {
         _elapsed += dt;
 
@@ -36,7 +36,7 @@ class Tween
 
     private var _from :Float;
     private var _to :Float;
-    private var _elapsed :Int;
-    private var _duration :Int;
+    private var _elapsed :Float;
+    private var _duration :Float;
     private var _easing :EasingFunction;
 }

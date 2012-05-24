@@ -38,7 +38,7 @@ class Parallel
         _completedActions = [];
     }
 
-    public function update (dt :Int, actor :Entity)
+    public function update (dt :Float, actor :Entity)
     {
         var done = true;
         for (ii in 0..._runningActions.length) {

@@ -102,7 +102,7 @@ private class HtmlPlayback
         return _clone.currentTime*1000;
     }
 
-    public function update (dt :Int) :Bool
+    public function update (dt :Float) :Bool
     {
         volume.update(dt);
 

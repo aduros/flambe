@@ -120,7 +120,7 @@ class Sprite extends Component
         return this;
     }
 
-    override public function onUpdate (dt :Int)
+    override public function onUpdate (dt :Float)
     {
         x.update(dt);
         y.update(dt);

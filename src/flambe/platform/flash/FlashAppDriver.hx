@@ -167,8 +167,7 @@ class FlashAppDriver
     private function onEnterFrame (_)
     {
         var now = Lib.getTimer();
-        var dt = now - _lastUpdate;
-
+        var dt = (now - _lastUpdate)/1000;
         _lastUpdate = now;
 
         mainLoop.update(dt);

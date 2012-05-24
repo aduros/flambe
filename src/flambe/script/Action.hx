@@ -8,5 +8,5 @@ import flambe.Entity;
 
 interface Action
 {
-    function update (dt :Int, actor :Entity) :Bool;
+    function update (dt :Float, actor :Entity) :Bool;
 }

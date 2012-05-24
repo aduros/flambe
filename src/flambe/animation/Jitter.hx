@@ -16,7 +16,7 @@ class Jitter
         this.strength = strength;
     }
 
-    public function update (dt :Int) :Float
+    public function update (dt :Float) :Float
     {
         return base + 2*Math.random()*strength - strength;
     }

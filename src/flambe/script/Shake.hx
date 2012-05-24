@@ -17,11 +17,11 @@ class Shake
     {
         _strengthX = strengthX;
         _strengthY = strengthY;
-        _duration = Std.int(1000*seconds);
+        _duration = seconds;
         _elapsed = 0;
     }
 
-    public function update (dt :Int, actor :Entity) :Bool
+    public function update (dt :Float, actor :Entity) :Bool
     {
         var sprite = actor.get(Sprite);
         if (_jitterX == null) {
@@ -47,11 +47,11 @@ class Shake
         return false;
     }
 
-    private var _elapsed :Int;
+    private var _elapsed :Float;
     private var _jitterX :Jitter;
     private var _jitterY :Jitter;
 
     private var _strengthX :Float;
     private var _strengthY :Float;
-    private var _duration :Int;
+    private var _duration :Float;
 }

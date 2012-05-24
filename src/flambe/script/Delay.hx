@@ -11,11 +11,11 @@ class Delay
 {
     public function new (seconds :Float)
     {
-        _duration = Std.int(1000*seconds);
+        _duration = seconds;
         _elapsed = 0;
     }
 
-    public function update (dt :Int, actor :Entity)
+    public function update (dt :Float, actor :Entity)
     {
         _elapsed += dt;
         if (_elapsed >= _duration) {
@@ -25,6 +25,6 @@ class Delay
         return false;
     }
 
-    private var _duration :Int;
-    private var _elapsed :Int;
+    private var _duration :Float;
+    private var _elapsed :Float;
 }

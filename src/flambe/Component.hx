@@ -32,7 +32,7 @@ class Component
     {
     }
 
-    public function onUpdate (dt :Int)
+    public function onUpdate (dt :Float)
     {
     }
 

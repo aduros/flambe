@@ -6,6 +6,6 @@ package flambe.animation;
 
 interface Behavior
 {
-    function update (dt :Int) :Float;
+    function update (dt :Float) :Float;
     function isComplete () :Bool;
 }

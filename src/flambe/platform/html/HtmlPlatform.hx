@@ -82,23 +82,6 @@ class HtmlPlatform
         renderer = new CanvasRenderer(canvas);
         mainLoop = new MainLoop();
 
-        // Use requestAnimationFrame if available, otherwise a 60 FPS setInterval
-        // https://developer.mozilla.org/en/DOM/window.mozRequestAnimationFrame
-        var requestAnimationFrame = HtmlUtil.loadExtension("requestAnimationFrame");
-        if (requestAnimationFrame != null) {
-            var updateFrame = null;
-            updateFrame = function (now :Int) {
-                update(now);
-                requestAnimationFrame(updateFrame, canvas);
-            };
-            requestAnimationFrame(updateFrame, canvas);
-        } else {
-            log.warn("No requestAnimationFrame support, falling back to setInterval");
-            (untyped Lib.window).setInterval(function () {
-                update(Date.now().getTime());
-            }, 1000/60);
-        }
-
         var container = canvas.parentNode;
         container.style.overflow = "hidden";
 
@@ -170,6 +153,36 @@ class HtmlPlatform
         };
 
         _lastUpdate = Date.now().getTime();
+
+        // Use requestAnimationFrame if available, otherwise a 60 FPS setInterval
+        // https://developer.mozilla.org/en/DOM/window.mozRequestAnimationFrame
+        var requestAnimationFrame = HtmlUtil.loadExtension("requestAnimationFrame");
+        if (requestAnimationFrame != null) {
+            // Use the high resolution, monotonic timer if available
+            // http://www.w3.org/TR/hr-time/
+            var performance :{ now :Void -> Float } = untyped Lib.window.performance;
+            var hasPerfNow = (performance != null) && HtmlUtil.polyfill("now", performance);
+
+            if (hasPerfNow) {
+                // performance.now is relative to navigationStart, rather than a timestamp
+                _lastUpdate = performance.now();
+            } else {
+                log.warn("No monotonic timer support, falling back to the system date");
+            }
+
+            var updateFrame = null;
+            updateFrame = function (now :Float) {
+                update(hasPerfNow ? performance.now() : now);
+                requestAnimationFrame(updateFrame, canvas);
+            };
+            requestAnimationFrame(updateFrame, canvas);
+
+        } else {
+            log.warn("No requestAnimationFrame support, falling back to setInterval");
+            (untyped Lib.window).setInterval(function () {
+                update(Date.now().getTime());
+            }, 1000/60);
+        }
     }
 
     public function loadAssetPack (manifest :Manifest) :Promise<AssetPack>

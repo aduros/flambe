@@ -53,6 +53,21 @@ class HtmlUtil
         return null;
     }
 
+    // Loads a vendor extension and jams it into the supplied object
+    public static function polyfill (name :String, ?obj :Dynamic) :Bool
+    {
+        if (obj == null) {
+            obj = Lib.window;
+        }
+
+        var ext = loadExtension(name, obj);
+        if (ext == null) {
+            return false;
+        }
+        Reflect.setField(obj, name, ext);
+        return true;
+    }
+
     public static function setVendorStyle (element :Dynamic, name :String, value :String)
     {
         var style = element.style;

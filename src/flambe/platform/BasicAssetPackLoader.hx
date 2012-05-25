@@ -150,7 +150,6 @@ class BasicAssetPackLoader
 
     private function handleSuccess ()
     {
-        log.info("Finished loading asset pack");
         promise.result = _pack;
     }
 

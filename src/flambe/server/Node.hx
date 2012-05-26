@@ -13,10 +13,6 @@ class Node
     public static var console (_console, null) :Dynamic;
     public static var process (_process, null) :Dynamic;
 
-    // TODO(bruno): Use haxe's JSON API
-    public static var stringify :Dynamic -> String = untyped JSON.stringify;
-    public static var parse :String -> Dynamic = untyped JSON.parse;
-
     // FIXME(bruno): Multiple loggers with different tags is not supported
     public static function logger (tag :String) :Logger
     {

@@ -15,6 +15,7 @@ class TestMain
         var runner = new TestRunner();
 
         // Register all our test cases
+        runner.add(new ConfigTest());
         runner.add(new EntityTest());
         runner.add(new ReactiveTest());
         runner.add(new StringTest());

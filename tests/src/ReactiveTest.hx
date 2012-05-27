@@ -4,6 +4,7 @@
 
 import haxe.unit.TestCase;
 
+import flambe.util.Promise;
 import flambe.util.Signal1;
 import flambe.util.Value;
 
@@ -70,5 +71,31 @@ class ReactiveTest extends TestCase
         fired = false;
         value._ = value._;
         assertFalse(fired);
+    }
+
+    public function testPromises ()
+    {
+        var promise = new Promise<Int>();
+        assertFalse(promise.hasResult);
+
+        assertThrows("Promise result not yet available", function () promise.result);
+
+        var fired = 0;
+        promise.get(function (n) fired = n);
+        promise.result = 1;
+        assertEquals(fired, 1);
+        assertEquals(promise.result, 1);
+
+        assertThrows("Promise result already assigned", function () promise.result = 2);
+    }
+
+    public function assertThrows (expectedError :Dynamic, fn :Void -> Void)
+    {
+        try {
+            fn();
+            assertTrue(false);
+        } catch (e :Dynamic) {
+            assertEquals(e, expectedError);
+        }
     }
 }

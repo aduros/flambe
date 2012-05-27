@@ -178,7 +178,14 @@ class Entity
         while (ii < _comps.length) {
             var comp = _comps[ii];
             if (comp != null) {
+                var name = comp.getName();
                 _comps[ii] = null;
+#if flash
+                untyped __delete__(_compMap, name);
+#elseif js
+                untyped __js__("delete")(_compMap[name]);
+#end
+
                 comp.onRemoved();
                 comp._internal_setOwner(null);
                 comp.onDispose();

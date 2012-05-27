@@ -1,0 +1,22 @@
+#!/usr/bin/env python
+
+from waflib import *
+
+# Setup options for display when running waf --help
+def options(ctx):
+    ctx.load("haxe", tooldir="../tools")
+
+# Setup configuration when running waf configure
+def configure(ctx):
+    ctx.load("haxe", tooldir="../tools")
+
+# Runs the build!
+def build(ctx):
+    ctx(features="haxe",
+        classpath = [ ctx.path.find_dir("src"), ctx.path.find_dir("../src") ],
+        target="runner.js",
+        flags="-main TestMain")
+    ctx.add_post_fun(run_tests)
+
+def run_tests(ctx):
+    ctx.cmd_and_log(["node", "build/runner.js"], quiet=Context.STDOUT)

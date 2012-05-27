@@ -115,7 +115,7 @@ class Manifest
                 }
 
                 var base = crossOriginBase;
-#if js
+#if html
                 if (type == Data) {
                     // Without CORS, readable data must be loaded from the same origin
                     // TODO(bruno): If Flambe ever gets an API to read pixels out of a texture,
@@ -136,7 +136,7 @@ class Manifest
      */
     private static function supportsCrossOrigin () :Bool
     {
-#if js
+#if html
         // CORS in the stock Android browser is buggy. If your game is contained in an iframe, XHR
         // will work the first time. If the response had an Expires header, on subsequent page loads
         // instead of retrieving it from the cache, it will fail with error code 0.

@@ -4,19 +4,34 @@
 Flambe is an engine and asset pipeline for cross-platform multiplayer games.
 
 Written in Haxe, games are compiled to Flash and HTML5, with support for mobile
-devices. Server-side logic compiles to JS and runs on node.js.
+devices. Server-side logic compiles to JS and runs on Node.js, for games that
+require multiplayer.
 
-High level overview
--------------------
+Rendering in Flash uses Stage3D, falling back to copyPixels if hardware accelerated
+Stage3D isn't available. The HTML5 renderer uses canvas, with plans for WebGL
+support later on.
 
-TODO! But for now, here are some philosophies I have been following for this
-project:
+Overview
+--------
 
-- Composition over inheritance.
-- Convention over configuration.
-- Rapid development, at most 2 seconds between making a code change and seeing
-  the results.
-- Mobile first, desktop second.
+Flambe's design and roadmap are guided by a few philosophies:
+
+- Composition over inheritance: Flambe uses an entity/component system rather
+  than sprawling inheritance hierarchies. The composition pattern also comes up
+  repeatedly in other parts of Flambe's design.
+
+- Convention over configuration: Project layouts and APIs should have sensible
+  defaults. Manual configuration for unusual use cases should be possible, but
+  not required.
+
+- HTML5 and mobile web support is a high priority.
+
+- Flambe is a "clean break" from the Flash API which most Haxe game engines are
+  based on. The Flash API and its many quirks are a huge amount of work to
+  reliably port to other platforms (ask the NME guys) and wasn't designed to run
+  well on GPUs (ask the Starling guys). By writing against a smaller,
+  well-defined API designed for games, Flambe games can be much more portable,
+  optimized, and developed more rapidly.
 
 Building
 --------

@@ -14,21 +14,71 @@ import flambe.util.Value;
 
 class Sprite extends Component
 {
+    /**
+     * X position, in pixels.
+     */
     public var x (default, null) :AnimatedFloat;
+
+    /**
+     * Y position, in pixels.
+     */
     public var y (default, null) :AnimatedFloat;
+
+    /**
+     * Rotation angle, in degrees.
+     */
     public var rotation (default, null) :AnimatedFloat;
+
+    /**
+     * Horizontal scale factor.
+     */
     public var scaleX (default, null) :AnimatedFloat;
+
+    /**
+     * Vertical scale factor.
+     */
     public var scaleY (default, null) :AnimatedFloat;
 
+    /**
+     * The X position of this sprite's anchor point. Local transformations are applied relative to
+     * this point.
+     */
     public var anchorX (default, null) :AnimatedFloat;
+
+    /**
+     * The Y position of this sprite's anchor point. Local transformations are applied relative to
+     * this point.
+     */
     public var anchorY (default, null) :AnimatedFloat;
 
+    /**
+     * The alpha (opacity) of this sprite, between 0 (invisible) and 1 (fully opaque).
+     */
     public var alpha (default, null) :AnimatedFloat;
+
+    /**
+     * The blend mode used to draw this sprite, or null to use its parent's blend mode.
+     */
     public var blendMode :BlendMode;
+
+    /**
+     * True if this sprite should be drawn.
+     */
     public var visible (default, null) :Value<Bool>;
 
+    /**
+     * Emitted when the pointer is pressed down over this sprite.
+     */
     public var pointerDown (getPointerDown, null) :Signal1<PointerEvent>;
+
+    /**
+     * Emitted when the pointer is moved over this sprite.
+     */
     public var pointerMove (getPointerMove, null) :Signal1<PointerEvent>;
+
+    /**
+     * Emitted when the pointer is raised over this sprite.
+     */
     public var pointerUp (getPointerUp, null) :Signal1<PointerEvent>;
 
     public function new ()
@@ -52,16 +102,27 @@ class Sprite extends Component
         _listenerCount = 0;
     }
 
+    /**
+     * The "natural" width of this sprite, without any transformations being applied. Used for hit
+     * testing.
+     */
     public function getNaturalWidth () :Float
     {
         return 0;
     }
 
+    /**
+     * The "natural" height of this sprite, without any transformations being applied. Used for hit
+     * testing.
+     */
     public function getNaturalHeight () :Float
     {
         return 0;
     }
 
+    /**
+     * Returns true if the given point (in viewport/stage coordinates) lies inside this sprite.
+     */
     public function contains (viewX :Float, viewY :Float) :Bool
     {
         updateViewMatrix();
@@ -73,6 +134,9 @@ class Sprite extends Component
         return containsLocal(localX, localY);
     }
 
+    /**
+     * Returns true if the given point (in local coordinates) lies inside this sprite.
+     */
     public function containsLocal (localX :Float, localY :Float) :Bool
     {
         return localX >= 0 && localX < getNaturalWidth()
@@ -132,6 +196,9 @@ class Sprite extends Component
         anchorY.update(dt);
     }
 
+    /**
+     * Draws this sprite to the given DrawingContext.
+     */
     public function draw (ctx :DrawingContext)
     {
         // See subclasses

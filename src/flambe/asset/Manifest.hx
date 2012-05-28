@@ -12,6 +12,11 @@ import flambe.platform.ManifestBuilder;
 using flambe.util.Strings;
 using StringTools;
 
+/**
+ * An asset manifest contains all the information needed to load an asset pack. A manifest is
+ * usually created with Manifest.build("directory"), but manifests can also be assembled
+ * programmatically if you need to.
+ */
 class Manifest
 {
     public function new ()
@@ -19,14 +24,16 @@ class Manifest
         _entries = [];
     }
 
-    // Get a manifest of a pack in the asset directory at build-time
+    /**
+     * Gets the manifest of a pack in the asset directory, that was processed at build-time.
+     */
     public static function build (packName :String) :Manifest
     {
         return _buildManifest.get(packName);
     }
 
     /**
-     * Try to find a pack suffixed with the closest available variant of the locale. For example,
+     * Tries to find a pack suffixed with the closest available variant of the locale. For example,
      * buildLocalized("foo", "pt-BR") will first try to load foo_pt-BR, then foo_pt, then just foo.
      */
     public static function buildLocalized (packName :String, locale :String = null) :Manifest
@@ -48,11 +55,17 @@ class Manifest
         return build(packName);
     }
 
+    /**
+     * Returns true if the given named pack was included in the asset directory at build-time.
+     */
     public static function exists (packName :String) :Bool
     {
         return _buildManifest.exists(packName);
     }
 
+    /**
+     * Adds an asset entry to this manifest.
+     */
     public function add (name :String, url :String, bytes :Int = 0, ?type :AssetType) :AssetEntry
     {
         if (type == null) {

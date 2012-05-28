@@ -6,6 +6,9 @@ package flambe.util;
 
 import haxe.xml.Fast;
 
+/**
+ * Utility mixins for haxe.xml.Fast objects. Designed to be imported with 'using'.
+ */
 class Xmls
 {
     public static function getStringAttr (reader :Fast, attr :String, def :String = null) :String

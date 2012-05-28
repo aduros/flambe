@@ -7,6 +7,9 @@ package flambe.sound;
 import flambe.animation.AnimatedFloat;
 import flambe.util.Disposable;
 
+/**
+ * Represents a currently playing sound.
+ */
 interface Playback
     implements Disposable
 {

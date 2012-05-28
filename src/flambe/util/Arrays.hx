@@ -4,6 +4,9 @@
 
 package flambe.util;
 
+/**
+ * Utility mixins for Arrays. Designed to be imported with 'using'.
+ */
 class Arrays
 {
     public static function sortedInsert<A> (arr :Array<A>, val :A, comp :A -> A -> Int) :Int

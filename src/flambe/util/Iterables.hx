@@ -4,6 +4,9 @@
 
 package flambe.util;
 
+/**
+ * Utility mixins for Iterables. Designed to be imported with 'using'.
+ */
 class Iterables
 {
     /**

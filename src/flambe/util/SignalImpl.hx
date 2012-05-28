@@ -6,6 +6,7 @@ package flambe.util;
 
 using Lambda;
 
+/** @private */
 class SignalImpl
 {
     public function new ()

@@ -4,6 +4,9 @@
 
 package flambe.display;
 
+/**
+ * A display orientation for devices, used by Stage.lockOrientation.
+ */
 enum Orientation
 {
     Portrait;

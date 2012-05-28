@@ -4,6 +4,9 @@
 
 package flambe.storage;
 
+/**
+ * A simple key/value store that persists between sessions.
+ */
 interface Storage
 {
     /**

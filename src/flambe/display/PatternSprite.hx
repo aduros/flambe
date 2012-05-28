@@ -6,6 +6,9 @@ package flambe.display;
 
 import flambe.animation.AnimatedFloat;
 
+/**
+ * A resizable sprite that tiles a texture over its area.
+ */
 class PatternSprite extends Sprite
 {
     public var texture :Texture;

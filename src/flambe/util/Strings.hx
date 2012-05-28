@@ -6,6 +6,9 @@ package flambe.util;
 
 using StringTools;
 
+/**
+ * Utility mixins for Strings. Designed to be imported with 'using'.
+ */
 class Strings
 {
     /**

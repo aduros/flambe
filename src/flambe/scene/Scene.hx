@@ -7,6 +7,9 @@ package flambe.scene;
 import flambe.Component;
 import flambe.util.Signal0;
 
+/**
+ * Optional, extra functionality for scene entities that are added to a Director.
+ */
 class Scene extends Component
 {
     /** Emitted by the Director when this scene becomes the top scene. */

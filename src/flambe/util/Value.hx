@@ -6,6 +6,9 @@ package flambe.util;
 
 import flambe.util.Signal2;
 
+/**
+ * Wraps a single value, notifying listeners when the value changes.
+ */
 class Value<A>
 #if (flash || cpp || cs || java)
     implements haxe.rtti.Generic // Generate typed templates on static targets

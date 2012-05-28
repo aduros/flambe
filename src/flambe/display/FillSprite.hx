@@ -7,6 +7,9 @@ package flambe.display;
 import flambe.animation.AnimatedFloat;
 import flambe.util.Value;
 
+/**
+ * A sprite that displays a rectangle filled with a given color.
+ */
 class FillSprite extends Sprite
 {
     public var color (default, null) :Value<Int>;

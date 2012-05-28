@@ -8,8 +8,14 @@ import flambe.asset.Manifest;
 import flambe.display.Texture;
 import flambe.sound.Sound;
 
+/**
+ * Represents a collection of fully loaded assets.
+ */
 interface AssetPack
 {
+    /**
+     * The manifest that was used to load this asset pack.
+     */
     var manifest (getManifest, null) :Manifest;
 
     /**

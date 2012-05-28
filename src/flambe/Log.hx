@@ -6,6 +6,9 @@ package flambe;
 
 import flambe.util.Logger;
 
+/**
+ * Flambe's internal logger. Games should use their own by calling System.logger().
+ */
 class Log
 {
 #if server

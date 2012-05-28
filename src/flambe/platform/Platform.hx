@@ -25,10 +25,6 @@ interface Platform
 
     var keyboard (getKeyboard, null) :Keyboard;
 
-    /**
-     * Gets the RFC 4646 language tag of the environment. For example, "en-US", "pt", or null if the
-     * locale is unknown.
-     */
     var locale (getLocale, null) :String;
 
     function loadAssetPack (manifest :Manifest) :Promise<AssetPack>;

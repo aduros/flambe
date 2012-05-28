@@ -15,6 +15,11 @@ class Signal1<A>
         }
     }
 
+    /**
+     * Connects a listener to this signal.
+     * @param prioritize True if this listener should fire before others.
+     * @returns A SignalConnection, that can be disposed to remove the listener.
+     */
     public function connect (listener :Listener1<A>, prioritize :Bool = false) :SignalConnection
     {
         if (_impl == null) {

@@ -7,6 +7,9 @@ package flambe.display;
 import flambe.display.Font;
 import flambe.math.FMath;
 
+/**
+ * A sprite that displays a line of text using a bitmap font.
+ */
 class TextSprite extends Sprite
 {
     public var text (default, setText) :String;

@@ -4,6 +4,9 @@
 
 package flambe.display;
 
+/**
+ * A fixed-size sprite that displays a single texture.
+ */
 class ImageSprite extends Sprite
 {
     public var texture :Texture;

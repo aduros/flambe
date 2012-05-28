@@ -4,6 +4,9 @@
 
 package flambe.util;
 
+/**
+ * Represents a value that isn't ready yet, but may become available in the future.
+ */
 class Promise<A>
 {
     /**
@@ -18,11 +21,24 @@ class Promise<A>
      */
     public var hasResult (default, null) :Bool;
 
+    /**
+     * Emitted when the promise is fulfilled and the result has become available.
+     */
     public var success (default, null) :Signal1<A>;
+
+    /**
+     * An error message emitted if there was a problem during loading.
+     */
     public var error (default, null) :Signal1<String>;
+
+    /**
+     * May be emitted during loading when the progress or total counts have been updated.
+     */
     public var progressChanged (default, null) :Signal0;
 
-    // Context on how close this promise is to being fulfilled. For file IO, these are in bytes.
+    /**
+     * Context on how close this promise is to being fulfilled. For file IO, these are in bytes.
+     */
     public var progress (getProgress, setProgress) :Float;
     public var total (getTotal, setTotal) :Float;
 
@@ -57,9 +73,11 @@ class Promise<A>
     }
 
     /**
-     * Retrieve the result if available, otherwise receive it later.
+     * Passes the result to the callback now if the result is available, otherwise calls it later.
+     * @returns If the callback was not called yet, a handle that can be disposed to cancel the
+     * request.
      */
-    public function get (fn :A -> Void)
+    public function get (fn :A -> Void) :Disposable
     {
         if (hasResult) {
             fn(_result);

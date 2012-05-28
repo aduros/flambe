@@ -12,6 +12,9 @@ import flambe.util.Disposable;
 
 using Lambda;
 
+/**
+ * A node in the entity hierarchy, and a collection of components.
+ */
 class Entity
     implements Disposable
 {
@@ -153,6 +156,10 @@ class Entity
         }
     }
 
+    /**
+     * Dispose all of this entity's children, without touching its own components or removing itself
+     * from its parent.
+     */
     public function disposeChildren ()
     {
         var ii = 0;
@@ -167,6 +174,9 @@ class Entity
         }
     }
 
+    /**
+     * Removes this entity from its parent, and disposes all its components and children.
+     */
     public function dispose ()
     {
         if (parent != null) {

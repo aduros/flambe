@@ -7,6 +7,9 @@ package flambe.scene;
 import flambe.Component;
 import flambe.Visitor;
 
+/**
+ * Manages a stack of scenes. Only the front-most scene receives game updates.
+ */
 class Director extends Component
 {
     /** The front-most scene. */
@@ -43,6 +46,10 @@ class Director extends Component
         }
     }
 
+    /**
+     * Pops the scene stack until the given entity is the top scene, or adds the scene if the stack
+     * becomes empty while popping.
+     */
     public function unwindToScene (scene :Entity)
     {
         if (topScene == scene) {

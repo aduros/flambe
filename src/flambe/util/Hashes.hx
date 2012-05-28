@@ -4,6 +4,9 @@
 
 package flambe.util;
 
+/**
+ * Utility mixins for Hashes. Designed to be imported with 'using'.
+ */
 class Hashes
 {
     /**

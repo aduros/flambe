@@ -15,11 +15,11 @@ class HtmlSound
     implements Sound
 {
     public var duration (getDuration, null) :Float;
-    public var element :Dynamic; // TODO(bruno): Use typed audio element extern
+    public var audioElement :Dynamic; // TODO(bruno): Use typed audio element extern
 
-    public function new (element :Dynamic)
+    public function new (audioElement :Dynamic)
     {
-        this.element = element;
+        this.audioElement = audioElement;
     }
 
     public function play (volume :Float = 1.0) :Playback
@@ -34,7 +34,7 @@ class HtmlSound
 
     public function getDuration () :Float
     {
-        return element.duration*1000;
+        return audioElement.duration;
     }
 }
 
@@ -53,21 +53,21 @@ private class HtmlPlayback
         _sound = sound;
         _tickableAdded = false;
         this.volume = new AnimatedFloat(volume, function (v, _) {
-            _clone.volume = v;
+            _clonedElement.volume = v;
         });
 
         // Create a copy of the original sound's element. Note that cloneNode() doesn't work in IE
-        _clone = Lib.document.createElement("audio");
-        _clone.volume = volume;
-        _clone.loop = loop;
-        _clone.src = sound.element.src;
+        _clonedElement = Lib.document.createElement("audio");
+        _clonedElement.volume = volume;
+        _clonedElement.loop = loop;
+        _clonedElement.src = sound.audioElement.src;
 
         playAudio();
     }
 
     public function setVolume (volume :Float) :Float
     {
-        return _clone.volume = volume;
+        return _clonedElement.volume = volume;
     }
 
     public function getSound () :Sound
@@ -77,14 +77,14 @@ private class HtmlPlayback
 
     inline public function isPaused () :Bool
     {
-        return _clone.paused;
+        return _clonedElement.paused;
     }
 
     public function setPaused (paused :Bool) :Bool
     {
-        if (_clone.paused != paused) {
+        if (_clonedElement.paused != paused) {
             if (paused) {
-                _clone.pause();
+                _clonedElement.pause();
             } else {
                 playAudio();
             }
@@ -94,12 +94,12 @@ private class HtmlPlayback
 
     inline public function isEnded () :Bool
     {
-        return _clone.ended;
+        return _clonedElement.ended;
     }
 
     public function getPosition () :Float
     {
-        return _clone.currentTime*1000;
+        return _clonedElement.currentTime;
     }
 
     public function update (dt :Float) :Bool
@@ -121,7 +121,7 @@ private class HtmlPlayback
 
     private function playAudio ()
     {
-        _clone.play();
+        _clonedElement.play();
 
         if (!_tickableAdded) {
             HtmlPlatform.instance.mainLoop.addTickable(this);
@@ -130,7 +130,7 @@ private class HtmlPlayback
     }
 
     private var _sound :HtmlSound;
-    private var _clone :Dynamic;
+    private var _clonedElement :Dynamic;
 
     private var _tickableAdded :Bool;
 }

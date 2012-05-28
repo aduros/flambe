@@ -27,7 +27,7 @@ interface Playback
     var ended (isEnded, null) :Bool;
 
     /**
-     * The current playback position in milliseconds.
+     * The current playback position in seconds.
      */
     var position (getPosition, null) :Float;
 

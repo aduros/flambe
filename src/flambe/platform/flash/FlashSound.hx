@@ -18,11 +18,11 @@ class FlashSound
     implements Sound
 {
     public var duration (getDuration, null) :Float;
-    public var fms :flash.media.Sound;
+    public var nativeSound :flash.media.Sound;
 
-    public function new (sound :flash.media.Sound)
+    public function new (nativeSound :flash.media.Sound)
     {
-        this.fms = sound;
+        this.nativeSound = nativeSound;
     }
 
     public function play (volume :Float = 1.0) :Playback
@@ -37,7 +37,7 @@ class FlashSound
 
     public function getDuration () :Float
     {
-        return fms.length;
+        return nativeSound.length*1000;
     }
 }
 
@@ -102,7 +102,7 @@ private class FlashPlayback
 
     public function getPosition () :Float
     {
-        return _channel.position;
+        return _channel.position*1000;
     }
 
     public function update (dt :Float) :Bool
@@ -130,7 +130,7 @@ private class FlashPlayback
 
     private function playAudio (startPosition :Float, soundTransform :SoundTransform)
     {
-        _channel = _sound.fms.play(startPosition, _loops, soundTransform);
+        _channel = _sound.nativeSound.play(startPosition, _loops, soundTransform);
         _channel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
         _pausePosition = -1;
         _ended = false;

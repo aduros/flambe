@@ -7,7 +7,7 @@ package flambe.sound;
 interface Sound
 {
     /**
-     * The length of the sound in milliseconds.
+     * The length of the sound in seconds.
      */
     var duration (getDuration, null) :Float;
 

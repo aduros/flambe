@@ -81,7 +81,7 @@ def apply_flambe(ctx):
         ctx.bld.install_files(install_prefix + "web/targets", swf)
 
     if build_html:
-        html_flags = "-D html --js-modern".split()
+        html_flags = "-D html".split()
 
         uncompressed = build_prefix + "html.uncompressed.js"
         js = build_prefix + "html.js"

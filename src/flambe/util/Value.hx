@@ -43,12 +43,12 @@ class Value<A>
         return changed.connect(listener);
     }
 
-    inline public function get () :A
+    inline private function get () :A
     {
         return _value;
     }
 
-    public function set (newValue :A) :A
+    private function set (newValue :A) :A
     {
         var oldValue = _value;
         if (newValue != oldValue) {

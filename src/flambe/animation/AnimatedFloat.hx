@@ -21,7 +21,7 @@ class AnimatedFloat extends Value<Float>
         super(value, listener);
     }
 
-    override public function set (value :Float) :Float
+    override private function set (value :Float) :Float
     {
         _behavior = null;
         return super.set(value);
@@ -58,14 +58,14 @@ class AnimatedFloat extends Value<Float>
         setBehavior(new Binding(to, fn));
     }
 
-    public function setBehavior (behavior :Behavior) :Behavior
+    private function setBehavior (behavior :Behavior) :Behavior
     {
         _behavior = behavior;
         update(0);
         return behavior;
     }
 
-    inline public function getBehavior () :Behavior
+    inline private function getBehavior () :Behavior
     {
         return _behavior;
     }

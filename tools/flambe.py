@@ -57,7 +57,7 @@ def apply_flambe(ctx):
     outputs = []
 
     if debug:
-        flags += "-debug --no-opt --no-inline".split()
+        flags += "-debug --no-opt --no-inline -D fdb".split()
     else:
         flags += "--no-traces -D flambe_disable_logging".split()
 

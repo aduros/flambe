@@ -14,7 +14,7 @@ class Parallel
     public function new (?actions :Array<Dynamic>)
     {
         _completedActions = [];
-        _runningActions = (actions != null) ? actions.copy() : [];
+        _runningActions = (actions != null) ? cast actions.copy() : [];
     }
 
     public function add (action :Action)

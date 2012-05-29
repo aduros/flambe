@@ -28,7 +28,8 @@ class HtmlUtil
     }
 
     // Load a prefixed vendor extension
-    public static function loadExtension (name :String, ?obj :Dynamic) :Dynamic
+    public static function loadExtension (
+        name :String, ?obj :Dynamic) :{ prefix :String, field :String, value :Dynamic }
     {
         if (obj == null) {
             obj = Lib.window;
@@ -37,20 +38,21 @@ class HtmlUtil
         // Try to load it as is
         var extension = Reflect.field(obj, name);
         if (extension != null) {
-            return extension;
+            return {prefix: null, field: name, value: extension};
         }
 
         // Look through common vendor prefixes
-        var capitalized = name.substr(0, 1).toUpperCase() + name.substr(1);
+        var capitalized = name.charAt(0).toUpperCase() + name.substr(1);
         for (prefix in VENDOR_PREFIXES) {
-            var extension = Reflect.field(obj, prefix + capitalized);
+            var field = prefix + capitalized;
+            var extension = Reflect.field(obj, field);
             if (extension != null) {
-                return extension;
+                return {prefix: prefix, field: field, value: extension};
             }
         }
 
         // Not found
-        return null;
+        return {prefix: null, field: null, value: null};
     }
 
     // Loads a vendor extension and jams it into the supplied object
@@ -60,11 +62,11 @@ class HtmlUtil
             obj = Lib.window;
         }
 
-        var ext = loadExtension(name, obj);
-        if (ext == null) {
+        var value = loadExtension(name, obj).value;
+        if (value == null) {
             return false;
         }
-        Reflect.setField(obj, name, ext);
+        Reflect.setField(obj, name, value);
         return true;
     }
 

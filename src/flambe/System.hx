@@ -14,6 +14,7 @@ import flambe.storage.Storage;
 import flambe.util.Logger;
 import flambe.util.Promise;
 import flambe.util.Signal1;
+import flambe.util.Value;
 
 class System
 {
@@ -44,6 +45,12 @@ class System
      * to your telemetry reporting service of choice.
      */
     public static var uncaughtError /*(default, null)*/ = new Signal1<String>();
+
+    /**
+     * True when the app is not currently visible, such as when minimized or placed in a background
+     * browser tab. While hidden, frame updates may be paused or throttled.
+     */
+    public static var hidden /*(default, null)*/ = new Value<Bool>(false);
 
     /**
      * Starts up Flambe, this should usually be the first thing a game does.

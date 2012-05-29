@@ -152,11 +152,23 @@ class HtmlPlatform
             return (oldErrorHandler != null) ? oldErrorHandler(message, url, line) : false;
         };
 
+        // Handle visibility changes if the browser supports them
+        // http://www.w3.org/TR/page-visibility/
+        var hiddenApi = HtmlUtil.loadExtension("hidden", Lib.document);
+        if (hiddenApi.value != null) {
+            var onVisibilityChanged = function () {
+                System.hidden._ = Reflect.field(Lib.document, hiddenApi.field);
+            };
+            onVisibilityChanged(); // Update now
+            (untyped Lib.document).addEventListener(hiddenApi.prefix + "visibilitychange",
+                onVisibilityChanged, false);
+        }
+
         _lastUpdate = Date.now().getTime();
 
         // Use requestAnimationFrame if available, otherwise a 60 FPS setInterval
         // https://developer.mozilla.org/en/DOM/window.mozRequestAnimationFrame
-        var requestAnimationFrame = HtmlUtil.loadExtension("requestAnimationFrame");
+        var requestAnimationFrame = HtmlUtil.loadExtension("requestAnimationFrame").value;
         if (requestAnimationFrame != null) {
             // Use the high resolution, monotonic timer if available
             // http://www.w3.org/TR/hr-time/

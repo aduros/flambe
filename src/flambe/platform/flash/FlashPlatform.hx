@@ -4,6 +4,7 @@
 
 package flambe.platform.flash;
 
+#if flash11_2 import flash.events.ThrottleEvent; #end
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.KeyboardEvent;
@@ -80,6 +81,13 @@ class FlashPlatform
 
         Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(
             UncaughtErrorEvent.UNCAUGHT_ERROR, onUncaughtError);
+
+#if flash11_2
+        // TODO(bruno): ThrottleEvent may not be exactly right, but VisibilityEvent is broken and
+        // Event.ACTIVATE only handles focus
+        stage.addEventListener(ThrottleEvent.THROTTLE, onThrottle);
+        // TODO(bruno): Get the currently throttled state when the app starts?
+#end
 
         _lastUpdate = Lib.getTimer();
     }
@@ -185,6 +193,13 @@ class FlashPlatform
     {
         System.uncaughtError.emit(FlashUtil.getErrorMessage(event.error));
     }
+
+#if flash11_2
+    private function onThrottle (event :ThrottleEvent)
+    {
+        System.hidden._ = (event.state != "resume");
+    }
+#end
 
     private static var _instance :FlashPlatform;
 

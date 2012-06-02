@@ -30,9 +30,15 @@ interface Stage
     /**
      * Request to lock the orientation, so that rotating the device will not adjust the screen. Has
      * no effect if the environment doesn't support orientation locking.
-     * @param orient The orientation to lock to, or null to unlock orientation.
+     * @param orient The orientation to lock to.
      */
     function lockOrientation (orient :Orientation) :Void;
+
+    /**
+     * Request to unlock the orientation, so that rotating the device will adjust the screen. Has no
+     * effect if the environment doesn't support orientation locking.
+     */
+    function unlockOrientation () :Void;
 
     /**
      * Request that the stage be resized to a certain size.

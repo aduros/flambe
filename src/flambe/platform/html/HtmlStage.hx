@@ -69,6 +69,11 @@ class HtmlStage
         // Nothing until mobile browsers support it
     }
 
+    public function unlockOrientation ()
+    {
+        // Nothing until mobile browsers support it
+    }
+
     public function requestResize (width :Int, height :Int)
     {
         if (resizeCanvas(width, height)) {

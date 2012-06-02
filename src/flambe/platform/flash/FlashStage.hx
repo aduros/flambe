@@ -52,13 +52,6 @@ class FlashStage
         if (!FlashUtil.isMobile()) {
             return;
         }
-        if (orient == null) {
-            if (_orientHack != null) {
-                _orientHack.parent.removeChild(_orientHack);
-                _orientHack = null;
-            }
-            return;
-        }
 
         // http://www.kongregate.com/pages/flash-sizing-zen#device_orientation
         // Only works in full screen. AIR has something less whack, but this works in the browser
@@ -71,6 +64,14 @@ class FlashStage
                 _orientHack.visible = false;
                 _stage.addChild(_orientHack);
             }
+        }
+    }
+
+    public function unlockOrientation ()
+    {
+        if (_orientHack != null) {
+            _orientHack.parent.removeChild(_orientHack);
+            _orientHack = null;
         }
     }
 

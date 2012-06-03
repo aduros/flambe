@@ -6,6 +6,9 @@ package flambe.script;
 
 import flambe.Entity;
 
+/**
+ * An action that repeats another action until it finishes a certain number of times.
+ */
 class Repeat
     implements Action
 {

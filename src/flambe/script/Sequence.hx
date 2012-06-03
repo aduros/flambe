@@ -8,6 +8,10 @@ import flambe.Entity;
 
 using Lambda;
 
+/**
+ * An action that manages a list of other actions, running them one-by-one sequentially until they
+ * all finish.
+ */
 class Sequence
     implements Action
 {

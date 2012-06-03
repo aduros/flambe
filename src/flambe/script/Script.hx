@@ -6,6 +6,10 @@ package flambe.script;
 
 using Lambda;
 
+/**
+ * Manages a set of actions that are updated over time. Scripts simplify writing composable
+ * animations.
+ */
 class Script extends Component
 {
     public function new ()
@@ -13,11 +17,17 @@ class Script extends Component
         stopAll();
     }
 
+    /**
+     * Add an action to this Script.
+     */
     public function run (action :Action)
     {
         _actions.push(action);
     }
 
+    /**
+     * Remove an action from this Script.
+     */
     public function stop (action :Action) :Bool
     {
         var idx = _actions.indexOf(action);
@@ -28,6 +38,9 @@ class Script extends Component
         return true;
     }
 
+    /**
+     * Remove all actions from this Script.
+     */
     public function stopAll ()
     {
         _actions = [];

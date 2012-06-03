@@ -9,6 +9,9 @@ import flambe.animation.Easing;
 import flambe.animation.Tween;
 import flambe.Entity;
 
+/**
+ * An action that tweens an AnimatedFloat by a certain delta.
+ */
 class AnimateBy
     implements Action
 {

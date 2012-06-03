@@ -9,6 +9,9 @@ import flambe.animation.Tween;
 import flambe.display.Sprite;
 import flambe.Entity;
 
+/**
+ * An action that translates the owner's sprite by a certain amount.
+ */
 class MoveBy
     implements Action
 {

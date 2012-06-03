@@ -6,6 +6,9 @@ package flambe.script;
 
 import flambe.Entity;
 
+/**
+ * An action that simply waits for a certain amount of time to pass before finishing.
+ */
 class Delay
     implements Action
 {

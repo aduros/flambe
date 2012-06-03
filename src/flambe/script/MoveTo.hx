@@ -9,6 +9,9 @@ import flambe.animation.Tween;
 import flambe.display.Sprite;
 import flambe.Entity;
 
+/**
+ * An action that translates the owner's sprite to a certain position.
+ */
 class MoveTo
     implements Action
 {

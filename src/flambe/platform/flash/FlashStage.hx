@@ -12,12 +12,14 @@ import flash.system.Capabilities;
 import flambe.display.Orientation;
 import flambe.display.Stage;
 import flambe.util.Signal0;
+import flambe.util.Value;
 
 class FlashStage
     implements Stage
 {
     public var width (getWidth, null) :Int;
     public var height (getHeight, null) :Int;
+    public var orientation (getOrientation, null) :Value<Orientation>;
 
     public var resize (default, null) :Signal0;
 
@@ -25,6 +27,9 @@ class FlashStage
     {
         _nativeStage = nativeStage;
         resize = new Signal0();
+
+        // TODO(bruno): Support orientation in AIR
+        _orientation = new Value<Orientation>(null);
 
         _nativeStage.scaleMode = NO_SCALE;
         _nativeStage.frameRate = 60;
@@ -45,6 +50,11 @@ class FlashStage
     public function getHeight () :Int
     {
         return _nativeStage.stageHeight;
+    }
+
+    public function getOrientation () :Value<Orientation>
+    {
+        return _orientation;
     }
 
     public function lockOrientation (orient :Orientation)
@@ -92,4 +102,6 @@ class FlashStage
 
     private var _nativeStage :flash.display.Stage;
     private var _orientHack :Video;
+
+    private var _orientation :Value<Orientation>;
 }

@@ -6,6 +6,8 @@ package flambe.platform.html;
 
 import js.Lib;
 
+import flambe.display.Orientation;
+
 class HtmlUtil
 {
     public static var VENDOR_PREFIXES = [ "webkit", "moz", "ms", "o", "khtml" ];
@@ -77,5 +79,16 @@ class HtmlUtil
             style.setProperty("-" + prefix + "-" + name, value);
         }
         style.setProperty(name, value);
+    }
+
+    /**
+     * Get a Flambe orientation from a window.orientation angle.
+     */
+    public static function orientation (angle :Int) :Orientation
+    {
+        switch (angle) {
+            case -90, 90: return Landscape;
+            default: return Portrait;
+        }
     }
 }

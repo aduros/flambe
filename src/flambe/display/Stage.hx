@@ -5,6 +5,7 @@
 package flambe.display;
 
 import flambe.util.Signal0;
+import flambe.util.Value;
 
 /**
  * Functions related to the environment's display viewport.
@@ -20,6 +21,12 @@ interface Stage
      * The height of the stage viewport, in pixels.
      */
     var height (getHeight, null) :Int;
+
+    /**
+     * The current screen orientation, or a wrapped null value if the environment doesn't support
+     * multiple orientations.
+     */
+    var orientation (getOrientation, null) :Value<Orientation>;
 
     /**
      * Emitted after the stage size changes, such as when the window is resized or the device is

@@ -9,6 +9,7 @@ import js.Lib;
 import flambe.display.Orientation;
 import flambe.display.Stage;
 import flambe.util.Signal0;
+import flambe.util.Value;
 
 class HtmlStage
     implements Stage
@@ -17,6 +18,7 @@ class HtmlStage
 
     public var width (getWidth, null) :Int;
     public var height (getHeight, null) :Int;
+    public var orientation (getOrientation, null) :Value<Orientation>;
 
     public var resize (default, null) :Signal0;
 
@@ -42,16 +44,22 @@ class HtmlStage
 
 #if !flambe_disable_autoresize
         if (HtmlUtil.SHOULD_HIDE_MOBILE_BROWSER) {
-            (untyped Lib.window).addEventListener("orientationchange", function () {
+            (untyped window).addEventListener("orientationchange", function () {
                 // Wait for the orientation change to finish... sigh
-                HtmlUtil.callLater(onOrientationChange, 200);
+                HtmlUtil.callLater(hideMobileBrowser, 200);
             }, false);
-            onOrientationChange();
+            hideMobileBrowser();
         }
 
-        (untyped Lib.window).addEventListener("resize", onWindowResize, false);
+        (untyped window).addEventListener("resize", onWindowResize, false);
         onWindowResize();
 #end
+
+        _orientation = new Value<Orientation>(null);
+        if ((untyped window).orientation != null) {
+            (untyped window).addEventListener("orientationchange", onOrientationChange, false);
+            onOrientationChange();
+        }
     }
 
     public function getWidth () :Int
@@ -62,6 +70,11 @@ class HtmlStage
     public function getHeight () :Int
     {
         return _canvas.height;
+    }
+
+    public function getOrientation () :Value<Orientation>
+    {
+        return _orientation;
     }
 
     public function lockOrientation (orient :Orientation)
@@ -109,7 +122,7 @@ class HtmlStage
     }
 
     // Voodoo hacks required to move the address bar out of the way on Android and iOS
-    private function onOrientationChange ()
+    private function hideMobileBrowser ()
     {
         // The maximum size of the part of the browser that can be scrolled away
         var mobileAddressBar = 100;
@@ -134,5 +147,12 @@ class HtmlStage
         });
     }
 
+    private function onOrientationChange ()
+    {
+        var value = HtmlUtil.orientation((untyped window).orientation);
+        _orientation._ = value;
+    }
+
     private var _canvas :Dynamic;
+    private var _orientation :Value<Orientation>;
 }

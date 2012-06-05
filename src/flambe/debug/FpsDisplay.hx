@@ -14,6 +14,7 @@ class FpsDisplay
 {
     public function new ()
     {
+        reset();
     }
 
     override public function onUpdate (dt :Float)
@@ -32,8 +33,13 @@ class FpsDisplay
                 trace(text);
             }
 
-            _fpsTime = _fpsFrames = 0;
+            reset();
         }
+    }
+
+    private function reset ()
+    {
+        _fpsTime = _fpsFrames = 0;
     }
 
     private var _fpsFrames :Int;

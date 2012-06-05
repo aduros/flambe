@@ -12,6 +12,8 @@ import flambe.display.TextSprite;
 class FpsDisplay
     extends Component
 {
+    private static var log = Log.log; // http://code.google.com/p/haxe/issues/detail?id=365
+
     public function new ()
     {
         reset();
@@ -30,7 +32,7 @@ class FpsDisplay
             if (sprite != null) {
                 sprite.text = text;
             } else {
-                trace(text);
+                log.info(text);
             }
 
             reset();

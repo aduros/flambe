@@ -36,11 +36,17 @@ Flambe's design and roadmap are guided by a few philosophies:
 Building
 --------
 
-Make sure you have Haxe 2.09, pick up [Waf](https://code.google.com/p/waf/), cd
-into one of the [demos](https://github.com/aduros/flambe-demos), and:
+(These instructions will work when I put Flambe up on haxelib, soon)
 
-    waf configure --debug
-    waf install
+Download and setup Flambe by running:
+
+    haxelib install flambe
+    haxelib run flambe
+
+Then cd into one of the [demos](https://github.com/aduros/flambe-demos), and:
+
+    flambe-waf configure --debug
+    flambe-waf install
 
 Then open a browser to deploy/web/index.html. The Flash or HTML5 build will run
 depending on what your browser best supports.

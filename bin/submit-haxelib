@@ -16,7 +16,12 @@ FLAMBE_ROOT=`readlink -f $(dirname $0)/..`
 cd $FLAMBE_ROOT
 
 rm -f $ARCHIVE
-git ls-files tools src LICENSE.txt | zip $ARCHIVE -@
+git ls-files bin/flambe-waf bin/waf tools LICENSE.txt | zip $ARCHIVE -@
+
+# Include the src directory's contents at the top-level to be nice to IDEs
+cd src
+git ls-files | zip $ARCHIVE -@
+cd ..
 
 # Process the haxelib.xml template and add it to the zip
 sed -e s/{{VERSION}}/$VERSION/ etc/haxelib.xml > /tmp/haxelib.xml

@@ -2,7 +2,7 @@ from waflib import *
 from waflib.TaskGen import *
 import os
 
-FLAMBE_ROOT = os.path.dirname(__file__) + "/.."
+FLAMBE_ROOT = os.path.dirname(__file__) + "/../.."
 SERVER_CONFIG = "/tmp/flambe-server.py"
 
 def options(ctx):
@@ -14,8 +14,8 @@ def options(ctx):
     group.add_option("--no-ios", action="store_true", help="Skip all iOS builds")
 
 def configure(ctx):
-    ctx.load("haxe", tooldir=FLAMBE_ROOT+"/tools")
-    ctx.load("closure", tooldir=FLAMBE_ROOT+"/tools")
+    ctx.load("haxe")
+    ctx.load("closure")
     ctx.find_program("npm", var="NPM", mandatory=False)
     ctx.find_program("adt", var="ADT", mandatory=False)
     ctx.find_program("adb", var="ADB", mandatory=False)
@@ -33,7 +33,7 @@ def apply_flambe(ctx):
         air_cert="etc/air-cert.pfx", air_desc="etc/air-desc.xml", air_password=None,
         ios_profile="etc/ios.mobileprovision")
 
-    classpath = [ ctx.path.find_dir("src"), ctx.bld.root.find_dir(FLAMBE_ROOT+"/src") ] + \
+    classpath = [ ctx.path.find_dir("src"), flambe_src(ctx) ] + \
         Utils.to_list(ctx.classpath) # The classpath option should be a list of nodes
     flags = ["-main", ctx.main, "--dead-code-elimination"] + Utils.to_list(ctx.flags)
     libs = ["format"] + Utils.to_list(ctx.libs)
@@ -228,7 +228,7 @@ def apply_flambe(ctx):
 def apply_flambe_server(ctx):
     Utils.def_attrs(ctx, classpath="", flags="", libs="", npm_libs="", include="")
 
-    classpath = [ ctx.path.find_dir("src"), ctx.bld.root.find_dir(FLAMBE_ROOT+"/src") ] + \
+    classpath = [ ctx.path.find_dir("src"), flambe_src(ctx) ] + \
         Utils.to_list(ctx.classpath) # The classpath option should be a list of nodes
     flags = ["-main", ctx.main] + Utils.to_list(ctx.flags)
     libs = Utils.to_list(ctx.libs)
@@ -311,3 +311,9 @@ Context.g_module.__dict__["restart_server"] = restart_server
 # Surround a string in quotes
 def quote(string):
     return '"' + string + '"';
+
+# Locate flambe's source code directory
+def flambe_src(ctx):
+    root = ctx.bld.root
+    dir = root.find_dir(FLAMBE_ROOT + "/src")
+    return dir if dir is not None else root.find_dir(FLAMBE_ROOT)

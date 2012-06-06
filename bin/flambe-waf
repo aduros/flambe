@@ -1,0 +1,31 @@
+#!/usr/bin/env python
+#
+# Locates a Flambe haxelib install and runs its bundled waf
+
+import os, sys
+join = os.path.join
+
+try:
+    with open(join(os.environ["HOME"], ".haxelib")) as f:
+        lib = join(f.read(), "flambe")
+
+    dev = join(lib, ".dev")
+    current = join(lib, ".current")
+
+    if os.path.isfile(dev):
+        with open(dev) as f:
+            flambe_root = join(f.read(), "..")
+    else:
+        with open(current) as f:
+            flambe_root = join(lib, f.read().replace(".", ","))
+
+except IOError:
+    print("Could not locate Flambe, run `haxelib install flambe`.")
+    sys.exit(1)
+
+# Let waf find our custom tools
+sys.path.insert(0, join(flambe_root, "tools", "waf"))
+
+waf = join(flambe_root, "bin", "waf")
+sys.argv[0] = waf # Kinda silly
+execfile(waf)

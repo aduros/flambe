@@ -119,7 +119,7 @@ def apply_flambe(ctx):
             ctx.bld.fatal("Could not find AIR certificate at %s." % ctx.air_cert)
 
         air_desc = ctx.path.find_resource(ctx.air_desc)
-        if not air_cert:
+        if not air_desc:
             ctx.bld.fatal("Could not find AIR descriptor at %s." % ctx.air_desc)
 
         air_password = ctx.air_password

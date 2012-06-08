@@ -24,5 +24,7 @@ chxdoc -o "$CHXDOC_DIR" haxedoc.xml \
     --ignoreRoot=true --includeOnly='flambe.*' --exclude=flambe.platform \
     --title="Flambe API Reference" --subtitle="Rapid game development"
 
+cp haxedoc.xml "$CHXDOC_DIR"
+
 # Decent terminals will turn this into a clickable link
 echo "API docs generated at file://$CHXDOC_DIR/index.html"

@@ -15,8 +15,21 @@ ARCHIVE=/tmp/haxelib.zip
 FLAMBE_ROOT=`readlink -f $(dirname $0)/..`
 cd $FLAMBE_ROOT
 
+# Make sure the unit tests pass
+cd tests
+../bin/flambe-waf configure build
+cd ..
+
 rm -f $ARCHIVE
-git ls-files bin/flambe-waf bin/waf tools LICENSE.txt | zip $ARCHIVE -@
+
+# Build the run.n that's executed by `haxelib run flambe`
+cd haxelib
+../bin/flambe-waf configure build
+zip -j $ARCHIVE build/run.n
+git ls-files template | zip $ARCHIVE -@
+cd ..
+
+git ls-files bin/flambe-waf bin/flambe-waf.bat bin/waf tools LICENSE.txt | zip $ARCHIVE -@
 
 # Include the src directory's contents at the top-level to be nice to IDEs
 cd src
@@ -26,6 +39,10 @@ cd ..
 # Process the haxelib.xml template and add it to the zip
 sed -e s/{{VERSION}}/$VERSION/ etc/haxelib.xml > /tmp/haxelib.xml
 zip -j $ARCHIVE /tmp/haxelib.xml
+
+# Include our haxedoc.xml as well
+bin/build-chxdoc
+zip -j $ARCHIVE chxdoc/haxedoc.xml
 
 # Now would be a good time to double-check everything works
 haxelib test $ARCHIVE

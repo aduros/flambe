@@ -1,0 +1,16 @@
+#
+# Continuous integration config
+# http://travis-ci.org/#!/aduros/flambe
+
+# flambe-waf should support both Python versions
+language: python
+python:
+    - 2.7
+    - 3.2
+
+# Install Haxe
+before_script:
+    - curl http://haxe.org/file/hxinst-linux.tgz | tar zxf -
+    - sudo ./hxinst-linux
+
+script: bin/run-travis

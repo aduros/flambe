@@ -1,6 +1,7 @@
 from waflib import *
 from waflib.TaskGen import *
 import os
+import optparse
 
 FLAMBE_ROOT = os.path.dirname(__file__) + "/../.."
 SERVER_CONFIG = "/tmp/flambe-server.py"
@@ -12,6 +13,7 @@ def options(ctx):
     group.add_option("--no-html", action="store_true", help="Skip all HTML builds")
     group.add_option("--no-android", action="store_true", help="Skip all Android builds")
     group.add_option("--no-ios", action="store_true", help="Skip all iOS builds")
+    group.add_option("--flashdevelop", action="store", help=optparse.SUPPRESS_HELP)
 
 def configure(ctx):
     ctx.load("haxe")
@@ -20,7 +22,7 @@ def configure(ctx):
     ctx.find_program("adt", var="ADT", mandatory=False)
     ctx.find_program("adb", var="ADB", mandatory=False)
 
-    ctx.env.debug = ctx.options.debug
+    ctx.env.debug = ctx.options.debug or ctx.options.flashdevelop == "debug"
     ctx.env.has_flash = (not ctx.options.no_flash)
     ctx.env.has_html = (not ctx.options.no_html)
     ctx.env.has_android = (not ctx.options.no_android) and bool(ctx.env.ADT and ctx.env.ADB)

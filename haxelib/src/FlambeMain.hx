@@ -75,7 +75,11 @@ class FlambeMain
 
         var capitalName = name.charAt(0).toUpperCase() + name.substr(1);
 
-        var outputDir = read("Project directory", Sys.getCwd() + "/" + name);
+        Sys.println("");
+        Sys.println("-- Press enter to use the defaults --");
+
+        var outputDir = read("Project directory", _cwd + name);
+
         var mainClassFull;
         do {
             mainClassFull = read("Main class, including package", capitalName + "Main");
@@ -107,9 +111,14 @@ class FlambeMain
             mainClassPackage: mainClassPackage,
         };
         copyTemplate(ctx, templateDir + "/wscript.tmpl", outputDir + "/wscript");
-        copyTemplate(ctx, templateDir + "/air-desc.xml.tmpl", outputDir + "/etc/air-desc.xml");
         copyTemplate(ctx, templateDir + "/AppMain.hx.tmpl", srcDir + "/" + mainClass + ".hx");
+
+        // For AIR
+        copyTemplate(ctx, templateDir + "/air-desc.xml.tmpl", outputDir + "/etc/air-desc.xml");
         File.copy(templateDir + "/air-cert.pfx", outputDir + "/etc/air-cert.pfx");
+
+        // For FlashDevelop
+        copyTemplate(ctx, templateDir + "/app.hxproj.tmpl", outputDir + "/" + name + ".hxproj");
     }
 
     public function help ()
@@ -154,7 +163,15 @@ class FlambeMain
             Sys.exit(1);
         }
 
-        var app = new FlambeMain(args[args.length-1], args.slice(0, args.length-1));
+        var libDir = Sys.getCwd();
+        var cwd = args[args.length-1];
+        var sep = (Sys.systemName() == "Windows") ? "\\" : "/";
+        if (cwd.charAt(cwd.length-1) != sep) {
+            cwd += sep;
+        }
+        Sys.setCwd(cwd);
+
+        var app = new FlambeMain(libDir, args.slice(0, args.length-1));
         app.run();
     }
 

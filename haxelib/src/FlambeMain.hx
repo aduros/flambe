@@ -78,7 +78,7 @@ class FlambeMain
         Sys.println("");
         Sys.println("-- Press enter to use the defaults --");
 
-        var outputDir = read("Project directory", _cwd + name);
+        var outputDir = read("Project directory", Sys.getCwd() + name);
 
         var mainClassFull;
         do {

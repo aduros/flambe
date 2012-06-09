@@ -151,27 +151,27 @@ class FlashPlatform
 
     private function onMouseDown (event :MouseEvent)
     {
-        _pointer.submitDown(new PointerEvent(event.stageX, event.stageY));
+        _pointer.submitDown(event.stageX, event.stageY);
     }
 
     private function onMouseMove (event :MouseEvent)
     {
-        _pointer.submitMove(new PointerEvent(event.stageX, event.stageY));
+        _pointer.submitMove(event.stageX, event.stageY);
     }
 
     private function onMouseUp (event :MouseEvent)
     {
-        _pointer.submitUp(new PointerEvent(event.stageX, event.stageY));
+        _pointer.submitUp(event.stageX, event.stageY);
     }
 
     private function onKeyDown (event :KeyboardEvent)
     {
-        _keyboard.submitDown(new KeyEvent(event.charCode));
+        _keyboard.submitDown(event.charCode);
     }
 
     private function onKeyUp (event :KeyboardEvent)
     {
-        _keyboard.submitUp(new KeyEvent(event.charCode));
+        _keyboard.submitUp(event.charCode);
     }
 
     private function onEnterFrame (_)

@@ -4,6 +4,10 @@
 
 package flambe.input;
 
+/**
+ * Represents an event coming from a physical key press. NOTE: For performance reasons, KeyEvent
+ * instances are reused by Flambe. Use clone() to retain a reference to an event.
+ */
 class KeyEvent
 {
     /**
@@ -12,8 +16,25 @@ class KeyEvent
      */
     public var charCode (default, null) :Int;
 
-    public function new (charCode :Int)
+    /**
+     * An incrementing ID unique to every dispatched key event.
+     */
+    public var id (default, null) :Int;
+
+    /** @private */ public function new ()
     {
+    }
+
+    public function clone () :KeyEvent
+    {
+        var event = new KeyEvent();
+        event._internal_init(id, charCode);
+        return event;
+    }
+
+    /** @private */ public function _internal_init (id :Int, charCode :Int)
+    {
+        this.id = id;
         this.charCode = charCode;
     }
 }

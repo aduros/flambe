@@ -30,6 +30,7 @@ class BasicPointer
         down = new Signal1();
         move = new Signal1();
         up = new Signal1();
+        _id = 0;
         _x = x;
         _y = y;
         _isDown = isDown;
@@ -58,19 +59,19 @@ class BasicPointer
     /**
      * Called by the platform to handle a down event.
      */
-    public function submitDown (event :PointerEvent)
+    public function submitDown (viewX :Float, viewY :Float)
     {
         if (_isDown) {
             return; // Ignore repeat down events
         }
 
         _isDown = true;
-        _x = event.viewX;
-        _y = event.viewY;
+        _x = viewX;
+        _y = viewY;
 
         // Take a snapshot of the entire event bubbling chain
         var chain = [];
-        var entity = getEntityUnderPoint(event.viewX, event.viewY);
+        var entity = getEntityUnderPoint(viewX, viewY);
         while (entity != null) {
             var sprite = entity.get(Sprite);
             if (sprite != null) {
@@ -84,22 +85,23 @@ class BasicPointer
         chain.push(down.clone());
 
         // Finally, emit the event up the chain
+        _sharedEvent._internal_init(++_id, viewX, viewY);
         for (signal in chain) {
-            signal.emit(event);
+            signal.emit(_sharedEvent);
         }
     }
 
     /**
      * Called by the platform to handle a move event.
      */
-    public function submitMove (event :PointerEvent)
+    public function submitMove (viewX :Float, viewY :Float)
     {
-        _x = event.viewX;
-        _y = event.viewY;
+        _x = viewX;
+        _y = viewY;
 
         // Take a snapshot of the entire event bubbling chain
         var chain = [];
-        var entity = getEntityUnderPoint(event.viewX, event.viewY);
+        var entity = getEntityUnderPoint(viewX, viewY);
         while (entity != null) {
             var sprite = entity.get(Sprite);
             if (sprite != null) {
@@ -113,27 +115,28 @@ class BasicPointer
         chain.push(move.clone());
 
         // Finally, emit the event up the chain
+        _sharedEvent._internal_init(++_id, viewX, viewY);
         for (signal in chain) {
-            signal.emit(event);
+            signal.emit(_sharedEvent);
         }
     }
 
     /**
      * Called by the platform to handle an up event.
      */
-    public function submitUp (event :PointerEvent)
+    public function submitUp (viewX :Float, viewY :Float)
     {
         if (!_isDown) {
             return; // Ignore repeat up events
         }
 
         _isDown = false;
-        _x = event.viewX;
-        _y = event.viewY;
+        _x = viewX;
+        _y = viewY;
 
         // Take a snapshot of the entire event bubbling chain
         var chain = [];
-        var entity = getEntityUnderPoint(event.viewX, event.viewY);
+        var entity = getEntityUnderPoint(viewX, viewY);
         while (entity != null) {
             var sprite = entity.get(Sprite);
             if (sprite != null) {
@@ -147,8 +150,9 @@ class BasicPointer
         chain.push(up.clone());
 
         // Finally, emit the event up the chain
+        _sharedEvent._internal_init(++_id, viewX, viewY);
         for (signal in chain) {
-            signal.emit(event);
+            signal.emit(_sharedEvent);
         }
     }
 
@@ -196,6 +200,9 @@ class BasicPointer
         return true;
     }
 
+    private static var _sharedEvent = new PointerEvent();
+
+    private var _id :Int;
     private var _x :Float;
     private var _y :Float;
     private var _isDown :Bool;

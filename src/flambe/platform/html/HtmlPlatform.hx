@@ -85,65 +85,88 @@ class HtmlPlatform
         var container = canvas.parentNode;
         container.style.overflow = "hidden";
 
-        canvas.addEventListener("mousedown", function (event) {
-            event.preventDefault();
-            _pointer.submitDown(createPointerEvent(event));
-            canvas.focus();
-        }, false);
-        canvas.addEventListener("mousemove", function (event) {
-            _pointer.submitMove(createPointerEvent(event));
-        }, false);
-        canvas.addEventListener("mouseup", function (event) {
-            _pointer.submitUp(createPointerEvent(event));
-        }, false);
-        canvas.addEventListener("keydown", function (event) {
-            event.preventDefault();
-            _keyboard.submitDown(new KeyEvent(event.keyCode));
-        }, false);
-        canvas.addEventListener("keyup", function (event) {
-            _keyboard.submitUp(new KeyEvent(event.keyCode));
-        }, false);
+        var onMouse = function (event) {
+            var bounds = event.target.getBoundingClientRect();
+            var x = getX(event, bounds);
+            var y = getY(event, bounds);
 
-        var touchId = -1;
-        var getPointerTouch = function (domEvent) :Bool {
-            var changedTouches :Array<Dynamic> = domEvent.changedTouches;
-            for (touch in changedTouches) {
-                if (touch.identifier == touchId) {
-                    return touch;
+            switch (event.type) {
+            case "mousedown":
+                event.preventDefault();
+                _pointer.submitDown(x, y);
+                event.target.focus();
+
+            case "mousemove":
+                _pointer.submitMove(x, y);
+
+            case "mouseup":
+                _pointer.submitUp(x, y);
+            }
+        };
+        canvas.addEventListener("mousedown", onMouse, false);
+        canvas.addEventListener("mousemove", onMouse, false);
+        canvas.addEventListener("mouseup", onMouse, false);
+
+        var pointerTouchId = -1;
+        var onTouch = function (event) {
+            var type = event.type;
+            var changedTouches :Array<Dynamic> = event.changedTouches;
+
+            var pointerTouch = null;
+            if (type == "touchstart") {
+                if (pointerTouchId == -1) {
+                    pointerTouch = event.changedTouches[0];
+                }
+            } else {
+                for (touch in changedTouches) {
+                    if (touch.identifier == pointerTouchId) {
+                        pointerTouch = touch;
+                        break;
+                    }
                 }
             }
-            return null;
-        };
-        var onTouchEnd = function (domEvent) {
-            var touch = getPointerTouch(domEvent);
-            if (touch != null) {
-                _pointer.submitUp(createPointerEvent(touch));
-                touchId = -1;
-            }
-        };
-        canvas.addEventListener("touchstart", function (domEvent) {
-            domEvent.preventDefault();
-            if (touchId >= 0) {
-                // We're already handling a finger
-                return;
-            }
-            if (HtmlUtil.SHOULD_HIDE_MOBILE_BROWSER) {
-                HtmlUtil.hideMobileBrowser();
-            }
 
-            var touch = domEvent.changedTouches[0];
-            touchId = touch.identifier;
-            _pointer.submitDown(createPointerEvent(touch));
-        }, false);
-        canvas.addEventListener("touchmove", function (domEvent) {
-            domEvent.preventDefault();
-            var touch = getPointerTouch(domEvent);
-            if (touch != null) {
-                _pointer.submitMove(createPointerEvent(touch));
+            if (pointerTouch != null) {
+                var bounds = event.target.getBoundingClientRect();
+                var x = getX(pointerTouch, bounds);
+                var y = getY(pointerTouch, bounds);
+
+                switch (type) {
+                case "touchstart":
+                    event.preventDefault();
+                    if (HtmlUtil.SHOULD_HIDE_MOBILE_BROWSER) {
+                        HtmlUtil.hideMobileBrowser();
+                    }
+                    pointerTouchId = pointerTouch.identifier;
+                    _pointer.submitDown(x, y);
+
+                case "touchmove":
+                    event.preventDefault();
+                    _pointer.submitMove(x, y);
+
+                case "touchend", "touchcancel":
+                    pointerTouchId = -1;
+                    _pointer.submitUp(x, y);
+                }
             }
-        }, false);
-        canvas.addEventListener("touchend", onTouchEnd, false);
-        canvas.addEventListener("touchcancel", onTouchEnd, false);
+        };
+        canvas.addEventListener("touchstart", onTouch, false);
+        canvas.addEventListener("touchmove", onTouch, false);
+        canvas.addEventListener("touchend", onTouch, false);
+        canvas.addEventListener("touchcancel", onTouch, false);
+
+        var onKey = function (event) {
+            var charCode = event.keyCode;
+            switch (event.type) {
+            case "keydown":
+                event.preventDefault();
+                _keyboard.submitDown(charCode);
+            case "keyup":
+                _keyboard.submitUp(charCode);
+            }
+        };
+        canvas.addEventListener("keydown", onKey, false);
+        canvas.addEventListener("keyup", onKey, false);
 
         // Handle uncaught errors
         var oldErrorHandler = (untyped Lib.window).onerror;
@@ -275,12 +298,14 @@ class HtmlPlatform
         return _keyboard;
     }
 
-    private function createPointerEvent (domEvent :Dynamic) :PointerEvent
+    private function getX (event :Dynamic, bounds :Dynamic) :Float
     {
-        var rect = domEvent.target.getBoundingClientRect();
-        return new PointerEvent(
-            _stage.devicePixelRatio*(domEvent.clientX - rect.left),
-            _stage.devicePixelRatio*(domEvent.clientY - rect.top));
+        return _stage.devicePixelRatio*(event.clientX - bounds.left);
+    }
+
+    private function getY (event :Dynamic, bounds :Dynamic) :Float
+    {
+        return _stage.devicePixelRatio*(event.clientY - bounds.top);
     }
 
     private static var _instance :HtmlPlatform;

@@ -21,6 +21,7 @@ class BasicKeyboard
         down = new Signal1();
         up = new Signal1();
         _keyStates = new IntHash();
+        _id = 0;
     }
 
     public function isSupported () :Bool
@@ -36,24 +37,29 @@ class BasicKeyboard
     /**
      * Called by the platform to handle a down event.
      */
-    public function submitDown (event :KeyEvent)
+    public function submitDown (charCode :Int)
     {
-        if (!isDown(event.charCode)) {
-            _keyStates.set(event.charCode, true);
-            down.emit(event);
+        if (!isDown(charCode)) {
+            _keyStates.set(charCode, true);
+            _sharedEvent._internal_init(++_id, charCode);
+            down.emit(_sharedEvent);
         }
     }
 
     /**
      * Called by the platform to handle an up event.
      */
-    public function submitUp (event :KeyEvent)
+    public function submitUp (charCode :Int)
     {
-        if (isDown(event.charCode)) {
-            _keyStates.remove(event.charCode);
-            up.emit(event);
+        if (isDown(charCode)) {
+            _keyStates.remove(charCode);
+            _sharedEvent._internal_init(++_id, charCode);
+            up.emit(_sharedEvent);
         }
     }
 
+    private static var _sharedEvent = new KeyEvent();
+
+    private var _id :Int;
     private var _keyStates :IntHash<Bool>;
 }

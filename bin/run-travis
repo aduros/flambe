@@ -11,21 +11,21 @@ cd "$FLAMBE_ROOT"
 haxelib dev flambe "$FLAMBE_ROOT/src"
 export PATH="$FLAMBE_ROOT/bin:$PATH"
 
-# Make sure everything at least compiles
+echo "Validating compilation..."
 haxe -js out.js --no-output --macro 'include("flambe", true, ["flambe.platform"])' \
     -lib format \
     -cp "$FLAMBE_ROOT/src"
 
-# Run the unit tests
+echo "Running unit tests..."
 cd tests
 flambe-waf configure build
 cd ..
 
-# Build the haxelib runner
+echo "Building haxelib runner..."
 cd haxelib
 flambe-waf configure build
 cd ..
 
-# Download and build all the demos
+echo "Building demos..."
 git clone git://github.com/aduros/flambe-demos.git
 flambe-demos/bin/build-all

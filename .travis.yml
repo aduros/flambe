@@ -17,6 +17,6 @@ node_js:
 # Install Haxe
 before_script:
     - curl http://haxe.org/file/hxinst-linux.tgz | tar zxf -
-    - sudo ./hxinst-linux
+    - echo y | sudo ./hxinst-linux
 
 script: bin/run-travis

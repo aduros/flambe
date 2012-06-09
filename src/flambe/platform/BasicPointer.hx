@@ -75,14 +75,17 @@ class BasicPointer
         while (entity != null) {
             var sprite = entity.get(Sprite);
             if (sprite != null) {
-                var signal = sprite.pointerDown;
-                if (signal.hasListeners()) {
+                // Avoid calling the public getter and lazily instanciating this signal
+                var signal = sprite._internal_pointerDown;
+                if (signal != null && signal.hasListeners()) {
                     chain.push(signal.clone());
                 }
             }
             entity = entity.parent;
         }
-        chain.push(down.clone());
+        if (down.hasListeners()) {
+            chain.push(down.clone());
+        }
 
         // Finally, emit the event up the chain
         _sharedEvent._internal_init(++_id, viewX, viewY);
@@ -105,14 +108,17 @@ class BasicPointer
         while (entity != null) {
             var sprite = entity.get(Sprite);
             if (sprite != null) {
-                var signal = sprite.pointerMove;
-                if (signal.hasListeners()) {
+                // Avoid calling the public getter and lazily instanciating this signal
+                var signal = sprite._internal_pointerMove;
+                if (signal != null && signal.hasListeners()) {
                     chain.push(signal.clone());
                 }
             }
             entity = entity.parent;
         }
-        chain.push(move.clone());
+        if (move.hasListeners()) {
+            chain.push(move.clone());
+        }
 
         // Finally, emit the event up the chain
         _sharedEvent._internal_init(++_id, viewX, viewY);
@@ -140,14 +146,17 @@ class BasicPointer
         while (entity != null) {
             var sprite = entity.get(Sprite);
             if (sprite != null) {
-                var signal = sprite.pointerUp;
-                if (signal.hasListeners()) {
+                // Avoid calling the public getter and lazily instanciating this signal
+                var signal = sprite._internal_pointerUp;
+                if (signal != null && signal.hasListeners()) {
                     chain.push(signal.clone());
                 }
             }
             entity = entity.parent;
         }
-        chain.push(up.clone());
+        if (up.hasListeners()) {
+            chain.push(up.clone());
+        }
 
         // Finally, emit the event up the chain
         _sharedEvent._internal_init(++_id, viewX, viewY);

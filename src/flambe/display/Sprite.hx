@@ -270,26 +270,26 @@ class Sprite extends Component
 
     private function getPointerDown ()
     {
-        if (_pointerDown == null) {
-            _pointerDown = new NotifyingSignal1(this);
+        if (_internal_pointerDown == null) {
+            _internal_pointerDown = new NotifyingSignal1(this);
         }
-        return _pointerDown;
+        return _internal_pointerDown;
     }
 
     private function getPointerMove ()
     {
-        if (_pointerMove == null) {
-            _pointerMove = new NotifyingSignal1(this);
+        if (_internal_pointerMove == null) {
+            _internal_pointerMove = new NotifyingSignal1(this);
         }
-        return _pointerMove;
+        return _internal_pointerMove;
     }
 
     private function getPointerUp ()
     {
-        if (_pointerUp == null) {
-            _pointerUp = new NotifyingSignal1(this);
+        if (_internal_pointerUp == null) {
+            _internal_pointerUp = new NotifyingSignal1(this);
         }
-        return _pointerUp;
+        return _internal_pointerUp;
     }
 
     /** @private */ public function _internal_onListenersAdded (count :Int)
@@ -320,9 +320,9 @@ class Sprite extends Component
     private var _matrixUpdateCount :Int;
     private var _parentMatrixUpdateCount :Int;
 
-    private var _pointerDown :Signal1<PointerEvent>;
-    private var _pointerMove :Signal1<PointerEvent>;
-    private var _pointerUp :Signal1<PointerEvent>;
+    /** @private */ public var _internal_pointerDown :Signal1<PointerEvent>;
+    /** @private */ public var _internal_pointerMove :Signal1<PointerEvent>;
+    /** @private */ public var _internal_pointerUp :Signal1<PointerEvent>;
 
     private var _listenerCount :Int;
 }

@@ -1,12 +1,18 @@
 #
 # Continuous integration config
-# http://travis-ci.org/#!/aduros/flambe
+# http://travis-ci.org/aduros/flambe
 
-# flambe-waf should support both Python versions
-language: python
-python:
-    - 2.7
-    - 3.2
+# # flambe-waf should support both Python versions
+# language: python
+# python:
+#     - 2.7
+#     - 3.2
+
+# Register as a node project for now (which isn't untrue), because the Travis Python queue is shared
+# with lots of large PHP projects and extremely over-utilized.
+language: node_js
+node_js:
+    - 0.6
 
 # Install Haxe
 before_script:

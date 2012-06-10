@@ -31,7 +31,6 @@ class MovieSprite extends Sprite
 
         _frameRate = movie.frameRate;
         _duration = movie.frames/_frameRate;
-        _goingToFrame = false;
         _frame = 0;
         _elapsed = 0;
         goto(1);
@@ -65,12 +64,6 @@ class MovieSprite extends Sprite
 
     private function goto (newFrame :Float)
     {
-        if (_goingToFrame) {
-            _pendingFrame = newFrame;
-            return;
-        }
-        _goingToFrame = true;
-
         var wrapped = newFrame < _frame;
         if (wrapped) {
             for (layer in _layers) {
@@ -82,15 +75,7 @@ class MovieSprite extends Sprite
             layer.composeFrame(newFrame);
         }
 
-        // var oldFrame = _frame;
         _frame = newFrame;
-
-        _goingToFrame = false;
-        if (_pendingFrame != -1) {
-            newFrame = _pendingFrame;
-            _pendingFrame = -1;
-            goto(newFrame);
-        }
     }
 
     private var _frameRate :Float;
@@ -100,8 +85,6 @@ class MovieSprite extends Sprite
     private var _elapsed :Float;
 
     private var _frame :Float;
-    private var _goingToFrame :Bool;
-    private var _pendingFrame :Float;
 }
 
 private class LayerSprite extends Sprite

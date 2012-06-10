@@ -63,4 +63,6 @@ What now, you ask? Documentation is slim, but the demos should be instructive.
 Once the dust settles, I'll write some proper docs and a series of tutorials.
 
 Are things not working? I'd be happy to help, [send me a
-message](https://github.com/aduros)!
+message](https://github.com/aduros) or chat to me in #Haxe on irc.freenode.net.
+
+[![Build Status](https://secure.travis-ci.org/aduros/flambe.png?branch=master)](http://travis-ci.org/aduros/flambe)

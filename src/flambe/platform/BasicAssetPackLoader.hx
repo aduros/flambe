@@ -26,7 +26,7 @@ class BasicAssetPackLoader
         _bytesLoaded = new Hash();
         _pack = new BasicAssetPack(manifest);
 
-        var entries = manifest.getEntries();
+        var entries = manifest.array();
         if (entries.length == 0) {
             // There's nothing to load, just send them an empty pack
             handleSuccess();

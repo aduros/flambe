@@ -26,17 +26,32 @@ class Manifest
 
     /**
      * Gets the manifest of a pack in the asset directory, that was processed at build-time.
+     * @param packName The folder name in your assets/ directory.
+     * @param required When true and this pack was not found, throw an error. Otherwise null is
+     *   returned.
      */
-    public static function build (packName :String) :Manifest
+    public static function build (packName :String, required :Bool = true) :Manifest
     {
-        return _buildManifest.get(packName);
+        var manifest = _buildManifest.get(packName);
+        if (manifest == null) {
+            if (required) {
+                throw "Missing asset pack: " + packName;
+            }
+            return null;
+        }
+        return manifest.clone();
     }
 
     /**
      * Tries to find a pack suffixed with the closest available variant of the locale. For example,
      * buildLocalized("foo", "pt-BR") will first try to load foo_pt-BR, then foo_pt, then just foo.
+     * @param packName The folder name in your assets/ directory.
+     * @param locale An RFC 4646 language tag, or null to use the system language.
+     * @param required When true and this pack was not found, throw an error. Otherwise null is
+     *   returned.
      */
-    public static function buildLocalized (packName :String, locale :String = null) :Manifest
+    public static function buildLocalized (
+        packName :String, locale :String = null, required :Bool = true) :Manifest
     {
         if (locale == null) {
             locale = System.locale;
@@ -45,14 +60,14 @@ class Manifest
         if (locale != null) {
             var parts = locale.split("-");
             while (parts.length > 0) {
-                var manifest = build(packName + "_" + parts.join("-"));
+                var manifest = build(packName + "_" + parts.join("-"), false);
                 if (manifest != null) {
                     return manifest;
                 }
                 parts.pop();
             }
         }
-        return build(packName);
+        return build(packName, required);
     }
 
     /**
@@ -65,6 +80,10 @@ class Manifest
 
     /**
      * Adds an asset entry to this manifest.
+     * @param name The name of the asset.
+     * @param url The URL this asset will be downloaded from.
+     * @param bytes The size in bytes.
+     * @param type Optionally specified content type, by default infer it from the URL.
      */
     public function add (name :String, url :String, bytes :Int = 0, ?type :AssetType) :AssetEntry
     {
@@ -77,9 +96,22 @@ class Manifest
         return entry;
     }
 
-    public function getEntries () :Array<AssetEntry>
+    /**
+     * Iterates over all the assets defined in this manifest.
+     */
+    inline public function iterator () :Iterator<AssetEntry>
     {
-        return _entries.copy();
+        return _entries.iterator();
+    }
+
+    /**
+     * Creates a copy of this manifest.
+     */
+    public function clone () :Manifest
+    {
+        var copy = new Manifest();
+        copy._entries = _entries.copy();
+        return copy;
     }
 
     private static function inferType (url :String) :AssetType

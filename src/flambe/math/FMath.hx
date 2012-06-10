@@ -4,9 +4,11 @@
 
 package flambe.math;
 
+/**
+ * Some handy math functions, and inlinable constants.
+ */
 class FMath
 {
-    // All the constants from Math, but inlinable at compile-time
     public static inline var E = 2.718281828459045;
     public static inline var LN2 = 0.6931471805599453;
     public static inline var LN10 = 2.302585092994046;

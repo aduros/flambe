@@ -4,6 +4,9 @@
 
 package flambe.math;
 
+/**
+ * A 2D matrix.
+ */
 class Matrix
 {
     public var m00 :Float;

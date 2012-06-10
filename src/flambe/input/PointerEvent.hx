@@ -30,6 +30,9 @@ class PointerEvent
     {
     }
 
+    /**
+     * Creates a copy of this event.
+     */
     public function clone () :PointerEvent
     {
         var event = new PointerEvent();

@@ -4,6 +4,9 @@
 
 package flambe;
 
+/**
+ * Used to iterate over an entity hierarchy.
+ */
 interface Visitor
 {
     /**

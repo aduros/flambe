@@ -4,6 +4,9 @@
 
 package flambe.display;
 
+/**
+ * A loaded texture image.
+ */
 interface Texture
 {
     /**

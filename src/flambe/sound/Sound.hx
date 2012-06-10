@@ -4,6 +4,9 @@
 
 package flambe.sound;
 
+/**
+ * A loaded sound file.
+ */
 interface Sound
 {
     /**

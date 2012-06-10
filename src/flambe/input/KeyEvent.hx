@@ -25,6 +25,9 @@ class KeyEvent
     {
     }
 
+    /**
+     * Creates a copy of this event.
+     */
     public function clone () :KeyEvent
     {
         var event = new KeyEvent();

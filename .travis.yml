@@ -16,7 +16,10 @@ node_js:
 
 # Install Haxe
 before_script:
+    - sudo apt-get install libgc1c2
     - curl http://haxe.org/file/hxinst-linux.tgz | tar zxf -
     - echo y | sudo ./hxinst-linux
+    - echo | haxelib setup
+    - haxelib install format
 
 script: bin/run-travis

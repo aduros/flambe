@@ -4,21 +4,33 @@
 
 package flambe.swf;
 
+import flambe.animation.AnimatedFloat;
 import flambe.display.Sprite;
 import flambe.swf.MovieSymbol;
 
+/**
+ * An instanced Flump animation.
+ */
 class MovieSprite extends Sprite
 {
+    /**
+     * The playback speed multiplier of this movie, defaults to 1.0. Higher values will play faster.
+     */
+    public var speed (default, null) :AnimatedFloat;
+
     public function new (movie :MovieSymbol)
     {
         super();
+
+        speed = new AnimatedFloat(1);
 
         _layers = [];
         for (layer in movie.layers) {
             _layers.push(new LayerSprite(layer));
         }
 
-        _duration = movie.frames/30;
+        _frameRate = movie.frameRate;
+        _duration = movie.frames/_frameRate;
         _goingToFrame = false;
         _frame = 0;
         _elapsed = 0;
@@ -40,13 +52,14 @@ class MovieSprite extends Sprite
     {
         super.onUpdate(dt);
 
-        _elapsed += dt;
+        speed.update(dt);
+
+        _elapsed += speed._*dt;
         if (_elapsed > _duration) {
             _elapsed = _elapsed % _duration;
         }
 
-        var newFrame = _elapsed*30;
-
+        var newFrame = _elapsed*_frameRate;
         goto(newFrame);
     }
 
@@ -80,7 +93,7 @@ class MovieSprite extends Sprite
         }
     }
 
-    private var _lib :Library;
+    private var _frameRate :Float;
 
     private var _layers :Array<LayerSprite>;
     private var _duration :Float;
@@ -193,4 +206,3 @@ private class LayerSprite extends Sprite
     // parent on layer creation.
     private var _sprites :Array<Sprite>;
 }
-

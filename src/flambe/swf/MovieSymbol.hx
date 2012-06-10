@@ -9,6 +9,9 @@ import flambe.math.FMath;
 import flambe.math.Matrix;
 import flambe.swf.Format;
 
+/**
+ * Defines a Flump movie.
+ */
 class MovieSymbol
     implements Symbol
 {
@@ -18,9 +21,12 @@ class MovieSymbol
     /** The total number of frames in this movie. */
     public var frames (default, null) :Int;
 
-    public function new (reader :MovieFormat)
+    public var frameRate (default, null) :Float;
+
+    public function new (lib :Library, reader :MovieFormat)
     {
         _name = reader.id;
+        frameRate = lib.frameRate;
 
         frames = 0;
         layers = [];

@@ -6,9 +6,18 @@ package flambe.swf;
 
 import flambe.display.Sprite;
 
+/**
+ * Defines an exported SWF symbol.
+ */
 interface Symbol
 {
+    /**
+     * The name of this symbol.
+     */
     var name (getName, null) :String;
 
+    /**
+     * Instantiate a sprite that displays this symbol.
+     */
     function createSprite () :Sprite;
 }

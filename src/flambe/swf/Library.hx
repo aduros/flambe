@@ -16,6 +16,11 @@ import flambe.swf.Format;
 class Library
 {
     /**
+     * The original frame rate of movies in this library.
+     */
+    public var frameRate (default, null) :Float;
+
+    /**
      * Creates a library using files in an AssetPack.
      * @param baseDir The directory in the pack containing Flump's library.json and texture atlases.
      */
@@ -25,9 +30,11 @@ class Library
 
         var reader :Format = Json.parse(pack.loadFile(baseDir + "/library.json"));
 
+        frameRate = reader.frameRate;
+
         var movies = [];
         for (movieObject in reader.movies) {
-            var movie = new MovieSymbol(movieObject);
+            var movie = new MovieSymbol(this, movieObject);
             movies.push(movie);
             _symbols.set(movie.name, movie);
         }

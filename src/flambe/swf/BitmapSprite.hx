@@ -7,6 +7,9 @@ package flambe.swf;
 import flambe.display.DrawingContext;
 import flambe.display.Sprite;
 
+/**
+ * An instanced Flump atlased texture.
+ */
 class BitmapSprite extends Sprite
 {
     public function new (symbol :BitmapSymbol)

@@ -8,6 +8,9 @@ import flambe.display.Sprite;
 import flambe.display.Texture;
 import flambe.swf.Format;
 
+/**
+ * Defines a Flump atlased texture.
+ */
 class BitmapSymbol
     implements Symbol
 {

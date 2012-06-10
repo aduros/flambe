@@ -7,7 +7,6 @@ package flambe.swf;
 import flambe.display.Sprite;
 import flambe.math.FMath;
 import flambe.math.Matrix;
-
 import flambe.swf.Format;
 
 class MovieSymbol
@@ -21,7 +20,7 @@ class MovieSymbol
 
     public function new (reader :MovieFormat)
     {
-        _name = reader.symbol;
+        _name = reader.id;
 
         frames = 0;
         layers = [];
@@ -65,7 +64,7 @@ class MovieLayer
         keyframes = [];
         var prevKf = null;
         for (keyframeObject in reader.keyframes) {
-            prevKf = new MovieKeyframe(keyframeObject, prevKf, false);
+            prevKf = new MovieKeyframe(keyframeObject, prevKf);
             keyframes.push(prevKf);
         }
     }
@@ -104,7 +103,7 @@ class MovieKeyframe
 
     public var ease (default, null) :Float;
 
-    public function new (reader :KeyframeFormat, prevKf :MovieKeyframe, flipbook :Bool)
+    public function new (reader :KeyframeFormat, prevKf :MovieKeyframe)
     {
         index = (prevKf != null) ? prevKf.index + prevKf.duration : 0;
 
@@ -123,9 +122,9 @@ class MovieKeyframe
         visible = true;
         ease = 0;
 
-        if (flipbook) {
-            return; // Purely labelled frame
-        }
+        // if (flipbook) {
+        //     return; // Purely labelled frame
+        // }
 
         if (symbolName == null) {
             return;
@@ -143,8 +142,13 @@ class MovieKeyframe
             scaleY = scale[1];
         }
 
-        if (reader.rotation != null) {
-            rotation = FMath.toDegrees(reader.rotation);
+        var skew = reader.skew;
+        if (skew != null) {
+            var skewX = skew[0];
+            if (skewX != skew[1]) {
+                Log.log.warn("Flump skewing is not yet supported");
+            }
+            rotation = FMath.toDegrees(skewX);
         }
 
         var pivot = reader.pivot;

@@ -7,12 +7,12 @@ package flambe.swf;
 // Documents Flump's JSON format and adds some type-safety to parsing
 
 typedef Format = {
-    // The file format version number
-    version: Int,
-
-    // A checksum of the original XFL library used to generate this file, used by the exporter tool
+    // A checksum of the original FLA library used to generate this file, used by the exporter tool
     // to detect modifications
-    checksum: String,
+    md5: String,
+
+    // The frame rate as exported from Flash
+    frameRate: Float,
 
     // All the movies and atlases in the library
     movies: Array<MovieFormat>,
@@ -21,17 +21,20 @@ typedef Format = {
 
 typedef MovieFormat = {
     // The symbol name of this movie
-    symbol: String,
+    // TODO(bruno): Why not call it symbol? Movies share the same namespace as textures
+    id: String,
 
     layers: Array<LayerFormat>,
+
+    md5: String,
 }
 
 typedef LayerFormat = {
     // The name of the layer in Flash
     name: String,
 
-    // Whether this is a flipbook-style animation
-    flipbook: Bool,
+    // Optional: Whether this is a flipbook-style animation. Defaults to false
+    flipbook: Null<Bool>,
 
     keyframes: Array<KeyframeFormat>,
 }
@@ -49,8 +52,8 @@ typedef KeyframeFormat = {
     // Optional: Transform [scaleX, scaleY] properties. Defaults to [1, 1]
     scale: Null<Array<Float>>,
 
-    // Optional: Transform rotation in radians. Defaults to 0
-    rotation: Null<Float>,
+    // Optional: Transform [skewX, skewY] in radians. Defaults to 0
+    skew: Null<Array<Float>>,
 
     // Optional: The anchor point [x, y]. Defaults to [0, 0]
     pivot: Null<Array<Float>>,
@@ -78,11 +81,13 @@ typedef AtlasFormat = {
 
 typedef TextureFormat = {
     // The symbol name of this texture
-    name: String,
+    symbol: String,
 
     // The top-left of the texture rectangle relative to the origin transformation point
     offset: Array<Float>,
 
     // The rectangle bounding the texture in its atlas
     rect: Array<Float>,
+
+    md5: String,
 }

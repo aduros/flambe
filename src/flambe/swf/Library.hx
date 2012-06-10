@@ -10,15 +10,20 @@ import flambe.asset.AssetPack;
 import flambe.display.Sprite;
 import flambe.swf.Format;
 
+/**
+ * An exported Flump library containing movies and bitmaps.
+ */
 class Library
 {
-    public var name (default, null) :String;
-
+    /**
+     * Creates a library using files in an AssetPack.
+     * @param baseDir The directory in the pack containing Flump's library.json and texture atlases.
+     */
     public function new (pack :AssetPack, baseDir :String)
     {
         _symbols = new Hash();
 
-        var reader :Format = Json.parse(pack.loadFile(baseDir + "/resources.json"));
+        var reader :Format = Json.parse(pack.loadFile(baseDir + "/library.json"));
 
         var movies = [];
         for (movieObject in reader.movies) {
@@ -28,8 +33,7 @@ class Library
         }
 
         for (atlasObject in reader.atlases) {
-            // TODO(bruno): Should textures be relative to baseDir?
-            var atlas = pack.loadTexture(atlasObject.file);
+            var atlas = pack.loadTexture(baseDir + "/" + atlasObject.file);
             for (textureObject in atlasObject.textures) {
                 var bitmap = new BitmapSymbol(textureObject, atlas);
                 _symbols.set(bitmap.name, bitmap);
@@ -54,22 +58,42 @@ class Library
         }
     }
 
-    inline public function movie (symbolName :String) :MovieSprite
-    {
-        return cast sprite(symbolName);
-    }
-
+    /**
+     * Retrieve a name symbol from this library, or null if not found.
+     */
     inline public function symbol (symbolName :String) :Symbol
     {
         return _symbols.get(symbolName);
     }
 
-    public function sprite (symbolName :String) :Sprite
+    /**
+     * Creates a sprite from a symbol name, it'll either be a movie or a bitmap.
+     * @param required If true and the symbol is not in this library, an error is thrown.
+     */
+    public function createSprite (symbolName :String, required :Bool = true) :Sprite
     {
         var symbol = _symbols.get(symbolName);
-        return (symbol != null) ? symbol.createSprite() : null;
+        if (symbol == null) {
+            if (required) {
+                throw "Missing symbol: " + symbolName;
+            }
+            return null;
+        }
+        return symbol.createSprite();
     }
 
+    /**
+     * Creates a movie sprite from a symbol name.
+     * @param required If true and the symbol is not in this library, an error is thrown.
+     */
+    inline public function createMovie (symbolName :String, required :Bool = true) :MovieSprite
+    {
+        return cast createSprite(symbolName, required);
+    }
+
+    /**
+     * Iterates over all the symbols in this library.
+     */
     inline public function iterator () :Iterator<Symbol>
     {
         return _symbols.iterator();

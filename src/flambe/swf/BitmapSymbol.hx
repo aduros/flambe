@@ -22,7 +22,7 @@ class BitmapSymbol
 
     public function new (reader :TextureFormat, atlas :Texture)
     {
-        _name = reader.name;
+        _name = reader.symbol;
         this.atlas = atlas;
 
         var rect = reader.rect;

@@ -44,7 +44,7 @@
     <hidden path="build" />
   </hiddenPaths>
   <!-- Executed before build -->
-  <preBuildCommand>cmd /c flambe-waf --flashdevelop=$(BuildConfig) configure install</preBuildCommand>
+  <preBuildCommand>cmd /c flambe-waf --flashdevelop=$(BuildConfig) configure install 2&gt;&amp;1</preBuildCommand>
   <!-- Executed after build -->
   <postBuildCommand alwaysRun="False" />
   <!-- Other project options -->

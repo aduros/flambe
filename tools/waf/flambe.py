@@ -31,13 +31,20 @@ def configure(ctx):
 @feature("flambe")
 def apply_flambe(ctx):
     Utils.def_attrs(ctx, platforms="flash html",
-        classpath="", flags="", libs="", asset_base=None, flash_version="10.1",
+        classpath="", flags="", libs="", asset_base=None, flash_version="10.1", main=None,
         air_cert="etc/air-cert.pfx", air_desc="etc/air-desc.xml", air_password=None,
         ios_profile="etc/ios.mobileprovision")
 
     classpath = [ ctx.path.find_dir("src"), flambe_src(ctx) ] + \
         Utils.to_list(ctx.classpath) # The classpath option should be a list of nodes
-    flags = ["-main", ctx.main, "--dead-code-elimination"] + Utils.to_list(ctx.flags)
+
+    main = ctx.main
+    if not main:
+        main = infer_main(ctx)
+        if not main:
+            ctx.bld.fatal("You must specify a main class in your wscript or hxproj")
+
+    flags = ["-main", main, "--dead-code-elimination"] + Utils.to_list(ctx.flags)
     libs = ["format"] + Utils.to_list(ctx.libs)
     platforms = Utils.to_list(ctx.platforms)
     flash_version = ctx.flash_version
@@ -228,10 +235,14 @@ def apply_flambe(ctx):
 
 @feature("flambe-server")
 def apply_flambe_server(ctx):
-    Utils.def_attrs(ctx, classpath="", flags="", libs="", npm_libs="", include="")
+    Utils.def_attrs(ctx, main=None, classpath="", flags="", libs="", npm_libs="", include="")
 
     classpath = [ ctx.path.find_dir("src"), flambe_src(ctx) ] + \
         Utils.to_list(ctx.classpath) # The classpath option should be a list of nodes
+
+    if not ctx.main:
+        ctx.bld.fatal("You must specify a main class in your wscript")
+
     flags = ["-main", ctx.main] + Utils.to_list(ctx.flags)
     libs = Utils.to_list(ctx.libs)
     npm_libs = Utils.to_list(ctx.npm_libs)
@@ -319,3 +330,19 @@ def flambe_src(ctx):
     root = ctx.bld.root
     dir = root.find_dir(FLAMBE_ROOT + "/src")
     return dir if dir is not None else root.find_dir(FLAMBE_ROOT)
+
+def infer_main(ctx):
+    from xml.dom.minidom import parse
+    projs = ctx.path.ant_glob("*.hxproj")
+    if projs:
+        proj = projs[0]
+        try:
+            xml = parse(proj.abspath())
+        except Exception as e:
+            ctx.bld.fatal("Could not parse %s: %s" % (proj.nice_path(), e))
+
+        for node in xml.getElementsByTagName("build"):
+            for node in xml.getElementsByTagName("option"):
+                main = node.getAttribute("mainClass")
+                if main:
+                    return main

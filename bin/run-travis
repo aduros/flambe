@@ -28,4 +28,4 @@ cd ..
 
 echo "Building demos..."
 git clone git://github.com/aduros/flambe-demos.git
-flambe-demos/bin/build-all
+flambe-demos/bin/build-all --debug

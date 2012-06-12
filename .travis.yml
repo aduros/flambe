@@ -21,5 +21,6 @@ before_script:
     - echo y | sudo ./hxinst-linux > /dev/null
     - echo | haxelib setup
     - haxelib install format
+    - haxelib install nape
 
 script: bin/run-travis

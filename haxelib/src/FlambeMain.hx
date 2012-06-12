@@ -85,6 +85,16 @@ class FlambeMain
                 Sys.println("Ok, you can install it later by running setup again");
             }
         }
+
+        if (hasPython()) {
+            Sys.println("You're all set!");
+        } else {
+            Sys.println(" ┌────────────────────────────────────────────────┐");
+            Sys.println(" │ It looks you don't have Python, you'll need to │");
+            Sys.println(" │ install it to build Flambe apps:               │");
+            Sys.println(" │           http://python.org/download           │");
+            Sys.println(" └────────────────────────────────────────────────┘");
+        }
     }
 
     public function create ()
@@ -188,7 +198,7 @@ class FlambeMain
         return path;
     }
 
-    private static function hasFlashDevelop ()
+    private static function hasFlashDevelop () :Bool
     {
         if (WINDOWS) {
             try {
@@ -198,6 +208,27 @@ class FlambeMain
             } catch (error :Dynamic) {
                 // Fall through
             }
+        }
+        return false;
+    }
+
+    private static function hasPython () :Bool
+    {
+        if (WINDOWS) {
+            // Look for the Python .py file association first
+            try {
+                // Deliberately wacky quoting
+                var p = new Process("cmd", ["/s /k\" assoc .py"]);
+                return p.stdout.readLine().indexOf("Python") >= 0;
+            } catch (error :Dynamic) {
+                // Fall through
+            }
+        }
+        try {
+            new Process("python", ["--version"]);
+            return true;
+        } catch (error :Dynamic) {
+            // Fall through
         }
         return false;
     }

@@ -59,8 +59,9 @@ to `localhost:8000/index.html`.
 If Flambe detected Adobe AIR and the Android SDK, an APK will be installed to
 your device if you have it plugged in.
 
-What now, you ask? Documentation is slim, but the demos should be instructive.
-Once the dust settles, I'll write some proper docs and a series of tutorials.
+What now, you ask? Compile the [demos](https://github.com/aduros/flambe-demos)
+and peruse [API docs](https://aduros.com/flambe/api). Once the dust settles,
+I'll write a couple of tutorials.
 
 Are things not working? I'd be happy to help, [send me a
 message](https://github.com/aduros) or chat to me in #Haxe on irc.freenode.net.

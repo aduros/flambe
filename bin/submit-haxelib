@@ -29,7 +29,10 @@ zip -j $ARCHIVE build/run.n
 git ls-files template | zip $ARCHIVE -@
 cd ..
 
-git ls-files bin/flambe-waf bin/flambe-waf.bat bin/waf tools LICENSE.txt | zip $ARCHIVE -@
+git ls-files \
+    bin/flambe-waf bin/flambe-waf.bat bin/waf \
+    tools/embedder tools/waf \
+    LICENSE.txt | zip $ARCHIVE -@
 
 # Include the src directory's contents at the top-level to be nice to IDEs
 cd src
@@ -43,6 +46,10 @@ zip -j $ARCHIVE /tmp/haxelib.xml
 # Include our haxedoc.xml as well
 bin/build-chxdoc
 zip -j $ARCHIVE chxdoc/haxedoc.xml
+
+# Include the FD plugin
+tools/flashdevelop/build-fdz
+zip -j $ARCHIVE tools/flashdevelop/flambe-FlashDevelop.fdz
 
 # Now would be a good time to double-check everything works
 haxelib test $ARCHIVE

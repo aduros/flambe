@@ -4,6 +4,7 @@
 
 import sys.FileSystem;
 import sys.io.File;
+import sys.io.Process;
 
 import haxe.Template;
 
@@ -46,7 +47,8 @@ class FlambeMain
 
     public function setup ()
     {
-        if (Sys.systemName() == "Windows") {
+        var dest;
+        if (WINDOWS) {
             var haxeDir = Sys.getEnv("HAXEPATH");
             if (haxeDir == null) {
                 Sys.println("%HAXEPATH% environment variable not set, " +
@@ -55,13 +57,32 @@ class FlambeMain
             }
             File.copy(_libDir + "/bin/flambe-waf", haxeDir + "/flambe-waf.py");
             File.copy(_libDir + "/bin/flambe-waf.bat", haxeDir + "/flambe-waf.bat");
+            dest = haxeDir + "/flambe-waf";
 
         } else {
-            var dest = "/usr/bin/flambe-waf";
+            dest = "/usr/bin/flambe-waf";
             try {
                 File.copy(_libDir + "/bin/flambe-waf", dest);
             } catch (e :Dynamic) {
                 Sys.println("Couldn't create " + dest + ", did you sudo?");
+                Sys.exit(1);
+            }
+        }
+
+        Sys.println("Installed flambe-waf to " + cleanPath(dest));
+
+        if (hasFlashDevelop()) {
+            switch (read("Install Flambe support in FlashDevelop?", "Y").toLowerCase()) {
+            case "y", "yes":
+                try {
+                    // Deliberately wacky quoting, cmd.exe was designed by loons
+                    new Process("cmd", ["/s /k\" \"" + _libDir + "\\flambe-FlashDevelop.fdz\""]);
+                } catch (err :Dynamic) {
+                    Sys.println("Err, something went wrong. You can try getting the FDZ manually" +
+                        " from https://github.com/aduros/flambe/downloads");
+                }
+            default:
+                Sys.println("Ok, you can install it later by running setup again");
             }
         }
     }
@@ -78,7 +99,7 @@ class FlambeMain
         Sys.println("");
         Sys.println("-- Press enter to use the defaults --");
 
-        var outputDir = read("Project directory", Sys.getCwd() + name);
+        var outputDir = read("Project directory", cleanPath(Sys.getCwd() + "/" + name));
 
         var mainClassFull;
         do {
@@ -154,26 +175,52 @@ class FlambeMain
         File.saveContent(to, template.execute(ctx));
     }
 
+    private static function cleanPath (path :String) :String
+    {
+        if (WINDOWS) {
+            path = path.replace("/", DIR_SEP);
+        }
+        // Remove duplicate slashes
+        path = new EReg("\\" + DIR_SEP + "+", "g").replace(path, DIR_SEP);
+        // Remove trailing slashes
+        path = new EReg("\\" + DIR_SEP + "$", "").replace(path, "");
+
+        return path;
+    }
+
+    private static function hasFlashDevelop ()
+    {
+        if (WINDOWS) {
+            try {
+                // Deliberately wacky quoting
+                var p = new Process("cmd", ["/s /k\" assoc .fdz"]);
+                return p.stdout.readLine().indexOf("FlashDevelop") >= 0;
+            } catch (error :Dynamic) {
+                // Fall through
+            }
+        }
+        return false;
+    }
+
     private static function main ()
     {
         var args = Sys.args();
         if (args.length < 1) {
             // When run using haxelib, a path will be added to the last argument
-            Sys.print("No path argument, are you running this with haxelib run?");
+            Sys.println("No path argument, are you running this with haxelib run?");
             Sys.exit(1);
         }
 
-        var libDir = Sys.getCwd();
-        var cwd = args[args.length-1];
-        var sep = (Sys.systemName() == "Windows") ? "\\" : "/";
-        if (cwd.charAt(cwd.length-1) != sep) {
-            cwd += sep;
-        }
+        var libDir = cleanPath(Sys.getCwd());
+        var cwd = cleanPath(args[args.length-1]);
         Sys.setCwd(cwd);
 
         var app = new FlambeMain(libDir, args.slice(0, args.length-1));
         app.run();
     }
+
+    private static var WINDOWS = Sys.systemName() == "Windows";
+    private static var DIR_SEP = WINDOWS ? "\\" : "/";
 
     private var _libDir :String;
     private var _args :Array<String>;

@@ -41,7 +41,7 @@ Building
 Download and setup Flambe by running:
 
     haxelib install flambe
-    haxelib run flambe
+    haxelib run flambe setup
 
 Then cd into one of the [demos](https://github.com/aduros/flambe-demos), and:
 

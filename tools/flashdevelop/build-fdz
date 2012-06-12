@@ -1,0 +1,17 @@
+#!/bin/sh
+#
+# Builds the FlashDevelop plugin
+
+set -e
+
+PLUGIN_ROOT=`readlink -f $(dirname $0)`
+cd "$PLUGIN_ROOT"
+
+FDZ="flambe-FlashDevelop.fdz"
+rm -f "$FDZ"
+git ls-files '$(BaseDir)' | zip "$FDZ" -@
+
+# Include an empty assets directory, since git can't handle empty dirs
+ASSET_DIR='$(BaseDir)/Projects/401 HaXe - Flambe Project/assets/bootstrap'
+mkdir -p "$ASSET_DIR"
+zip "$FDZ" "$ASSET_DIR"

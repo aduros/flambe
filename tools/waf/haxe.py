@@ -3,11 +3,9 @@ Basic Haxe compiler support for Waf
 """
 
 import os, re
-from waflib.Configure import conf
-from waflib import TaskGen, Task, Utils, Options, Build, Errors, Node
-from waflib.TaskGen import feature, before_method, after_method
+from waflib import *
+from waflib.TaskGen import feature
 
-from waflib.Tools import ccroot
 
 def configure(self):
     # If HAXE_HOME is set, we prepend it to the path list

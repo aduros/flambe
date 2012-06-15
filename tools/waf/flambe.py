@@ -68,7 +68,7 @@ def apply_flambe(ctx):
     if debug:
         flags += "-debug --no-opt --no-inline -D fdb".split()
     else:
-        flags += "--no-traces -D flambe_disable_logging".split()
+        flags += "--no-traces".split()
 
     # Inject a custom asset base URL if provided
     if ctx.asset_base != None:

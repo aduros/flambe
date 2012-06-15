@@ -27,14 +27,7 @@ class Logger
         _handler = handler;
     }
 
-#if flambe_disable_logging
-    // In release builds, logging calls are completely stripped out
-    inline public function info (?text :String, ?args :Array<Dynamic>) { }
-    inline public function warn (?text :String, ?args :Array<Dynamic>) { }
-    inline public function error (?text :String, ?args :Array<Dynamic>) { }
-    inline public function log (level :LogLevel, ?text :String, ?args :Array<Dynamic>) { }
-
-#else
+#if (debug || flambe_keep_logs)
     public function info (?text :String, ?args :Array<Dynamic>)
     {
         log(Info, text, args);
@@ -97,6 +90,13 @@ class Logger
 
         _handler.log(level, text);
     }
+
+#else
+    // In release builds, logging calls are stripped out
+    inline public function info (?text :String, ?args :Array<Dynamic>) {}
+    inline public function warn (?text :String, ?args :Array<Dynamic>) {}
+    inline public function error (?text :String, ?args :Array<Dynamic>) {}
+    inline public function log (level :LogLevel, ?text :String, ?args :Array<Dynamic>) {}
 #end
 
     private var _handler :LogHandler;

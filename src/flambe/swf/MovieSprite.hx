@@ -45,7 +45,14 @@ class MovieSprite extends Sprite
         }
     }
 
-    // TODO(bruno): onRemove
+    override public function onRemoved ()
+    {
+        super.onRemoved();
+
+        for (layer in _layers) {
+            owner.removeChild(layer.owner);
+        }
+    }
 
     override public function onUpdate (dt :Float)
     {

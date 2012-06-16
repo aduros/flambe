@@ -55,7 +55,7 @@ class System
     /**
      * Starts up Flambe, this should usually be the first thing a game does.
      */
-    inline public static function init ()
+    public static function init ()
     {
         if (!_calledInit) {
             _platform.init();

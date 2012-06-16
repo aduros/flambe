@@ -19,6 +19,15 @@ class Point
     }
 
     /**
+     * Re-assign the coordinates of this point.
+     */
+    public function setXY (x :Float, y :Float)
+    {
+        this.x = x;
+        this.y = y;
+    }
+
+    /**
      * Normalize this vector, so that its new magnitude is 1.
      */
     public function normalize ()

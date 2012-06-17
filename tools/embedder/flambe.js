@@ -2,8 +2,8 @@
  * A helper for embedding Flambe games in a browser that smartly chooses either the Flash or HTML
  * platform based on what the browser best supports.
  *
- * For testing, you can use URL query ?flambe-platform=flash (or =html) to force the use of a
- * specific platform.
+ * For testing, you can use URL query ?flambe=flash (or =html) to force the use of a specific
+ * platform.
  */
 var flambe = {};
 
@@ -34,7 +34,7 @@ flambe.embed = function (urls, elementId) {
         args[unescape(pair[0])] = (pair.length > 1) ? unescape(pair[1]) : null;
     }
 
-    var pref = args["flambe-platform"];
+    var pref = args["flambe"];
 
     for (var ii = 0; ii < urls.length; ++ii) {
         var url = urls[ii];

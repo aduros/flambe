@@ -14,7 +14,7 @@ rm -rf "$CHXDOC_DIR"
 
 # Generate intermediary haxedoc.xml
 cd "$TMP_DIR"
-haxe -xml haxedoc.xml \
+haxe -xml haxedoc.xml -debug \
     --macro 'include("flambe", true, ["flambe.platform"])' \
     -lib format \
     --no-output -cp "$FLAMBE_ROOT/src"

@@ -11,6 +11,7 @@ import flambe.input.Keyboard;
 import flambe.input.Pointer;
 import flambe.platform.Platform;
 import flambe.storage.Storage;
+import flambe.util.Assert;
 import flambe.util.Logger;
 import flambe.util.Promise;
 import flambe.util.Signal1;
@@ -68,6 +69,7 @@ class System
      */
     inline public static function loadAssetPack (manifest :Manifest) :Promise<AssetPack>
     {
+        #if debug assertCalledInit(); #end
         return _platform.loadAssetPack(manifest);
     }
 
@@ -78,6 +80,7 @@ class System
      */
     inline public static function callNative (funcName :String, ?params :Array<Dynamic>) :Dynamic
     {
+        #if debug assertCalledInit(); #end
         return _platform.callNative(funcName, params);
     }
 
@@ -88,32 +91,43 @@ class System
      */
     inline public static function logger (tag :String) :Logger
     {
+        // No need to assertCalledInit here, this should be callable from static initializers
         return new Logger(_platform.createLogHandler(tag));
     }
 
     inline private static function getStage () :Stage
     {
+        #if debug assertCalledInit(); #end
         return _platform.stage;
     }
 
     inline private static function getStorage () :Storage
     {
+        #if debug assertCalledInit(); #end
         return _platform.storage;
     }
 
     inline private static function getPointer () :Pointer
     {
+        #if debug assertCalledInit(); #end
         return _platform.pointer;
     }
 
     inline private static function getKeyboard () :Keyboard
     {
+        #if debug assertCalledInit(); #end
         return _platform.keyboard;
     }
 
     inline private static function getLocale () :String
     {
+        #if debug assertCalledInit(); #end
         return _platform.locale;
+    }
+
+    private static function assertCalledInit ()
+    {
+        Assert.that(_calledInit, "You must call System.init() first");
     }
 
     private static var _platform :Platform =

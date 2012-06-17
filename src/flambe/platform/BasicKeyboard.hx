@@ -5,7 +5,7 @@
 package flambe.platform;
 
 import flambe.input.Keyboard;
-import flambe.input.KeyEvent;
+import flambe.input.KeyboardEvent;
 import flambe.util.Signal1;
 
 class BasicKeyboard
@@ -13,8 +13,8 @@ class BasicKeyboard
 {
     public var supported (isSupported, null) :Bool;
 
-    public var down (default, null) :Signal1<KeyEvent>;
-    public var up (default, null) :Signal1<KeyEvent>;
+    public var down (default, null) :Signal1<KeyboardEvent>;
+    public var up (default, null) :Signal1<KeyboardEvent>;
 
     public function new ()
     {
@@ -58,7 +58,7 @@ class BasicKeyboard
         }
     }
 
-    private static var _sharedEvent = new KeyEvent();
+    private static var _sharedEvent = new KeyboardEvent();
 
     private var _id :Int;
     private var _keyStates :IntHash<Bool>;

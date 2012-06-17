@@ -20,12 +20,12 @@ interface Keyboard
     /**
      * Emitted when a key is pressed down.
      */
-    var down (default, null) :Signal1<KeyEvent>;
+    var down (default, null) :Signal1<KeyboardEvent>;
 
     /**
      * Emitted when a key is released.
      */
-    var up (default, null) :Signal1<KeyEvent>;
+    var up (default, null) :Signal1<KeyboardEvent>;
 
     /**
      * @returns True if a key with the given charCode is currently being held down.

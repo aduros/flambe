@@ -5,10 +5,10 @@
 package flambe.input;
 
 /**
- * Represents an event coming from a physical key press. NOTE: For performance reasons, KeyEvent
- * instances are reused by Flambe. Use clone() to retain a reference to an event.
+ * Represents an event coming from a physical key press. NOTE: For performance reasons,
+ * KeyboardEvent instances are reused by Flambe. Use clone() to retain a reference to an event.
  */
-class KeyEvent
+class KeyboardEvent
 {
     /**
      * The key's character code. This value is platform dependent, so be sure to test thoroughly,
@@ -28,9 +28,9 @@ class KeyEvent
     /**
      * Creates a copy of this event.
      */
-    public function clone () :KeyEvent
+    public function clone () :KeyboardEvent
     {
-        var event = new KeyEvent();
+        var event = new KeyboardEvent();
         event._internal_init(id, charCode);
         return event;
     }

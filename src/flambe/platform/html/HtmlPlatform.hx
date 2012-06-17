@@ -21,6 +21,7 @@ import flambe.platform.BasicPointer;
 import flambe.platform.MainLoop;
 import flambe.storage.Storage;
 import flambe.System;
+import flambe.util.Assert;
 import flambe.util.Logger;
 import flambe.util.Promise;
 import flambe.util.Signal1;
@@ -60,10 +61,8 @@ class HtmlPlatform
             canvas = (untyped Lib.window).flambe.canvas;
         } catch (error :Dynamic) {
         }
-        if (canvas == null) {
-            log.error("Could not find a Flambe canvas! Are you not embedding with flambe.js?");
-            return;
-        }
+        Assert.that(canvas != null,
+            "Could not find a Flambe canvas! Are you embedding with flambe.js?");
 
         // Allow the canvas to trap keyboard focus
         canvas.setAttribute("tabindex", "0");

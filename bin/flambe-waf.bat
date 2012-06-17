@@ -1,1 +1,0 @@
-@flambe-waf.py %*

@@ -45,8 +45,8 @@ Download and setup Flambe by running:
 
 Then cd into one of the [demos](https://github.com/aduros/flambe-demos), and:
 
-    flambe-waf configure --debug
-    flambe-waf install
+    wafl configure --debug
+    wafl install
 
 Then open a browser to deploy/web/index.html. The Flash or HTML5 build will run
 depending on what your browser best supports.

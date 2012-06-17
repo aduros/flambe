@@ -18,12 +18,12 @@ haxe -js out.js --no-output --macro 'include("flambe", true, ["flambe.platform"]
 
 echo "Running unit tests..."
 cd tests
-flambe-waf configure build
+wafl configure build
 cd ..
 
 echo "Building haxelib runner..."
 cd haxelib
-flambe-waf configure build
+wafl configure build
 cd ..
 
 echo "Building demos..."

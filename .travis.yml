@@ -2,7 +2,7 @@
 # Continuous integration config
 # http://travis-ci.org/aduros/flambe
 
-# # flambe-waf should support both Python versions
+# # wafl should support both Python versions
 # language: python
 # python:
 #     - 2.7

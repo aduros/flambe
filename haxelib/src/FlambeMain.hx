@@ -55,21 +55,21 @@ class FlambeMain
                     "did you install Haxe properly?");
                 Sys.exit(1);
             }
-            File.copy(_libDir + "/bin/flambe-waf", haxeDir + "/flambe-waf.py");
-            File.copy(_libDir + "/bin/flambe-waf.bat", haxeDir + "/flambe-waf.bat");
-            dest = haxeDir + "/flambe-waf";
+            File.copy(_libDir + "/bin/wafl", haxeDir + "/wafl.py");
+            File.copy(_libDir + "/bin/wafl.bat", haxeDir + "/wafl.bat");
+            dest = haxeDir + "/wafl";
 
         } else {
-            dest = "/usr/bin/flambe-waf";
+            dest = "/usr/bin/wafl";
             try {
-                File.copy(_libDir + "/bin/flambe-waf", dest);
+                File.copy(_libDir + "/bin/wafl", dest);
             } catch (e :Dynamic) {
                 Sys.println("Couldn't create " + dest + ", did you sudo?");
                 Sys.exit(1);
             }
         }
 
-        Sys.println("Installed flambe-waf to " + cleanPath(dest));
+        Sys.println("Installed wafl to " + cleanPath(dest));
 
         if (hasFlashDevelop()) {
             switch (read("Install Flambe support in FlashDevelop?", "Y").toLowerCase()) {

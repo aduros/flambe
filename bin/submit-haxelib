@@ -17,20 +17,20 @@ cd $FLAMBE_ROOT
 
 # Make sure the unit tests pass
 cd tests
-../bin/flambe-waf configure build
+../bin/wafl configure build
 cd ..
 
 rm -f $ARCHIVE
 
 # Build the run.n that's executed by `haxelib run flambe`
 cd haxelib
-../bin/flambe-waf configure build
+../bin/wafl configure build
 zip -j $ARCHIVE build/run.n
 git ls-files template | zip $ARCHIVE -@
 cd ..
 
 git ls-files \
-    bin/flambe-waf bin/flambe-waf.bat bin/waf \
+    bin/wafl bin/wafl.bat bin/waf \
     tools/embedder tools/waf \
     LICENSE.txt | zip $ARCHIVE -@
 

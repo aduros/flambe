@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project name="flambe" url="https://github.com/aduros/flambe" license="BSD">
 
-  <user name="aduros"/>
+  <user name="Aduros"/>
   <description>
     Flambe is a fast, expressive, and cross-platform engine for Flash and HTML5 games.
   </description>

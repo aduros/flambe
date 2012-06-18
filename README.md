@@ -7,12 +7,15 @@ Written in Haxe, games are compiled to Flash and HTML5, with support for mobile
 devices. Server-side logic compiles to JS and runs on Node.js, for games that
 require multiplayer.
 
-Rendering in Flash uses Stage3D, falling back to copyPixels if hardware accelerated
-Stage3D isn't available. The HTML5 renderer uses canvas, with plans for WebGL
-support later on.
+Rendering in Flash uses Stage3D, falling back to copyPixels if hardware
+accelerated Stage3D isn't available. The HTML5 renderer uses canvas, with plans
+for WebGL support later on.
 
-Overview
---------
+## Demos
+
+Demos and more are on the [Flambe wiki](https://github.com/aduros/flambe/wiki).
+
+## Overview
 
 Flambe's design and roadmap are guided by a few philosophies:
 
@@ -33,35 +36,10 @@ Flambe's design and roadmap are guided by a few philosophies:
   well-defined API designed for games, Flambe games can be much more portable,
   optimized, and developed more rapidly.
 
-Building
---------
+## Installing
 
-(These instructions will work when I put Flambe up on haxelib, soon)
-
-Download and setup Flambe by running:
-
-    haxelib install flambe
-    haxelib run flambe setup
-
-Then cd into one of the [demos](https://github.com/aduros/flambe-demos), and:
-
-    wafl configure --debug
-    wafl install
-
-Then open a browser to deploy/web/index.html. The Flash or HTML5 build will run
-depending on what your browser best supports.
-
-NOTE: Some of the demos require file parsing, which will throw a security error
-if loaded from file://. To properly test, you should load from a real web
-server. One way to do this is `python -m SimpleHTTPServer` then navigating
-to `localhost:8000/index.html`.
-
-If Flambe detected Adobe AIR and the Android SDK, an APK will be installed to
-your device if you have it plugged in.
-
-What now, you ask? Compile the [demos](https://github.com/aduros/flambe-demos)
-and peruse [API docs](https://aduros.com/flambe/api). Once the dust settles,
-I'll write a couple of tutorials.
+See the [install guide](https://github.com/aduros/flambe/wiki/Installation) on
+the wiki.
 
 Are things not working? I'd be happy to help, [send me a
 message](https://github.com/aduros) or chat to me in #Haxe on irc.freenode.net.

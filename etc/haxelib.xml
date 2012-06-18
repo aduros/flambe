@@ -8,7 +8,7 @@
 
   <depends name="format"/>
 
-  <version name="{{VERSION}}">See https://github.com/aduros/flambe/wiki/changelog</version>
+  <version name="{{VERSION}}">See https://github.com/aduros/flambe/wiki/Changes</version>
 
   <tag v="android"/>
   <tag v="cross"/>

@@ -59,5 +59,6 @@ case "$CONFIRM" in
     "Y" | "y" | "")
         git tag $VERSION
         haxelib submit $ARCHIVE
+        rsync -avz --delete chxdoc/ catdap:web/flambe/api/
         ;;
 esac

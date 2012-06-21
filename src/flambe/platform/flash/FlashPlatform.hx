@@ -140,7 +140,7 @@ class FlashPlatform
 
     public function createLogHandler (tag :String) :LogHandler
     {
-#if !flambe_disable_logging
+#if (debug || flambe_keep_logs)
         return new FlashLogHandler(tag);
 #else
         return null;

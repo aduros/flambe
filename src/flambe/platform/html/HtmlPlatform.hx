@@ -268,7 +268,7 @@ class HtmlPlatform
 
     public function createLogHandler (tag :String) :LogHandler
     {
-#if !flambe_disable_logging
+#if (debug || flambe_keep_logs)
         if (HtmlLogHandler.isSupported()) {
             return new HtmlLogHandler(tag);
         }

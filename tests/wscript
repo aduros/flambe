@@ -16,6 +16,6 @@ def build(ctx):
     ctx(features="haxe",
         classpath = [ ctx.path.find_dir("src"), ctx.path.find_dir("../src") ],
         target="runner.js",
-        flags="-main TestMain -D server -D flambe_disable_logging")
+        flags="-main TestMain -D server")
 
     ctx(rule="${NODE} ${SRC}", source="runner.js", always=True)

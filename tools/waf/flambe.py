@@ -144,7 +144,7 @@ def apply_flambe(ctx):
                     "ensure it's in your $PATH and re-run waf configure.")
 
             # Derive the location of the Android SDK from adb's path
-            android_root = adb[0:adb.rindex("/platform-tools/adb")]
+            android_root = adb[0:adb.rindex("platform-tools")-1]
 
             apk_type = "apk-debug" if debug else "apk-captive-runtime"
             rule = ("%s -package -target %s " +

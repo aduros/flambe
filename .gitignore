@@ -1,5 +1,5 @@
 build
 chxdoc
 .lock-waf*
-bin/.waf-*
+bin/.waf*
 *.fdz

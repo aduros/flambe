@@ -28,9 +28,18 @@ except IOError:
     print("Could not locate Flambe, run `haxelib install flambe`.")
     sys.exit(1)
 
-# Let waf find our custom tools
-sys.path.insert(0, join(flambe_root, "tools", "waf"))
-
+# We can't just use runpy because waf contains null bytes, so open and exec it manually, leaving out
+# the binary section
 waf = join(flambe_root, "bin", "waf")
-sys.argv[0] = waf # Kinda silly
-execfile(waf)
+with open(waf, "rb") as f:
+    src = bytearray()
+    terminator = "#==>\n".encode()
+    for line in f:
+        if line == terminator: break
+        src += line
+
+    # Let waf find our custom tools
+    sys.path.insert(0, join(flambe_root, "tools", "waf"))
+    sys.argv[0] = waf # Kinda silly
+
+    exec(compile(src, waf, "exec"))

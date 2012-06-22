@@ -26,7 +26,11 @@ def configure(ctx):
     ctx.env.has_flash = (not ctx.options.no_flash)
     ctx.env.has_html = (not ctx.options.no_html)
     ctx.env.has_android = (not ctx.options.no_android) and bool(ctx.env.ADT and ctx.env.ADB)
-    ctx.env.has_ios = False # (not ctx.options.no_ios) and bool(ctx.env.ADT)
+
+    import platform
+    system = platform.system()
+    ctx.env.has_ios = (not ctx.options.no_ios) and bool(ctx.env.ADT) and \
+        (system == "Windows" or system == "Darwin")
 
 @feature("flambe")
 def apply_flambe(ctx):

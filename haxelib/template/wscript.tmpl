@@ -12,9 +12,11 @@ def configure(ctx):
 def build(ctx):
     platforms = ["flash", "html"]
 
-    # Only build mobile apps if the required tools are installed
+    # Android builds require the Android SDK
     if ctx.env.has_android: platforms += ["android"]
-    if ctx.env.has_ios: platforms += ["ios"]
+
+    # iOS builds require a valid certificate and provisioning profile
+    # if ctx.env.has_ios: platforms += ["ios"]
 
     # Kick off a build with the desired platforms
     ctx(features="flambe",

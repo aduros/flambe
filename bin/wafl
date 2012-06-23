@@ -2,16 +2,17 @@
 #
 # Locates a Flambe haxelib install and runs its bundled waf
 
-import os, platform, sys
+import os, sys
 env = os.environ
 join = os.path.join
 
 try:
     # TODO(bruno): This may need to be changed in Haxe 3?
-    if platform.system() == "Windows":
+    from platform import system
+    if system() == "Windows":
         lib = join(env["HAXEPATH"], "lib", "flambe")
     else:
-        with open(join(env["HOME"], ".haxelib")) as f:
+        with open(join(os.path.expanduser("~"), ".haxelib")) as f:
             lib = join(f.read(), "flambe")
 
     dev = join(lib, ".dev")

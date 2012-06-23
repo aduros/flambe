@@ -83,15 +83,17 @@ class HtmlPlatform
         container.style.overflow = "hidden";
 
         var onMouse = function (event) {
-            var bounds = event.target.getBoundingClientRect();
+            var bounds = canvas.getBoundingClientRect();
             var x = getX(event, bounds);
             var y = getY(event, bounds);
 
             switch (event.type) {
             case "mousedown":
-                event.preventDefault();
-                _pointer.submitDown(x, y);
-                event.target.focus();
+                if (event.target == canvas) {
+                    event.preventDefault();
+                    _pointer.submitDown(x, y);
+                    event.target.focus();
+                }
 
             case "mousemove":
                 _pointer.submitMove(x, y);
@@ -100,9 +102,10 @@ class HtmlPlatform
                 _pointer.submitUp(x, y);
             }
         };
-        canvas.addEventListener("mousedown", onMouse, false);
-        canvas.addEventListener("mousemove", onMouse, false);
-        canvas.addEventListener("mouseup", onMouse, false);
+        // Add listeners on the window object so dragging and releasing outside of the canvas works
+        (untyped window).addEventListener("mousedown", onMouse, false);
+        (untyped window).addEventListener("mousemove", onMouse, false);
+        (untyped window).addEventListener("mouseup", onMouse, false);
 
         var pointerTouchId = -1;
         var onTouch = function (event) {

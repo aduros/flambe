@@ -49,7 +49,7 @@ class HtmlPlatform
         log = Log.log;
         log.info("Initializing HTML platform");
 
-#if debug
+#if (debug && !haxe_210)
         haxe.Firebug.redirectTraces();
 #end
 

@@ -9,6 +9,7 @@ import flambe.display.Sprite;
 import flambe.input.PointerEvent;
 import flambe.math.FMath;
 import flambe.math.Matrix;
+import flambe.math.Point;
 import flambe.util.Signal1;
 import flambe.util.Value;
 
@@ -125,13 +126,8 @@ class Sprite extends Component
      */
     public function contains (viewX :Float, viewY :Float) :Bool
     {
-        updateViewMatrix();
-        var localX = _viewMatrix.inverseTransformX(viewX, viewY);
-        var localY = _viewMatrix.inverseTransformY(viewX, viewY);
-        if (localX == Math.NaN || localY == Math.NaN) {
-            return false;
-        }
-        return containsLocal(localX, localY);
+        return getViewMatrix().inverseTransform(viewX, viewY, _scratchPoint) &&
+            containsLocal(_scratchPoint.x, _scratchPoint.y);
     }
 
     /**
@@ -310,6 +306,7 @@ class Sprite extends Component
     }
 
     private static var IDENTITY = new Matrix();
+    private static var _scratchPoint = new Point();
 
     // All sprites that have input event listeners attached, in screen depth order.
     // Used to optimize picking.

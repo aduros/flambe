@@ -86,36 +86,29 @@ class Matrix
         return new Point(transformX(x, y), transformY(x, y));
     }
 
-    public function getDeterminant ()
+    /**
+     * Calculate the determinant of this matrix.
+     */
+    public function determinant ()
     {
         return m00*m11 - m01*m10;
     }
 
-    public function inverseTransformX (x :Float, y :Float) :Float
+    /**
+     * Transforms a point by the inverse of this matrix, or return false if this matrix is not
+     * invertible.
+     */
+    public function inverseTransform (x :Float, y :Float, result :Point) :Bool
     {
+        var det = determinant();
+        if (det == 0) {
+            return false;
+        }
         x -= m02;
         y -= m12;
-        var det = getDeterminant();
-        if (det == 0) {
-            return Math.NaN;
-        }
-        return (x*m11 - y*m01) / det;
-    }
-
-    public function inverseTransformY (x :Float, y :Float) :Float
-    {
-        x -= m02;
-        y -= m12;
-        var det = getDeterminant();
-        if (det == 0) {
-            return Math.NaN;
-        }
-        return (y*m00 - x*m10) / det;
-    }
-
-    public function inverseTransformPoint (x :Float, y :Float) :Point
-    {
-        return new Point(inverseTransformX(x, y), inverseTransformY(x, y));
+        result.x = (x*m11 - y*m01) / det;
+        result.y = (y*m00 - x*m10) / det;
+        return true;
     }
 
 #if debug

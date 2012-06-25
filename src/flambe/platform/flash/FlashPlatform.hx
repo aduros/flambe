@@ -164,12 +164,12 @@ class FlashPlatform
 
     private function onKeyDown (event :KeyboardEvent)
     {
-        _keyboard.submitDown(event.charCode);
+        _keyboard.submitDown(event.keyCode);
     }
 
     private function onKeyUp (event :KeyboardEvent)
     {
-        _keyboard.submitUp(event.charCode);
+        _keyboard.submitUp(event.keyCode);
     }
 
     private function onEnterFrame (_)

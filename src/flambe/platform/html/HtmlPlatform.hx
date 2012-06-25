@@ -156,13 +156,12 @@ class HtmlPlatform
         canvas.addEventListener("touchcancel", onTouch, false);
 
         var onKey = function (event) {
-            var charCode = event.keyCode;
             switch (event.type) {
             case "keydown":
                 event.preventDefault();
-                _keyboard.submitDown(charCode);
+                _keyboard.submitDown(event.keyCode);
             case "keyup":
-                _keyboard.submitUp(charCode);
+                _keyboard.submitUp(event.keyCode);
             }
         };
         canvas.addEventListener("keydown", onKey, false);

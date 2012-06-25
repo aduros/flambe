@@ -29,19 +29,19 @@ class BasicKeyboard
         return true;
     }
 
-    inline public function isDown (charCode :Int) :Bool
+    inline public function isDown (keyCode :Int) :Bool
     {
-        return _keyStates.exists(charCode);
+        return _keyStates.exists(keyCode);
     }
 
     /**
      * Called by the platform to handle a down event.
      */
-    public function submitDown (charCode :Int)
+    public function submitDown (keyCode :Int)
     {
-        if (!isDown(charCode)) {
-            _keyStates.set(charCode, true);
-            _sharedEvent._internal_init(++_id, charCode);
+        if (!isDown(keyCode)) {
+            _keyStates.set(keyCode, true);
+            _sharedEvent._internal_init(++_id, keyCode);
             down.emit(_sharedEvent);
         }
     }
@@ -49,11 +49,11 @@ class BasicKeyboard
     /**
      * Called by the platform to handle an up event.
      */
-    public function submitUp (charCode :Int)
+    public function submitUp (keyCode :Int)
     {
-        if (isDown(charCode)) {
-            _keyStates.remove(charCode);
-            _sharedEvent._internal_init(++_id, charCode);
+        if (isDown(keyCode)) {
+            _keyStates.remove(keyCode);
+            _sharedEvent._internal_init(++_id, keyCode);
             up.emit(_sharedEvent);
         }
     }

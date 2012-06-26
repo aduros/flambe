@@ -63,6 +63,7 @@ class FlambeMain
             dest = "/usr/bin/wafl";
             try {
                 File.copy(_libDir + "/bin/wafl", dest);
+                Sys.command("chmod", ["755", dest]);
             } catch (e :Dynamic) {
                 Sys.println("Couldn't create " + dest + ", did you sudo?");
                 Sys.exit(1);

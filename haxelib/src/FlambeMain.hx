@@ -87,9 +87,7 @@ class FlambeMain
             }
         }
 
-        if (hasPython()) {
-            Sys.println("You're all set!");
-        } else {
+        if (!hasPython()) {
             Sys.println(" ┌────────────────────────────────────────────────┐");
             Sys.println(" │ It looks you don't have Python, you'll need to │");
             Sys.println(" │ install it to build Flambe apps:               │");

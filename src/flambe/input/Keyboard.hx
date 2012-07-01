@@ -28,7 +28,7 @@ interface Keyboard
     var up (default, null) :Signal1<KeyboardEvent>;
 
     /**
-     * @returns True if a key with the given keyCode is currently being held down.
+     * @returns True if the given key is currently being held down.
      */
     function isDown (key :Key) :Bool;
 }

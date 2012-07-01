@@ -4,9 +4,12 @@
 
 package flambe.platform;
 
+import flambe.input.Key;
 import flambe.input.Keyboard;
 import flambe.input.KeyboardEvent;
 import flambe.util.Signal1;
+
+using flambe.platform.KeyCodes;
 
 class BasicKeyboard
     implements Keyboard
@@ -29,7 +32,12 @@ class BasicKeyboard
         return true;
     }
 
-    inline public function isDown (keyCode :Int) :Bool
+    public function isDown (key :Key) :Bool
+    {
+        return isCodeDown(key.toKeyCode());
+    }
+
+    inline private function isCodeDown (keyCode :Int) :Bool
     {
         return _keyStates.exists(keyCode);
     }
@@ -39,9 +47,9 @@ class BasicKeyboard
      */
     public function submitDown (keyCode :Int)
     {
-        if (!isDown(keyCode)) {
+        if (!isCodeDown(keyCode)) {
             _keyStates.set(keyCode, true);
-            _sharedEvent._internal_init(++_id, keyCode);
+            _sharedEvent._internal_init(++_id, keyCode.toKey());
             down.emit(_sharedEvent);
         }
     }
@@ -51,9 +59,9 @@ class BasicKeyboard
      */
     public function submitUp (keyCode :Int)
     {
-        if (isDown(keyCode)) {
+        if (isCodeDown(keyCode)) {
             _keyStates.remove(keyCode);
-            _sharedEvent._internal_init(++_id, keyCode);
+            _sharedEvent._internal_init(++_id, keyCode.toKey());
             up.emit(_sharedEvent);
         }
     }

@@ -30,5 +30,5 @@ interface Keyboard
     /**
      * @returns True if a key with the given keyCode is currently being held down.
      */
-    function isDown (keyCode :Int) :Bool;
+    function isDown (key :Key) :Bool;
 }

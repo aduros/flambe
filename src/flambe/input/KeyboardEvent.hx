@@ -11,10 +11,9 @@ package flambe.input;
 class KeyboardEvent
 {
     /**
-     * The key's code. This value is currently platform dependent, so be sure to test thoroughly,
-     * especially across different browsers in the HTML target: http://unixpapa.com/js/key.html
+     * The key that caused this event.
      */
-    public var keyCode (default, null) :Int;
+    public var key (default, null) :Key;
 
     /**
      * An incrementing ID unique to every dispatched key event.
@@ -31,13 +30,13 @@ class KeyboardEvent
     public function clone () :KeyboardEvent
     {
         var event = new KeyboardEvent();
-        event._internal_init(id, keyCode);
+        event._internal_init(id, key);
         return event;
     }
 
-    /** @private */ public function _internal_init (id :Int, keyCode :Int)
+    /** @private */ public function _internal_init (id :Int, key :Key)
     {
         this.id = id;
-        this.keyCode = keyCode;
+        this.key = key;
     }
 }

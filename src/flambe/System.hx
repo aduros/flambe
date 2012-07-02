@@ -17,6 +17,9 @@ import flambe.util.Promise;
 import flambe.util.Signal1;
 import flambe.util.Value;
 
+/**
+ * Provides access to all the different subsystems implemented on each platform.
+ */
 class System
 {
     /**
@@ -24,12 +27,24 @@ class System
      */
     public static var root /*(default, null)*/ = new Entity();
 
+    /**
+     * The Stage subsystem, for controlling the display viewport.
+     */
     public static var stage (getStage, null) :Stage;
 
+    /**
+     * The Storage subsystem, for persisting values.
+     */
     public static var storage (getStorage, null) :Storage;
 
+    /**
+     * The Pointer subsystem, for mouse/touch events.
+     */
     public static var pointer (getPointer, null) :Pointer;
 
+    /**
+     * The Keyboard subsystem, for keyboard events.
+     */
     public static var keyboard (getKeyboard, null) :Keyboard;
 
     /**

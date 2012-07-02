@@ -4,10 +4,19 @@
 
 package flambe.util;
 
+/**
+ * An alias for Signal2 listeners.
+ */
 typedef Listener2<A,B> = A -> B -> Void;
 
+/**
+ * A two-argument signal. See Signal0 and Signal1 for different arities.
+ */
 class Signal2<A,B>
 {
+    /**
+     * @param listener An optional listener to immediately connect to the signal.
+     */
     public function new (?listener :Listener2<A,B>)
     {
         if (listener != null) {
@@ -28,6 +37,9 @@ class Signal2<A,B>
         return _impl.connect(listener, prioritize);
     }
 
+    /**
+     * Removes all listeners connected to this signal.
+     */
     public function disconnectAll ()
     {
         if (_impl != null) {
@@ -35,6 +47,9 @@ class Signal2<A,B>
         }
     }
 
+    /**
+     * Emit the signal, notifying each connected listener.
+     */
     public function emit (arg1 :A, arg2 :B)
     {
         if (_impl != null) {
@@ -42,6 +57,9 @@ class Signal2<A,B>
         }
     }
 
+    /**
+     * @returns A shallow copy of this signal.
+     */
     public function clone () :Signal2<A,B>
     {
         var copy = new Signal2<A,B>();
@@ -51,6 +69,9 @@ class Signal2<A,B>
         return copy;
     }
 
+    /**
+     * @returns True if this signal has at least one listener.
+     */
     public function hasListeners () :Bool
     {
         return _impl != null && _impl.hasListeners();

@@ -4,13 +4,12 @@
 
 package flambe.input;
 
+/**
+ * All the possible keyboard keys that can be handled. Use Unknown to handle any platform-specific
+ * key codes not yet supported here.
+ */
 enum Key
 {
-    /**
-     * Used if the environment sends an unknown key code.
-     */
-    Unknown (keyCode :Int);
-
     A; B; C; D; E; F; G; H; I; J; K; L; M; N; O; P; Q; R; S; T; U; V; W; X; Y; Z;
 
     Number0; Number1; Number2; Number3; Number4; Number5; Number6; Number7; Number8; Number9;
@@ -28,4 +27,9 @@ enum Key
     Semicolon; Shift; Slash; Space; Tab;
 
     // TODO(bruno): Add Android and media player keys
+
+    /**
+     * Used if the environment sends an unknown key code.
+     */
+    Unknown (keyCode :Int);
 }

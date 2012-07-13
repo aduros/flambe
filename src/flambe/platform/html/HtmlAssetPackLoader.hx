@@ -6,6 +6,7 @@ package flambe.platform.html;
 
 import js.Dom;
 import js.Lib;
+import js.XMLHttpRequest;
 
 import haxe.Http;
 
@@ -24,36 +25,55 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
     override private function loadEntry (entry :AssetEntry)
     {
         switch (entry.type) {
-            case Image:
-                var image :Image = untyped __js__ ("new Image()");
-                image.onload = function (_) {
-                    image.onload = null;
-                    image.onerror = null;
+        case Image:
+            var image :Image = untyped __js__ ("new Image()");
+            image.onload = function (_) {
+                image.onload = null;
+                image.onerror = null;
 
-                    var texture = new HtmlTexture();
-                    if (CANVAS_TEXTURES) {
-                        var canvas :Dynamic = Lib.document.createElement("canvas");
-                        canvas.width = image.width;
-                        canvas.height = image.height;
-                        canvas.getContext("2d").drawImage(image, 0, 0);
-                        image = null; // Free it up
-                        texture.image = canvas;
-                    } else {
-                        texture.image = image;
-                    }
+                var texture = new HtmlTexture();
+                if (CANVAS_TEXTURES) {
+                    var canvas :Dynamic = Lib.document.createElement("canvas");
+                    canvas.width = image.width;
+                    canvas.height = image.height;
+                    canvas.getContext("2d").drawImage(image, 0, 0);
+                    image = null; // Free it up
+                    texture.image = canvas;
+                } else {
+                    texture.image = image;
+                }
 
-                    var renderer = HtmlPlatform.instance.renderer;
-                    renderer.uploadTexture(texture);
-                    handleLoad(entry, texture);
+                var renderer = HtmlPlatform.instance.renderer;
+                renderer.uploadTexture(texture);
+                handleLoad(entry, texture);
+            };
+            image.onerror = function (_) {
+                handleError("Failed to load image: " + entry.url);
+            };
+
+            image.src = entry.url;
+
+        case Audio:
+            // If we made it this far, we definitely support audio and can play this asset
+            if (WebAudioSound.supported) {
+                var req = untyped __new__(XMLHttpRequest);
+                req.open("GET", entry.url, true);
+                req.responseType = "arraybuffer";
+
+                req.onload = function () {
+                    WebAudioSound.ctx.decodeAudioData(req.response, function (buffer) {
+                        handleLoad(entry, new WebAudioSound(buffer));
+                    }, function () {
+                        handleError("Failed to decode audio " + entry.url);
+                    });
                 };
-                image.onerror = function (_) {
-                    handleError("Failed to load image " + entry.url);
+                req.onerror = function () {
+                    handleError("Failed to load audio " + entry.url);
                 };
+                // TODO(bruno): Handle progress events
+                req.send();
 
-                image.src = entry.url;
-
-            case Audio:
-                // If we made it this far, we definitely support audio and can play this asset
+            } else {
                 var audio :Dynamic = Lib.document.createElement("audio");
                 audio.preload = "auto"; // Hint that we want to preload the entire file
 
@@ -79,16 +99,17 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                 // TODO(bruno): Handle progress events
                 audio.src = entry.url;
                 audio.load();
+            }
 
-            case Data:
-                var http = new Http(entry.url);
-                http.onData = function (data) {
-                    handleLoad(entry, data);
-                };
-                http.onError = function (error) {
-                    handleError("Failed to load data " + entry.url + ", error=" + error);
-                };
-                http.request(false);
+        case Data:
+            var http = new Http(entry.url);
+            http.onData = function (data) {
+                handleLoad(entry, data);
+            };
+            http.onError = function (error) {
+                handleError("Failed to load data " + entry.url + ", error=" + error);
+            };
+            http.request(false);
         }
     }
 
@@ -110,7 +131,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
 
         // Reject browsers that claim to support audio, but are too buggy or incomplete
         var blacklist = ~/\b(iPhone|iPod|iPad|Android)\b/;
-        if (blacklist.match(Lib.window.navigator.userAgent)) {
+        if (!WebAudioSound.supported && blacklist.match(Lib.window.navigator.userAgent)) {
             return [];
         }
 

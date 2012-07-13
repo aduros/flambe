@@ -65,11 +65,6 @@ private class HtmlPlayback
         playAudio();
     }
 
-    public function setVolume (volume :Float) :Float
-    {
-        return _clonedElement.volume = volume;
-    }
-
     public function getSound () :Sound
     {
         return _sound;

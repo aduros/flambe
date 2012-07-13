@@ -58,7 +58,11 @@ class BasicAssetPackLoader
 
                 } else {
                     bytesTotal += bestEntry.bytes;
-                    loadEntry(bestEntry);
+                    try {
+                        loadEntry(bestEntry);
+                    } catch (error :Dynamic) {
+                        handleError("Failed to load asset: " + error);
+                    }
                 }
             }
 

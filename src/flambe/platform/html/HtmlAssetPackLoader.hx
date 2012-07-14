@@ -136,18 +136,16 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         }
 
         // Select what formats the browser supports and order them by confidence
-        var result = [];
         var formats = [
-            { extension: "ogg", type: "audio/ogg; codecs=vorbis" },
             { extension: "m4a", type: "audio/mp4; codecs=mp4a" },
             { extension: "mp3", type: "audio/mpeg" },
+            { extension: "ogg", type: "audio/ogg; codecs=vorbis" },
             { extension: "wav", type: "audio/wav" },
         ];
-        for (confidence in [ "probably", "maybe" ]) {
-            for (format in formats) {
-                if (element.canPlayType(format.type) == confidence) {
-                    result.push(format.extension);
-                }
+        var result = [];
+        for (format in formats) {
+            if (element.canPlayType(format.type) != "") {
+                result.push(format.extension);
             }
         }
         return result;

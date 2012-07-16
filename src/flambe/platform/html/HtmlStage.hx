@@ -166,7 +166,16 @@ class HtmlStage
             backingStorePixelRatio = 1;
         }
 
-        return devicePixelRatio / backingStorePixelRatio;
+        // Calculate the scale, but bail early if this would cause the canvas to be larger than some
+        // magic threshold. This was added to disable the retina display on the iPad 3, as
+        // performance plummets there when scaling such a huge canvas
+        var scale = devicePixelRatio / backingStorePixelRatio;
+        var screenWidth = (untyped screen).width;
+        var screenHeight = (untyped screen).height;
+        if (scale*screenWidth > 1024 || scale*screenHeight > 1024) {
+            return 1;
+        }
+        return scale;
     }
 
     private var _canvas :Dynamic;

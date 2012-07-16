@@ -35,7 +35,6 @@ class MovieSprite extends Sprite
             _layers.push(new LayerSprite(layer));
         }
 
-        _duration = symbol.frames / symbol.frameRate;
         _frame = 0;
         _elapsed = 0;
         goto(1);
@@ -66,8 +65,8 @@ class MovieSprite extends Sprite
         speed.update(dt);
 
         _elapsed += speed._*dt;
-        if (_elapsed > _duration) {
-            _elapsed = _elapsed % _duration;
+        if (_elapsed > symbol.duration) {
+            _elapsed = _elapsed % symbol.duration;
         }
 
         var newFrame = _elapsed*symbol.frameRate;
@@ -91,7 +90,6 @@ class MovieSprite extends Sprite
     }
 
     private var _layers :Array<LayerSprite>;
-    private var _duration :Float;
     private var _elapsed :Float;
 
     private var _frame :Float;

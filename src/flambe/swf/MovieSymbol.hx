@@ -18,10 +18,20 @@ class MovieSymbol
     public var name (getName, null) :String;
     public var layers (default, null) :Array<MovieLayer>;
 
-    /** The total number of frames in this movie. */
+    /**
+     * The total number of frames in this movie.
+     */
     public var frames (default, null) :Int;
 
+    /**
+     * The rate that this movie is played, in frames per second.
+     */
     public var frameRate (default, null) :Float;
+
+    /**
+     * The duration of this animation in seconds.
+     */
+    public var duration (default, null) :Float;
 
     public function new (lib :Library, reader :MovieFormat)
     {
@@ -35,6 +45,7 @@ class MovieSymbol
             frames = cast Math.max(layer.frames, frames);
             layers.push(layer);
         }
+        duration = frames / frameRate;
     }
 
     public function getName () :String

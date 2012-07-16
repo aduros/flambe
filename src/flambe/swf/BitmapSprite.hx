@@ -12,28 +12,31 @@ import flambe.display.Sprite;
  */
 class BitmapSprite extends Sprite
 {
+    /**
+     * The symbol this sprite displays.
+     */
+    public var symbol (default, null) :BitmapSymbol;
+
     public function new (symbol :BitmapSymbol)
     {
         super();
-        _symbol = symbol;
-        anchorX._ = _symbol.anchorX;
-        anchorY._ = _symbol.anchorY;
+        this.symbol = symbol;
+        anchorX._ = symbol.anchorX;
+        anchorY._ = symbol.anchorY;
     }
 
     override public function draw (ctx :DrawingContext)
     {
-        ctx.drawSubImage(_symbol.atlas, 0, 0, _symbol.x, _symbol.y, _symbol.width, _symbol.height);
+        ctx.drawSubImage(symbol.atlas, 0, 0, symbol.x, symbol.y, symbol.width, symbol.height);
     }
 
     override public function getNaturalWidth () :Float
     {
-        return _symbol.width;
+        return symbol.width;
     }
 
     override public function getNaturalHeight () :Float
     {
-        return _symbol.height;
+        return symbol.height;
     }
-
-    private var _symbol :BitmapSymbol;
 }

@@ -14,23 +14,28 @@ import flambe.swf.MovieSymbol;
 class MovieSprite extends Sprite
 {
     /**
+     * The symbol this sprite displays.
+     */
+    public var symbol (default, null) :MovieSymbol;
+
+    /**
      * The playback speed multiplier of this movie, defaults to 1.0. Higher values will play faster.
      */
     public var speed (default, null) :AnimatedFloat;
 
-    public function new (movie :MovieSymbol)
+    public function new (symbol :MovieSymbol)
     {
         super();
+        this.symbol = symbol;
 
         speed = new AnimatedFloat(1);
 
         _layers = [];
-        for (layer in movie.layers) {
+        for (layer in symbol.layers) {
             _layers.push(new LayerSprite(layer));
         }
 
-        _frameRate = movie.frameRate;
-        _duration = movie.frames/_frameRate;
+        _duration = symbol.frames / symbol.frameRate;
         _frame = 0;
         _elapsed = 0;
         goto(1);
@@ -65,7 +70,7 @@ class MovieSprite extends Sprite
             _elapsed = _elapsed % _duration;
         }
 
-        var newFrame = _elapsed*_frameRate;
+        var newFrame = _elapsed*symbol.frameRate;
         goto(newFrame);
     }
 
@@ -84,8 +89,6 @@ class MovieSprite extends Sprite
 
         _frame = newFrame;
     }
-
-    private var _frameRate :Float;
 
     private var _layers :Array<LayerSprite>;
     private var _duration :Float;

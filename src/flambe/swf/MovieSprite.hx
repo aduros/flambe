@@ -6,6 +6,7 @@ package flambe.swf;
 
 import flambe.animation.AnimatedFloat;
 import flambe.display.Sprite;
+import flambe.math.FMath;
 import flambe.swf.MovieSymbol;
 
 /**
@@ -17,6 +18,11 @@ class MovieSprite extends Sprite
      * The symbol this sprite displays.
      */
     public var symbol (default, null) :MovieSymbol;
+
+    /**
+     * The current playback position in seconds.
+     */
+    public var position (getPosition, setPosition) :Float;
 
     /**
      * The playback speed multiplier of this movie, defaults to 1.0. Higher values will play faster.
@@ -36,7 +42,7 @@ class MovieSprite extends Sprite
         }
 
         _frame = 0;
-        _elapsed = 0;
+        _position = 0;
         goto(1);
     }
 
@@ -64,12 +70,12 @@ class MovieSprite extends Sprite
 
         speed.update(dt);
 
-        _elapsed += speed._*dt;
-        if (_elapsed > symbol.duration) {
-            _elapsed = _elapsed % symbol.duration;
+        _position += speed._*dt;
+        if (_position > symbol.duration) {
+            _position = _position % symbol.duration;
         }
 
-        var newFrame = _elapsed*symbol.frameRate;
+        var newFrame = _position*symbol.frameRate;
         goto(newFrame);
     }
 
@@ -89,9 +95,19 @@ class MovieSprite extends Sprite
         _frame = newFrame;
     }
 
-    private var _layers :Array<LayerSprite>;
-    private var _elapsed :Float;
+    inline private function getPosition () :Float
+    {
+        return _position;
+    }
 
+    private function setPosition (position :Float) :Float
+    {
+        return _position = FMath.clamp(position, 0, symbol.duration);
+    }
+
+    private var _layers :Array<LayerSprite>;
+
+    private var _position :Float;
     private var _frame :Float;
 }
 

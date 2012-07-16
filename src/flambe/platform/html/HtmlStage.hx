@@ -22,24 +22,20 @@ class HtmlStage
 
     public var resize (default, null) :Signal0;
 
-    public var devicePixelRatio (default, null) :Float;
+    public var scaleFactor (default, null) :Float;
 
     public function new (canvas :Dynamic)
     {
         _canvas = canvas;
         resize = new Signal0();
 
-        devicePixelRatio = (untyped window).devicePixelRatio;
-        if (devicePixelRatio == null) {
-            devicePixelRatio = 1;
-        }
-
         // If the DPI is being scaled by the browser, reverse it so that one canvas pixel equals
         // one screen pixel
-        if (devicePixelRatio != 1) {
-            log.info("Reversing device DPI scaling", ["devicePixelRatio", devicePixelRatio]);
+        scaleFactor = computeScaleFactor(canvas);
+        if (scaleFactor != 1) {
+            log.info("Reversing device DPI scaling", ["scaleFactor", scaleFactor]);
             HtmlUtil.setVendorStyle(_canvas, "transform-origin", "top left");
-            HtmlUtil.setVendorStyle(_canvas, "transform", "scale(" + (1/devicePixelRatio) + ")");
+            HtmlUtil.setVendorStyle(_canvas, "transform", "scale(" + (1/scaleFactor) + ")");
         }
 
 #if !flambe_disable_autoresize
@@ -108,8 +104,8 @@ class HtmlStage
     private function resizeCanvas (width :Float, height :Float) :Bool
     {
         // Take device scaling into account...
-        var scaledWidth = devicePixelRatio*width;
-        var scaledHeight = devicePixelRatio*height;
+        var scaledWidth = scaleFactor*width;
+        var scaledHeight = scaleFactor*height;
 
         if (_canvas.width == scaledWidth && _canvas.height == scaledHeight) {
             return false;
@@ -151,6 +147,26 @@ class HtmlStage
     {
         var value = HtmlUtil.orientation((untyped window).orientation);
         _orientation._ = value;
+    }
+
+    private static function computeScaleFactor (canvas :Dynamic) :Float
+    {
+        // Based on "Delivering Web Content on High Resolution Displays"
+        // https://developer.apple.com/videos/wwdc/2012/?id=602
+
+        var devicePixelRatio = (untyped window).devicePixelRatio;
+        if (devicePixelRatio == null) {
+            devicePixelRatio = 1;
+        }
+
+        // Take into account any behind-the-scenes scaling of the canvas element
+        var ctx = canvas.getContext("2d");
+        var backingStorePixelRatio = HtmlUtil.loadExtension("backingStorePixelRatio", ctx).value;
+        if (backingStorePixelRatio == null) {
+            backingStorePixelRatio = 1;
+        }
+
+        return devicePixelRatio / backingStorePixelRatio;
     }
 
     private var _canvas :Dynamic;

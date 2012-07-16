@@ -299,12 +299,12 @@ class HtmlPlatform
 
     private function getX (event :Dynamic, bounds :Dynamic) :Float
     {
-        return _stage.devicePixelRatio*(event.clientX - bounds.left);
+        return _stage.scaleFactor*(event.clientX - bounds.left);
     }
 
     private function getY (event :Dynamic, bounds :Dynamic) :Float
     {
-        return _stage.devicePixelRatio*(event.clientY - bounds.top);
+        return _stage.scaleFactor*(event.clientY - bounds.top);
     }
 
     private static var _instance :HtmlPlatform;

@@ -17,6 +17,8 @@ import flambe.util.Signal1;
 
 class HtmlAssetPackLoader extends BasicAssetPackLoader
 {
+    private static var log = Log.log; // http://code.google.com/p/haxe/issues/detail?id=365
+
     public function new (manifest :Manifest)
     {
         super(manifest);
@@ -64,7 +66,13 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                     WebAudioSound.ctx.decodeAudioData(req.response, function (buffer) {
                         handleLoad(entry, new WebAudioSound(buffer));
                     }, function () {
-                        handleError("Failed to decode audio " + entry.url);
+                        // Happens in iOS 6 beta for some sounds that should be able to play. It
+                        // seems that monochannel audio will always fail, try converting to stereo.
+                        // Since this happens unpredictably, continue with a DummySound rather than
+                        // rejecting the entire asset pack.
+                        log.warn("Couldn't decode Web Audio, ignoring this asset." +
+                            " Is this a buggy browser?", ["url", entry.url]);
+                        handleLoad(entry, DummySound.getInstance());
                     });
                 };
                 req.onerror = function () {

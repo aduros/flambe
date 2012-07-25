@@ -15,7 +15,7 @@ using Lambda;
 class Parallel
     implements Action
 {
-    public function new (?actions :Array<Dynamic>)
+    public function new (?actions :Array<Action>)
     {
         _completedActions = [];
         _runningActions = (actions != null) ? cast actions.copy() : [];

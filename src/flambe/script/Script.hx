@@ -4,7 +4,7 @@
 
 package flambe.script;
 
-using Lambda;
+import flambe.util.Disposable;
 
 /**
  * Manages a set of actions that are updated over time. Scripts simplify writing composable
@@ -19,23 +19,13 @@ class Script extends Component
 
     /**
      * Add an action to this Script.
+     * @returns A handle that can be disposed to stop the action.
      */
-    public function run (action :Action)
+    public function run (action :Action) :Disposable
     {
-        _actions.push(action);
-    }
-
-    /**
-     * Remove an action from this Script.
-     */
-    public function stop (action :Action) :Bool
-    {
-        var idx = _actions.indexOf(action);
-        if (idx < 0) {
-            return false;
-        }
-        _actions[idx] = null;
-        return true;
+        var handle = new Handle(action);
+        _handles.push(handle);
+        return handle;
     }
 
     /**
@@ -43,22 +33,40 @@ class Script extends Component
      */
     public function stopAll ()
     {
-        _actions = [];
+        _handles = [];
     }
 
     override public function onUpdate (dt :Float)
     {
         var ii = 0;
-        while (ii < _actions.length) {
-            var action = _actions[ii];
-            // Action can be null if stop() was called during iteration
-            if (action == null || action.update(dt, owner)) {
-                _actions.splice(ii, 1);
+        while (ii < _handles.length) {
+            var handle = _handles[ii];
+            if (handle.removed || handle.action.update(dt, owner)) {
+                _handles.splice(ii, 1);
             } else {
                 ++ii;
             }
         }
     }
 
-    private var _actions :Array<Action>;
+    private var _handles :Array<Handle>;
+}
+
+private class Handle
+    implements Disposable
+{
+    public var removed (default, null) :Bool;
+    public var action :Action;
+
+    public function new (action :Action)
+    {
+        removed = false;
+        this.action = action;
+    }
+
+    public function dispose ()
+    {
+        removed = true;
+        action = null;
+    }
 }

@@ -38,7 +38,7 @@ class HtmlPlatform
     public var mainLoop (default, null) :MainLoop;
     public var renderer :Renderer;
 
-    public static var instance /*(default, null)*/ = new HtmlPlatform();
+    public static var instance (default, null) :HtmlPlatform = new HtmlPlatform();
 
     private function new ()
     {

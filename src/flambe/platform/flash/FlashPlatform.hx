@@ -43,7 +43,7 @@ class FlashPlatform
     public var mainLoop (default, null) :MainLoop;
     public var renderer :Renderer;
 
-    public static var instance /*(default, null)*/ = new FlashPlatform();
+    public static var instance (default, null) :FlashPlatform = new FlashPlatform();
 
     private function new ()
     {

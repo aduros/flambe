@@ -25,7 +25,7 @@ class System
     /**
      * The entity at the root of the hierarchy.
      */
-    public static var root /*(default, null)*/ = new Entity();
+    public static var root (default, null) :Entity = new Entity();
 
     /**
      * The Stage subsystem, for controlling the display viewport.
@@ -60,13 +60,13 @@ class System
      * Emitted when an uncaught exception occurs, if the platform supports it. You can wire this up
      * to your telemetry reporting service of choice.
      */
-    public static var uncaughtError /*(default, null)*/ = new Signal1<String>();
+    public static var uncaughtError (default, null) :Signal1<String> = new Signal1<String>();
 
     /**
      * True when the app is not currently visible, such as when minimized or placed in a background
      * browser tab. While hidden, frame updates may be paused or throttled.
      */
-    public static var hidden /*(default, null)*/ = new Value<Bool>(false);
+    public static var hidden (default, null) :Value<Bool> = new Value<Bool>(false);
 
     /**
      * Starts up Flambe, this should usually be the first thing a game does.

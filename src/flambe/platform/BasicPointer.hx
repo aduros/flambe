@@ -25,7 +25,7 @@ class BasicPointer
     public var x (getX, null) :Float;
     public var y (getY, null) :Float;
 
-    public function new (x :Int = 0, y :Int = 0, isDown :Bool = false)
+    public function new (x :Float = 0, y :Float = 0, isDown :Bool = false)
     {
         down = new Signal1();
         move = new Signal1();
@@ -59,15 +59,12 @@ class BasicPointer
     /**
      * Called by the platform to handle a down event.
      */
-    public function submitDown (viewX :Float, viewY :Float)
+    public function submitDown (viewX :Float, viewY :Float, source :EventSource)
     {
         if (_isDown) {
             return; // Ignore repeat down events
         }
-
         _isDown = true;
-        _x = viewX;
-        _y = viewY;
 
         // Take a snapshot of the entire event bubbling chain
         var chain = [];
@@ -88,7 +85,7 @@ class BasicPointer
         }
 
         // Finally, emit the event up the chain
-        _sharedEvent._internal_init(++_id, viewX, viewY);
+        prepare(viewX, viewY, source);
         for (signal in chain) {
             signal.emit(_sharedEvent);
         }
@@ -97,11 +94,8 @@ class BasicPointer
     /**
      * Called by the platform to handle a move event.
      */
-    public function submitMove (viewX :Float, viewY :Float)
+    public function submitMove (viewX :Float, viewY :Float, source :EventSource)
     {
-        _x = viewX;
-        _y = viewY;
-
         // Take a snapshot of the entire event bubbling chain
         var chain = [];
         var entity = getEntityUnderPoint(viewX, viewY);
@@ -121,7 +115,7 @@ class BasicPointer
         }
 
         // Finally, emit the event up the chain
-        _sharedEvent._internal_init(++_id, viewX, viewY);
+        prepare(viewX, viewY, source);
         for (signal in chain) {
             signal.emit(_sharedEvent);
         }
@@ -130,13 +124,13 @@ class BasicPointer
     /**
      * Called by the platform to handle an up event.
      */
-    public function submitUp (viewX :Float, viewY :Float)
+    public function submitUp (viewX :Float, viewY :Float, source :EventSource)
     {
         if (!_isDown) {
             return; // Ignore repeat up events
         }
-
         _isDown = false;
+
         _x = viewX;
         _y = viewY;
 
@@ -159,10 +153,17 @@ class BasicPointer
         }
 
         // Finally, emit the event up the chain
-        _sharedEvent._internal_init(++_id, viewX, viewY);
+        prepare(viewX, viewY, source);
         for (signal in chain) {
             signal.emit(_sharedEvent);
         }
+    }
+
+    private function prepare (viewX :Float, viewY :Float, source :EventSource)
+    {
+        _x = viewX;
+        _y = viewY;
+        _sharedEvent._internal_init(++_id, viewX, viewY, source);
     }
 
     /**

@@ -20,6 +20,7 @@ import flambe.asset.Manifest;
 import flambe.display.Stage;
 import flambe.Entity;
 import flambe.input.Keyboard;
+import flambe.input.Mouse;
 import flambe.input.Pointer;
 import flambe.platform.Platform;
 import flambe.platform.BasicKeyboard;
@@ -37,6 +38,7 @@ class FlashPlatform
     public var stage (getStage, null) :Stage;
     public var storage (getStorage, null) :Storage;
     public var pointer (getPointer, null) :Pointer;
+    public var mouse (getMouse, null) :Mouse;
     public var keyboard (getKeyboard, null) :Keyboard;
     public var locale (getLocale, null) :String;
 
@@ -58,6 +60,7 @@ class FlashPlatform
 
         _stage = new FlashStage(stage);
         _pointer = new BasicPointer();
+        _mouse = new FlashMouse(_pointer);
         _keyboard = new BasicKeyboard();
 
 #if flash11
@@ -71,9 +74,19 @@ class FlashPlatform
 
         stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
         stage.addEventListener(Event.RENDER, onRender);
+
         stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
         stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
         stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+#if flash11_2
+        stage.addEventListener(MouseEvent.MIDDLE_MOUSE_DOWN, onMouseDown);
+        stage.addEventListener(MouseEvent.MIDDLE_MOUSE_UP, onMouseUp);
+        stage.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onMouseDown);
+        stage.addEventListener(MouseEvent.RIGHT_MOUSE_UP, onMouseUp);
+
+        // stage.addEventListener(MouseEvent.RIGHT_CLICK, function (_) {});
+#end
+
         stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
         stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
 
@@ -119,6 +132,11 @@ class FlashPlatform
         return _pointer;
     }
 
+    public function getMouse () :Mouse
+    {
+        return _mouse;
+    }
+
     public function getKeyboard () :Keyboard
     {
         return _keyboard;
@@ -149,17 +167,29 @@ class FlashPlatform
 
     private function onMouseDown (event :MouseEvent)
     {
-        _pointer.submitDown(event.stageX, event.stageY);
+        var buttonCode;
+        switch (event.type) {
+            case "middleMouseDown": buttonCode = MouseCodes.MIDDLE;
+            case "rightMouseDown": buttonCode = MouseCodes.RIGHT;
+            default: buttonCode = MouseCodes.LEFT;
+        }
+        _mouse.submitDown(event.stageX, event.stageY, buttonCode);
     }
 
     private function onMouseMove (event :MouseEvent)
     {
-        _pointer.submitMove(event.stageX, event.stageY);
+        _mouse.submitMove(event.stageX, event.stageY);
     }
 
     private function onMouseUp (event :MouseEvent)
     {
-        _pointer.submitUp(event.stageX, event.stageY);
+        var buttonCode;
+        switch (event.type) {
+            case "middleMouseUp": buttonCode = MouseCodes.MIDDLE;
+            case "rightMouseUp": buttonCode = MouseCodes.RIGHT;
+            default: buttonCode = MouseCodes.LEFT;
+        }
+        _mouse.submitUp(event.stageX, event.stageY, buttonCode);
     }
 
     private function onKeyDown (event :KeyboardEvent)
@@ -203,6 +233,7 @@ class FlashPlatform
 
     private var _stage :Stage;
     private var _pointer :BasicPointer;
+    private var _mouse :FlashMouse;
     private var _keyboard :BasicKeyboard;
     private var _storage :Storage;
 

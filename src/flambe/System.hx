@@ -8,6 +8,7 @@ import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
 import flambe.display.Stage;
 import flambe.input.Keyboard;
+import flambe.input.Mouse;
 import flambe.input.Pointer;
 import flambe.platform.Platform;
 import flambe.storage.Storage;
@@ -41,6 +42,11 @@ class System
      * The Pointer subsystem, for mouse/touch events.
      */
     public static var pointer (getPointer, null) :Pointer;
+
+    /**
+     * The Mouse subsystem, for direct access to the mouse.
+     */
+    public static var mouse (getMouse, null) :Mouse;
 
     /**
      * The Keyboard subsystem, for keyboard events.
@@ -126,6 +132,12 @@ class System
     {
         #if debug assertCalledInit(); #end
         return _platform.pointer;
+    }
+
+    inline private static function getMouse () :Mouse
+    {
+        #if debug assertCalledInit(); #end
+        return _platform.mouse;
     }
 
     inline private static function getKeyboard () :Keyboard

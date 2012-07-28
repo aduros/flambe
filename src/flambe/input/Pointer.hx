@@ -30,7 +30,7 @@ interface Pointer
 
     /**
      * Emitted when the pointing device is released (when the mouse button is released or the finger
-     * is lifted is lifted from the screen).
+     * is lifted from the screen).
      */
     var up (default, null) :Signal1<PointerEvent>;
 
@@ -40,7 +40,7 @@ interface Pointer
     var x (getX, null) :Float;
 
     /**
-     * The last recorded Y coordinate of the pointer;
+     * The last recorded Y coordinate of the pointer.
      */
     var y (getY, null) :Float;
 

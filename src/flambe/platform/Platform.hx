@@ -10,6 +10,7 @@ import flambe.display.Stage;
 import flambe.display.Texture;
 import flambe.Entity;
 import flambe.input.Keyboard;
+import flambe.input.Mouse;
 import flambe.input.Pointer;
 import flambe.storage.Storage;
 import flambe.util.Logger;
@@ -22,6 +23,8 @@ interface Platform
     var storage (getStorage, null) :Storage;
 
     var pointer (getPointer, null) :Pointer;
+
+    var mouse (getMouse, null) :Mouse;
 
     var keyboard (getKeyboard, null) :Keyboard;
 

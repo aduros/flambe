@@ -12,6 +12,7 @@ import flambe.display.Stage;
 import flambe.display.Texture;
 import flambe.Entity;
 import flambe.input.Keyboard;
+import flambe.input.Mouse;
 import flambe.input.Pointer;
 import flambe.platform.Platform;
 import flambe.platform.BasicKeyboard;
@@ -32,6 +33,7 @@ class HtmlPlatform
     public var stage (getStage, null) :Stage;
     public var storage (getStorage, null) :Storage;
     public var pointer (getPointer, null) :Pointer;
+    public var mouse (getMouse, null) :Mouse;
     public var keyboard (getKeyboard, null) :Keyboard;
     public var locale (getLocale, null) :String;
 
@@ -74,6 +76,7 @@ class HtmlPlatform
 
         _stage = new HtmlStage(canvas);
         _pointer = new BasicPointer();
+        _mouse = new HtmlMouse(_pointer, canvas);
         _keyboard = new BasicKeyboard();
 
         renderer = new CanvasRenderer(canvas);
@@ -91,15 +94,15 @@ class HtmlPlatform
             case "mousedown":
                 if (event.target == canvas) {
                     event.preventDefault();
-                    _pointer.submitDown(x, y);
+                    _mouse.submitDown(x, y, event.button);
                     event.target.focus();
                 }
 
             case "mousemove":
-                _pointer.submitMove(x, y);
+                _mouse.submitMove(x, y);
 
             case "mouseup":
-                _pointer.submitUp(x, y);
+                _mouse.submitUp(x, y, event.button);
             }
         };
         // Add listeners on the window object so dragging and releasing outside of the canvas works
@@ -138,15 +141,15 @@ class HtmlPlatform
                         HtmlUtil.hideMobileBrowser();
                     }
                     pointerTouchId = pointerTouch.identifier;
-                    _pointer.submitDown(x, y);
+                    _pointer.submitDown(x, y, Touch);
 
                 case "touchmove":
                     event.preventDefault();
-                    _pointer.submitMove(x, y);
+                    _pointer.submitMove(x, y, Touch);
 
                 case "touchend", "touchcancel":
                     pointerTouchId = -1;
-                    _pointer.submitUp(x, y);
+                    _pointer.submitUp(x, y, Touch);
                 }
             }
         };
@@ -292,6 +295,11 @@ class HtmlPlatform
         return _pointer;
     }
 
+    public function getMouse () :Mouse
+    {
+        return _mouse;
+    }
+
     public function getKeyboard () :Keyboard
     {
         return _keyboard;
@@ -311,6 +319,7 @@ class HtmlPlatform
 
     private var _stage :HtmlStage;
     private var _pointer :BasicPointer;
+    private var _mouse :HtmlMouse;
     private var _keyboard :BasicKeyboard;
     private var _storage :Storage;
 

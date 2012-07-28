@@ -32,6 +32,13 @@ interface Mouse
     var up (default, null) :Signal1<MouseEvent>;
 
     /**
+     * A velocity emitted when the mouse wheel or trackpad is scrolled. A positive value is an
+     * upward scroll, negative is a downward scroll. Typically, each scroll wheel "click" equates to
+     * 1 velocity.
+     */
+    var scroll (default, null) :Signal1<Float>;
+
+    /**
      * The last recorded X coordinate of the mouse.
      */
     var x (getX, null) :Float;

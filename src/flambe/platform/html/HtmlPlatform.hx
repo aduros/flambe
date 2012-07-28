@@ -103,12 +103,23 @@ class HtmlPlatform
 
             case "mouseup":
                 _mouse.submitUp(x, y, event.button);
+
+            case "mousewheel", "DOMMouseScroll":
+                var velocity = (event.type == "mousewheel") ? event.wheelDelta/40 : -event.detail;
+                if (_mouse.submitScroll(x, y, velocity)) {
+                    // Only prevent page scrolling if the event was handled
+                    event.preventDefault();
+                }
             }
         };
         // Add listeners on the window object so dragging and releasing outside of the canvas works
         (untyped window).addEventListener("mousedown", onMouse, false);
         (untyped window).addEventListener("mousemove", onMouse, false);
         (untyped window).addEventListener("mouseup", onMouse, false);
+
+        // But the wheel listener should only go on the canvas
+        canvas.addEventListener("mousewheel", onMouse, false);
+        canvas.addEventListener("DOMMouseScroll", onMouse, false); // https://bugzil.la/719320
 
         var pointerTouchId = -1;
         var onTouch = function (event) {

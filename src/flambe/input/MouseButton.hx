@@ -12,8 +12,6 @@ enum MouseButton
 {
     Left; Middle; Right;
 
-    // WheelUp; WheelDown;
-
     /**
      * Used if the environment sends an unknown button.
      */

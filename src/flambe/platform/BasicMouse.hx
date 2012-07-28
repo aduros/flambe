@@ -21,6 +21,7 @@ class BasicMouse
     public var down (default, null) :Signal1<MouseEvent>;
     public var move (default, null) :Signal1<MouseEvent>;
     public var up (default, null) :Signal1<MouseEvent>;
+    public var scroll (default, null) :Signal1<Float>;
 
     public var x (getX, null) :Float;
     public var y (getY, null) :Float;
@@ -34,6 +35,7 @@ class BasicMouse
         down = new Signal1();
         move = new Signal1();
         up = new Signal1();
+        scroll = new Signal1();
         _id = 0;
         _x = 0;
         _y = 0;
@@ -100,6 +102,18 @@ class BasicMouse
             _pointer.submitUp(viewX, viewY, _source);
             up.emit(_sharedEvent);
         }
+    }
+
+    // Returns true if the scroll signal was handled
+    public function submitScroll (viewX :Float, viewY :Float, velocity :Float) :Bool
+    {
+        _x = viewX;
+        _y = viewY;
+        if (!scroll.hasListeners()) {
+            return false;
+        }
+        scroll.emit(velocity);
+        return true;
     }
 
     inline private function isCodeDown (buttonCode :Int) :Bool

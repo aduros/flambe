@@ -78,6 +78,7 @@ class FlashPlatform
         stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
         stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
         stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+        stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);
 #if flash11_2
         stage.addEventListener(MouseEvent.MIDDLE_MOUSE_DOWN, onMouseDown);
         stage.addEventListener(MouseEvent.MIDDLE_MOUSE_UP, onMouseUp);
@@ -190,6 +191,12 @@ class FlashPlatform
             default: buttonCode = MouseCodes.LEFT;
         }
         _mouse.submitUp(event.stageX, event.stageY, buttonCode);
+    }
+
+    private function onMouseWheel (event :MouseEvent)
+    {
+        // Flash only fires mouse wheel events on Windows, see issue #32
+        _mouse.submitScroll(event.stageX, event.stageY, event.delta);
     }
 
     private function onKeyDown (event :KeyboardEvent)

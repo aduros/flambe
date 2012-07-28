@@ -48,7 +48,7 @@ class PointerEvent
     public function clone () :PointerEvent
     {
         // Ensure the source gets deep copied too
-        var sourceCopy;
+        var sourceCopy = null;
         switch (sourceCopy) {
             case Mouse(event): sourceCopy = Mouse(event.clone());
             case Touch: sourceCopy = Touch;

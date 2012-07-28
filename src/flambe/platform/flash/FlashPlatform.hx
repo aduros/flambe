@@ -84,8 +84,6 @@ class FlashPlatform
         stage.addEventListener(MouseEvent.MIDDLE_MOUSE_UP, onMouseUp);
         stage.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onMouseDown);
         stage.addEventListener(MouseEvent.RIGHT_MOUSE_UP, onMouseUp);
-
-        // stage.addEventListener(MouseEvent.RIGHT_CLICK, function (_) {});
 #end
 
         stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);

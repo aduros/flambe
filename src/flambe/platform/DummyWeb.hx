@@ -27,4 +27,9 @@ class DummyWeb
         Assert.fail("Web.createView is unsupported in this environment, check the `supported` flag.");
         return null;
     }
+
+    public function openBrowser (url :String)
+    {
+        // Nothing
+    }
 }

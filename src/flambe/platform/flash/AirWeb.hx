@@ -16,13 +16,11 @@ import flambe.util.Value;
 import flambe.web.Web;
 import flambe.web.WebView;
 
-class AirWeb
-    implements Web
+class AirWeb extends FlashWeb
 {
-    public var supported (isSupported, null) :Bool;
-
     public function new (stage :Stage)
     {
+        super();
         _stage = stage;
     }
 
@@ -31,12 +29,12 @@ class AirWeb
         return StageWebView.isSupported;
     }
 
-    public function isSupported () :Bool
+    override public function isSupported () :Bool
     {
         return true;
     }
 
-    public function createView (x :Float, y :Float, width :Float, height :Float) :WebView
+    override public function createView (x :Float, y :Float, width :Float, height :Float) :WebView
     {
         var nativeView = new StageWebView();
         nativeView.stage = _stage;

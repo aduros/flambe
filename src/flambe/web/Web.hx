@@ -21,5 +21,10 @@ interface Web
      */
     function createView (x :Float, y :Float, width :Float, height :Float) :WebView;
 
-    // function openBrowser (url :String);
+    /**
+     * Open a new browser window or tab to the given URL. This operation is always supported. URI
+     * schemes such as mailto: are also available. On mobile, sms: and tel: are supported. On
+     * Android, market: is supported.
+     */
+    function openBrowser (url :String) :Void;
 }

@@ -40,6 +40,11 @@ class HtmlWeb
         return view;
     }
 
+    public function openBrowser (url :String)
+    {
+        Lib.window.open(url, "_blank");
+    }
+
     private var _container :Dynamic;
 }
 

@@ -147,9 +147,14 @@ class FlashPlatform
     {
         if (_web == null) {
 #if flambe_air
-            _web = AirWeb.shouldUse() ? new AirWeb(_stage.nativeStage) : new DummyWeb();
+            if (AirWeb.shouldUse()) {
+                _web = new AirWeb(_stage.nativeStage);
+            } else {
+                log.warn("StageWebView is unavailable");
+                _web = new FlashWeb();
+            }
 #else
-            _web = new DummyWeb();
+            _web = new FlashWeb();
 #end
         }
         return _web;

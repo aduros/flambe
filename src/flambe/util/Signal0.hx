@@ -38,16 +38,6 @@ class Signal0
     }
 
     /**
-     * Removes all listeners connected to this signal.
-     */
-    public function disconnectAll ()
-    {
-        if (_impl != null) {
-            _impl.disconnectAll();
-        }
-    }
-
-    /**
      * Emit the signal, notifying each connected listener.
      */
     public function emit ()

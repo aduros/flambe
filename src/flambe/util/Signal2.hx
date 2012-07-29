@@ -38,16 +38,6 @@ class Signal2<A,B>
     }
 
     /**
-     * Removes all listeners connected to this signal.
-     */
-    public function disconnectAll ()
-    {
-        if (_impl != null) {
-            _impl.disconnectAll();
-        }
-    }
-
-    /**
      * Emit the signal, notifying each connected listener.
      */
     public function emit (arg1 :A, arg2 :B)

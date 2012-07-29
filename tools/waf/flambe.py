@@ -18,14 +18,13 @@ def options(ctx):
 def configure(ctx):
     ctx.load("haxe")
     ctx.load("closure")
-    ctx.find_program("npm", var="NPM", mandatory=False)
     ctx.find_program("adt", var="ADT", mandatory=False)
-    ctx.find_program("adb", var="ADB", mandatory=False)
+    ctx.find_program("npm", var="NPM", mandatory=False)
 
     ctx.env.debug = ctx.options.debug or ctx.options.flashdevelop == "debug"
     ctx.env.has_flash = (not ctx.options.no_flash)
     ctx.env.has_html = (not ctx.options.no_html)
-    ctx.env.has_android = (not ctx.options.no_android) and bool(ctx.env.ADT and ctx.env.ADB)
+    ctx.env.has_android = (not ctx.options.no_android) and bool(ctx.env.ADT)
 
     import platform
     system = platform.system()
@@ -143,30 +142,25 @@ def apply_flambe(ctx):
         air_apps = []
 
         if build_android:
-            adb = ctx.env.ADB
-            if not adb:
-                ctx.bld.fatal("adb from the Android SDK is required, " + \
-                    "ensure it's in your $PATH and re-run waf configure.")
-
-            # Derive the location of the Android SDK from adb's path
-            android_root = adb[0:adb.rindex("platform-tools")-1]
-
             apk_type = "apk-debug" if debug else "apk-captive-runtime"
             rule = ("%s -package -target %s " +
                 "-storetype pkcs12 -keystore %s -storepass %s " +
-                "\"${TGT}\" %s " +
-                "-platformsdk %s ") % (
+                "\"${TGT}\" %s ") % (
                     quote(adt), apk_type, quote(air_cert.abspath()), quote(air_password),
-                    quote(air_desc.abspath()), quote(android_root))
+                    quote(air_desc.abspath()))
 
             if ctx.bld.cmd == "install":
-                # Install the APK if there's a device plugged in
+                # Install and run the APK
+                app_id = infer_app_id(ctx, air_desc)
                 def install_apk(ctx):
-                    state = ctx.cmd_and_log("%s get-state" % quote(adb), quiet=Context.STDOUT)
-                    if state == "device\n":
-                        ctx.to_log("Installing APK to device...\n")
-                        ctx.exec_command("%s install -rs %s" %
-                            (quote(adb), quote(install_prefix + "packages/" + build_prefix + "android.apk")))
+                    ctx.to_log("Installing APK to device...\n")
+                    ctx.exec_command("%s -uninstallApp -platform android -appid %s" % (
+                        (quote(adt), quote(app_id))))
+                    ctx.exec_command("%s -installApp -platform android -package %s" % (
+                        (quote(adt), quote( \
+                            install_prefix + "packages/" + build_prefix + "android.apk"))))
+                    ctx.exec_command("%s -launchApp -platform android -appid %s" % (
+                        (quote(adt), quote(app_id))))
                 ctx.bld.add_post_fun(install_apk)
 
             air_apps.append((build_prefix + "android.apk", rule))
@@ -178,7 +172,7 @@ def apply_flambe(ctx):
 
             # TODO(bruno): Add -connect [host] for debug builds, if fdb is present
             # TODO(bruno): Handle final app store packaging
-            # TODO(bruno): Is there a way to install an IPA from the command line? (sans jailbreak)
+            # TODO(bruno): Install and launch the IPA (AIR 3.4 required for that)
             ipa_type = "ipa-debug" if debug else "ipa-ad-hoc"
             rule = ("%s -package -target %s -provisioning-profile %s " +
                 "-storetype pkcs12 -keystore %s -storepass %s " +
@@ -351,3 +345,12 @@ def infer_main(ctx):
                 main = node.getAttribute("mainClass")
                 if main:
                     return main
+
+def infer_app_id(ctx, air_desc):
+    from xml.dom.minidom import parse
+    try:
+        xml = parse(air_desc.abspath())
+        id = xml.getElementsByTagName("id")[0]
+        return id.childNodes[0].nodeValue
+    except Exception as e:
+        ctx.bld.fatal("Could not parse %s: %s" % (air_desc.nice_path(), e))

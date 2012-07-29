@@ -23,13 +23,15 @@ class Disposer extends Component
     /**
      * Add a Disposable, so that it also gets disposed when this component does.
      */
-    public function add (disposable :Disposable)
+    public function add (disposable :Disposable) :Disposer
     {
         _disposables.push(disposable);
+        return this;
     }
 
     /**
      * Remove a Disposable from this disposer.
+     * @return True if the disposable was removed.
      */
     public function remove (disposable :Disposable) :Bool
     {
@@ -40,27 +42,30 @@ class Disposer extends Component
      * Convenience method for connecting a signal listener and adding its SignalConnection to this
      * disposer.
      */
-    public function connect0 (signal :Signal0, listener :Listener0)
+    public function connect0 (signal :Signal0, listener :Listener0) :Disposer
     {
         add(signal.connect(listener));
+        return this;
     }
 
     /**
      * Convenience method for connecting a signal listener and adding its SignalConnection to this
      * disposer.
      */
-    public function connect1<A> (signal :Signal1<A>, listener :Listener1<A>)
+    public function connect1<A> (signal :Signal1<A>, listener :Listener1<A>) :Disposer
     {
         add(signal.connect(listener));
+        return this;
     }
 
     /**
      * Convenience method for connecting a signal listener and adding its SignalConnection to this
      * disposer.
      */
-    public function connect2<A,B> (signal :Signal2<A,B>, listener :Listener2<A,B>)
+    public function connect2<A,B> (signal :Signal2<A,B>, listener :Listener2<A,B>) :Disposer
     {
         add(signal.connect(listener));
+        return this;
     }
 
     override public function onDispose ()

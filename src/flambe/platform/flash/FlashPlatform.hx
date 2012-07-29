@@ -29,6 +29,7 @@ import flambe.platform.MainLoop;
 import flambe.storage.Storage;
 import flambe.util.Logger;
 import flambe.util.Promise;
+import flambe.web.Web;
 
 class FlashPlatform
     implements Platform
@@ -40,6 +41,7 @@ class FlashPlatform
     public var pointer (getPointer, null) :Pointer;
     public var mouse (getMouse, null) :Mouse;
     public var keyboard (getKeyboard, null) :Keyboard;
+    public var web (getWeb, null) :Web;
     public var locale (getLocale, null) :String;
 
     public var mainLoop (default, null) :MainLoop;
@@ -141,6 +143,18 @@ class FlashPlatform
         return _keyboard;
     }
 
+    public function getWeb () :Web
+    {
+        if (_web == null) {
+#if flambe_air
+            _web = AirWeb.shouldUse() ? new AirWeb(_stage.nativeStage) : new DummyWeb();
+#else
+            _web = new DummyWeb();
+#end
+        }
+        return _web;
+    }
+
     public function getLocale () :String
     {
         return Capabilities.language;
@@ -234,13 +248,12 @@ class FlashPlatform
     }
 #end
 
-    private static var _instance :FlashPlatform;
-
-    private var _stage :Stage;
+    private var _stage :FlashStage;
     private var _pointer :BasicPointer;
     private var _mouse :FlashMouse;
     private var _keyboard :BasicKeyboard;
     private var _storage :Storage;
+    private var _web :Web;
 
     private var _lastUpdate :Int;
 }

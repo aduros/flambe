@@ -24,6 +24,7 @@ import flambe.util.Assert;
 import flambe.util.Logger;
 import flambe.util.Promise;
 import flambe.util.Signal1;
+import flambe.web.Web;
 
 class HtmlPlatform
     implements Platform
@@ -35,6 +36,7 @@ class HtmlPlatform
     public var pointer (getPointer, null) :Pointer;
     public var mouse (getMouse, null) :Mouse;
     public var keyboard (getKeyboard, null) :Keyboard;
+    public var web (getWeb, null) :Web;
     public var locale (getLocale, null) :String;
 
     public var mainLoop (default, null) :MainLoop;
@@ -82,8 +84,9 @@ class HtmlPlatform
         renderer = new CanvasRenderer(canvas);
         mainLoop = new MainLoop();
 
-        var container = canvas.parentNode;
-        container.style.overflow = "hidden";
+        _container = canvas.parentNode;
+        _container.style.overflow = "hidden";
+        _container.style.position = "relative";
 
         var onMouse = function (event) {
             var bounds = canvas.getBoundingClientRect();
@@ -316,6 +319,14 @@ class HtmlPlatform
         return _keyboard;
     }
 
+    public function getWeb () :Web
+    {
+        if (_web == null) {
+            _web = new HtmlWeb(_container);
+        }
+        return _web;
+    }
+
     private function getX (event :Dynamic, bounds :Dynamic) :Float
     {
         return _stage.scaleFactor*(event.clientX - bounds.left);
@@ -326,13 +337,14 @@ class HtmlPlatform
         return _stage.scaleFactor*(event.clientY - bounds.top);
     }
 
-    private static var _instance :HtmlPlatform;
-
     private var _stage :HtmlStage;
     private var _pointer :BasicPointer;
     private var _mouse :HtmlMouse;
     private var _keyboard :BasicKeyboard;
     private var _storage :Storage;
+    private var _web :Web;
+
+    private var _container :Dynamic;
 
     private var _lastUpdate :Float;
 }

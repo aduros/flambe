@@ -10,5 +10,9 @@ package flambe.platform;
  */
 interface Tickable
 {
+    /**
+     * @param dt The elapsed delta-time in seconds.
+     * @return True if this Tickable should no longer be updated.
+     */
     function update (dt :Float) :Bool;
 }

@@ -23,33 +23,35 @@ class FlashStage
 
     public var resize (default, null) :Signal0;
 
+    public var nativeStage (default, null) :flash.display.Stage;
+
     public function new (nativeStage :flash.display.Stage)
     {
-        _nativeStage = nativeStage;
+        this.nativeStage = nativeStage;
         resize = new Signal0();
 
         // TODO(bruno): Support orientation in AIR
         _orientation = new Value<Orientation>(null);
 
-        _nativeStage.scaleMode = NO_SCALE;
-        _nativeStage.frameRate = 60;
-        _nativeStage.showDefaultContextMenu = false;
-        _nativeStage.addEventListener(Event.RESIZE, onResize);
+        nativeStage.scaleMode = NO_SCALE;
+        nativeStage.frameRate = 60;
+        nativeStage.showDefaultContextMenu = false;
+        nativeStage.addEventListener(Event.RESIZE, onResize);
 
         // If we're running in a mobile browser, go full screen on a pointer event
         if (Capabilities.playerType == "PlugIn" && FlashUtil.isMobile()) {
-            _nativeStage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
+            nativeStage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
         }
     }
 
     public function getWidth () :Int
     {
-        return _nativeStage.stageWidth;
+        return nativeStage.stageWidth;
     }
 
     public function getHeight () :Int
     {
-        return _nativeStage.stageHeight;
+        return nativeStage.stageHeight;
     }
 
     public function getOrientation () :Value<Orientation>
@@ -72,7 +74,7 @@ class FlashStage
             if (_orientHack == null) {
                 _orientHack = new Video(0, 0);
                 _orientHack.visible = false;
-                _nativeStage.addChild(_orientHack);
+                nativeStage.addChild(_orientHack);
             }
         }
     }
@@ -92,7 +94,7 @@ class FlashStage
 
     private function onMouseDown (_)
     {
-        _nativeStage.displayState = FULL_SCREEN;
+        nativeStage.displayState = FULL_SCREEN;
     }
 
     private function onResize (_)
@@ -100,7 +102,6 @@ class FlashStage
         resize.emit();
     }
 
-    private var _nativeStage :flash.display.Stage;
     private var _orientHack :Video;
 
     private var _orientation :Value<Orientation>;

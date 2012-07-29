@@ -6,6 +6,7 @@
   </description>
 
   <depends name="format"/>
+  <depends name="air3"/>
 
   <version name="{{VERSION}}">See https://github.com/aduros/flambe/wiki/Changes</version>
 

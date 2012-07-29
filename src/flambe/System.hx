@@ -17,6 +17,7 @@ import flambe.util.Logger;
 import flambe.util.Promise;
 import flambe.util.Signal1;
 import flambe.util.Value;
+import flambe.web.Web;
 
 /**
  * Provides access to all the different subsystems implemented on each platform.
@@ -54,13 +55,18 @@ class System
     public static var keyboard (getKeyboard, null) :Keyboard;
 
     /**
+     * The Web subsystem, for using the device's web browser.
+     */
+    public static var web (getWeb, null) :Web;
+
+    // TODO(bruno): Subsystems for touch, accelerometer, gamepads, haptic, geolocation, video,
+    // textInput
+
+    /**
      * Gets the RFC 4646 language tag of the environment. For example, "en-US", "pt", or null if the
      * locale is unknown.
      */
     public static var locale (getLocale, null) :String;
-
-    // TODO(bruno): mouse, touch, accelerometer, gamepads, haptic, geolocation, video, web,
-    // textInput
 
     /**
      * Emitted when an uncaught exception occurs, if the platform supports it. You can wire this up
@@ -144,6 +150,12 @@ class System
     {
         #if debug assertCalledInit(); #end
         return _platform.keyboard;
+    }
+
+    inline private static function getWeb () :Web
+    {
+        #if debug assertCalledInit(); #end
+        return _platform.web;
     }
 
     inline private static function getLocale () :String

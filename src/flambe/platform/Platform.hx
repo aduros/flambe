@@ -15,6 +15,7 @@ import flambe.input.Pointer;
 import flambe.storage.Storage;
 import flambe.util.Logger;
 import flambe.util.Promise;
+import flambe.web.Web;
 
 interface Platform
 {
@@ -27,6 +28,8 @@ interface Platform
     var mouse (getMouse, null) :Mouse;
 
     var keyboard (getKeyboard, null) :Keyboard;
+
+    var web (getWeb, null) :Web;
 
     var locale (getLocale, null) :String;
 

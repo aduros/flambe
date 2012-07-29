@@ -31,12 +31,6 @@ class ReactiveTest extends TestCase
         signal.emit(1);
         assertEquals(count, 1);
 
-        var connection = signal.connect(function (n) fired = n);
-        signal.disconnectAll();
-        fired = 0;
-        signal.emit(1);
-        assertEquals(fired, 0);
-
         signal = new Signal1();
         signal.connect(function (n) {
             signal.connect(function (n) fired = n);

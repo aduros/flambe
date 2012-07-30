@@ -13,6 +13,7 @@ VERSION=$1
 ARCHIVE=/tmp/haxelib.zip
 
 FLAMBE_ROOT=`readlink -f $(dirname $0)/..`
+DEMOS_ROOT="$FLAMBE_ROOT/../flambe-demos"
 cd $FLAMBE_ROOT
 
 # Make sure the unit tests pass
@@ -57,8 +58,9 @@ haxelib test $ARCHIVE
 read -p "Submit Flambe $VERSION to haxelib [Y/n]? " CONFIRM
 case "$CONFIRM" in
     "Y" | "y" | "")
-        git tag flambe-$VERSION
-        haxelib submit $ARCHIVE
+        $DEMOS_ROOT/bin/upload-all
         rsync -avz --delete chxdoc/ catdap:web/flambe/api/
+        haxelib submit $ARCHIVE
+        git tag flambe-$VERSION
         ;;
 esac

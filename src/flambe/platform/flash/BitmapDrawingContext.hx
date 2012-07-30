@@ -139,6 +139,16 @@ class BitmapDrawingContext
             rect.width = width*scaleX;
             rect.height = height*scaleY;
 
+            // fillRect and colorTransform don't support negative rectangles
+            if (rect.width < 0) {
+                rect.width = -rect.width;
+                rect.x -= rect.width;
+            }
+            if (rect.height < 0) {
+                rect.height = -rect.height;
+                rect.y -= rect.height;
+            }
+
             // If we don't need to alpha blend, use fillRect(), otherwise colorTransform()
             if (state.color == null) {
                 _buffer.fillRect(rect, color);

@@ -57,7 +57,7 @@ haxelib test $ARCHIVE
 read -p "Submit Flambe $VERSION to haxelib [Y/n]? " CONFIRM
 case "$CONFIRM" in
     "Y" | "y" | "")
-        git tag $VERSION
+        git tag flambe-$VERSION
         haxelib submit $ARCHIVE
         rsync -avz --delete chxdoc/ catdap:web/flambe/api/
         ;;

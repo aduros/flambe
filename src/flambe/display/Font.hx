@@ -8,13 +8,28 @@ import flambe.asset.AssetPack;
 
 using StringTools;
 
+/**
+ * A bitmap font, created in any tool that exports the BMFont format, such as the original BMFont
+ * editor, Hiero, or Glyph Designer.
+ */
 class Font
 {
     private static var log = Log.log; // http://code.google.com/p/haxe/issues/detail?id=365
 
+    /**
+     * The name that was used to load this font.
+     */
     public var name (default, null) :String;
-    public var size (default, null) :Int;
 
+    /**
+     * The vertical size of this font, in pixels.
+     */
+    public var size (default, null) :Float;
+
+    /**
+     * Parses a font using files in an asset pack.
+     * @param name The path to the font within the asset pack, excluding the .fnt suffix.
+     */
     public function new (pack :AssetPack, name :String)
     {
         this.name = name;
@@ -148,10 +163,14 @@ class Font
     private var _glyphs :IntHash<Glyph>;
 }
 
-// TODO: Kerning
+/**
+ * Represents a single glyph in a bitmap font.
+ */
 class Glyph
 {
-    // This glyph's ASCII character code
+    /**
+     * This glyph's ASCII character code.
+     */
     public var charCode (default, null) :Int;
 
     // Location and dimensions of this glyph on the sprite sheet
@@ -160,7 +179,9 @@ class Glyph
     public var width :Int;
     public var height :Int;
 
-    // The sprite sheet that contains this glyph
+    /**
+     * The atlas that contains this glyph.
+     */
     public var page :Texture;
 
     public var xOffset :Int;
@@ -168,11 +189,14 @@ class Glyph
 
     public var xAdvance :Int;
 
-    public function new (charCode :Int)
+    /** @private */ public function new (charCode :Int)
     {
         this.charCode = charCode;
     }
 
+    /**
+     * Draws this glyph to a DrawingContext surface.
+     */
     public function draw (ctx :DrawingContext, destX :Float, destY :Float)
     {
         // Avoid drawing whitespace

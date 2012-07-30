@@ -139,7 +139,20 @@ def apply_flambe(ctx):
         if not air_password:
             ctx.bld.fatal("You must specify the air_password to your certificate.")
 
+        app_id = infer_app_id(ctx, air_desc)
         air_apps = []
+
+        # Installs and launches an AIR app on the device
+        def air_install(ctx, platform, package):
+            ctx.to_log("Installing %s to %s device...\n" % (app_id, platform))
+
+            from subprocess import PIPE # Squelch some noisy errors
+            platform = platform.lower()
+            ctx.exec_command([ adt, "-uninstallApp", "-platform", platform, "-appid", app_id ],
+                stderr=PIPE)
+            ctx.exec_command([ adt, "-installApp", "-platform", platform, "-package", package ])
+            ctx.exec_command([ adt, "-launchApp", "-platform", platform, "-appid", app_id ],
+                stderr=PIPE)
 
         if build_android:
             apk_type = "apk-debug" if debug else "apk-captive-runtime"
@@ -150,17 +163,9 @@ def apply_flambe(ctx):
                     quote(air_desc.abspath()))
 
             if ctx.bld.cmd == "install":
-                # Install and run the APK
-                app_id = infer_app_id(ctx, air_desc)
                 def install_apk(ctx):
-                    ctx.to_log("Installing APK to device...\n")
-                    ctx.exec_command("%s -uninstallApp -platform android -appid %s" % (
-                        (quote(adt), quote(app_id))))
-                    ctx.exec_command("%s -installApp -platform android -package %s" % (
-                        (quote(adt), quote( \
-                            install_prefix + "packages/" + build_prefix + "android.apk"))))
-                    ctx.exec_command("%s -launchApp -platform android -appid %s" % (
-                        (quote(adt), quote(app_id))))
+                    air_install(ctx, "Android",
+                        install_prefix + "packages/" + build_prefix + "android.apk")
                 ctx.bld.add_post_fun(install_apk)
 
             air_apps.append((build_prefix + "android.apk", rule))
@@ -172,13 +177,18 @@ def apply_flambe(ctx):
 
             # TODO(bruno): Add -connect [host] for debug builds, if fdb is present
             # TODO(bruno): Handle final app store packaging
-            # TODO(bruno): Install and launch the IPA (AIR 3.4 required for that)
             ipa_type = "ipa-debug" if debug else "ipa-ad-hoc"
             rule = ("%s -package -target %s -provisioning-profile %s " +
                 "-storetype pkcs12 -keystore %s -storepass %s " +
                 "\"${TGT}\" %s ") % (
                     quote(adt), ipa_type, quote(ios_profile.abspath()),
                     quote(air_cert.abspath()), quote(air_password), quote(air_desc.abspath()))
+
+            if ctx.bld.cmd == "install":
+                def install_ipa(ctx):
+                    air_install(ctx, "iOS",
+                        install_prefix + "packages/" + build_prefix + "ios.ipa")
+                ctx.bld.add_post_fun(install_ipa)
 
             air_apps.append((build_prefix + "ios.ipa", rule))
 

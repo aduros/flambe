@@ -13,7 +13,7 @@ for WebGL support later on.
 
 ## Demos
 
-Demos and more are on the [Flambe wiki](https://github.com/aduros/flambe/wiki).
+Demos and more are on the [Flambe wiki].
 
 ## Overview
 
@@ -38,10 +38,22 @@ Flambe's design and roadmap are guided by a few philosophies:
 
 ## Installing
 
-See the [install guide](https://github.com/aduros/flambe/wiki/Installation) on
-the wiki.
+See the [install guide] on the wiki.
 
-Are things not working? I'd be happy to help, [send me a
-message](https://github.com/aduros) or chat to me in #Haxe on irc.freenode.net.
+## Hacking
+
+To build and develop Flambe from source, clone this repository and run
+`haxelib dev flambe ./src` to use it. Patches and pull requests are
+welcome!
+
+Are things not working? I'd be happy to help, open an [issue], ask on
+the [forum], [email me] privately, or talk to me in #Haxe on
+irc.freenode.net.
 
 [![Build Status](https://secure.travis-ci.org/aduros/flambe.png?branch=master)](http://travis-ci.org/aduros/flambe)
+
+[Flambe wiki]: https://github.com/aduros/flambe/wiki
+[install guide]: https://github.com/aduros/flambe/wiki/Installation
+[issue]: https://github.com/aduros/flambe/issues
+[forum]: https://groups.google.com/forum/#!forum/flambe
+[email me]: mailto:b@aduros.com

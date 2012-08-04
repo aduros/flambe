@@ -46,10 +46,6 @@ class HtmlPlatform
         log = Log.log;
         log.info("Initializing HTML platform");
 
-#if (debug && !haxe_210)
-        haxe.Firebug.redirectTraces();
-#end
-
         var canvas :Dynamic = null;
         try {
             // Use the canvas assigned to us by the flambe.js embedder

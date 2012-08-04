@@ -11,12 +11,12 @@ package flambe.input;
 class MouseEvent
 {
     /**
-     * The X position of the pointing device, in view (stage) coordinates.
+     * The X position of the mouse, in view (stage) coordinates.
      */
     public var viewX (default, null) :Float;
 
     /**
-     * The Y position of the pointing device, in view (stage) coordinates.
+     * The Y position of the mouse, in view (stage) coordinates.
      */
     public var viewY (default, null) :Float;
 

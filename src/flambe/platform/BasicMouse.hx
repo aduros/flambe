@@ -121,18 +121,6 @@ class BasicMouse
         return _buttonStates.exists(buttonCode);
     }
 
-    private function submit (signal :Signal1<MouseEvent>,
-        viewX :Float, viewY :Float, button :MouseButton)
-    {
-        _x = viewX;
-        _y = viewY;
-
-        if (signal.hasListeners()) {
-            _sharedEvent._internal_init(++_id, viewX, viewY, button);
-            signal.emit(_sharedEvent);
-        }
-    }
-
     private function prepare (viewX :Float, viewY :Float, button :MouseButton)
     {
         _x = viewX;

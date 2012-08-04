@@ -20,27 +20,21 @@ import flambe.web.Web;
 
 interface Platform
 {
-    var stage (getStage, null) :Stage;
+    function init () :Void;
 
-    var storage (getStorage, null) :Storage;
+    function getStage () :Stage;
+    function getStorage () :Storage;
+    function getPointer () :Pointer;
+    function getMouse () :Mouse;
+    function getTouch () :Touch;
+    function getKeyboard () :Keyboard;
+    function getWeb () :Web;
 
-    var pointer (getPointer, null) :Pointer;
-
-    var mouse (getMouse, null) :Mouse;
-
-    var touch (getTouch, null) :Touch;
-
-    var keyboard (getKeyboard, null) :Keyboard;
-
-    var web (getWeb, null) :Web;
-
-    var locale (getLocale, null) :String;
+    function getLocale () :String;
 
     function loadAssetPack (manifest :Manifest) :Promise<AssetPack>;
 
     function callNative (funcName :String, params :Array<Dynamic>) :Dynamic;
 
     function createLogHandler (tag :String) :LogHandler;
-
-    function init () :Void;
 }

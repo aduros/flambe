@@ -32,19 +32,10 @@ class HtmlPlatform
 {
     private static var log :Logger; // This needs to be initialized later
 
-    public var stage (getStage, null) :Stage;
-    public var storage (getStorage, null) :Storage;
-    public var pointer (getPointer, null) :Pointer;
-    public var mouse (getMouse, null) :Mouse;
-    public var touch (getTouch, null) :Touch;
-    public var keyboard (getKeyboard, null) :Keyboard;
-    public var web (getWeb, null) :Web;
-    public var locale (getLocale, null) :String;
+    public static var instance (default, null) :HtmlPlatform = new HtmlPlatform();
 
     public var mainLoop (default, null) :MainLoop;
     public var renderer :Renderer;
-
-    public static var instance (default, null) :HtmlPlatform = new HtmlPlatform();
 
     private function new ()
     {

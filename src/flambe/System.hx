@@ -41,7 +41,7 @@ class System
     public static var storage (getStorage, null) :Storage;
 
     /**
-     * The Pointer subsystem, for mouse/touch events.
+     * The Pointer subsystem, for unified mouse/touch events.
      */
     public static var pointer (getPointer, null) :Pointer;
 
@@ -65,8 +65,7 @@ class System
      */
     public static var web (getWeb, null) :Web;
 
-    // TODO(bruno): Subsystems for touch, accelerometer, gamepads, haptic, geolocation, video,
-    // textInput
+    // TODO(bruno): Subsystems for accelerometer, gamepads, haptic, geolocation, video, textInput
 
     /**
      * Gets the RFC 4646 language tag of the environment. For example, "en-US", "pt", or null if the
@@ -131,49 +130,49 @@ class System
     inline private static function getStage () :Stage
     {
         #if debug assertCalledInit(); #end
-        return _platform.stage;
+        return _platform.getStage();
     }
 
     inline private static function getStorage () :Storage
     {
         #if debug assertCalledInit(); #end
-        return _platform.storage;
+        return _platform.getStorage();
     }
 
     inline private static function getPointer () :Pointer
     {
         #if debug assertCalledInit(); #end
-        return _platform.pointer;
+        return _platform.getPointer();
     }
 
     inline private static function getMouse () :Mouse
     {
         #if debug assertCalledInit(); #end
-        return _platform.mouse;
+        return _platform.getMouse();
     }
 
     inline private static function getTouch () :Touch
     {
         #if debug assertCalledInit(); #end
-        return _platform.touch;
+        return _platform.getTouch();
     }
 
     inline private static function getKeyboard () :Keyboard
     {
         #if debug assertCalledInit(); #end
-        return _platform.keyboard;
+        return _platform.getKeyboard();
     }
 
     inline private static function getWeb () :Web
     {
         #if debug assertCalledInit(); #end
-        return _platform.web;
+        return _platform.getWeb();
     }
 
     inline private static function getLocale () :String
     {
         #if debug assertCalledInit(); #end
-        return _platform.locale;
+        return _platform.getLocale();
     }
 
     private static function assertCalledInit ()

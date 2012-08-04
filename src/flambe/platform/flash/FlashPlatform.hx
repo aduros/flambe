@@ -12,7 +12,6 @@ import flash.events.MouseEvent;
 import flash.events.TouchEvent;
 import flash.events.UncaughtErrorEvent;
 import flash.external.ExternalInterface;
-import flash.input.Multitouch;
 import flash.Lib;
 import flash.net.SharedObject;
 import flash.system.Capabilities;
@@ -66,8 +65,14 @@ class FlashPlatform
 
         _stage = new FlashStage(stage);
         _pointer = new BasicPointer();
-        _mouse = new FlashMouse(_pointer);
-        _touch = new BasicTouch(_pointer);
+        _mouse = FlashMouse.shouldUse() ? new FlashMouse(_pointer, stage) : new DummyMouse();
+
+#if flambe_air
+        _touch = AirTouch.shouldUse() ? new AirTouch(_pointer, stage) : new DummyTouch();
+#else
+        _touch = new DummyTouch();
+#end
+
         _keyboard = new BasicKeyboard();
 
 #if flash11
@@ -81,29 +86,6 @@ class FlashPlatform
 
         stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
         stage.addEventListener(Event.RENDER, onRender);
-
-        stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
-        stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
-        stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
-        stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);
-#if flash11_2
-        stage.addEventListener(MouseEvent.MIDDLE_MOUSE_DOWN, onMouseDown);
-        stage.addEventListener(MouseEvent.MIDDLE_MOUSE_UP, onMouseUp);
-        stage.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onMouseDown);
-        stage.addEventListener(MouseEvent.RIGHT_MOUSE_UP, onMouseUp);
-#end
-
-#if flambe_air
-        // Enable touch events, and disable emulated mouse events. Note that since mapToTouchMouse
-        // requires AIR, touch is intentionally not enabled when running in the browser. One more
-        // reason to switch to the HTML target for the browser!
-        Multitouch.inputMode = TOUCH_POINT;
-        Multitouch.mapTouchToMouse = false;
-
-        stage.addEventListener(TouchEvent.TOUCH_BEGIN, onTouchBegin);
-        stage.addEventListener(TouchEvent.TOUCH_MOVE, onTouchMove);
-        stage.addEventListener(TouchEvent.TOUCH_END, onTouchEnd);
-#end
 
         stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
         stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
@@ -205,54 +187,6 @@ class FlashPlatform
 #end
     }
 
-    private function onMouseDown (event :MouseEvent)
-    {
-        var buttonCode;
-        switch (event.type) {
-            case "middleMouseDown": buttonCode = MouseCodes.MIDDLE;
-            case "rightMouseDown": buttonCode = MouseCodes.RIGHT;
-            default: buttonCode = MouseCodes.LEFT;
-        }
-        _mouse.submitDown(event.stageX, event.stageY, buttonCode);
-    }
-
-    private function onMouseMove (event :MouseEvent)
-    {
-        _mouse.submitMove(event.stageX, event.stageY);
-    }
-
-    private function onMouseUp (event :MouseEvent)
-    {
-        var buttonCode;
-        switch (event.type) {
-            case "middleMouseUp": buttonCode = MouseCodes.MIDDLE;
-            case "rightMouseUp": buttonCode = MouseCodes.RIGHT;
-            default: buttonCode = MouseCodes.LEFT;
-        }
-        _mouse.submitUp(event.stageX, event.stageY, buttonCode);
-    }
-
-    private function onMouseWheel (event :MouseEvent)
-    {
-        // Flash only fires mouse wheel events on Windows, see issue #32
-        _mouse.submitScroll(event.stageX, event.stageY, event.delta);
-    }
-
-    private function onTouchBegin (event :TouchEvent)
-    {
-        _touch.submitDown(event.touchPointID, event.stageX, event.stageY);
-    }
-
-    private function onTouchMove (event :TouchEvent)
-    {
-        _touch.submitMove(event.touchPointID, event.stageX, event.stageY);
-    }
-
-    private function onTouchEnd (event :TouchEvent)
-    {
-        _touch.submitUp(event.touchPointID, event.stageX, event.stageY);
-    }
-
     private function onKeyDown (event :KeyboardEvent)
     {
         _keyboard.submitDown(event.keyCode);
@@ -292,8 +226,8 @@ class FlashPlatform
 
     private var _stage :FlashStage;
     private var _pointer :BasicPointer;
-    private var _mouse :FlashMouse;
-    private var _touch :BasicTouch;
+    private var _mouse :Mouse;
+    private var _touch :Touch;
     private var _keyboard :BasicKeyboard;
     private var _storage :Storage;
     private var _web :Web;

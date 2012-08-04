@@ -9,8 +9,10 @@ import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
+import flash.events.TouchEvent;
 import flash.events.UncaughtErrorEvent;
 import flash.external.ExternalInterface;
+import flash.input.Multitouch;
 import flash.Lib;
 import flash.net.SharedObject;
 import flash.system.Capabilities;
@@ -22,6 +24,7 @@ import flambe.Entity;
 import flambe.input.Keyboard;
 import flambe.input.Mouse;
 import flambe.input.Pointer;
+import flambe.input.Touch;
 import flambe.platform.Platform;
 import flambe.platform.BasicKeyboard;
 import flambe.platform.BasicPointer;
@@ -40,6 +43,7 @@ class FlashPlatform
     public var storage (getStorage, null) :Storage;
     public var pointer (getPointer, null) :Pointer;
     public var mouse (getMouse, null) :Mouse;
+    public var touch (getTouch, null) :Touch;
     public var keyboard (getKeyboard, null) :Keyboard;
     public var web (getWeb, null) :Web;
     public var locale (getLocale, null) :String;
@@ -63,6 +67,7 @@ class FlashPlatform
         _stage = new FlashStage(stage);
         _pointer = new BasicPointer();
         _mouse = new FlashMouse(_pointer);
+        _touch = new BasicTouch(_pointer);
         _keyboard = new BasicKeyboard();
 
 #if flash11
@@ -86,6 +91,18 @@ class FlashPlatform
         stage.addEventListener(MouseEvent.MIDDLE_MOUSE_UP, onMouseUp);
         stage.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onMouseDown);
         stage.addEventListener(MouseEvent.RIGHT_MOUSE_UP, onMouseUp);
+#end
+
+#if flambe_air
+        // Enable touch events, and disable emulated mouse events. Note that since mapToTouchMouse
+        // requires AIR, touch is intentionally not enabled when running in the browser. One more
+        // reason to switch to the HTML target for the browser!
+        Multitouch.inputMode = TOUCH_POINT;
+        Multitouch.mapTouchToMouse = false;
+
+        stage.addEventListener(TouchEvent.TOUCH_BEGIN, onTouchBegin);
+        stage.addEventListener(TouchEvent.TOUCH_MOVE, onTouchMove);
+        stage.addEventListener(TouchEvent.TOUCH_END, onTouchEnd);
 #end
 
         stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
@@ -136,6 +153,11 @@ class FlashPlatform
     public function getMouse () :Mouse
     {
         return _mouse;
+    }
+
+    public function getTouch () :Touch
+    {
+        return _touch;
     }
 
     public function getKeyboard () :Keyboard
@@ -216,6 +238,21 @@ class FlashPlatform
         _mouse.submitScroll(event.stageX, event.stageY, event.delta);
     }
 
+    private function onTouchBegin (event :TouchEvent)
+    {
+        _touch.submitDown(event.touchPointID, event.stageX, event.stageY);
+    }
+
+    private function onTouchMove (event :TouchEvent)
+    {
+        _touch.submitMove(event.touchPointID, event.stageX, event.stageY);
+    }
+
+    private function onTouchEnd (event :TouchEvent)
+    {
+        _touch.submitUp(event.touchPointID, event.stageX, event.stageY);
+    }
+
     private function onKeyDown (event :KeyboardEvent)
     {
         _keyboard.submitDown(event.keyCode);
@@ -256,6 +293,7 @@ class FlashPlatform
     private var _stage :FlashStage;
     private var _pointer :BasicPointer;
     private var _mouse :FlashMouse;
+    private var _touch :BasicTouch;
     private var _keyboard :BasicKeyboard;
     private var _storage :Storage;
     private var _web :Web;

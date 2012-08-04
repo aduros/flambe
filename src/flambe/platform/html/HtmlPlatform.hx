@@ -14,6 +14,7 @@ import flambe.Entity;
 import flambe.input.Keyboard;
 import flambe.input.Mouse;
 import flambe.input.Pointer;
+import flambe.input.Touch;
 import flambe.platform.Platform;
 import flambe.platform.BasicKeyboard;
 import flambe.platform.BasicPointer;
@@ -35,6 +36,7 @@ class HtmlPlatform
     public var storage (getStorage, null) :Storage;
     public var pointer (getPointer, null) :Pointer;
     public var mouse (getMouse, null) :Mouse;
+    public var touch (getTouch, null) :Touch;
     public var keyboard (getKeyboard, null) :Keyboard;
     public var web (getWeb, null) :Web;
     public var locale (getLocale, null) :String;
@@ -79,6 +81,7 @@ class HtmlPlatform
         _stage = new HtmlStage(canvas);
         _pointer = new BasicPointer();
         _mouse = new HtmlMouse(_pointer, canvas);
+        _touch = new BasicTouch(_pointer);
         _keyboard = new BasicKeyboard();
 
         renderer = new CanvasRenderer(canvas);
@@ -88,7 +91,13 @@ class HtmlPlatform
         _container.style.overflow = "hidden";
         _container.style.position = "relative";
 
+        var lastTouchTime = 0;
         var onMouse = function (event) {
+            if (event.timeStamp - lastTouchTime < 1000) {
+                // Ignore if there was too recent a touch event, to filter out mouse events emulated
+                // by mobile browsers: http://www.w3.org/TR/touch-events/#mouse-events
+                return;
+            }
             var bounds = canvas.getBoundingClientRect();
             var x = getX(event, bounds);
             var y = getY(event, bounds);
@@ -124,46 +133,36 @@ class HtmlPlatform
         canvas.addEventListener("mousewheel", onMouse, false);
         canvas.addEventListener("DOMMouseScroll", onMouse, false); // https://bugzil.la/719320
 
-        var pointerTouchId = -1;
         var onTouch = function (event) {
-            var type = event.type;
             var changedTouches :Array<Dynamic> = event.changedTouches;
+            var bounds = event.target.getBoundingClientRect();
+            lastTouchTime = event.timeStamp;
 
-            var pointerTouch = null;
-            if (type == "touchstart") {
-                if (pointerTouchId == -1) {
-                    pointerTouch = event.changedTouches[0];
+            switch (event.type) {
+            case "touchstart":
+                event.preventDefault();
+                if (HtmlUtil.SHOULD_HIDE_MOBILE_BROWSER) {
+                    HtmlUtil.hideMobileBrowser();
                 }
-            } else {
                 for (touch in changedTouches) {
-                    if (touch.identifier == pointerTouchId) {
-                        pointerTouch = touch;
-                        break;
-                    }
+                    var x = getX(touch, bounds);
+                    var y = getY(touch, bounds);
+                    _touch.submitDown(Std.int(touch.identifier), x, y);
                 }
-            }
 
-            if (pointerTouch != null) {
-                var bounds = event.target.getBoundingClientRect();
-                var x = getX(pointerTouch, bounds);
-                var y = getY(pointerTouch, bounds);
+            case "touchmove":
+                event.preventDefault();
+                for (touch in changedTouches) {
+                    var x = getX(touch, bounds);
+                    var y = getY(touch, bounds);
+                    _touch.submitMove(Std.int(touch.identifier), x, y);
+                }
 
-                switch (type) {
-                case "touchstart":
-                    event.preventDefault();
-                    if (HtmlUtil.SHOULD_HIDE_MOBILE_BROWSER) {
-                        HtmlUtil.hideMobileBrowser();
-                    }
-                    pointerTouchId = pointerTouch.identifier;
-                    _pointer.submitDown(x, y, Touch);
-
-                case "touchmove":
-                    event.preventDefault();
-                    _pointer.submitMove(x, y, Touch);
-
-                case "touchend", "touchcancel":
-                    pointerTouchId = -1;
-                    _pointer.submitUp(x, y, Touch);
+            case "touchend", "touchcancel":
+                for (touch in changedTouches) {
+                    var x = getX(touch, bounds);
+                    var y = getY(touch, bounds);
+                    _touch.submitUp(Std.int(touch.identifier), x, y);
                 }
             }
         };
@@ -314,6 +313,11 @@ class HtmlPlatform
         return _mouse;
     }
 
+    public function getTouch () :Touch
+    {
+        return _touch;
+    }
+
     public function getKeyboard () :Keyboard
     {
         return _keyboard;
@@ -340,6 +344,7 @@ class HtmlPlatform
     private var _stage :HtmlStage;
     private var _pointer :BasicPointer;
     private var _mouse :HtmlMouse;
+    private var _touch :BasicTouch;
     private var _keyboard :BasicKeyboard;
     private var _storage :Storage;
     private var _web :Web;

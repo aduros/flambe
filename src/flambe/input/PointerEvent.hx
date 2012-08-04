@@ -7,7 +7,7 @@ package flambe.input;
 enum EventSource
 {
     Mouse (event :MouseEvent);
-    Touch;
+    Touch (point :TouchPoint);
 }
 
 /**
@@ -49,9 +49,9 @@ class PointerEvent
     {
         // Ensure the source gets deep copied too
         var sourceCopy = null;
-        switch (sourceCopy) {
+        switch (source) {
             case Mouse(event): sourceCopy = Mouse(event.clone());
-            case Touch: sourceCopy = Touch;
+            default: sourceCopy = source;
         }
 
         var event = new PointerEvent();

@@ -10,6 +10,7 @@ import flambe.display.Stage;
 import flambe.input.Keyboard;
 import flambe.input.Mouse;
 import flambe.input.Pointer;
+import flambe.input.Touch;
 import flambe.platform.Platform;
 import flambe.storage.Storage;
 import flambe.util.Assert;
@@ -48,6 +49,11 @@ class System
      * The Mouse subsystem, for direct access to the mouse.
      */
     public static var mouse (getMouse, null) :Mouse;
+
+    /**
+     * The Touch subsystem, for direct access to the multi-touch.
+     */
+    public static var touch (getTouch, null) :Touch;
 
     /**
      * The Keyboard subsystem, for keyboard events.
@@ -144,6 +150,12 @@ class System
     {
         #if debug assertCalledInit(); #end
         return _platform.mouse;
+    }
+
+    inline private static function getTouch () :Touch
+    {
+        #if debug assertCalledInit(); #end
+        return _platform.touch;
     }
 
     inline private static function getKeyboard () :Keyboard

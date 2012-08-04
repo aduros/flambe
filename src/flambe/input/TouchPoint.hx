@@ -6,12 +6,28 @@ package flambe.input;
 
 import flambe.input.PointerEvent;
 
+/**
+ * Represents a touch screen contact point, such as a finger. It is possible to retain a reference
+ * to a TouchPoint, and track changes to it over time.
+ */
 class TouchPoint
 {
-    public var id (default, null) :Int;
-
+    /**
+     * The X position of the touch, in view (stage) coordinates. This value is modified when the
+     * point moves.
+     */
     public var viewX (default, null) :Float;
+
+    /**
+     * The Y position of the touch, in view (stage) coordinates. This value is modified when the
+     * point moves.
+     */
     public var viewY (default, null) :Float;
+
+    /**
+     * An identifier unique to this touch.
+     */
+    public var id (default, null) :Int;
 
     /** @private */ public function new (id :Int)
     {

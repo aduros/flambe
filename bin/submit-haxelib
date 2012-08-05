@@ -62,5 +62,6 @@ case "$CONFIRM" in
         rsync -avz --delete chxdoc/ catdap:web/flambe/api/
         haxelib submit $ARCHIVE
         git tag flambe-$VERSION
+        git tag flambe-$VERSION --git-dir=$DEMOS_ROOT
         ;;
 esac

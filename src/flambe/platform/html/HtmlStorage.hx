@@ -32,6 +32,7 @@ class HtmlStorage
         try {
             var serializer = new Serializer();
             serializer.useCache = true; // Allow circular references
+            serializer.useEnumIndex = false; // Ensure persistence-friendly enums
             serializer.serialize(value);
             encoded = serializer.toString();
         } catch (error :Dynamic) {

@@ -87,11 +87,17 @@ class FlashPlatform
 #if flash11_2
         // TODO(bruno): ThrottleEvent may not be exactly right, but VisibilityEvent is broken and
         // Event.ACTIVATE only handles focus
-        stage.addEventListener(ThrottleEvent.THROTTLE, onThrottle);
         // TODO(bruno): Get the currently throttled state when the app starts?
+        stage.addEventListener(ThrottleEvent.THROTTLE, onThrottle);
+        System.hidden.changed.connect(function (hidden,_) {
+            if (!hidden) {
+                _skipFrame = true;
+            }
+        });
 #end
 
         _lastUpdate = Lib.getTimer();
+        _skipFrame = false;
     }
 
     public function loadAssetPack (manifest :Manifest) :Promise<AssetPack>
@@ -194,6 +200,11 @@ class FlashPlatform
         var dt = (now - _lastUpdate)/1000;
         _lastUpdate = now;
 
+        if (_skipFrame) {
+            _skipFrame = false;
+            return;
+        }
+
         mainLoop.update(dt);
         Lib.current.stage.invalidate();
     }
@@ -224,4 +235,5 @@ class FlashPlatform
     private var _web :Web;
 
     private var _lastUpdate :Int;
+    private var _skipFrame :Bool;
 }

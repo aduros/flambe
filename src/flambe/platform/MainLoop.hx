@@ -36,6 +36,12 @@ class MainLoop
             log.warn("Zero or negative time elapsed since the last frame!", ["dt", dt]);
             return;
         }
+        if (dt > 1) {
+            // Clamp deltaTime to a reasonable limit. Games tend not to cope well with huge
+            // deltaTimes. Platforms should skip the next frame after unpausing to prevent sending
+            // huge deltaTimes, but not all environments support detecting an unpause
+            dt = 1;
+        }
 
         // First update any tickables, folding away nulls
         var ii = 0;

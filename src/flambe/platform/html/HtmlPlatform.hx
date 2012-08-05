@@ -187,9 +187,15 @@ class HtmlPlatform
             onVisibilityChanged(); // Update now
             (untyped Lib.document).addEventListener(hiddenApi.prefix + "visibilitychange",
                 onVisibilityChanged, false);
+            System.hidden.changed.connect(function (hidden,_) {
+                if (!hidden) {
+                    _skipFrame = true;
+                }
+            });
         }
 
         _lastUpdate = Date.now().getTime();
+        _skipFrame = false;
 
         // Use requestAnimationFrame if available, otherwise a 60 FPS setInterval
         // https://developer.mozilla.org/en/DOM/window.mozRequestAnimationFrame
@@ -286,6 +292,11 @@ class HtmlPlatform
         var dt = (now - _lastUpdate)/1000;
         _lastUpdate = now;
 
+        if (_skipFrame) {
+            _skipFrame = false;
+            return;
+        }
+
         mainLoop.update(dt);
         mainLoop.render(renderer);
     }
@@ -339,4 +350,5 @@ class HtmlPlatform
     private var _container :Dynamic;
 
     private var _lastUpdate :Float;
+    private var _skipFrame :Bool;
 }

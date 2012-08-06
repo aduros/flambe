@@ -42,7 +42,7 @@ class Easing
     /** Quadratic out. */
     public static function quadOut (t :Float) :Float
     {
-        return -t * (t - 2);
+        return t * (2 - t);
     }
 
     /** Quadratic in and out. */
@@ -78,7 +78,7 @@ class Easing
     /** Quartic out. */
     public static function quartOut (t :Float) :Float
     {
-        return 1 - (t-=1) * t * t * t;
+        return 1 - (--t) * t * t * t;
     }
 
     /** Quartic in and out. */
@@ -108,7 +108,7 @@ class Easing
     /** Sine in. */
     public static function sineIn (t :Float) :Float
     {
-        return -Math.cos(PI2 * t) + 1;
+        return 1 - Math.cos(PI2 * t);
     }
 
     /** Sine out. */
@@ -120,7 +120,7 @@ class Easing
     /** Sine in and out. */
     public static function sineInOut (t :Float) :Float
     {
-        return -Math.cos(PI * t) / 2 + .5;
+        return .5 - Math.cos(PI * t) / 2;
     }
 
     /** Bounce in. */
@@ -145,8 +145,7 @@ class Easing
     /** Bounce in and out. */
     public static function bounceInOut (t :Float) :Float
     {
-        if (t < .5)
-        {
+        if (t < .5) {
             t = 1 - t * 2;
             if (t < B1) return (1 - 7.5625 * t * t) / 2;
             if (t < B2) return (1 - (7.5625 * (t - B3) * (t - B3) + .75)) / 2;
@@ -163,13 +162,14 @@ class Easing
     /** Circle in. */
     public static function circIn (t :Float) :Float
     {
-        return -(Math.sqrt(1 - t * t) - 1);
+        return 1 - Math.sqrt(1 - t * t);
     }
 
     /** Circle out. */
     public static function circOut (t :Float) :Float
     {
-        return Math.sqrt(1 - (t - 1) * (t - 1));
+        --t;
+        return Math.sqrt(1 - t * t);
     }
 
     /** Circle in and out. */
@@ -213,8 +213,8 @@ class Easing
     {
         t *= 2;
         if (t < 1) return t * t * (2.70158 * t - 1.70158) / 2;
-        t --;
-        return (1 - (--t) * (t) * (-2.70158 * t - 1.70158)) / 2 + .5;
+        t -= 2;
+        return (1 - t * t * (-2.70158 * t - 1.70158)) / 2 + .5;
     }
 
     private static inline var PI :Float = FMath.PI;

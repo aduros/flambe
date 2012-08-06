@@ -15,7 +15,7 @@ using Lambda;
 class Sequence
     implements Action
 {
-    public function new (?actions :Array<Action>)
+    public function new<A:Action> (?actions :Array<A>)
     {
         _idx = 0;
         _runningActions = (actions != null) ? cast actions.copy() : [];

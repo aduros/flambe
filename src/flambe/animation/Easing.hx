@@ -4,59 +4,225 @@
 
 package flambe.animation;
 
+import flambe.math.FMath;
+
 /** Receives and returns a number between [0,1]. */
 typedef EasingFunction = Float -> Float;
 
+/**
+ * Easing functions that can be used to animate values. For a cheat sheet, see <a
+ * href="http://easings.net" target="_blank">easings.net</a>.
+ */
 class Easing
 {
-    public static function linear (r :Float) :Float
+    // Adapted from FlashPunk:
+    // https://github.com/Draknek/FlashPunk/blob/master/net/flashpunk/utils/Ease.as
+    //
+    // Operation of in/out easers:
+    //
+    // in(t)
+    //        return t;
+    // out(t)
+    //         return 1 - in(1 - t);
+    // inOut(t)
+    //         return (t <= .5) ? in(t * 2) / 2 : out(t * 2 - 1) / 2 + .5;
+
+    /** Linear, no easing. */
+    public static function linear (t :Float) :Float
     {
-        return r;
+        return t;
     }
 
-    public static function quadIn (r :Float) :Float
+    /** Quadratic in. */
+    public static function quadIn (t :Float) :Float
     {
-        return r*r;
+        return t * t;
     }
 
-    public static function quadOut (r :Float) :Float
+    /** Quadratic out. */
+    public static function quadOut (t :Float) :Float
     {
-        return r*(2-r);
+        return -t * (t - 2);
     }
 
-    public static function quadInOut (r :Float) :Float
+    /** Quadratic in and out. */
+    public static function quadInOut (t :Float) :Float
     {
-        return (r < 0.5) ? 2*r*r : -2*r*(r-2)-1;
+        return t <= .5 ? t * t * 2 : 1 - (--t) * t * 2;
     }
 
-    public static function bounceIn (r :Float) :Float
+    /** Cubic in. */
+    public static function cubeIn (t :Float) :Float
     {
-        return bounceOut(1 - r);
+        return t * t * t;
     }
 
-    public static function bounceOut (r :Float) :Float
+    /** Cubic out. */
+    public static function cubeOut (t :Float) :Float
     {
-        if (r < (1/2.75)) {
-            return 7.5625*r*r;
-        } else if (r < (2/2.75)) {
-            return 7.5625*(r-=(1.5/2.75))*r + 0.75;
-        } else if (r < (2.5/2.75)) {
-            return 7.5625*(r-=(2.25/2.75))*r + 0.9375;
-        } else {
-            return 7.5625*(r-=(2.625/2.75))*r + 0.984375;
+        return 1 + (--t) * t * t;
+    }
+
+    /** Cubic in and out. */
+    public static function cubeInOut (t :Float) :Float
+    {
+        return t <= .5 ? t * t * t * 4 : 1 + (--t) * t * t * 4;
+    }
+
+    /** Quartic in. */
+    public static function quartIn (t :Float) :Float
+    {
+        return t * t * t * t;
+    }
+
+    /** Quartic out. */
+    public static function quartOut (t :Float) :Float
+    {
+        return 1 - (t-=1) * t * t * t;
+    }
+
+    /** Quartic in and out. */
+    public static function quartInOut (t :Float) :Float
+    {
+        return t <= .5 ? t * t * t * t * 8 : (1 - (t = t * 2 - 2) * t * t * t) / 2 + .5;
+    }
+
+    /** Quintic in. */
+    public static function quintIn (t :Float) :Float
+    {
+        return t * t * t * t * t;
+    }
+
+    /** Quintic out. */
+    public static function quintOut (t :Float) :Float
+    {
+        return (t = t - 1) * t * t * t * t + 1;
+    }
+
+    /** Quintic in and out. */
+    public static function quintInOut (t :Float) :Float
+    {
+        return ((t *= 2) < 1) ? (t * t * t * t * t) / 2 : ((t -= 2) * t * t * t * t + 2) / 2;
+    }
+
+    /** Sine in. */
+    public static function sineIn (t :Float) :Float
+    {
+        return -Math.cos(PI2 * t) + 1;
+    }
+
+    /** Sine out. */
+    public static function sineOut (t :Float) :Float
+    {
+        return Math.sin(PI2 * t);
+    }
+
+    /** Sine in and out. */
+    public static function sineInOut (t :Float) :Float
+    {
+        return -Math.cos(PI * t) / 2 + .5;
+    }
+
+    /** Bounce in. */
+    public static function bounceIn (t :Float) :Float
+    {
+        t = 1 - t;
+        if (t < B1) return 1 - 7.5625 * t * t;
+        if (t < B2) return 1 - (7.5625 * (t - B3) * (t - B3) + .75);
+        if (t < B4) return 1 - (7.5625 * (t - B5) * (t - B5) + .9375);
+        return 1 - (7.5625 * (t - B6) * (t - B6) + .984375);
+    }
+
+    /** Bounce out. */
+    public static function bounceOut (t :Float) :Float
+    {
+        if (t < B1) return 7.5625 * t * t;
+        if (t < B2) return 7.5625 * (t - B3) * (t - B3) + .75;
+        if (t < B4) return 7.5625 * (t - B5) * (t - B5) + .9375;
+        return 7.5625 * (t - B6) * (t - B6) + .984375;
+    }
+
+    /** Bounce in and out. */
+    public static function bounceInOut (t :Float) :Float
+    {
+        if (t < .5)
+        {
+            t = 1 - t * 2;
+            if (t < B1) return (1 - 7.5625 * t * t) / 2;
+            if (t < B2) return (1 - (7.5625 * (t - B3) * (t - B3) + .75)) / 2;
+            if (t < B4) return (1 - (7.5625 * (t - B5) * (t - B5) + .9375)) / 2;
+            return (1 - (7.5625 * (t - B6) * (t - B6) + .984375)) / 2;
         }
+        t = t * 2 - 1;
+        if (t < B1) return (7.5625 * t * t) / 2 + .5;
+        if (t < B2) return (7.5625 * (t - B3) * (t - B3) + .75) / 2 + .5;
+        if (t < B4) return (7.5625 * (t - B5) * (t - B5) + .9375) / 2 + .5;
+        return (7.5625 * (t - B6) * (t - B6) + .984375) / 2 + .5;
     }
 
-    public static function backIn (r :Float) :Float
+    /** Circle in. */
+    public static function circIn (t :Float) :Float
     {
-        var s = 1.70158;
-        return r*r*((s+1)*r - s);
+        return -(Math.sqrt(1 - t * t) - 1);
     }
 
-    public static function backOut (r :Float) :Float
+    /** Circle out. */
+    public static function circOut (t :Float) :Float
     {
-        var s = 1.70158;
-        --r;
-        return r*r*((s+1)*r + s) + 1;
+        return Math.sqrt(1 - (t - 1) * (t - 1));
     }
+
+    /** Circle in and out. */
+    public static function circInOut (t :Float) :Float
+    {
+        return t <= .5 ? (Math.sqrt(1 - t * t * 4) - 1) / -2 : (Math.sqrt(1 - (t * 2 - 2) * (t * 2 - 2)) + 1) / 2;
+    }
+
+    /** Exponential in. */
+    public static function expoIn (t :Float) :Float
+    {
+        return Math.pow(2, 10 * (t - 1));
+    }
+
+    /** Exponential out. */
+    public static function expoOut (t :Float) :Float
+    {
+        return -Math.pow(2, -10 * t) + 1;
+    }
+
+    /** Exponential in and out. */
+    public static function expoInOut (t :Float) :Float
+    {
+        return t < .5 ? Math.pow(2, 10 * (t * 2 - 1)) / 2 : (-Math.pow(2, -10 * (t * 2 - 1)) + 2) / 2;
+    }
+
+    /** Back in. */
+    public static function backIn (t :Float) :Float
+    {
+        return t * t * (2.70158 * t - 1.70158);
+    }
+
+    /** Back out. */
+    public static function backOut (t :Float) :Float
+    {
+        return 1 - (--t) * (t) * (-2.70158 * t - 1.70158);
+    }
+
+    /** Back in and out. */
+    public static function backInOut (t :Float) :Float
+    {
+        t *= 2;
+        if (t < 1) return t * t * (2.70158 * t - 1.70158) / 2;
+        t --;
+        return (1 - (--t) * (t) * (-2.70158 * t - 1.70158)) / 2 + .5;
+    }
+
+    private static inline var PI :Float = FMath.PI;
+    private static inline var PI2 :Float = FMath.PI / 2;
+    private static inline var B1 :Float = 1 / 2.75;
+    private static inline var B2 :Float = 2 / 2.75;
+    private static inline var B3 :Float = 1.5 / 2.75;
+    private static inline var B4 :Float = 2.5 / 2.75;
+    private static inline var B5 :Float = 2.25 / 2.75;
+    private static inline var B6 :Float = 2.625 / 2.75;
 }

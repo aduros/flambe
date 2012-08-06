@@ -4,7 +4,7 @@
 
 package flambe.script;
 
-import flambe.animation.Easing;
+import flambe.animation.Ease;
 import flambe.animation.Tween;
 import flambe.display.Sprite;
 import flambe.Entity;
@@ -16,7 +16,7 @@ class MoveTo
     implements Action
 {
     public function new (
-        x :Float, y :Float, seconds :Float, easingX :EasingFunction, ?easingY :EasingFunction)
+        x :Float, y :Float, seconds :Float, easingX :EaseFunction, ?easingY :EaseFunction)
     {
         _x = x;
         _y = y;
@@ -52,6 +52,6 @@ class MoveTo
     private var _x :Float;
     private var _y :Float;
     private var _seconds :Float;
-    private var _easingX :EasingFunction;
-    private var _easingY :EasingFunction;
+    private var _easingX :EaseFunction;
+    private var _easingY :EaseFunction;
 }

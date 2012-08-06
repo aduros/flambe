@@ -5,7 +5,7 @@
 package flambe.script;
 
 import flambe.animation.AnimatedFloat;
-import flambe.animation.Easing;
+import flambe.animation.Ease;
 import flambe.animation.Tween;
 import flambe.Entity;
 
@@ -15,7 +15,7 @@ import flambe.Entity;
 class AnimateBy
     implements Action
 {
-    public function new (value :AnimatedFloat, by :Float, seconds :Float, easing :EasingFunction)
+    public function new (value :AnimatedFloat, by :Float, seconds :Float, easing :EaseFunction)
     {
         _value = value;
         _by = by;
@@ -42,5 +42,5 @@ class AnimateBy
     private var _value :AnimatedFloat;
     private var _by :Float;
     private var _seconds :Float;
-    private var _easing :EasingFunction;
+    private var _easing :EaseFunction;
 }

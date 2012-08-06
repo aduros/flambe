@@ -7,13 +7,13 @@ package flambe.animation;
 import flambe.math.FMath;
 
 /** Receives and returns a number between [0,1]. */
-typedef EasingFunction = Float -> Float;
+typedef EaseFunction = Float -> Float;
 
 /**
  * Easing functions that can be used to animate values. For a cheat sheet, see <a
  * href="http://easings.net" target="_blank">easings.net</a>.
  */
-class Easing
+class Ease
 {
     // Adapted from FlashPunk:
     // https://github.com/Draknek/FlashPunk/blob/master/net/flashpunk/utils/Ease.as

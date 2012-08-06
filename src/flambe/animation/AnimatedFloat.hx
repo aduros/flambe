@@ -5,7 +5,7 @@
 package flambe.animation;
 
 import flambe.animation.Binding;
-import flambe.animation.Easing;
+import flambe.animation.Ease;
 import flambe.util.Signal2;
 import flambe.util.Value;
 
@@ -37,18 +37,18 @@ class AnimatedFloat extends Value<Float>
         }
     }
 
-    public function animate (from :Float, to :Float, seconds :Float, ?easing :EasingFunction)
+    public function animate (from :Float, to :Float, seconds :Float, ?easing :EaseFunction)
     {
         set(from);
         animateTo(to, seconds, easing);
     }
 
-    public function animateTo (to :Float, seconds :Float, ?easing :EasingFunction)
+    public function animateTo (to :Float, seconds :Float, ?easing :EaseFunction)
     {
         setBehavior(new Tween(_value, to, seconds, easing));
     }
 
-    public function animateBy (by :Float, seconds :Float, ?easing :EasingFunction)
+    public function animateBy (by :Float, seconds :Float, ?easing :EaseFunction)
     {
         setBehavior(new Tween(_value, _value + by, seconds, easing));
     }

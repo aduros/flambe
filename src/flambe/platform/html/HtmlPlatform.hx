@@ -68,7 +68,6 @@ class HtmlPlatform
         _stage = new HtmlStage(canvas);
         _pointer = new BasicPointer();
         _mouse = new HtmlMouse(_pointer, canvas);
-        _touch = new BasicTouch(_pointer);
         _keyboard = new BasicKeyboard();
 
         renderer = new CanvasRenderer(canvas);
@@ -120,43 +119,53 @@ class HtmlPlatform
         canvas.addEventListener("mousewheel", onMouse, false);
         canvas.addEventListener("DOMMouseScroll", onMouse, false); // https://bugzil.la/719320
 
-        var onTouch = function (event) {
-            var changedTouches :Array<Dynamic> = event.changedTouches;
-            var bounds = event.target.getBoundingClientRect();
-            lastTouchTime = event.timeStamp;
+        // Detect touch support. See http://modernizr.github.com/Modernizr/touch.html for more
+        // sophisticated detection methods, but this seems to cover all important browsers
+        if (untyped __js__("'ontouchstart' in window")) {
+            var basicTouch = new BasicTouch(_pointer);
+            _touch = basicTouch;
 
-            switch (event.type) {
-            case "touchstart":
-                event.preventDefault();
-                if (HtmlUtil.SHOULD_HIDE_MOBILE_BROWSER) {
-                    HtmlUtil.hideMobileBrowser();
-                }
-                for (touch in changedTouches) {
-                    var x = getX(touch, bounds);
-                    var y = getY(touch, bounds);
-                    _touch.submitDown(Std.int(touch.identifier), x, y);
-                }
+            var onTouch = function (event) {
+                var changedTouches :Array<Dynamic> = event.changedTouches;
+                var bounds = event.target.getBoundingClientRect();
+                lastTouchTime = event.timeStamp;
 
-            case "touchmove":
-                event.preventDefault();
-                for (touch in changedTouches) {
-                    var x = getX(touch, bounds);
-                    var y = getY(touch, bounds);
-                    _touch.submitMove(Std.int(touch.identifier), x, y);
-                }
+                switch (event.type) {
+                case "touchstart":
+                    event.preventDefault();
+                    if (HtmlUtil.SHOULD_HIDE_MOBILE_BROWSER) {
+                        HtmlUtil.hideMobileBrowser();
+                    }
+                    for (touch in changedTouches) {
+                        var x = getX(touch, bounds);
+                        var y = getY(touch, bounds);
+                        basicTouch.submitDown(Std.int(touch.identifier), x, y);
+                    }
 
-            case "touchend", "touchcancel":
-                for (touch in changedTouches) {
-                    var x = getX(touch, bounds);
-                    var y = getY(touch, bounds);
-                    _touch.submitUp(Std.int(touch.identifier), x, y);
+                case "touchmove":
+                    event.preventDefault();
+                    for (touch in changedTouches) {
+                        var x = getX(touch, bounds);
+                        var y = getY(touch, bounds);
+                        basicTouch.submitMove(Std.int(touch.identifier), x, y);
+                    }
+
+                case "touchend", "touchcancel":
+                    for (touch in changedTouches) {
+                        var x = getX(touch, bounds);
+                        var y = getY(touch, bounds);
+                        basicTouch.submitUp(Std.int(touch.identifier), x, y);
+                    }
                 }
-            }
-        };
-        canvas.addEventListener("touchstart", onTouch, false);
-        canvas.addEventListener("touchmove", onTouch, false);
-        canvas.addEventListener("touchend", onTouch, false);
-        canvas.addEventListener("touchcancel", onTouch, false);
+            };
+            canvas.addEventListener("touchstart", onTouch, false);
+            canvas.addEventListener("touchmove", onTouch, false);
+            canvas.addEventListener("touchend", onTouch, false);
+            canvas.addEventListener("touchcancel", onTouch, false);
+
+        } else {
+            _touch = new DummyTouch();
+        }
 
         var onKey = function (event) {
             switch (event.type) {
@@ -342,7 +351,7 @@ class HtmlPlatform
     private var _stage :HtmlStage;
     private var _pointer :BasicPointer;
     private var _mouse :HtmlMouse;
-    private var _touch :BasicTouch;
+    private var _touch :Touch;
     private var _keyboard :BasicKeyboard;
     private var _storage :Storage;
     private var _web :Web;

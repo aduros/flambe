@@ -144,7 +144,7 @@ class Font
                 x += glyph.xAdvance;
                 ++ii;
                 if (ii != ll) {
-                    var nextGlyph = _glyphs[ii];
+                    var nextGlyph = glyphs[ii];
                     x += glyph.getKerning(nextGlyph.charCode);
                 }
             }

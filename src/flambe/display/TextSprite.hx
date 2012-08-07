@@ -24,10 +24,13 @@ class TextSprite extends Sprite
 
     override public function draw (ctx :DrawingContext)
     {
-        var x = 0;
-        for (glyph in _glyphs) {
-            glyph.draw(ctx, x, 0);
-            x += glyph.xAdvance;
+        var ii = 0;
+        var ll = _glyphs.length;
+        while (ii < ll) {
+            var glyph = _glyphs[ii];
+            var offset = _offsets[ii];
+            glyph.draw(ctx, offset, 0);
+            ++ii;
         }
     }
 
@@ -63,16 +66,30 @@ class TextSprite extends Sprite
     private function invalidate ()
     {
         _glyphs = font.getGlyphs(text);
-
+        _offsets = [0];
         _width = 0;
         _height = 0;
-        for (glyph in _glyphs) {
-            _width += glyph.xAdvance;
+
+        var ii = 0;
+        var ll = _glyphs.length;
+        while (ii < ll) {
+            var glyph = _glyphs[ii];
+            ++ii;
+
+            if (ii == ll) {
+                // Last glyph, only advance up until its right edge
+                _width += glyph.width;
+            } else {
+                var nextGlyph = _glyphs[ii];
+                _width += glyph.xAdvance + glyph.getKerning(nextGlyph.charCode);
+                _offsets.push(_width);
+            }
             _height = FMath.max(_height, glyph.height + glyph.yOffset);
         }
     }
 
     private var _glyphs :Array<Glyph>;
+    private var _offsets :Array<Float>;
     private var _font :Font;
 
     private var _width :Float;

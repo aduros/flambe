@@ -44,52 +44,66 @@ class Font
 
         for (keyword in parser.keywords()) {
             switch (keyword) {
-                case "info":
-                    for (pair in parser.pairs()) {
-                        switch (pair.key) {
-                            case "size":
-                                size = pair.getInt();
-                        }
+            case "info":
+                for (pair in parser.pairs()) {
+                    switch (pair.key) {
+                    case "size":
+                        size = pair.getInt();
                     }
+                }
 
-                case "page":
-                    var pageId :Int = 0;
-                    var file :String = null;
-                    for (pair in parser.pairs()) {
-                        switch (pair.key) {
-                            case "id":
-                                pageId = pair.getInt();
-                            case "file":
-                                file = pair.getString();
-                        }
+            case "page":
+                var pageId :Int = 0;
+                var file :String = null;
+                for (pair in parser.pairs()) {
+                    switch (pair.key) {
+                        case "id":
+                            pageId = pair.getInt();
+                        case "file":
+                            file = pair.getString();
                     }
-                    pages.set(pageId, pack.loadTexture(basePath + file));
+                }
+                pages.set(pageId, pack.loadTexture(basePath + file));
 
-                case "char":
-                    var glyph = null;
-                    for (pair in parser.pairs()) {
-                        switch (pair.key) {
-                            case "id":
-                                glyph = new Glyph(pair.getInt());
-                            case "x":
-                                glyph.x = pair.getInt();
-                            case "y":
-                                glyph.y = pair.getInt();
-                            case "width":
-                                glyph.width = pair.getInt();
-                            case "height":
-                                glyph.height = pair.getInt();
-                            case "page":
-                                glyph.page = pages.get(pair.getInt());
-                            case "xoffset":
-                                glyph.xOffset = pair.getInt();
-                            case "yoffset":
-                                glyph.yOffset = pair.getInt();
-                            case "xadvance":
-                                glyph.xAdvance = pair.getInt();
-                        }
+            case "char":
+                var glyph = null;
+                for (pair in parser.pairs()) {
+                    switch (pair.key) {
+                    case "id":
+                        glyph = new Glyph(pair.getInt());
+                    case "x":
+                        glyph.x = pair.getInt();
+                    case "y":
+                        glyph.y = pair.getInt();
+                    case "width":
+                        glyph.width = pair.getInt();
+                    case "height":
+                        glyph.height = pair.getInt();
+                    case "page":
+                        glyph.page = pages.get(pair.getInt());
+                    case "xoffset":
+                        glyph.xOffset = pair.getInt();
+                    case "yoffset":
+                        glyph.yOffset = pair.getInt();
+                    case "xadvance":
+                        glyph.xAdvance = pair.getInt();
                     }
-                    _glyphs.set(glyph.charCode, glyph);
+                }
+                _glyphs.set(glyph.charCode, glyph);
+
+            case "kerning":
+                var first :Glyph = null;
+                var second = -1;
+                for (pair in parser.pairs()) {
+                    switch (pair.key) {
+                    case "first":
+                        first = _glyphs.get(pair.getInt());
+                    case "second":
+                        second = pair.getInt();
+                    case "amount":
+                        first._internal_setKerning(second, pair.getInt());
+                    }
+                }
             }
         }
     }
@@ -104,9 +118,10 @@ class Font
         var lines = [];
         var x = 0;
         var ii = 0;
+        var ll = glyphs.length;
         var lastSpaceIdx = -1;
 
-        while (ii < glyphs.length) {
+        while (ii < ll) {
             var glyph = glyphs[ii];
             if (x + glyph.width > maxWidth) {
                 // Ran off the edge, add a line
@@ -128,6 +143,10 @@ class Font
                 line += String.fromCharCode(glyph.charCode);
                 x += glyph.xAdvance;
                 ++ii;
+                if (ii != ll) {
+                    var nextGlyph = _glyphs[ii];
+                    x += glyph.getKerning(nextGlyph.charCode);
+                }
             }
         }
         lines.push(line);
@@ -155,7 +174,10 @@ class Font
         return list;
     }
 
-    public function getGlyph (charCode :Int)
+    /**
+     * Get the Glyph for a given character code.
+     */
+    inline public function getGlyph (charCode :Int) :Glyph
     {
         return _glyphs.get(charCode);
     }
@@ -204,6 +226,21 @@ class Glyph
             ctx.drawSubImage(page, destX + xOffset, destY + yOffset, x, y, width, height);
         }
     }
+
+    public function getKerning (nextCharCode :Int) :Int
+    {
+        return (_kernings != null) ? Std.int(_kernings.get(nextCharCode)) : 0;
+    }
+
+    /** @private */ public function _internal_setKerning (nextCharCode :Int, amount :Int)
+    {
+        if (_kernings == null) {
+            _kernings = new IntHash();
+        }
+        _kernings.set(nextCharCode, amount);
+    }
+
+    private var _kernings :IntHash<Int>;
 }
 
 private class ConfigParser

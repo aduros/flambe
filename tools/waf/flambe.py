@@ -309,7 +309,7 @@ def apply_flambe_server(ctx):
 # Spawns a development server for testing
 def server(ctx):
     from subprocess import Popen
-    print("Restart the server using `waf restart_server`.")
+    print("Restart the server using `wafl restart_server`.")
     while True:
         print("")
         conf = ConfigSet.ConfigSet(SERVER_CONFIG)

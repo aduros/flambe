@@ -19,6 +19,7 @@ class HtmlStage
     public var width (getWidth, null) :Int;
     public var height (getHeight, null) :Int;
     public var orientation (getOrientation, null) :Value<Orientation>;
+    public var fullscreen (getFullscreen, null) :Value<Bool>;
 
     public var resize (default, null) :Signal0;
 
@@ -56,6 +57,12 @@ class HtmlStage
             (untyped window).addEventListener("orientationchange", onOrientationChange, false);
             onOrientationChange();
         }
+
+        _fullscreen = new Value<Bool>(false);
+        HtmlUtil.addVendorListener(Lib.document, "fullscreenchange", function (_) {
+            updateFullscreen();
+        }, false);
+        updateFullscreen();
     }
 
     public function getWidth () :Int
@@ -71,6 +78,11 @@ class HtmlStage
     public function getOrientation () :Value<Orientation>
     {
         return _orientation;
+    }
+
+    public function getFullscreen () :Value<Bool>
+    {
+        return _fullscreen;
     }
 
     public function lockOrientation (orient :Orientation)
@@ -90,6 +102,25 @@ class HtmlStage
             var container = _canvas.parentNode;
             container.style.width = width + "px";
             container.style.height = height + "px";
+        }
+    }
+
+    public function requestFullscreen (enable :Bool = true)
+    {
+        if (enable) {
+            var documentElement = untyped Lib.document.documentElement;
+            var requestFullscreen = HtmlUtil.loadFirstExtension(
+               ["requestFullscreen", "requestFullScreen"], documentElement).value;
+            if (requestFullscreen != null) {
+                Reflect.callMethod(documentElement, requestFullscreen, []);
+            }
+
+        } else {
+            var cancelFullscreen = HtmlUtil.loadFirstExtension(
+                ["cancelFullscreen", "cancelFullScreen"], Lib.document).value;
+            if (cancelFullscreen != null) {
+                Reflect.callMethod(Lib.document, cancelFullscreen, []);
+            }
         }
     }
 
@@ -149,6 +180,13 @@ class HtmlStage
         _orientation._ = value;
     }
 
+    private function updateFullscreen ()
+    {
+        var state :Dynamic = HtmlUtil.loadFirstExtension(
+            ["fullscreen", "fullScreen", "isFullScreen"], Lib.document).value;
+        _fullscreen._ = (state == true); // state will be null if fullscreen not supported
+    }
+
     private static function computeScaleFactor (canvas :Dynamic) :Float
     {
         // Based on "Delivering Web Content on High Resolution Displays"
@@ -180,4 +218,5 @@ class HtmlStage
 
     private var _canvas :Dynamic;
     private var _orientation :Value<Orientation>;
+    private var _fullscreen :Value<Bool>;
 }

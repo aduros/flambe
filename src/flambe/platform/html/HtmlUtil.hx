@@ -57,6 +57,20 @@ class HtmlUtil
         return {prefix: null, field: null, value: null};
     }
 
+    public static function loadFirstExtension (
+        names :Array<String>, ?obj :Dynamic) :{ prefix :String, field :String, value :Dynamic }
+    {
+        for (name in names) {
+            var extension = loadExtension(name, obj);
+            if (extension.field != null) {
+                return extension;
+            }
+        }
+
+        // Not found
+        return {prefix: null, field: null, value: null};
+    }
+
     // Loads a vendor extension and jams it into the supplied object
     public static function polyfill (name :String, ?obj :Dynamic) :Bool
     {
@@ -79,6 +93,15 @@ class HtmlUtil
             style.setProperty("-" + prefix + "-" + name, value);
         }
         style.setProperty(name, value);
+    }
+
+    public static function addVendorListener (dispatcher :Dynamic, type :String,
+        listener :Dynamic -> Void, useCapture :Bool)
+    {
+        for (prefix in VENDOR_PREFIXES) {
+            dispatcher.addEventListener(prefix + type, listener, useCapture);
+        }
+        dispatcher.addEventListener(type, listener, useCapture);
     }
 
     /**

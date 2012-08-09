@@ -4,7 +4,9 @@
 
 package flambe.platform.flash;
 
+import flash.display.StageDisplayState;
 import flash.events.Event;
+import flash.events.FullScreenEvent;
 import flash.events.MouseEvent;
 import flash.media.Video;
 import flash.system.Capabilities;
@@ -20,6 +22,7 @@ class FlashStage
     public var width (getWidth, null) :Int;
     public var height (getHeight, null) :Int;
     public var orientation (getOrientation, null) :Value<Orientation>;
+    public var fullscreen (getFullscreen, null) :Value<Bool>;
 
     public var resize (default, null) :Signal0;
 
@@ -42,6 +45,10 @@ class FlashStage
         if (Capabilities.playerType == "PlugIn" && FlashUtil.isMobile()) {
             nativeStage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
         }
+
+        _fullscreen = new Value<Bool>(false);
+        nativeStage.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
+        onFullscreen();
     }
 
     public function getWidth () :Int
@@ -57,6 +64,11 @@ class FlashStage
     public function getOrientation () :Value<Orientation>
     {
         return _orientation;
+    }
+
+    public function getFullscreen () :Value<Bool>
+    {
+        return _fullscreen;
     }
 
     public function lockOrientation (orient :Orientation)
@@ -92,9 +104,14 @@ class FlashStage
         // Not supported
     }
 
+    public function requestFullscreen (enable :Bool = true)
+    {
+        nativeStage.displayState = enable ? FULL_SCREEN : NORMAL;
+    }
+
     private function onMouseDown (_)
     {
-        nativeStage.displayState = FULL_SCREEN;
+        requestFullscreen(true);
     }
 
     private function onResize (_)
@@ -102,7 +119,13 @@ class FlashStage
         resize.emit();
     }
 
+    private function onFullscreen (?_)
+    {
+        _fullscreen._ = (nativeStage.displayState != NORMAL);
+    }
+
     private var _orientHack :Video;
 
     private var _orientation :Value<Orientation>;
+    private var _fullscreen :Value<Bool>;
 }

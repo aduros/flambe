@@ -29,6 +29,11 @@ interface Stage
     var orientation (getOrientation, null) :Value<Orientation>;
 
     /**
+     * True if the stage is currently fullscreen.
+     */
+    var fullscreen (getFullscreen, null) :Value<Bool>;
+
+    /**
      * Emitted after the stage size changes, such as when the window is resized or the device is
      * rotated.
      */
@@ -51,4 +56,9 @@ interface Stage
      * Request that the stage be resized to a certain size.
      */
     function requestResize (width :Int, height :Int) :Void;
+
+    /**
+     * Request that fullscreen be enabled or disabled.
+     */
+    function requestFullscreen (enable :Bool = true) :Void;
 }

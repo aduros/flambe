@@ -34,6 +34,12 @@ interface Stage
     var fullscreen (getFullscreen, null) :Value<Bool>;
 
     /**
+     * Whether the stage may change its fullscreen state. False if the stage is fullscreen and can't
+     * go into windowed mode, or vise versa.
+     */
+    var fullscreenSupported (isFullscreenSupported, null) :Bool;
+
+    /**
      * Emitted after the stage size changes, such as when the window is resized or the device is
      * rotated.
      */
@@ -58,7 +64,8 @@ interface Stage
     function requestResize (width :Int, height :Int) :Void;
 
     /**
-     * Request that fullscreen be enabled or disabled.
+     * Request that fullscreen be enabled or disabled. No effect if changing fullscreen is not
+     * supported.
      */
     function requestFullscreen (enable :Bool = true) :Void;
 }

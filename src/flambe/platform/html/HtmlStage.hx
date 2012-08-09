@@ -20,6 +20,7 @@ class HtmlStage
     public var height (getHeight, null) :Int;
     public var orientation (getOrientation, null) :Value<Orientation>;
     public var fullscreen (getFullscreen, null) :Value<Bool>;
+    public var fullscreenSupported (isFullscreenSupported, null) :Bool;
 
     public var resize (default, null) :Signal0;
 
@@ -83,6 +84,12 @@ class HtmlStage
     public function getFullscreen () :Value<Bool>
     {
         return _fullscreen;
+    }
+
+    public function isFullscreenSupported () :Bool
+    {
+        return HtmlUtil.loadFirstExtension(
+            ["fullscreenEnabled", "fullScreenEnabled"], Lib.document).value == true;
     }
 
     public function lockOrientation (orient :Orientation)

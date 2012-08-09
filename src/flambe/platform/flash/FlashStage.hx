@@ -23,6 +23,7 @@ class FlashStage
     public var height (getHeight, null) :Int;
     public var orientation (getOrientation, null) :Value<Orientation>;
     public var fullscreen (getFullscreen, null) :Value<Bool>;
+    public var fullscreenSupported (isFullscreenSupported, null) :Bool;
 
     public var resize (default, null) :Signal0;
 
@@ -71,6 +72,15 @@ class FlashStage
         return _fullscreen;
     }
 
+    public function isFullscreenSupported () :Bool
+    {
+#if flash10_2
+        return nativeStage.allowsFullScreen;
+#else
+        return true;
+#end
+    }
+
     public function lockOrientation (orient :Orientation)
     {
         if (!FlashUtil.isMobile()) {
@@ -106,6 +116,7 @@ class FlashStage
 
     public function requestFullscreen (enable :Bool = true)
     {
+        // Use FULL_SCREEN_INTERACTIVE instead?
         nativeStage.displayState = enable ? FULL_SCREEN : NORMAL;
     }
 

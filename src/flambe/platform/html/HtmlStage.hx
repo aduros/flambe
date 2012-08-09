@@ -63,6 +63,13 @@ class HtmlStage
         HtmlUtil.addVendorListener(Lib.document, "fullscreenchange", function (_) {
             updateFullscreen();
         }, false);
+#if debug
+        HtmlUtil.addVendorListener(Lib.document, "fullscreenerror", function (_) {
+            // No useful error message since the event provides no reason. See the error conditions
+            // at http://dvcs.w3.org/hg/fullscreen/raw-file/tip/Overview.html#dom-element-requestfullscreen
+            log.warn("Error when requesting fullscreen");
+        }, false);
+#end
         updateFullscreen();
     }
 

@@ -117,7 +117,12 @@ class FlashStage
     public function requestFullscreen (enable :Bool = true)
     {
         // Use FULL_SCREEN_INTERACTIVE instead?
-        nativeStage.displayState = enable ? FULL_SCREEN : NORMAL;
+        try {
+            nativeStage.displayState = enable ? FULL_SCREEN : NORMAL;
+        } catch (error :Dynamic) {
+            log.warn("Error when changing fullscreen", ["enable", enable,
+                "error", FlashUtil.getErrorMessage(error)]);
+        }
     }
 
     private function onMouseDown (_)

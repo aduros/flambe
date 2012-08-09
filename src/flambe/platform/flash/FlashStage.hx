@@ -19,6 +19,8 @@ import flambe.util.Value;
 class FlashStage
     implements Stage
 {
+    private static var log = Log.log; // http://code.google.com/p/haxe/issues/detail?id=365
+
     public var width (getWidth, null) :Int;
     public var height (getHeight, null) :Int;
     public var orientation (getOrientation, null) :Value<Orientation>;

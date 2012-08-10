@@ -4,6 +4,9 @@
 
 package flambe.platform.flash;
 
+#if flambe_air
+import flash.events.StageOrientationEvent;
+#end
 import flash.display.StageDisplayState;
 import flash.events.Event;
 import flash.events.FullScreenEvent;
@@ -36,22 +39,25 @@ class FlashStage
         this.nativeStage = nativeStage;
         resize = new Signal0();
 
-        // TODO(bruno): Support orientation in AIR
-        _orientation = new Value<Orientation>(null);
-
         nativeStage.scaleMode = NO_SCALE;
         nativeStage.frameRate = 60;
         nativeStage.showDefaultContextMenu = false;
         nativeStage.addEventListener(Event.RESIZE, onResize);
+
+        _fullscreen = new Value<Bool>(false);
+        nativeStage.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
+        onFullscreen();
 
         // If we're running in a mobile browser, go full screen on a pointer event
         if (Capabilities.playerType == "PlugIn" && FlashUtil.isMobile()) {
             nativeStage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
         }
 
-        _fullscreen = new Value<Bool>(false);
-        nativeStage.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
-        onFullscreen();
+        _orientation = new Value<Orientation>(null);
+#if flambe_air
+        nativeStage.addEventListener(StageOrientationEvent.ORIENTATION_CHANGE, onOrientationChange);
+        onOrientationChange();
+#end
     }
 
     public function getWidth () :Int
@@ -83,6 +89,26 @@ class FlashStage
 #end
     }
 
+#if flambe_air
+    public function lockOrientation (orient :Orientation)
+    {
+        nativeStage.autoOrients = false;
+        nativeStage.setAspectRatio(FlashUtil.aspectRatio(orient));
+    }
+
+    public function unlockOrientation ()
+    {
+        nativeStage.autoOrients = true;
+    }
+
+    private function onOrientationChange (?_)
+    {
+        // Maybe this should be nativeStage.deviceOrientation, but deviceOrientation doesn't change
+        // after a lockOrientation()
+        _orientation._ = FlashUtil.orientation(nativeStage.orientation);
+    }
+
+#else
     public function lockOrientation (orient :Orientation)
     {
         if (!FlashUtil.isMobile()) {
@@ -110,6 +136,9 @@ class FlashStage
             _orientHack = null;
         }
     }
+
+    private var _orientHack :Video;
+#end
 
     public function requestResize (width :Int, height :Int)
     {
@@ -141,8 +170,6 @@ class FlashStage
     {
         _fullscreen._ = (nativeStage.displayState != NORMAL);
     }
-
-    private var _orientHack :Video;
 
     private var _orientation :Value<Orientation>;
     private var _fullscreen :Value<Bool>;

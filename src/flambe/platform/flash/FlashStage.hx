@@ -92,13 +92,14 @@ class FlashStage
 #if flambe_air
     public function lockOrientation (orient :Orientation)
     {
-        nativeStage.autoOrients = false;
+        nativeStage.autoOrients = true;
         nativeStage.setAspectRatio(FlashUtil.aspectRatio(orient));
     }
 
     public function unlockOrientation ()
     {
         nativeStage.autoOrients = true;
+        nativeStage.setAspectRatio(cast "any"); // ANY is undefined, WTF?
     }
 
     private function onOrientationChange (?_)

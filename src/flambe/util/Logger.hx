@@ -20,7 +20,7 @@ enum LogLevel {
 
 interface LogHandler
 {
-    public function log (level :LogLevel, message :String) :Void;
+    function log (level :LogLevel, message :String) :Void;
 }
 
 /**

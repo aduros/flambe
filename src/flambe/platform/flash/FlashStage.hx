@@ -26,8 +26,8 @@ class FlashStage
 
     public var width (getWidth, null) :Int;
     public var height (getHeight, null) :Int;
-    public var orientation (getOrientation, null) :Value<Orientation>;
-    public var fullscreen (getFullscreen, null) :Value<Bool>;
+    public var orientation (default, null) :Value<Orientation>;
+    public var fullscreen (default, null) :Value<Bool>;
     public var fullscreenSupported (isFullscreenSupported, null) :Bool;
 
     public var resize (default, null) :Signal0;
@@ -44,7 +44,7 @@ class FlashStage
         nativeStage.showDefaultContextMenu = false;
         nativeStage.addEventListener(Event.RESIZE, onResize);
 
-        _fullscreen = new Value<Bool>(false);
+        fullscreen = new Value<Bool>(false);
         nativeStage.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
         onFullscreen();
 
@@ -53,7 +53,7 @@ class FlashStage
             nativeStage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
         }
 
-        _orientation = new Value<Orientation>(null);
+        orientation = new Value<Orientation>(null);
 #if flambe_air
         nativeStage.addEventListener(StageOrientationEvent.ORIENTATION_CHANGE, onOrientationChange);
         onOrientationChange();
@@ -68,16 +68,6 @@ class FlashStage
     public function getHeight () :Int
     {
         return nativeStage.stageHeight;
-    }
-
-    public function getOrientation () :Value<Orientation>
-    {
-        return _orientation;
-    }
-
-    public function getFullscreen () :Value<Bool>
-    {
-        return _fullscreen;
     }
 
     public function isFullscreenSupported () :Bool
@@ -106,7 +96,7 @@ class FlashStage
     {
         // Maybe this should be nativeStage.deviceOrientation, but deviceOrientation doesn't change
         // after a lockOrientation()
-        _orientation._ = FlashUtil.orientation(nativeStage.orientation);
+        orientation._ = FlashUtil.orientation(nativeStage.orientation);
     }
 
 #else
@@ -169,9 +159,6 @@ class FlashStage
 
     private function onFullscreen (?_)
     {
-        _fullscreen._ = (nativeStage.displayState != NORMAL);
+        fullscreen._ = (nativeStage.displayState != NORMAL);
     }
-
-    private var _orientation :Value<Orientation>;
-    private var _fullscreen :Value<Bool>;
 }

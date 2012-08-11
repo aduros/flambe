@@ -26,12 +26,12 @@ interface Stage
      * The current screen orientation, or a wrapped null value if the environment doesn't support
      * multiple orientations.
      */
-    var orientation (getOrientation, null) :Value<Orientation>;
+    var orientation (default, null) :Value<Orientation>;
 
     /**
      * True if the stage is currently fullscreen.
      */
-    var fullscreen (getFullscreen, null) :Value<Bool>;
+    var fullscreen (default, null) :Value<Bool>;
 
     /**
      * Whether the stage may change its fullscreen state. False if the stage is fullscreen and can't

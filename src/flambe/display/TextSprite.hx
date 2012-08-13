@@ -58,7 +58,7 @@ class TextSprite extends Sprite
 
     private function setFont (font :Font) :Font
     {
-        this.font = font;
+        _font = font;
         invalidate();
         return font;
     }

@@ -116,6 +116,11 @@ class KeyCodes
     public static inline var SPACE = 32;
     public static inline var TAB = 9;
 
+    // Android keys (AIR only)
+    public static inline var BACK = 0x01000016;
+    public static inline var MENU = 0x01000012;
+    public static inline var SEARCH = 0x0100001f;
+
     public static function toKey (keyCode :Int) :Key
     {
         switch (keyCode) {
@@ -220,6 +225,10 @@ class KeyCodes
             case SLASH: return Key.Slash;
             case SPACE: return Key.Space;
             case TAB: return Key.Tab;
+
+            case BACK: return Key.Back;
+            case MENU: return Key.Menu;
+            case SEARCH: return Key.Search;
         }
 
         return Unknown(keyCode);
@@ -332,6 +341,10 @@ class KeyCodes
             case Key.Slash: return SLASH;
             case Key.Space: return SPACE;
             case Key.Tab: return TAB;
+
+            case Key.Back: return BACK;
+            case Key.Menu: return MENU;
+            case Key.Search: return SEARCH;
 
             case Key.Unknown(keyCode): return keyCode;
         }

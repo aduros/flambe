@@ -26,7 +26,8 @@ enum Key
     Equals; Escape; Home; Insert; LeftBracket; Minus; PageDown; PageUp; Period; Quote; RightBracket;
     Semicolon; Shift; Slash; Space; Tab;
 
-    // TODO(bruno): Add Android and media player keys
+    // Android keys
+    Back; Menu; Search;
 
     /**
      * Used if the environment sends an unknown key code.

@@ -186,6 +186,7 @@ class FlashPlatform
 
     private function onKeyDown (event :KeyboardEvent)
     {
+        event.preventDefault();
         _keyboard.submitDown(event.keyCode);
     }
 

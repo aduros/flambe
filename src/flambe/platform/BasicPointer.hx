@@ -88,6 +88,9 @@ class BasicPointer
         prepare(viewX, viewY, source);
         for (signal in chain) {
             signal.emit(_sharedEvent);
+            if (_sharedEvent._internal_stopped) {
+                break;
+            }
         }
     }
 
@@ -118,6 +121,9 @@ class BasicPointer
         prepare(viewX, viewY, source);
         for (signal in chain) {
             signal.emit(_sharedEvent);
+            if (_sharedEvent._internal_stopped) {
+                break;
+            }
         }
     }
 
@@ -156,6 +162,9 @@ class BasicPointer
         prepare(viewX, viewY, source);
         for (signal in chain) {
             signal.emit(_sharedEvent);
+            if (_sharedEvent._internal_stopped) {
+                break;
+            }
         }
     }
 

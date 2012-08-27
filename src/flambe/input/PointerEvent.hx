@@ -43,6 +43,15 @@ class PointerEvent
     }
 
     /**
+     * Prevents this PointerEvent from propagating up to parent sprites and the top-level Pointer
+     * signal. Other listeners for this event on the current sprite will still fire.
+     */
+    inline public function stopPropagation ()
+    {
+        _internal_stopped = true;
+    }
+
+    /**
      * Creates a copy of this event.
      */
     public function clone () :PointerEvent
@@ -66,5 +75,8 @@ class PointerEvent
         this.viewX = viewX;
         this.viewY = viewY;
         this.source = source;
+        _internal_stopped = false;
     }
+
+    /** @private */ public var _internal_stopped :Bool;
 }

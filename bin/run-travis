@@ -5,16 +5,19 @@
 set -e
 
 FLAMBE_ROOT=`readlink -f $(dirname $0)/..`
-cd "$FLAMBE_ROOT"
+FLAMBE_SPACE="/tmp/flambe space"
+
+# Make sure the test directory has a space in it, so we can nip any issues around that in the bud
+ln -sfT "$FLAMBE_ROOT" "$FLAMBE_SPACE"
+cd "$FLAMBE_SPACE"
 
 # Set up Flambe development paths
-haxelib dev flambe "$FLAMBE_ROOT/src"
-export PATH="$FLAMBE_ROOT/bin:$PATH"
+haxelib dev flambe "$FLAMBE_SPACE/src"
+export PATH="$FLAMBE_SPACE/bin:$PATH"
 
 echo "Validating compilation..."
 haxe -js out.js --no-output --macro 'include("flambe", true, ["flambe.platform"])' \
-    -lib format \
-    -cp "$FLAMBE_ROOT/src"
+    -lib format -lib flambe
 
 echo "Running unit tests..."
 cd tests

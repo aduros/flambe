@@ -13,7 +13,7 @@ def configure(ctx):
         ctx.env["JAVA_HOME"] = [ctx.environ["JAVA_HOME"]]
     ctx.find_program("java", var="JAVA", path_list=path)
 
-    ctx.env.CLOSURE_JAR = ctx.find_file("closure.jar", path_list=os.path.dirname(__file__))
+    ctx.env.CLOSURE_JAR = ctx.find_file("closure.jar", path_list=[os.path.dirname(__file__)])
 
 class closure(Task.Task):
     color = "BLUE"

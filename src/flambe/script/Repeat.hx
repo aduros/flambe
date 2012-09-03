@@ -22,21 +22,21 @@ class Repeat
         _remaining = count;
     }
 
-    public function update (dt :Float, actor :Entity)
+    public function update (dt :Float, actor :Entity) :Float
     {
         if (_count == 0) {
             // Handle the special case of a 0-count Repeat
-            return true;
+            return 0;
         }
 
-        var complete = _action.update(dt, actor);
-        if (complete && _count >= 0 && --_remaining < 0) {
+        var spent = _action.update(dt, actor);
+        if (_count >= 0 && spent >= 0 && --_remaining < 0) {
             _remaining = _count; // Reset state in case this Action is reused
-            return true;
+            return spent;
         }
 
         // Keep repeating
-        return false;
+        return -1;
     }
 
     private var _action :Action;

@@ -42,17 +42,37 @@ class Sequence
         _runningActions = [];
     }
 
-    public function update (dt :Float, actor :Entity) :Bool
+    public function update (dt :Float, actor :Entity) :Float
     {
-        var action = _runningActions[_idx];
-        if (action == null || action.update(dt, actor)) {
+        // The total time taken by the actions updated this frame
+        var total = 0.0;
+
+        while (true) {
+            var action = _runningActions[_idx];
+            if (action != null) {
+                var spent = action.update(dt-total, actor);
+                if (spent >= 0) {
+                    // This action completed, add it to the total time
+                    total += spent;
+                } else {
+                    // This action didn't complete, so neither will this sequence
+                    return -1;
+                }
+            }
+
             ++_idx;
             if (_idx >= _runningActions.length) {
+                // If this is the last action, reset to the starting position and finish
                 _idx = 0;
-                return true;
+                break;
+
+            } else if (total > dt) {
+                // Otherwise, if there are still actions but not enough time to complete them
+                return -1;
             }
         }
-        return false;
+
+        return total;
     }
 
     private var _runningActions :Array<Action>;

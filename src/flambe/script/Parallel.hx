@@ -42,16 +42,23 @@ class Parallel
         _completedActions = [];
     }
 
-    public function update (dt :Float, actor :Entity) :Bool
+    public function update (dt :Float, actor :Entity) :Float
     {
         var done = true;
+        var maxSpent = 0.0;
         for (ii in 0..._runningActions.length) {
             var action = _runningActions[ii];
             if (action != null) {
-                if (action.update(dt, actor)) {
+                var spent = action.update(dt, actor);
+                if (spent >= 0) {
                     _runningActions[ii] = null;
                     _completedActions.push(action);
+                    if (spent > maxSpent) {
+                        maxSpent = spent;
+                    }
                 } else {
+                    // We can't possibly finish this frame, but continue ticking the rest of the
+                    // actions anyways
                     done = false;
                 }
             }
@@ -60,9 +67,9 @@ class Parallel
         if (done) {
             _runningActions = _completedActions;
             _completedActions = [];
-            return true;
+            return maxSpent;
         }
-        return false;
+        return -1;
     }
 
     private var _runningActions :Array<Action>;

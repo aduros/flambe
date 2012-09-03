@@ -18,14 +18,15 @@ class Delay
         _elapsed = 0;
     }
 
-    public function update (dt :Float, actor :Entity)
+    public function update (dt :Float, actor :Entity) :Float
     {
         _elapsed += dt;
         if (_elapsed >= _duration) {
+            var overtime = _elapsed - _duration;
             _elapsed = 0;
-            return true;
+            return dt - overtime;
         }
-        return false;
+        return -1;
     }
 
     private var _duration :Float;

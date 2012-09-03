@@ -21,7 +21,7 @@ class Shake
         _elapsed = 0;
     }
 
-    public function update (dt :Float, actor :Entity) :Bool
+    public function update (dt :Float, actor :Entity) :Float
     {
         var sprite = actor.get(Sprite);
         if (_jitterX == null) {
@@ -33,6 +33,7 @@ class Shake
 
         _elapsed += dt;
         if (_elapsed >= _duration) {
+            var overtime = _elapsed - _duration;
             if (sprite.x.behavior == _jitterX) {
                 sprite.x._ = _jitterX.base;
             }
@@ -42,9 +43,9 @@ class Shake
             _jitterX = null;
             _jitterY = null;
             _elapsed = 0;
-            return true;
+            return dt - overtime;
         }
-        return false;
+        return -1;
     }
 
     private var _elapsed :Float;

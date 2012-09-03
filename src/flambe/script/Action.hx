@@ -12,10 +12,12 @@ import flambe.Entity;
 interface Action
 {
     /**
-     * Called when the owning entity has been updated.
+     * Called when the acting entity has been updated.
+     *
      * @param dt The time elapsed since the last frame, in seconds.
      * @param actor The entity of the Script that this action was added to.
-     * @return True if the action is complete and no longer wants to receive updates.
+     * @return The amount of time in seconds spent this frame to finish the action, which may be
+     *   less than dt. Or -1 if the action is not yet finished.
      */
-    function update (dt :Float, actor :Entity) :Bool;
+    function update (dt :Float, actor :Entity) :Float;
 }

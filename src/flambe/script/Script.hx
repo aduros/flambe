@@ -41,7 +41,7 @@ class Script extends Component
         var ii = 0;
         while (ii < _handles.length) {
             var handle = _handles[ii];
-            if (handle.removed || handle.action.update(dt, owner)) {
+            if (handle.removed || handle.action.update(dt, owner) >= 0) {
                 _handles.splice(ii, 1);
             } else {
                 ++ii;

@@ -23,7 +23,7 @@ class AnimateTo
         _easing = easing;
     }
 
-    public function update (dt :Float, actor :Entity) :Bool
+    public function update (dt :Float, actor :Entity) :Float
     {
         if (_tween == null) {
             _tween = new Tween(_value._, _to, _seconds, _easing);
@@ -31,10 +31,11 @@ class AnimateTo
             _value.update(dt); // Fake an update to account for this frame
         }
         if (_value.behavior != _tween) {
+            var overtime = _tween.elapsed - _seconds;
             _tween = null;
-            return true;
+            return (overtime > 0) ? dt - overtime : 0;
         }
-        return false;
+        return -1;
     }
 
     private var _tween :Tween;

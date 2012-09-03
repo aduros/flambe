@@ -23,7 +23,7 @@ class CallFunction
     public function update (dt :Float, actor :Entity)
     {
         _fn();
-        return true;
+        return 0;
     }
 
     private var _fn :Void -> Dynamic;

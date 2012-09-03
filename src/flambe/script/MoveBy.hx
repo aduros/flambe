@@ -8,6 +8,7 @@ import flambe.animation.Ease;
 import flambe.animation.Tween;
 import flambe.display.Sprite;
 import flambe.Entity;
+import flambe.math.FMath;
 
 /**
  * An action that translates the owner's sprite by a certain amount.
@@ -25,7 +26,7 @@ class MoveBy
         _easingY = easingY;
     }
 
-    public function update (dt :Float, actor :Entity) :Bool
+    public function update (dt :Float, actor :Entity) :Float
     {
         var sprite = actor.get(Sprite);
         if (_tweenX == null) {
@@ -39,11 +40,12 @@ class MoveBy
             sprite.y.update(dt); // Fake an update to account for this frame
         }
         if (sprite.x.behavior != _tweenX && sprite.y.behavior != _tweenY) {
+            var overtime = FMath.max(_tweenX.elapsed, _tweenY.elapsed) - _seconds;
             _tweenX = null;
             _tweenY = null;
-            return true;
+            return (overtime > 0) ? dt - overtime : 0;
         }
-        return false;
+        return -1;
     }
 
     private var _tweenX :Tween;

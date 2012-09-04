@@ -46,6 +46,25 @@ class MovieSprite extends Sprite
         goto(1);
     }
 
+    /**
+     * Retrieves a named layer from this movie. Children can be added to the returned entity to add
+     * sprites that move with the layer, which for example, can be used to add equipment sprites to
+     * an avatar.
+     * @param required If true and the layer is not found, an error is thrown.
+     */
+    public function getLayer (name :String, required :Bool = true) :Entity
+    {
+        for (animator in _animators) {
+            if (animator.layer.name == name) {
+                return animator.content;
+            }
+        }
+        if (required) {
+            throw "Missing layer: " + name;
+        }
+        return null;
+    }
+
     override public function onAdded ()
     {
         super.onAdded();
@@ -118,24 +137,26 @@ private class LayerAnimator
     public var changedKeyframe :Bool;
     public var keyframeIdx :Int;
 
+    public var layer :MovieLayer;
+
     public function new (layer :MovieLayer)
     {
         changedKeyframe = false;
         keyframeIdx = 0;
-        _layer = layer;
+        this.layer = layer;
 
         content = new Entity();
         var sprite;
-        if (_layer.multipleSymbols) {
+        if (layer.multipleSymbols) {
             _sprites = [];
-            for (kf in _layer.keyframes) {
+            for (kf in layer.keyframes) {
                 var sprite = kf.symbol.createSprite();
                 _sprites.push(sprite);
             }
             sprite = _sprites[0];
 
-        } else if (_layer.lastSymbol != null) {
-            sprite = _layer.lastSymbol.createSprite();
+        } else if (layer.lastSymbol != null) {
+            sprite = layer.lastSymbol.createSprite();
 
         } else {
             sprite = new Sprite();
@@ -145,7 +166,7 @@ private class LayerAnimator
 
     public function composeFrame (frame :Float)
     {
-        var keyframes = _layer.keyframes;
+        var keyframes = layer.keyframes;
         var finalFrame = keyframes.length - 1;
 
         while (keyframeIdx < finalFrame && keyframes[keyframeIdx+1].index <= frame) {
@@ -212,8 +233,6 @@ private class LayerAnimator
         sprite.anchorX._ = kf.pivotX;
         sprite.anchorY._ = kf.pivotY;
     }
-
-    private var _layer :MovieLayer;
 
     // Only created if there are multiple symbols on this layer. If it does exist, the appropriate
     // sprite is swapped in at keyframe changes. If it doesn't, the sprite is only added to the

@@ -21,13 +21,19 @@ class BitmapSprite extends Sprite
     {
         super();
         this.symbol = symbol;
-        anchorX._ = symbol.anchorX;
-        anchorY._ = symbol.anchorY;
     }
 
     override public function draw (ctx :DrawingContext)
     {
-        ctx.drawSubImage(symbol.atlas, 0, 0, symbol.x, symbol.y, symbol.width, symbol.height);
+        ctx.drawSubImage(symbol.atlas, -symbol.anchorX, -symbol.anchorY,
+            symbol.x, symbol.y, symbol.width, symbol.height);
+    }
+
+    override public function containsLocal (localX :Float, localY :Float)
+    {
+        // We can't set the _anchorX/Y properties, since they're modified by LayerAnimator, so
+        // instead they have to be handled specially when drawing and hit testing
+        return super.containsLocal(localX+symbol.anchorX, localY+symbol.anchorY);
     }
 
     override public function getNaturalWidth () :Float

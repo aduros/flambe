@@ -16,6 +16,7 @@ class MovieSymbol
     implements Symbol
 {
     public var name (getName, null) :String;
+
     public var layers (default, null) :Array<MovieLayer>;
 
     /**

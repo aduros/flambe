@@ -36,9 +36,9 @@ class MovieSprite extends Sprite
 
         speed = new AnimatedFloat(1);
 
-        _layers = [];
-        for (layer in symbol.layers) {
-            _layers.push(new LayerSprite(layer));
+        _animators = [];
+        for (animator in symbol.layers) {
+            _animators.push(new LayerAnimator(animator));
         }
 
         _frame = 0;
@@ -50,8 +50,8 @@ class MovieSprite extends Sprite
     {
         super.onAdded();
 
-        for (layer in _layers) {
-            owner.addChild(new Entity().add(layer));
+        for (animator in _animators) {
+            owner.addChild(animator.content);
         }
     }
 
@@ -59,8 +59,8 @@ class MovieSprite extends Sprite
     {
         super.onRemoved();
 
-        for (layer in _layers) {
-            owner.removeChild(layer.owner);
+        for (animator in _animators) {
+            owner.removeChild(animator.content);
         }
     }
 
@@ -83,13 +83,13 @@ class MovieSprite extends Sprite
     {
         var wrapped = newFrame < _frame;
         if (wrapped) {
-            for (layer in _layers) {
-                layer.changedKeyframe = true;
-                layer.keyframeIdx = 0;
+            for (animator in _animators) {
+                animator.changedKeyframe = true;
+                animator.keyframeIdx = 0;
             }
         }
-        for (layer in _layers) {
-            layer.composeFrame(newFrame);
+        for (animator in _animators) {
+            animator.composeFrame(newFrame);
         }
 
         _frame = newFrame;
@@ -105,74 +105,80 @@ class MovieSprite extends Sprite
         return _position = FMath.clamp(position, 0, symbol.duration);
     }
 
-    private var _layers :Array<LayerSprite>;
+    private var _animators :Array<LayerAnimator>;
 
     private var _position :Float;
     private var _frame :Float;
 }
 
-private class LayerSprite extends Sprite
+private class LayerAnimator
 {
+    public var content (default, null) :Entity;
+
     public var changedKeyframe :Bool;
     public var keyframeIdx :Int;
 
     public function new (layer :MovieLayer)
     {
-        super();
         changedKeyframe = false;
         keyframeIdx = 0;
-        _keyframes = layer.keyframes;
-        _content = new Entity();
+        _layer = layer;
 
-        if (layer.multipleSymbols) {
+        content = new Entity();
+        var sprite;
+        if (_layer.multipleSymbols) {
             _sprites = [];
-            for (kf in _keyframes) {
+            for (kf in _layer.keyframes) {
                 var sprite = kf.symbol.createSprite();
                 _sprites.push(sprite);
             }
-            _content.add(_sprites[0]);
+            sprite = _sprites[0];
 
-        } else if (layer.lastSymbol != null) {
-            _content.add(layer.lastSymbol.createSprite());
+        } else if (_layer.lastSymbol != null) {
+            sprite = _layer.lastSymbol.createSprite();
+
         } else {
-            // setSprite(new Sprite());
+            sprite = new Sprite();
         }
+        content.add(sprite);
     }
 
-    override public function onAdded ()
+    public function composeFrame (frame :Float)
     {
-        super.onAdded();
+        var keyframes = _layer.keyframes;
+        var finalFrame = keyframes.length - 1;
 
-        owner.addChild(_content);
-    }
-
-    // TODO(bruno): onRemove
-
-    public function composeFrame (frameFloat :Float)
-    {
-        var frameInt = Std.int(frameFloat);
-        while (keyframeIdx < _keyframes.length - 1
-                && _keyframes[keyframeIdx + 1].index <= frameInt) {
+        while (keyframeIdx < finalFrame && keyframes[keyframeIdx+1].index <= frame) {
             ++keyframeIdx;
             changedKeyframe = true;
         }
 
+        var sprite;
         if (changedKeyframe && _sprites != null) {
-            _content.add(_sprites[keyframeIdx]);
+            // Switch to the next instance if this is a multi-layer symbol
+            changedKeyframe = false;
+            sprite = _sprites[keyframeIdx];
+            content.add(sprite);
+        } else {
+            sprite = content.get(Sprite);
         }
 
-        var kf = _keyframes[keyframeIdx];
+        var kf = keyframes[keyframeIdx];
+        var visible = kf.visible;
+        sprite.visible._ = visible;
+        if (!visible) {
+            return; // Don't bother animating invisible layers
+        }
 
-        if (keyframeIdx == _keyframes.length - 1 || kf.index == frameInt) {
-            x._ = kf.x;
-            y._ = kf.y;
-            scaleX._ = kf.scaleX;
-            scaleY._ = kf.scaleY;
-            rotation._ = kf.rotation;
-            alpha._ = kf.alpha;
+        var x = kf.x;
+        var y = kf.y;
+        var scaleX = kf.scaleX;
+        var scaleY = kf.scaleY;
+        var rotation = kf.rotation;
+        var alpha = kf.alpha;
 
-        } else {
-            var interp = (frameFloat - kf.index)/kf.duration;
+        if (keyframeIdx < finalFrame) {
+            var interp = (frame-kf.index) / kf.duration;
             var ease = kf.ease;
             if (ease != 0) {
                 var t;
@@ -188,23 +194,26 @@ private class LayerSprite extends Sprite
                 interp = ease*t + (1 - ease)*interp;
             }
 
-            var nextKf = _keyframes[keyframeIdx + 1];
-            x._ = kf.x + (nextKf.x - kf.x) * interp;
-            y._ = kf.y + (nextKf.y - kf.y) * interp;
-            scaleX._ = kf.scaleX + (nextKf.scaleX - kf.scaleX) * interp;
-            scaleY._ = kf.scaleY + (nextKf.scaleY - kf.scaleY) * interp;
-            rotation._ = kf.rotation + (nextKf.rotation - kf.rotation) * interp;
-            alpha._ = kf.alpha + (nextKf.alpha - kf.alpha) * interp;
+            var nextKf = keyframes[keyframeIdx + 1];
+            x += (nextKf.x-kf.x) * interp;
+            y += (nextKf.y-kf.y) * interp;
+            scaleX += (nextKf.scaleX-kf.scaleX) * interp;
+            scaleY += (nextKf.scaleY-kf.scaleY) * interp;
+            rotation += (nextKf.rotation-kf.rotation) * interp;
+            alpha += (nextKf.alpha-kf.alpha) * interp;
         }
 
-        anchorX._ = kf.pivotX;
-        anchorY._ = kf.pivotY;
-        visible._ = kf.visible;
+        sprite.x._ = x;
+        sprite.y._ = y;
+        sprite.scaleX._ = scaleX;
+        sprite.scaleY._ = scaleY;
+        sprite.rotation._ = rotation;
+        sprite.alpha._ = alpha;
+        sprite.anchorX._ = kf.pivotX;
+        sprite.anchorY._ = kf.pivotY;
     }
 
-    private var _keyframes :Array<MovieKeyframe>;
-
-    private var _content :Entity;
+    private var _layer :MovieLayer;
 
     // Only created if there are multiple symbols on this layer. If it does exist, the appropriate
     // sprite is swapped in at keyframe changes. If it doesn't, the sprite is only added to the

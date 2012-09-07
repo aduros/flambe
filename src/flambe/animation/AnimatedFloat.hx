@@ -4,6 +4,8 @@
 
 package flambe.animation;
 
+import flambe.util.Signal2;
+
 import flambe.animation.Binding;
 import flambe.animation.Easing;
 import flambe.util.Signal2;

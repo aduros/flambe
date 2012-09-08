@@ -4,6 +4,8 @@
 
 package flambe.util;
 
+using flambe.util.Strings;
+
 /**
  * Simple runtime assertions. A failed assertion throws an error, which should NOT be caught and
  * handled. Assertions are stripped from release builds, unless the -D flambe_keep_asserts compiler
@@ -15,26 +17,35 @@ class Assert
     /**
      * Asserts that a condition is true.
      * @param message If this assertion fails, the message to include in the thrown error.
+     * @param params Optional parameters to be included with the message, see Strings.addParams.
      */
-    public static function that (condition :Bool, ?message :String)
+    public static function that (condition :Bool, ?message :String, ?params :Array<Dynamic>)
     {
         if (!condition) {
-            fail(message);
+            fail(message, params);
         }
     }
 
     /**
-     * Immediately fails an assertion. Same as Assert.that(false)
+     * Immediately fails an assertion. Same as Assert.that(false).
      * @param message The message to include in the thrown error.
+     * @param params Optional parameters to be included with the message, see Strings.addParams.
      */
-    public static function fail (?message :String)
+    public static function fail (?message :String, ?params :Array<Dynamic>)
     {
-        throw "Assertion failed" + (message != null ? ": " + message : "");
+        var error = "Assertion failed!";
+        if (message != null) {
+            error += " " + message;
+        }
+        if (params != null) {
+            error = error.addParams(params);
+        }
+        throw error;
     }
 
 #else
     // In release builds, assertions are stripped out
-    inline public static function that (condition :Bool, ?message :String) {}
-    inline public static function fail (?message :String) {}
+    inline public static function that (condition :Bool, ?message :String, ?params :Array<Dynamic>) {}
+    inline public static function fail (?message :String, ?params :Array<Dynamic>) {}
 #end
 }

@@ -10,6 +10,8 @@ import flambe.asset.AssetPack;
 import flambe.display.Sprite;
 import flambe.swf.Format;
 
+using flambe.util.Strings;
+
 /**
  * An exported Flump library containing movies and bitmaps.
  */
@@ -82,7 +84,7 @@ class Library
         var symbol = _symbols.get(symbolName);
         if (symbol == null) {
             if (required) {
-                throw "Missing symbol: " + symbolName;
+                throw "Missing symbol".addParams(["name", symbolName]);
             }
             return null;
         }

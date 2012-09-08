@@ -4,6 +4,8 @@
 
 package flambe.util;
 
+using flambe.util.Strings;
+
 /**
  * Represents the severity of a log message.
  */
@@ -87,46 +89,12 @@ class Logger
         if (_handler == null) {
             return; // No handler, carry on quietly
         }
-
         if (text == null) {
             text = "";
         }
-
         if (args != null) {
-            var ll = args.length;
-            if (ll > 0) {
-                text += (text.length > 0) ? " [" : "[";
-                var ii = 0;
-                while (ii < ll) {
-                    if (ii > 0) {
-                        text += ", ";
-                    }
-                    var name = args[ii];
-                    var value :Dynamic = args[ii + 1];
-
-                    // Replace throwables with their stack trace
-#if flash
-                    if (Std.is(value, flash.errors.Error)) {
-                        var stack :String = cast(value, flash.errors.Error).getStackTrace();
-                        if (stack != null) {
-                            value = stack;
-                        }
-                    }
-#elseif js
-                    if (Std.is(value, untyped __js__("Error"))) {
-                        var stack :Dynamic = value.stack;
-                        if (stack != null) {
-                            value = stack;
-                        }
-                    }
-#end
-                    text += name + "=" + value;
-                    ii += 2;
-                }
-                text += "]";
-            }
+            text = text.addParams(args);
         }
-
         _handler.log(level, text);
     }
 

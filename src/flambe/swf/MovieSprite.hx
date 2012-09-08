@@ -60,7 +60,7 @@ class MovieSprite extends Sprite
             }
         }
         if (required) {
-            throw "Missing layer: " + name;
+            throw "Missing layer".addParams(["name", name]);
         }
         return null;
     }

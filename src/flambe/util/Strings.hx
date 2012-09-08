@@ -31,7 +31,12 @@ class Strings
         return code;
     }
 
-    public static function substitute (str :String, values :Array<Dynamic>)
+    /**
+     * Substitute all "{n}" tokens with the corresponding values.
+     * Example: <pre>substitute("{1} sat on a {0}", ["wall", "Humpty Dumpty"])</pre> returns
+     * <pre>"Humpty Dumpty sat on a wall"</pre>.
+     */
+    public static function substitute (str :String, values :Array<Dynamic>) :String
     {
         // FIXME(bruno): If your {0} replacement has a {1} in it, then that'll get replaced next
         // iteration
@@ -39,5 +44,48 @@ class Strings
             str = str.replace("{" + ii + "}", values[ii]);
         }
         return str;
+    }
+
+    /**
+     * Format a message with named parameters into a standard format for logging and errors.
+     * Example: <pre>addParams("Wobbles were frobulated", ["count", 5, "silly", true])</pre> returns
+     * <pre>"Wobbles were frobulated [count=5, silly=true]"</pre>.
+     */
+    public static function addParams (message :String, params :Array<Dynamic>) :String
+    {
+        var ll = params.length;
+        if (ll > 0) {
+            message += (message.length > 0) ? " [" : "[";
+            var ii = 0;
+            while (ii < ll) {
+                if (ii > 0) {
+                    message += ", ";
+                }
+                var name = params[ii];
+                var value :Dynamic = params[ii + 1];
+
+                // Replace throwables with their stack trace
+#if flash
+                if (Std.is(value, flash.errors.Error)) {
+                    var stack :String = cast(value, flash.errors.Error).getStackTrace();
+                    if (stack != null) {
+                        value = stack;
+                    }
+                }
+#elseif js
+                if (Std.is(value, untyped __js__("Error"))) {
+                    var stack :String = value.stack;
+                    if (stack != null) {
+                        value = stack;
+                    }
+                }
+#end
+                message += name + "=" + value;
+                ii += 2;
+            }
+            message += "]";
+        }
+
+        return message;
     }
 }

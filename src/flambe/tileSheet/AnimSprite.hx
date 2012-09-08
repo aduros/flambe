@@ -1,5 +1,7 @@
 package flambe.tileSheet;
 
+import flambe.display.Texture;
+import flambe.display.DrawingContext;
 import flambe.display.Sprite;
 import flash.display.Bitmap;
 import flash.display.BitmapData;
@@ -32,27 +34,23 @@ class AnimSprite extends Sprite {
     static public inline var LEFT:UInt = 1;
     static public inline var RIGHT:UInt = 2;
 
-    public function new() {
+    public function new(texture :Texture) {
 
         super();
         fakeElapsed = 0.0167;
-      //  super(bitmapData);
+
         frameTimer = 0;
         mSequences = [];
+        this.texture=texture;
     }
 
-//
-// Initialize the sprite with the texture sheet.
-//  supportFlip: set to true if you intend to use right/left flipping
-//
+
 
     public function initialize(sheet:AnimTextureSheet):Void {
         if (sheet == null)
             return;
         mAnimSheet = sheet;
-// Create the frame buffer
-        bitmapData = new BitmapData(mAnimSheet.maxRect.width, mAnimSheet.maxRect.height);
-       // smoothing = true;
+
         curAnim = null;
         this.frame = 0;
         drawFrame(true);
@@ -92,7 +90,7 @@ class AnimSprite extends Sprite {
         if (curAnim != null)
             curIndex = curAnim.arFrames[curFrame]
         else curIndex = val;
-//curAnim = null;
+
         dirty = true;
         return val;
     }
@@ -126,11 +124,10 @@ class AnimSprite extends Sprite {
         return null;
     }
 
-// Start playing a sequence
-//
+
 
     public function play(name:String = null):Void {
-// Continue playing from last frame
+
         if (name == null) {
             donePlaying = false;
             dirty = true;
@@ -146,26 +143,22 @@ class AnimSprite extends Sprite {
             trace("play: cannot find sequence: " + name);
             return;
         }
-// trace("playing " + name +", frames: " + curAnim.arFrames.length);
-// Set to first frame
+
         curIndex = curAnim.arFrames[0];
         donePlaying = false;
         dirty = true;
-// Stop if we only have a single frame
+
         if (curAnim.arFrames.length == 1)
             donePlaying = true;
     }
 
-// External use only (editor)
-//
+
 
     public function stop():Void {
         donePlaying = true;
     }
 
-// Manually advance one frame forwards or back
-// Used by the viewer (not the game)
-//
+
 
     public function frameAdvance(next:Bool):Void {
         if (next) {
@@ -187,14 +180,18 @@ class AnimSprite extends Sprite {
             drawFrameInternal();
     }
 
-// TODO: Replace with global time based on getTimer()
+
     var fakeElapsed:Float;
-//  Call this function on every frame update
-//
+    override public function onUpdate (dt :Float)
+    {
+
+        super.onUpdate(dt);
+        updateAnimation();
+        }
 
     public function updateAnimation():Void {
         if (curAnim != null && curAnim.delay > 0 && !donePlaying) {
-// Check elapsed time and adjust to sequence rate
+
             frameTimer += fakeElapsed;
             while (frameTimer > curAnim.delay) {
                 frameTimer = frameTimer - curAnim.delay;
@@ -206,8 +203,6 @@ class AnimSprite extends Sprite {
             drawFrameInternal();
     }
 
-//
-//
 
     function advanceFrame():Void {
         if (curFrame == curAnim.arFrames.length - 1) {
@@ -224,9 +219,28 @@ class AnimSprite extends Sprite {
 // Internal function to update the current animation frame
 
     function drawFrameInternal():Void {
-        dirty = false;
-        bitmapData.fillRect(bitmapData.rect, 0);
-        mAnimSheet.drawFrame(curIndex, bitmapData);
+
+    }
+
+
+
+    public var texture :Texture;
+    override public function draw(ctx:DrawingContext) {
+        var frame:SheetFormat=mAnimSheet.getFrameData(curIndex);
+
+
+      var data:FrameData=frame.spriteSourceSize;
+        ctx.drawSubImage(texture,data.offX,data.offY,data.x,data.y,data.width,data.height) ;
+    }
+
+    override public function getNaturalWidth () :Float
+    {
+        return mAnimSheet.getFrameWidth(curIndex);
+    }
+
+    override public function getNaturalHeight () :Float
+    {
+        return mAnimSheet.getFrameHeight(curIndex);;
     }
 
 }

@@ -5,16 +5,20 @@ import flash.display.BitmapData;
 import haxe.Json;
 class TileSheetHelper {
 
-    public function prepareAnimTexture(texture:BitmapData, baseDir:String):AnimTextureSheet {
-        var seqRaw:Dynamic =  Json.parse(pack.loadFile(baseDir + "/library.json"));
-		
+
+    public function new ():Void{
+
+    }
+    public function prepareAnimTexture(src:String):AnimTextureSheet {
+        var seqRaw:Dynamic = Json.parse(pack.loadFile(src));
+
         var animData:Array<SheetFormat> = new Array<SheetFormat>();
         populateFrameArray(animData, seqRaw.frames);
 
         animData.sortOn("id");
 
         var tileSheet:AnimTextureSheet = new AnimTextureSheet();
-        tileSheet.init(texture, animData);
+        tileSheet.init(animData);
         return tileSheet;
     }
 

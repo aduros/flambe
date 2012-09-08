@@ -4,6 +4,7 @@
 
 package flambe.display;
 
+import flambe.Component;
 import flambe.animation.AnimatedFloat;
 import flambe.display.Sprite;
 import flambe.input.PointerEvent;

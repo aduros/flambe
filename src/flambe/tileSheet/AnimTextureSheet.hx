@@ -17,11 +17,11 @@ class AnimTextureSheet {
     var mName:String;
     var mTextureRegions:Vector<Rectangle>;
     var mFrameOffsets:Vector<Point>;
-    var mTextureSheet:BitmapData;
+
     var mFrameRect:Rectangle;
 
     public function new() {
-;
+
         mTextureRegions = new Vector<Rectangle>();
         mFrameRect = new Rectangle();
         mFrameOffsets = new Vector<Point>();
@@ -47,8 +47,12 @@ class AnimTextureSheet {
         return (mTextureRegions[fr].height + mFrameOffsets[fr].y);
     }
 
-    public function init(sheet:BitmapData, arFrameData:Array<SheetFormat>):Void {
-        mTextureSheet = sheet;
+
+    public var arFrameData:Array<SheetFormat>;
+    public function init(arFrameData:Array<SheetFormat>):Void {
+
+        this.arFrameData=arFrameData;
+
         var rcFrame:Rectangle;
         var regPt:Point;
         var i:Int = 0;
@@ -69,8 +73,14 @@ class AnimTextureSheet {
         }
     }
 
-    public function drawFrame(frame:Int, destBmp:BitmapData):Void {
+  /*  public function drawFrame(frame:Int, destBmp:BitmapData):Void {
         destBmp.copyPixels(mTextureSheet, mTextureRegions[frame], mFrameOffsets[frame]);
+    }*/
+
+    public function getFrameData(frame:Int):SheetFormat{
+
+
+            return   arFrameData[frame];
     }
 
 }

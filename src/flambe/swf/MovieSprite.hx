@@ -9,6 +9,8 @@ import flambe.display.Sprite;
 import flambe.math.FMath;
 import flambe.swf.MovieSymbol;
 
+using flambe.util.Strings;
+
 /**
  * An instanced Flump animation.
  */

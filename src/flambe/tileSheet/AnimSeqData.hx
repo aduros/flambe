@@ -1,5 +1,7 @@
 package flambe.tileSheet;
 
+
+import flambe.tileSheet.Format;
 //
 // Helper VO for storing sequence data
 //
@@ -12,9 +14,9 @@ class AnimSeqData {
 // Whether or not the animation is looped
     public var loop:Bool;
 // A list of frames stored as uint objects
-    public var arFrames:Array<SheetFormat>;
+    public var arFrames:Array<UInt>;
 
-    public function new(name:String, frames:Array<SheetFormat>, ?frameRate:Float = 0, ?looped:Bool = true) {
+    public function new(name:String, frames:Array<UInt>, ?frameRate:Float = 0, ?looped:Bool = true) {
         seqName = name;
         delay = 0;
         if (frameRate > 0)

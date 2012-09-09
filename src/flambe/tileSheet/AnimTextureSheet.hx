@@ -5,6 +5,8 @@ import flash.display.BitmapData;
 import flash.geom.Point;
 import flash.geom.Rectangle;
 
+import flambe.tileSheet.Format;
+
 //
 // AnimPack holds a single texture tile sheet, and can have
 // multiple animation sequneces in it.
@@ -48,8 +50,8 @@ class AnimTextureSheet {
     }
 
 
-    public var arFrameData:Array<SheetFormat>;
-    public function init(arFrameData:Array<SheetFormat>):Void {
+    public var arFrameData:Array<FrameData>;
+    public function init(arFrameData:Array<FrameData>):Void {
 
         this.arFrameData=arFrameData;
 
@@ -77,7 +79,7 @@ class AnimTextureSheet {
         destBmp.copyPixels(mTextureSheet, mTextureRegions[frame], mFrameOffsets[frame]);
     }*/
 
-    public function getFrameData(frame:Int):SheetFormat{
+    public function getFrameData(frame:Int):FrameData{
 
 
             return   arFrameData[frame];

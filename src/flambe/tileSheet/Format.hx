@@ -15,10 +15,11 @@ typedef SheetFormat = {
 typedef FrameData = {
 // A checksum of the original FLA library used to generate this file, used by the exporter tool
 // to detect modifications
+    id:String,
     x:Float,
     y:Float,
-    width:Float,
-    height:Float,
+    w:Float,
+    h:Float,
     offX:Float,
     offY:Float
 }

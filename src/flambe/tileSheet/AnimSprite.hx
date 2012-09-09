@@ -5,6 +5,7 @@ import flambe.display.DrawingContext;
 import flambe.display.Sprite;
 import flash.display.Bitmap;
 import flash.display.BitmapData;
+import flambe.tileSheet.Format;
 
 // =============================  Created by: Amos Laber, Dec 2, 2011
 //
@@ -41,7 +42,12 @@ class AnimSprite extends Sprite {
 
         frameTimer = 0;
         mSequences = [];
+
+
+
         this.texture=texture;
+
+
     }
 
 
@@ -58,8 +64,7 @@ class AnimSprite extends Sprite {
 
 
 
-// Check if we are playing a sequence
-//
+
 
     public function isPlaying(index:Int = 0):Bool {
         return !donePlaying;
@@ -103,7 +108,7 @@ class AnimSprite extends Sprite {
         return mSequences[seq].seqName;
     }
 
-    public function addSequence(name:String, frames:Array<SheetFormat>, ?frameRate:Float = 0, ?looped:Bool = true):Void {
+    public function addSequence(name:String, frames:Array<UInt>, ?frameRate:Float = 0, ?looped:Bool = true):Void {
         mSequences.push(new AnimSeqData(name, frames, frameRate, looped));
     }
 
@@ -162,7 +167,7 @@ class AnimSprite extends Sprite {
 
     public function frameAdvance(next:Bool):Void {
         if (next) {
-            if (curFrame < curAnim.arFrames.length - 1)
+            if (Std.int(curFrame) < curAnim.arFrames.length - 1)
                 ++curFrame;
         }
 
@@ -205,7 +210,7 @@ class AnimSprite extends Sprite {
 
 
     function advanceFrame():Void {
-        if (curFrame == curAnim.arFrames.length - 1) {
+        if (Std.int(curFrame) == curAnim.arFrames.length - 1) {
             if (curAnim.loop)
                 curFrame = 0
             else donePlaying = true;
@@ -226,11 +231,11 @@ class AnimSprite extends Sprite {
 
     public var texture :Texture;
     override public function draw(ctx:DrawingContext) {
-        var frame:SheetFormat=mAnimSheet.getFrameData(curIndex);
+      //  var frame:FrameData=mAnimSheet.getFrameData(curIndex);
 
 
-      var data:FrameData=frame.spriteSourceSize;
-        ctx.drawSubImage(texture,data.offX,data.offY,data.x,data.y,data.width,data.height) ;
+      var data:FrameData=mAnimSheet.getFrameData(curIndex);
+        ctx.drawSubImage(texture,data.offX,data.offY,data.x,data.y,data.w,data.h) ;
     }
 
     override public function getNaturalWidth () :Float
@@ -240,7 +245,7 @@ class AnimSprite extends Sprite {
 
     override public function getNaturalHeight () :Float
     {
-        return mAnimSheet.getFrameHeight(curIndex);;
+        return mAnimSheet.getFrameHeight(curIndex);
     }
 
 }

@@ -1,18 +1,20 @@
 package flambe.tileSheet;
 
 
+import flambe.Component;
 import flash.display.BitmapData;
 import haxe.Json;
-class TileSheetHelper {
+class TileSheetHelper extends Component {
 
 
     public function new ():Void{
+        super();
 
     }
     public function prepareAnimTexture(src:String):AnimTextureSheet {
         var seqRaw:Dynamic = Json.parse(pack.loadFile(src));
 
-        var animData:Array<SheetFormat> = new Array<SheetFormat>();
+        var animData:Array<FrameData> = new Array<FrameData>();
         populateFrameArray(animData, seqRaw.frames);
 
         animData.sortOn("id");
@@ -22,7 +24,7 @@ class TileSheetHelper {
         return tileSheet;
     }
 
-    function populateFrameArray(arDest:Array<SheetFormat>, src:Dynamic):Void {
+    function populateFrameArray(arDest:Array<FrameData>, src:Dynamic):Void {
         var entry:SheetFormat;
         var nameId:String;
         var item:SheetFormat;
@@ -43,7 +45,6 @@ class TileSheetHelper {
     }
 
 
-    public function new() {
-    }
+
 }
 

@@ -227,7 +227,7 @@ class AnimSprite extends Sprite {
     function drawFrameInternal():Void {
         dirty = false;
        // needDraw=true;
-       trace(curIndex);
+     //  trace(curIndex);
     }
 
 

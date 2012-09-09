@@ -21,12 +21,22 @@ class TileSheetHelper extends Component {
 
        // animData.sortOn("id");
       //  animData.so
-
+         animData.sort(onShort) ;
         var tileSheet:AnimTextureSheet = new AnimTextureSheet();
         tileSheet.init(animData);
         return tileSheet;
     }
 
+
+    function onShort(ad:FrameData,bd:FrameData):Int{
+      var    a :String=ad.id.toLowerCase();
+        var b:String=bd.id.toLowerCase();
+
+        if (a < b) return -1;
+        if (a > b) return 1;
+        return 0;
+
+    }
     function populateFrameArray(arDest:Array<FrameData>, src:Dynamic):Void {
         var entry:SheetFormat;
         var nameId:String;

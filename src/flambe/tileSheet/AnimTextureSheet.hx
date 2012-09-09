@@ -75,14 +75,14 @@ class AnimTextureSheet {
         }
     }
 
-  /*  public function drawFrame(frame:Int, destBmp:BitmapData):Void {
+  /* public function drawFrame(frame:Int, destBmp:BitmapData):Void {
         destBmp.copyPixels(mTextureSheet, mTextureRegions[frame], mFrameOffsets[frame]);
     }*/
 
     public function getFrameData(frame:Int):FrameData{
 
 
-            return   arFrameData[frame];
+        return arFrameData[frame];
     }
 
 }

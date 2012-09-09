@@ -223,8 +223,11 @@ class AnimSprite extends Sprite {
 
 // Internal function to update the current animation frame
 
+    var needDraw:Bool=false;
     function drawFrameInternal():Void {
-
+        dirty = false;
+       // needDraw=true;
+       trace(curIndex);
     }
 
 
@@ -235,7 +238,10 @@ class AnimSprite extends Sprite {
 
 
       var data:FrameData=mAnimSheet.getFrameData(curIndex);
-        ctx.drawSubImage(texture,data.offX,data.offY,data.x,data.y,data.w,data.h) ;
+
+
+       ctx.drawSubImage(texture,data.offX,data.offY,data.x,data.y,data.w,data.h) ;
+
     }
 
     override public function getNaturalWidth () :Float

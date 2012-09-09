@@ -163,7 +163,19 @@ class MovieKeyframe
         var skew = reader.skew;
         if (skew != null) {
             var skewX = skew[0];
-            if (skewX != skew[1]) {
+            var skewY = skew[1];
+            var supported = true;
+            if (Math.abs(skewX - FMath.PI) <= 0.01) {
+                scaleY *= -1;
+            } else {
+                supported = false;
+            }
+            if (Math.abs(skewY - FMath.PI) <= 0.01) {
+                scaleX *= -1;
+            } else {
+                supported = false;
+            }
+            if (!supported) {
                 Log.log.warn("Flump skewing is not yet supported");
             }
             rotation = FMath.toDegrees(skewX);

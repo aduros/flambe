@@ -21,6 +21,7 @@ import flambe.display.Texture;
 import flambe.platform.shader.DrawImage;
 import flambe.platform.shader.DrawPattern;
 import flambe.platform.shader.FillRect;
+import flambe.util.Assert;
 
 class Stage3DDrawingContext
     implements DrawingContext
@@ -32,7 +33,7 @@ class Stage3DDrawingContext
         _context3D.enableErrorChecking = true;
 #end
 
-        _stack = new FastList<DrawingState>();
+        _stateList = new DrawingState();
         _scratchVector = new Vector<Float>(12, true);
         _scratchVector3D = new Vector3D();
 
@@ -57,21 +58,20 @@ class Stage3DDrawingContext
 
     public function save ()
     {
-        var copy = new DrawingState();
+        var current = _stateList;
+        var state = _stateList.next;
 
-        if (_stack.isEmpty()) {
-            copy.matrix = new Matrix3D();
-            copy.alpha = 1;
-            copy.blendMode = Normal;
-
-        } else {
-            var state = getTopState();
-            copy.matrix = state.matrix.clone();
-            copy.alpha = state.alpha;
-            copy.blendMode = state.blendMode;
+        if (state == null) {
+            // Grow the list
+            state = new DrawingState();
+            state.prev = current;
+            current.next = state;
         }
 
-        _stack.add(copy);
+        state.matrix.copyFrom(current.matrix);
+        state.alpha = current.alpha;
+        state.blendMode = current.blendMode;
+        _stateList = state;
     }
 
     public function translate (x :Float, y :Float)
@@ -97,7 +97,8 @@ class Stage3DDrawingContext
 
     public function restore ()
     {
-        _stack.pop();
+        Assert.that(_stateList.prev != null, "Can't restore without a previous save");
+        _stateList = _stateList.prev;
     }
 
     private function addQuadToBatch ()
@@ -414,7 +415,7 @@ class Stage3DDrawingContext
 
     inline private function getTopState () :DrawingState
     {
-        return _stack.head.elt;
+        return _stateList;
     }
 
     private static inline var ELEMENTS_PER_VERTEX = 5;
@@ -422,7 +423,7 @@ class Stage3DDrawingContext
 
     private var _context3D :Context3D;
 
-    private var _stack :FastList<DrawingState>;
+    private var _stateList :DrawingState;
     private var _scratchVector3D :Vector3D;
     private var _scratchVector :Vector<Float>;
     private var _projMatrix :Matrix3D;
@@ -448,5 +449,13 @@ private class DrawingState
     public var alpha :Float;
     public var blendMode :BlendMode;
 
-    public function new () { }
+    public var prev :DrawingState;
+    public var next :DrawingState;
+
+    public function new ()
+    {
+        matrix = new Matrix3D();
+        alpha = 1;
+        blendMode = Normal;
+    }
 }

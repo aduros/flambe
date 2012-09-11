@@ -20,6 +20,7 @@ import flambe.display.BlendMode;
 import flambe.display.DrawingContext;
 import flambe.display.Texture;
 import flambe.math.FMath;
+import flambe.util.Assert;
 
 class BitmapDrawingContext
     implements DrawingContext
@@ -27,7 +28,7 @@ class BitmapDrawingContext
     public function new (buffer :BitmapData)
     {
         _buffer = buffer;
-        _stack = new FastList<DrawingState>();
+        _stateList = new DrawingState();
         _shape = new Shape();
         _pixel = new BitmapData(1, 1, false);
         _scratchRect = new Rectangle();
@@ -37,20 +38,26 @@ class BitmapDrawingContext
 
     public function save ()
     {
-        var copy = new DrawingState();
+        var current = _stateList;
+        var state = _stateList.next;
 
-        if (_stack.isEmpty()) {
-            copy.matrix = new Matrix();
-        } else {
-            var state = getTopState();
-            copy.matrix = state.matrix.clone();
-            copy.blendMode = state.blendMode;
-            if (state.color != null) {
-                copy.color = new ColorTransform(1, 1, 1, state.color.alphaMultiplier);
-            }
+        if (state == null) {
+            // Grow the list
+            state = new DrawingState();
+            state.prev = current;
+            current.next = state;
         }
 
-        _stack.add(copy);
+#if flash11
+        state.matrix.copyFrom(current.matrix);
+#else
+        var to = state.matrix, from = current.matrix;
+        to.a = from.a; to.c = from.c; to.tx = from.tx;
+        to.b = from.b; to.d = from.d; to.ty = from.ty;
+#end
+        state.color.alphaMultiplier = current.color.alphaMultiplier;
+        state.blendMode = current.blendMode;
+        _stateList = state;
     }
 
     public function translate (x :Float, y :Float)
@@ -94,8 +101,9 @@ class BitmapDrawingContext
 
     public function restore ()
     {
+        Assert.that(_stateList.prev != null, "Can't restore without a previous save");
         flushGraphics();
-        _stack.pop();
+        _stateList = _stateList.prev;
     }
 
     public function drawImage (texture :Texture, destX :Float, destY :Float)
@@ -150,7 +158,7 @@ class BitmapDrawingContext
             }
 
             // If we don't need to alpha blend, use fillRect(), otherwise colorTransform()
-            if (state.color == null) {
+            if (state.color.alphaMultiplier == 1) {
                 _buffer.fillRect(rect, color);
 
             } else {
@@ -184,11 +192,7 @@ class BitmapDrawingContext
         flushGraphics();
 
         var state = getTopState();
-        if (state.color == null) {
-            state.color = new ColorTransform(1, 1, 1, factor);
-        } else {
-            state.color.alphaMultiplier *= factor;
-        }
+        state.color.alphaMultiplier *= factor;
     }
 
     public function setBlendMode (blendMode :BlendMode)
@@ -211,7 +215,7 @@ class BitmapDrawingContext
         // Use the faster copyPixels() if possible
         // TODO(bruno): Use approximately equals?
         if (matrix.a == 1 && matrix.b == 0 && matrix.c == 0 && matrix.d == 1
-                && state.color == null && state.blendMode == null) {
+                && state.color.alphaMultiplier == 1 && state.blendMode == null) {
 
             if (sourceRect == null) {
                 sourceRect = _scratchRect;
@@ -257,7 +261,7 @@ class BitmapDrawingContext
 
     inline private function getTopState () :DrawingState
     {
-        return _stack.head.elt;
+        return _stateList;
     }
 
     private function flushGraphics ()
@@ -278,7 +282,7 @@ class BitmapDrawingContext
         }
     }
 
-    private var _stack :FastList<DrawingState>;
+    private var _stateList :DrawingState;
     private var _buffer :BitmapData;
 
     // The shape used for all rendering that can't be done with a BitmapData
@@ -302,5 +306,12 @@ private class DrawingState
     public var color :ColorTransform;
     public var blendMode :flash.display.BlendMode;
 
-    public function new () { }
+    public var prev :DrawingState;
+    public var next :DrawingState;
+
+    public function new ()
+    {
+        matrix = new Matrix();
+        color = new ColorTransform();
+    }
 }

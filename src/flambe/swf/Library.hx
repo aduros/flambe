@@ -84,7 +84,7 @@ class Library
         var symbol = _symbols.get(symbolName);
         if (symbol == null) {
             if (required) {
-                throw "Missing symbol".addParams(["name", symbolName]);
+                throw "Missing symbol".withFields(["name", symbolName]);
             }
             return null;
         }

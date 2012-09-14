@@ -194,7 +194,7 @@ private class BasicAssetPack
     {
         var texture = textures.get(name);
         if (texture == null && required) {
-            throw "Missing texture".addParams(["name", name]);
+            throw "Missing texture".withFields(["name", name]);
         }
         return texture;
     }
@@ -203,7 +203,7 @@ private class BasicAssetPack
     {
         var sound = sounds.get(name);
         if (sound == null && required) {
-            throw "Missing sound".addParams(["name", name]);
+            throw "Missing sound".withFields(["name", name]);
         }
         return sound;
     }
@@ -212,7 +212,7 @@ private class BasicAssetPack
     {
         var file = files.get(name);
         if (file == null && required) {
-            throw "Missing file".addParams(["name", name]);
+            throw "Missing file".withFields(["name", name]);
         }
         return file;
     }

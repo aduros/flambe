@@ -35,7 +35,7 @@ class Manifest
         var manifest = _buildManifest.get(packName);
         if (manifest == null) {
             if (required) {
-                throw "Missing asset pack".addParams(["name", packName]);
+                throw "Missing asset pack".withFields(["name", packName]);
             }
             return null;
         }

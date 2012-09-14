@@ -48,12 +48,13 @@ class Strings
 
     /**
      * Format a message with named parameters into a standard format for logging and errors.
-     * Example: <pre>addParams("Wobbles were frobulated", ["count", 5, "silly", true])</pre> returns
+     * Example: <pre>withFields("Wobbles were frobulated", ["count", 5, "silly", true])</pre> returns
      * <pre>"Wobbles were frobulated [count=5, silly=true]"</pre>.
+     * @param fields The field names and values to be formatted. Must have an even length.
      */
-    public static function addParams (message :String, params :Array<Dynamic>) :String
+    public static function withFields (message :String, fields :Array<Dynamic>) :String
     {
-        var ll = params.length;
+        var ll = fields.length;
         if (ll > 0) {
             message += (message.length > 0) ? " [" : "[";
             var ii = 0;
@@ -61,8 +62,8 @@ class Strings
                 if (ii > 0) {
                     message += ", ";
                 }
-                var name = params[ii];
-                var value :Dynamic = params[ii + 1];
+                var name = fields[ii];
+                var value :Dynamic = fields[ii + 1];
 
                 // Replace throwables with their stack trace
 #if flash

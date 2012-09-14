@@ -93,7 +93,7 @@ class Logger
             text = "";
         }
         if (args != null) {
-            text = text.addParams(args);
+            text = text.withFields(args);
         }
         _handler.log(level, text);
     }

@@ -24,7 +24,7 @@ flambe.embed = function (urls, elementId) {
 
     var container = document.getElementById(elementId);
     if (container == null) {
-        throw new Error("Could not find element: " + elementId);
+        throw new Error("Could not find element [id=" + elementId + "]");
     }
 
     var args = {};
@@ -86,7 +86,7 @@ flambe.embed = function (urls, elementId) {
             break;
 
         default:
-            throw new Error("Don't know how to embed: " + url);
+            throw new Error("Don't know how to embed [url=" + url + "]");
         }
     }
 

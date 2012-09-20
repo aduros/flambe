@@ -17,7 +17,7 @@
 //****************************************************************************
 package flambe.geom;
 
-import flash.display.MovieClip;
+import flambe.display.Sprite;
 
 class Transform {
 	public var matrix(getMatrix, setMatrix) : Matrix;
@@ -45,21 +45,21 @@ class Transform {
 		return null;
 	}
 
-	public function new(mc : MovieClip) {
+	public function new(mc : Sprite) {
 		_init(mc);
 	}
 
-	var target : MovieClip;
+	var target : Sprite;
 	var _Mt : Matrix;
-	function _init(mc:MovieClip) : Void {
+	function _init(mc:Sprite) : Void {
 		//Reflect.field(mc, Std.string("transform2")) = this;
 		
 		//mc["transform2"] = this;
 		
-		Reflect.setProperty(mc, "transform2", this);
+		Reflect.setProperty(mc, "transform", this);
 		
 		
-		trace(Reflect.getProperty(mc, "transform2"));
+
 		
 		
 		this.target = mc;
@@ -81,7 +81,7 @@ import flash.Lib;
 
 import geom.Matrix;
 import geom.Transform;
-import flash.display.MovieClip;
+import flash.display.Sprite;
 class Main extends Sprite
 {
 
@@ -95,7 +95,7 @@ class Main extends Sprite
         myMatrix.ty = 200;
 
 //myMatrix.invert();
-        var rectangleShape:MovieClip = createRectangle(100, 100, 0xff0000);
+        var rectangleShape:Sprite = createRectangle(100, 100, 0xff0000);
 
         myMatrix.scale(0.5,2);
         myMatrix.rotate(45);
@@ -119,8 +119,8 @@ class Main extends Sprite
 
     }
 
-    public function createRectangle(w:Float, h:Float, color:UInt):MovieClip {
-        var rect:MovieClip = new MovieClip();
+    public function createRectangle(w:Float, h:Float, color:UInt):Sprite {
+        var rect:Sprite = new Sprite();
         rect.graphics.beginFill(color);
         rect.graphics.drawRect(0, 0, w, h);
         addChild(rect);

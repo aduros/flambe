@@ -69,3 +69,64 @@ class Transform {
 
 }
 
+/** example
+* package ;
+
+import flash.display.Sprite;
+import flash.display.StageAlign;
+import flash.display.StageScaleMode;
+import flash.Lib;
+
+
+
+import geom.Matrix;
+import geom.Transform;
+import flash.display.MovieClip;
+class Main extends Sprite
+{
+
+    public function new() {
+        super();
+
+        var myMatrix:Matrix = new Matrix();
+        myMatrix.a = 1;
+        myMatrix.d = 1;
+        myMatrix.tx = 100;
+        myMatrix.ty = 200;
+
+//myMatrix.invert();
+        var rectangleShape:MovieClip = createRectangle(100, 100, 0xff0000);
+
+        myMatrix.scale(0.5,2);
+        myMatrix.rotate(45);
+        var rectangleTrans:Transform = new Transform(rectangleShape);
+
+//rectangleShape.transform2.matrix=myMatrix;
+
+        var tr:Transform =	Reflect.getProperty(rectangleShape, "transform2");
+        tr.matrix = myMatrix;
+
+    }
+    static function main()
+    {
+        var stage = Lib.current.stage;
+        stage.scaleMode = StageScaleMode.NO_SCALE;
+        stage.align = StageAlign.TOP_LEFT;
+
+
+        stage.addChild(new Main());
+
+
+    }
+
+    public function createRectangle(w:Float, h:Float, color:UInt):MovieClip {
+        var rect:MovieClip = new MovieClip();
+        rect.graphics.beginFill(color);
+        rect.graphics.drawRect(0, 0, w, h);
+        addChild(rect);
+        return rect;
+    }
+
+}
+*
+**/

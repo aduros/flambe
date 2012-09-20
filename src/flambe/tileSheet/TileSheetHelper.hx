@@ -19,8 +19,7 @@ class TileSheetHelper extends Component {
         var animData:Array<FrameData> = new Array<FrameData>();
         populateFrameArray(animData, seqRaw.frames);
 
-       // animData.sortOn("id");
-      //  animData.so
+
          animData.sort(onShort) ;
         var tileSheet:AnimTextureSheet = new AnimTextureSheet();
         tileSheet.init(animData);

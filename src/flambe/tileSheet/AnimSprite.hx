@@ -48,6 +48,7 @@ class AnimSprite extends Sprite {
         this.texture=texture;
 
 
+
     }
 
 
@@ -60,6 +61,8 @@ class AnimSprite extends Sprite {
         curAnim = null;
         this.frame = 0;
         drawFrame(true);
+
+
     }
 
 

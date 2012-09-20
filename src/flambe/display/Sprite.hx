@@ -146,6 +146,9 @@ class Sprite extends Component
         return _viewMatrix;
     }
 
+
+
+
     inline public function setAnchor (x :Float, y :Float) :Sprite
     {
         anchorX._ = x;

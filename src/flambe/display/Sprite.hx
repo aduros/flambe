@@ -4,6 +4,7 @@
 
 package flambe.display;
 
+import flambe.geom.Transform;
 import flambe.Component;
 import flambe.animation.AnimatedFloat;
 import flambe.display.Sprite;
@@ -82,6 +83,14 @@ class Sprite extends Component
      * Emitted when the pointer is raised over this sprite.
      */
     public var pointerUp (getPointerUp, null) :Signal1<PointerEvent>;
+
+/**
+     same as as3 Transform
+**/
+    public var transform(getTransform, setTransform) : Transform;
+
+
+    private var _transform:Transform;
 
     public function new ()
     {
@@ -292,6 +301,16 @@ class Sprite extends Component
         return _internal_pointerUp;
     }
 
+
+    private function getTransform():Transform{
+
+        return _transform;
+    }
+
+    private function setTransform(_:Transform):Void{
+
+        _transform=_;
+    }
     /** @private */ public function _internal_onListenersAdded (count :Int)
     {
         if (_listenerCount == 0) {

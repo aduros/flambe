@@ -307,9 +307,10 @@ class Sprite extends Component
         return _transform;
     }
 
-    private function setTransform(_:Transform):Void{
+    private function setTransform(_:Transform):Transform{
 
         _transform=_;
+        return _;
     }
     /** @private */ public function _internal_onListenersAdded (count :Int)
     {

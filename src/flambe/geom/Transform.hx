@@ -64,7 +64,7 @@ class Transform {
 		
 		this.target = mc;
 		_Mt = new Matrix();
-		_Mt.createBox(mc._xscale, mc._yscale, mc._rotation * Math.PI, mc._x, mc._y);
+		_Mt.createBox(mc.scaleX._,mc.scaleY._, mc.rotation._,  mc.x._, mc.y._);
 	}
 
 }

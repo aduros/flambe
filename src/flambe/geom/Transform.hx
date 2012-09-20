@@ -33,11 +33,11 @@ class Transform {
 		var sx : Float = Math.sqrt(value.a * value.a + value.c * value.c);
 		var sy : Float = ts / sx;
 		var angle : Float = Math.acos(value.a / sx);
-		target.scaleX = sx;
-		target.scaleY = sy;
-		target.rotation = angle / Math.PI * 180;
-		target.x = value.tx;
-		target.y = value.ty;
+		target.scaleX._ = sx;
+		target.scaleY._ = sy;
+		target.rotation._ = angle / Math.PI * 180;
+		target.x._ = value.tx;
+		target.y._ = value.ty;
 		return value;
 	}
 
@@ -56,8 +56,8 @@ class Transform {
 		
 		//mc["transform2"] = this;
 		
-		Reflect.setProperty(mc, "transform", this);
-		
+	//	Reflect.setProperty(mc, "transform", this);
+		mc.transform=this;
 		
 
 		

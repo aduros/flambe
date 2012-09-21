@@ -4,6 +4,8 @@
 
 package flambe.display;
 
+import flambe.geom.Transform;
+import flambe.Component;
 import flambe.animation.AnimatedFloat;
 import flambe.display.Sprite;
 import flambe.input.PointerEvent;
@@ -82,6 +84,14 @@ class Sprite extends Component
      */
     public var pointerUp (getPointerUp, null) :Signal1<PointerEvent>;
 
+/**
+     same as as3 Transform
+**/
+    public var transform(getTransform, setTransform) : Transform;
+
+
+    private var _transform:Transform;
+
     public function new ()
     {
         var dirtyMatrix = function (_,_) {
@@ -144,6 +154,9 @@ class Sprite extends Component
         updateViewMatrix();
         return _viewMatrix;
     }
+
+
+
 
     inline public function setAnchor (x :Float, y :Float) :Sprite
     {
@@ -288,6 +301,17 @@ class Sprite extends Component
         return _internal_pointerUp;
     }
 
+
+    private function getTransform():Transform{
+
+        return _transform;
+    }
+
+    private function setTransform(_:Transform):Transform{
+
+        _transform=_;
+        return _;
+    }
     /** @private */ public function _internal_onListenersAdded (count :Int)
     {
         if (_listenerCount == 0) {

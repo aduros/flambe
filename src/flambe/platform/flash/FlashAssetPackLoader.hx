@@ -4,6 +4,7 @@
 
 package flambe.platform.flash;
 
+import flambe.platform.EventGroup;
 import flash.display.Bitmap;
 import flash.display.Loader;
 import flash.errors.Error;

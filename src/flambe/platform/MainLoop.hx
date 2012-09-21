@@ -4,6 +4,7 @@
 
 package flambe.platform;
 
+import flambe.animation.AnimatedFloat;
 import flambe.Component;
 import flambe.display.DrawingContext;
 import flambe.display.Sprite;
@@ -150,12 +151,12 @@ private class DrawVisitor
 
     private function drawSprite (entity :Entity) :Bool
     {
-        var sprite = entity.get(Sprite);
+        var sprite:Sprite = entity.get(Sprite);
         if (sprite == null) {
             return true;
         }
 
-        var alpha = sprite.alpha._;
+        var alpha:Float = sprite.alpha._;
         if (!sprite.visible._ || alpha <= 0) {
             return false;
         }

@@ -283,7 +283,7 @@ def apply_flambe_server(ctx):
     if ctx.env.debug:
         flags += "-D debug --no-opt --no-inline".split()
     else:
-        flags += "--no-traces".split()
+        flags += "--no-traces -D flambe_keep_logs".split()
 
     server = build_prefix + "server.js"
     ctx.bld(features="haxe", classpath=classpath, flags=flags, libs=libs, target=server)

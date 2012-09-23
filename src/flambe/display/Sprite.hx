@@ -98,9 +98,6 @@ class Sprite extends Component
         anchorY = new AnimatedFloat(0, dirtyMatrix);
         visible = new Value<Bool>(true);
         blendMode = null;
-
-        _localMatrixDirty = false;
-        _listenerCount = 0;
     }
 
     /**
@@ -203,7 +200,8 @@ class Sprite extends Component
     override public function onAdded ()
     {
         if (_listenerCount > 0) {
-            // TODO: Insert in screen depth order
+            // TODO(bruno): Insert in screen depth order
+            // TODO(bruno): This is really leak prone, switch over to a safer system
             _internal_interactiveSprites.unshift(this);
         }
     }
@@ -293,8 +291,9 @@ class Sprite extends Component
 
     /** @private */ public function _internal_onListenersAdded (count :Int)
     {
-        if (_listenerCount == 0) {
-            // TODO: Insert in screen depth order
+        if (_listenerCount == 0 && owner != null) {
+            // TODO(bruno): Insert in screen depth order
+            // TODO(bruno): This is really leak prone, switch over to a safer system
             _internal_interactiveSprites.unshift(this);
         }
         _listenerCount += count;
@@ -303,7 +302,7 @@ class Sprite extends Component
     /** @private */ public function _internal_onListenersRemoved (count :Int)
     {
         _listenerCount -= count;
-        if (_listenerCount == 0) {
+        if (_listenerCount == 0 && owner != null) {
             _internal_interactiveSprites.remove(this);
         }
     }
@@ -316,15 +315,15 @@ class Sprite extends Component
     /** @private */ public static var _internal_interactiveSprites :Array<Sprite> = [];
 
     private var _viewMatrix :Matrix;
-    private var _localMatrixDirty :Bool;
-    private var _matrixUpdateCount :Int;
-    private var _parentMatrixUpdateCount :Int;
+    private var _localMatrixDirty :Bool = false;
+    private var _matrixUpdateCount :Int = 0;
+    private var _parentMatrixUpdateCount :Int = 0;
 
     /** @private */ public var _internal_pointerDown :Signal1<PointerEvent>;
     /** @private */ public var _internal_pointerMove :Signal1<PointerEvent>;
     /** @private */ public var _internal_pointerUp :Signal1<PointerEvent>;
 
-    private var _listenerCount :Int;
+    private var _listenerCount :Int = 0;
 }
 
 import flambe.util.Signal1;

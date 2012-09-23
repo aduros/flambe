@@ -85,6 +85,15 @@ class MovieSprite extends Sprite
         }
     }
 
+    override public function onDispose ()
+    {
+        super.onDispose();
+
+        for (animator in _animators) {
+            animator.content.dispose();
+        }
+    }
+
     override public function onUpdate (dt :Float)
     {
         super.onUpdate(dt);

@@ -19,10 +19,17 @@ class MultiPromise extends Promise<Array<Dynamic>>
         _promises = cast promises.copy();
         _successCount = 0;
         _disposer = new Disposer();
-        for (promise in _promises) {
-            _disposer.connect1(promise.success, onSuccess);
+
+        onProgressChanged();
+
+        var snapshot = _promises;
+        for (promise in snapshot) {
             _disposer.connect1(promise.error, onError);
             _disposer.connect0(promise.progressChanged, onProgressChanged);
+            var pending = promise.get(onSuccess);
+            if (pending != null) {
+                _disposer.add(pending);
+            }
         }
     }
 

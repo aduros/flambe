@@ -230,6 +230,9 @@ class Sprite extends Component
 
     private function getParentSprite () :Sprite
     {
+        if (owner == null) {
+            return null;
+        }
         var entity = owner.parent;
         while (entity != null) {
             var sprite = entity.get(Sprite);

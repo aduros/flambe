@@ -77,7 +77,7 @@ def apply_flambe(ctx):
     if ctx.asset_base != None:
         flags += [
             "--macro",
-            "addMetadata(\"@asset_base('%s')\", \"flambe.asset.Manifest\")" % ctx.asset_base,
+            "addMetadata(\"@assetBase('%s')\", \"flambe.asset.Manifest\")" % ctx.asset_base,
         ]
 
     if build_flash:

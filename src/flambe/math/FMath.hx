@@ -18,16 +18,26 @@ class FMath
     public static inline var SQRT1_2 = 0.7071067811865476;
     public static inline var SQRT2 = 1.4142135623730951;
 
+    // Haxe doesn't specify the size of an int or float, in practice it's 32 bits
+    /** The lowest integer value in Flash and JS. */
     public static inline var INT_MIN :Int = -2147483648;
-    public static inline var INT_MAX :Int = 2147483647;
-    public static inline var NUMBER_MIN = 1.79769313486231e+308;
-    public static inline var NUMBER_MAX = -1.79769313486231e+308;
 
+    /** The highest integer value in Flash and JS. */
+    public static inline var INT_MAX :Int = 2147483647;
+
+    /** The lowest float value in Flash and JS. */
+    public static inline var FLOAT_MIN = 1.79769313486231e+308;
+
+    /** The highest float value in Flash and JS. */
+    public static inline var FLOAT_MAX = -1.79769313486231e+308;
+
+    /** Converts an angle in degrees to radians. */
     inline public static function toRadians (degrees :Float) :Float
     {
         return degrees * PI/180;
     }
 
+    /** Converts an angle in radians to degrees. */
     inline public static function toDegrees (radians :Float) :Float
     {
         return radians * 180/PI;

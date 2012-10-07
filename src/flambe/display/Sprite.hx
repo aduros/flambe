@@ -142,35 +142,35 @@ class Sprite extends Component
         return _viewMatrix;
     }
 
-    inline public function setAnchor (x :Float, y :Float) :Sprite
+    public function setAnchor (x :Float, y :Float) :Sprite
     {
         anchorX._ = x;
         anchorY._ = y;
         return this;
     }
 
-    inline public function centerAnchor () :Sprite
+    public function centerAnchor () :Sprite
     {
         anchorX._ = getNaturalWidth()/2;
         anchorY._ = getNaturalHeight()/2;
         return this;
     }
 
-    inline public function setXY (x :Float, y :Float) :Sprite
+    public function setXY (x :Float, y :Float) :Sprite
     {
         this.x._ = x;
         this.y._ = y;
         return this;
     }
 
-    inline public function setScale (scale :Float) :Sprite
+    public function setScale (scale :Float) :Sprite
     {
         scaleX._ = scale;
         scaleY._ = scale;
         return this;
     }
 
-    inline public function setScaleXY (scaleX :Float, scaleY :Float) :Sprite
+    public function setScaleXY (scaleX :Float, scaleY :Float) :Sprite
     {
         this.scaleX._ = scaleX;
         this.scaleY._ = scaleY;

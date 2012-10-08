@@ -30,11 +30,14 @@ class ManifestBuilder
             // When running in code completion, skip out early
             return toExpr(EBlock([]));
         }
-
+        	
+        #if nme_install_tool
+        var assetPrefix = "assets/";
+        #else
         var assetPrefix = "../assets/";
+        #end
         var exprs :Array<Expr> = [];
         var hash_set = toExpr(EField(hash, "set"));
-
         for (packName in readDirectoryNoHidden(assetPrefix)) {
             var entries :Array<Expr> = [];
             if (FileSystem.isDirectory(assetPrefix + packName)) {
@@ -43,7 +46,7 @@ class ManifestBuilder
                     var path = assetPrefix + packName + "/" + file;
                     var md5 = Context.signature(File.getBytes(path));
                     var bytes = FileSystem.stat(path).size;
-
+                    
                     // Assemble the object literal for this asset
                     var entry = EObjectDecl([
                         { field: "name", expr: toExpr(name) },

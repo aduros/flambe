@@ -77,7 +77,7 @@ def apply_haxe(self):
     elif target.endswith(".n"):
         flags += ["-neko", target]
     else:
-        raise "Unsupported target file type!"
+        raise Exception("Unsupported target file type!")
 
     for lib in Utils.to_list(self.libs):
         flags += ["-lib", lib]

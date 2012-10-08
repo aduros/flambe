@@ -325,7 +325,7 @@ def restart_server(ctx):
     try:
         conf = ConfigSet.ConfigSet(SERVER_CONFIG)
         if "pid" in conf:
-            os.kill(conf.pid, signal.SIGTERM)
+            os.kill(conf.pid, signal.SIGHUP)
     except (IOError, OSError):
         pass
 Context.g_module.__dict__["restart_server"] = restart_server

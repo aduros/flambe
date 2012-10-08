@@ -245,6 +245,8 @@ def apply_flambe(ctx):
 @feature("flambe-server")
 def apply_flambe_server(ctx):
     Utils.def_attrs(ctx, main=None, classpath="", flags="", libs="", npm_libs="", include="")
+    if ctx.target == "":
+        ctx.target = "server.js"
 
     classpath = [ ctx.path.find_dir("src"), flambe_src(ctx) ] + \
         Utils.to_list(ctx.classpath) # The classpath option should be a list of nodes
@@ -252,6 +254,7 @@ def apply_flambe_server(ctx):
     if not ctx.main:
         ctx.bld.fatal("You must specify a main class in your wscript")
 
+    target = ctx.target
     flags = ["-main", ctx.main] + Utils.to_list(ctx.flags)
     libs = Utils.to_list(ctx.libs)
     npm_libs = Utils.to_list(ctx.npm_libs)
@@ -259,13 +262,14 @@ def apply_flambe_server(ctx):
     build_prefix = (ctx.name if ctx.name else "main") + "-server/"
     install_prefix = "deploy/" + build_prefix;
 
+    cwd = ctx.path.get_bld().make_node(build_prefix)
+    cwd.mkdir()
+
     if npm_libs:
         if not ctx.env.NPM:
             ctx.bld.fatal("npm is required to specify node libraries, " + \
                 "ensure it's in your $PATH and re-run waf configure.")
 
-        cwd = ctx.path.get_bld().make_node(build_prefix)
-        cwd.mkdir()
         for npm_lib in npm_libs:
             ctx.bld(rule="%s install %s" % (quote(ctx.env.NPM), npm_lib), cwd=cwd.abspath())
 
@@ -285,26 +289,27 @@ def apply_flambe_server(ctx):
     else:
         flags += "--no-traces -D flambe_keep_logs".split()
 
-    server = build_prefix + "server.js"
-    ctx.bld(features="haxe", classpath=classpath, flags=flags, libs=libs, target=server)
-    ctx.bld.install_files(install_prefix, server)
+    ctx.bld(features="haxe", classpath=classpath, flags=flags, libs=libs,
+        target=build_prefix + target)
+    ctx.bld.install_files(install_prefix, build_prefix + target)
 
     # Mark any other custom files for installation
     if include:
         ctx.bld.install_files(install_prefix, include, relative_trick=True)
 
-    file = SERVER_CONFIG
-    conf = ConfigSet.ConfigSet()
-    try:
-        conf.load(file)
-    except (IOError):
-        pass
-    conf.script = install_prefix + "server.js"
-    conf.store(file)
+    if target == "server.js":
+        file = SERVER_CONFIG
+        conf = ConfigSet.ConfigSet()
+        try:
+            conf.load(file)
+        except (IOError):
+            pass
+        conf.script = install_prefix + target
+        conf.store(file)
 
-    # Restart the development server when installing
-    if ctx.bld.cmd == "install":
-        ctx.bld.add_post_fun(restart_server)
+        # Restart the development server when installing
+        if ctx.bld.cmd == "install":
+            ctx.bld.add_post_fun(restart_server)
 
 # Spawns a development server for testing
 def server(ctx):
@@ -325,7 +330,7 @@ def restart_server(ctx):
     try:
         conf = ConfigSet.ConfigSet(SERVER_CONFIG)
         if "pid" in conf:
-            os.kill(conf.pid, signal.SIGTERM)
+            os.kill(conf.pid, signal.SIGHUP)
     except (IOError, OSError):
         pass
 Context.g_module.__dict__["restart_server"] = restart_server

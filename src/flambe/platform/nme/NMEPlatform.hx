@@ -22,6 +22,7 @@ import flambe.input.Keyboard;
 import flambe.input.Mouse;
 import flambe.input.Pointer;
 import flambe.input.Touch;
+import flambe.platform.flash.BitmapRenderer;
 import flambe.platform.Platform;
 import flambe.platform.BasicKeyboard;
 import flambe.platform.BasicPointer;

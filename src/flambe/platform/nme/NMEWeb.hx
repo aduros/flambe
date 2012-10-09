@@ -4,8 +4,8 @@
 
 package flambe.platform.nme;
 
-import flash.Lib;
-import flash.net.URLRequest;
+import nme.Lib;
+import nme.net.URLRequest;
 
 class NMEWeb extends DummyWeb
 {

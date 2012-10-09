@@ -125,7 +125,7 @@ class BitmapDrawingContext
     {
         beginGraphics();
 
-        var flashTexture = Lib.as(texture, FlashTexture);
+        var flashTexture = cast (texture, FlashTexture);
         _graphics.beginBitmapFill(flashTexture.bitmapData);
         _graphics.drawRect(x, y, width, height);
     }
@@ -208,7 +208,7 @@ class BitmapDrawingContext
     {
         flushGraphics();
 
-        var flashTexture = Lib.as(texture, FlashTexture);
+        var flashTexture = cast (texture, FlashTexture);
         var state = getTopState();
         var matrix = state.matrix;
 

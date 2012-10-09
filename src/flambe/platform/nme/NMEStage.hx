@@ -8,8 +8,9 @@ package flambe.platform.nme;
 import flash.events.StageOrientationEvent;
 #end
 import nme.display.StageDisplayState;
+import nme.display.StageScaleMode;
 import nme.events.Event;
-import nme.events.FullScreenEvent;
+//import nme.events.FullScreenEvent;
 import nme.events.MouseEvent;
 //import nme.media.Video;
 import nme.system.Capabilities;
@@ -39,19 +40,19 @@ class NMEStage
         this.nativeStage = nativeStage;
         resize = new Signal0();
 
-        nativeStage.scaleMode = NO_SCALE;
+        nativeStage.scaleMode = StageScaleMode.NO_SCALE;
         nativeStage.frameRate = 60;
-        nativeStage.showDefaultContextMenu = false;
+        //nativeStage.showDefaultContextMenu = false;
         nativeStage.addEventListener(Event.RESIZE, onResize);
 
         fullscreen = new Value<Bool>(false);
-        nativeStage.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
+        //nativeStage.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
         onFullscreen();
 
         // If we're running in a mobile browser, go full screen on a pointer event
-        if (Capabilities.playerType == "PlugIn" && NMEUtil.isMobile()) {
-            nativeStage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
-        }
+        //if (Capabilities.playerType == "PlugIn" && NMEUtil.isMobile()) {
+           // nativeStage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
+        //}
 
         orientation = new Value<Orientation>(null);
 #if flambe_air
@@ -122,10 +123,10 @@ class NMEStage
 
     public function unlockOrientation ()
     {
-        if (_orientHack != null) {
-            _orientHack.parent.removeChild(_orientHack);
-            _orientHack = null;
-        }
+        //if (_orientHack != null) {
+            //_orientHack.parent.removeChild(_orientHack);
+            //_orientHack = null;
+        //}
     }
 
     //private var _orientHack :Video;

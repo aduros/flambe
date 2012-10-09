@@ -7,6 +7,7 @@ package flambe.platform.nme;
 import nme.display.Stage;
 import nme.events.TouchEvent;
 import nme.ui.Multitouch;
+import nme.ui.MultitouchInputMode;
 
 class NMETouch extends BasicTouch
 {
@@ -17,7 +18,7 @@ class NMETouch extends BasicTouch
         // Enable touch events, and disable emulated mouse events. Note that since mapToTouchMouse
         // requires AIR, touch is intentionally not enabled when running in the browser. One more
         // reason to switch to the HTML target for the browser!
-        Multitouch.inputMode = TOUCH_POINT;
+        Multitouch.inputMode = MultitouchInputMode.TOUCH_POINT;
         //Multitouch.mapTouchToMouse = false;
 
         stage.addEventListener(TouchEvent.TOUCH_BEGIN, onTouchBegin);

@@ -17,7 +17,7 @@ import nme.media.Sound;
 import nme.net.URLLoader;
 import nme.net.URLRequest;
 import nme.system.Capabilities;
-import nme.system.LoaderContext;
+//import nme.system.LoaderContext;
 
 import flambe.asset.AssetEntry;
 import flambe.asset.Manifest;
@@ -52,10 +52,11 @@ class NMEAssetPackLoader extends BasicAssetPackLoader
                     return texture;
                 };
 
-                var ctx = new LoaderContext();
-                ctx.checkPolicyFile = true;
-                ctx.allowCodeImport = false;
-                loader.load(req, ctx);
+                //var ctx = new LoaderContext();
+                //ctx.checkPolicyFile = true;
+                //ctx.allowCodeImport = false;
+                //loader.load(req, ctx);
+                loader.load(req);
 
             case Audio:
                 var sound = new Sound(req);
@@ -68,7 +69,7 @@ class NMEAssetPackLoader extends BasicAssetPackLoader
                 create = function () return urlLoader.data;
 
         } catch (error :Error) {
-            handleError(error.message);
+            handleError(Std.string (error));
             return;
         }
 
@@ -94,7 +95,8 @@ class NMEAssetPackLoader extends BasicAssetPackLoader
     {
         // TODO(bruno): Flash actually has an m4a decoder, but it's only accessible through the
         // horrendous NetStream API and not good old flash.media.Sound
-        return (Capabilities.hasAudio && Capabilities.hasMP3) ? [ "mp3" ] : [];
+        return [ "wav", "ogg", "mp3" ];
+        //return (Capabilities.hasAudio && Capabilities.hasMP3) ? [ "mp3" ] : [];
     }
 
     private function onError (event :ErrorEvent)

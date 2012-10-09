@@ -31,17 +31,19 @@ class NMEMouse extends BasicMouse
 
     public static function shouldUse () :Bool
     {
-        return Mouse.supportsCursor;
+    	return true;
+        //return Mouse.supportsCursor;
     }
 
     override public function setCursor (cursor :MouseCursor) :MouseCursor
     {
-        Mouse.show();
+        /*Mouse.show();
         switch (cursor) {
             case Default: Mouse.cursor = "arrow";
             case Button: Mouse.cursor = "button";
             case None: Mouse.hide();
         }
+        return super.setCursor(cursor);*/
         return super.setCursor(cursor);
     }
 

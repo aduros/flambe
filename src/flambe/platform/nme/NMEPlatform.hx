@@ -9,7 +9,6 @@ import nme.events.Event;
 import nme.events.KeyboardEvent;
 import nme.events.MouseEvent;
 import nme.events.TouchEvent;
-import nme.events.UncaughtErrorEvent;
 import nme.external.ExternalInterface;
 import nme.Lib;
 import nme.net.SharedObject;
@@ -149,7 +148,7 @@ class NMEPlatform
 
     private function onKeyDown (event :KeyboardEvent)
     {
-        event.preventDefault();
+        //event.preventDefault();
         _keyboard.submitDown(event.keyCode);
     }
 

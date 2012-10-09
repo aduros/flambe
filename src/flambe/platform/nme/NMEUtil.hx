@@ -19,14 +19,19 @@ class NMEUtil
     /** Tries to guess if we're running on a mobile device. */
     inline public static function isMobile () :Bool
     {
-        return !Mouse.supportsCursor;
+    	#if mobile
+    	return true;
+    	#else
+    	return false;
+    	#end
+        //return !Mouse.supportsCursor;
     }
 
     /** Extracts the best error-like message from a given value. */
     public static function getErrorMessage (error :Dynamic) :String
     {
         if (Std.is(error, Error)) {
-            return cast(error, Error).message;
+            return Std.string (cast(error, Error));
         } else if (Std.is(error, ErrorEvent)) {
             return cast(error, ErrorEvent).text;
         } else {

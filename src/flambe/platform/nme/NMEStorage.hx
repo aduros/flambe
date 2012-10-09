@@ -41,14 +41,14 @@ class NMEStorage
             log.warn("Storage serialization failed", ["message", error]);
             return false;
         }
-
-        _so.data[untyped key] = encoded;
+		
+		Reflect.setField (_so.data, key, encoded);
         return true;
     }
 
     public function get (key :String) :Dynamic
     {
-        var encoded :String = _so.data[untyped key];
+        var encoded :String = Reflect.field (_so.data, key);
         if (encoded != null) {
             try {
                 return Unserializer.run(encoded);
@@ -61,7 +61,7 @@ class NMEStorage
 
     public function remove (key :String)
     {
-        untyped __delete__(_so.data, key);
+        Reflect.deleteField (_so.data, key);
     }
 
     public function clear ()

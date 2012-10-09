@@ -27,6 +27,8 @@ class Entity
         _compMap = cast new flash.utils.Dictionary();
 #elseif js
         _compMap = {};
+#else
+		_compMap = cast new Hash <Component> ();
 #end
         _children = [];
     }
@@ -39,7 +41,11 @@ class Entity
             remove(prev);
         }
 
+		#if (flash || js)
         untyped _compMap[name] = comp;
+        #else
+        untyped _compMap.set (name, comp);
+        #end
         _comps.push(comp);
 
         comp._internal_setOwner(this);
@@ -56,6 +62,8 @@ class Entity
             untyped __delete__(_compMap, name);
 #elseif js
             untyped __js__("delete")(_compMap[name]);
+#else
+			untyped _compMap.remove (name);
 #end
             var idx = _comps.indexOf(comp);
             if (idx >= 0) {
@@ -100,7 +108,11 @@ class Entity
 
     inline public function getComponent (name :String) :Component
     {
+    	#if (flash || js)
         return untyped _compMap[name];
+        #else
+        return untyped _compMap.get (name);
+        #end
     }
 
     public function visit (visitor :Visitor, visitComponents :Bool, visitChildren :Bool)
@@ -194,6 +206,8 @@ class Entity
                 untyped __delete__(_compMap, name);
 #elseif js
                 untyped __js__("delete")(_compMap[name]);
+#else
+				untyped _compMap.remove (name);
 #end
 
                 comp.onRemoved();

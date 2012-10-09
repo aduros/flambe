@@ -24,14 +24,13 @@ class NMEUtil
     	#else
     	return false;
     	#end
-        //return !Mouse.supportsCursor;
     }
 
     /** Extracts the best error-like message from a given value. */
     public static function getErrorMessage (error :Dynamic) :String
     {
         if (Std.is(error, Error)) {
-            return Std.string (cast(error, Error));
+            return cast(error, Error).message;
         } else if (Std.is(error, ErrorEvent)) {
             return cast(error, ErrorEvent).text;
         } else {

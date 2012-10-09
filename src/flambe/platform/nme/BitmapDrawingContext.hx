@@ -159,7 +159,8 @@ class BitmapDrawingContext
 
             // If we don't need to alpha blend, use fillRect(), otherwise colorTransform()
             if (state.color.alphaMultiplier == 1) {
-                _buffer.fillRect(rect, { a: Std.int (state.color.alphaMultiplier * 0xFF), rgb: color });
+                //_buffer.fillRect(rect, { a: Std.int (state.color.alphaMultiplier * 0xFF), rgb: color });
+                _buffer.fillRect(rect, color);
 
             } else {
                 var red = 0xff & (color >> 16);
@@ -183,7 +184,7 @@ class BitmapDrawingContext
             _scratchMatrix.concat(matrix);
 
             _pixel.setPixel(0, 0, color);
-            //_buffer.draw(_pixel, _scratchMatrix, state.color, state.blendMode);
+            _buffer.draw(_pixel, _scratchMatrix, state.color, state.blendMode);
         }
     }
 
@@ -246,12 +247,12 @@ class BitmapDrawingContext
                     _scratchPoint.x = 0;
                     _scratchPoint.y = 0;
                     scratch.copyPixels(flashTexture.bitmapData, sourceRect, _scratchPoint);
-                    //_buffer.draw(scratch, matrix, state.color, state.blendMode, null, true);
+                    _buffer.draw(scratch, matrix, state.color, state.blendMode, null, true);
                     scratch.dispose();
                 }
             } else {
-                //_buffer.draw(flashTexture.bitmapData, matrix,
-                    //state.color, state.blendMode, null, true);
+                _buffer.draw(flashTexture.bitmapData, matrix,
+                    state.color, state.blendMode, null, true);
             }
             if (copy != null) {
                 state.matrix = copy;
@@ -269,7 +270,7 @@ class BitmapDrawingContext
         // If we're in vector graphics mode, push it out to the screen buffer
         if (_graphics != null) {
             var state = getTopState();
-            //_buffer.draw(_shape, state.matrix, state.color, state.blendMode, null, true);
+            _buffer.draw(_shape, state.matrix, state.color, state.blendMode, null, true);
             _graphics.clear();
             _graphics = null;
         }

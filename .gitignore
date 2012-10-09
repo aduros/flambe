@@ -3,3 +3,4 @@ chxdoc
 .lock-waf*
 bin/.waf*
 *.fdz
+.DS_Store

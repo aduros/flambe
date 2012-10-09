@@ -20,10 +20,18 @@ class FMath
 
     // Haxe doesn't specify the size of an int or float, in practice it's 32 bits
     /** The lowest integer value in Flash and JS. */
-    public static inline var INT_MIN :Int = -2147483648;
+   #if neko
+    public static inline var INT_MIN :Int = -0x3FFFFFFF;
+    #else
+    public static inline var INT_MIN :Int = -0x7FFFFFFF;
+    #end
 
     /** The highest integer value in Flash and JS. */
-    public static inline var INT_MAX :Int = 2147483647;
+    #if neko
+    public static inline var INT_MAX :Int = 0x3FFFFFFF;
+    #else
+    public static inline var INT_MAX :Int = 0x7FFFFFFF;
+    #end
 
     /** The lowest float value in Flash and JS. */
     public static inline var FLOAT_MIN = 1.79769313486231e+308;

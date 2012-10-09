@@ -159,7 +159,7 @@ class BitmapDrawingContext
 
             // If we don't need to alpha blend, use fillRect(), otherwise colorTransform()
             if (state.color.alphaMultiplier == 1) {
-                _buffer.fillRect(rect, color);
+                _buffer.fillRect(rect, { a: Std.int (state.color.alphaMultiplier * 0xFF), rgb: color });
 
             } else {
                 var red = 0xff & (color >> 16);

@@ -17,7 +17,7 @@ class MoveTo
     implements Action
 {
     public function new (
-        x :Float, y :Float, seconds :Float, easingX :EaseFunction, ?easingY :EaseFunction)
+        x :Float, y :Float, seconds :Float, ?easingX :EaseFunction, ?easingY :EaseFunction)
     {
         _x = x;
         _y = y;

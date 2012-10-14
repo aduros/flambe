@@ -15,7 +15,7 @@ import flambe.Entity;
 class AnimateBy
     implements Action
 {
-    public function new (value :AnimatedFloat, by :Float, seconds :Float, easing :EaseFunction)
+    public function new (value :AnimatedFloat, by :Float, seconds :Float, ?easing :EaseFunction)
     {
         _value = value;
         _by = by;

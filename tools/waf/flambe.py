@@ -35,8 +35,8 @@ def configure(ctx):
 def apply_flambe(ctx):
     Utils.def_attrs(ctx, platforms="flash html",
         classpath="", flags="", libs="", asset_base=None, flash_version="10.1", main=None,
-        air_cert="etc/air-cert.pfx", air_desc="etc/air-desc.xml", air_password=None,
-        ios_profile="etc/ios.mobileprovision")
+        dead_code_elimination=True, air_cert="etc/air-cert.pfx", air_desc="etc/air-desc.xml",
+        air_password=None, ios_profile="etc/ios.mobileprovision")
 
     classpath = [ ctx.path.find_dir("src"), flambe_src(ctx) ] + \
         Utils.to_list(ctx.classpath) # The classpath option should be a list of nodes
@@ -47,7 +47,11 @@ def apply_flambe(ctx):
         if not main:
             ctx.bld.fatal("You must specify a main class in your wscript or hxproj")
 
-    flags = ["-main", main, "--dead-code-elimination"] + Utils.to_list(ctx.flags)
+    flags = ["-main", main]
+    if ctx.dead_code_elimination:
+        flags += ["--dead-code-elimination"]
+    flags += Utils.to_list(ctx.flags)
+
     libs = ["format"] + Utils.to_list(ctx.libs)
     platforms = Utils.to_list(ctx.platforms)
     flash_version = ctx.flash_version

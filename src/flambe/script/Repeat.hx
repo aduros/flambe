@@ -30,7 +30,7 @@ class Repeat
         }
 
         var spent = _action.update(dt, actor);
-        if (_count >= 0 && spent >= 0 && --_remaining < 0) {
+        if (_count > 0 && spent >= 0 && --_remaining == 0) {
             _remaining = _count; // Reset state in case this Action is reused
             return spent;
         }

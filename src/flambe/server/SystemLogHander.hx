@@ -12,7 +12,7 @@ class SystemLogHander
     public function new (syslog :Dynamic, tag :String)
     {
         _syslog = syslog;
-        _syslog.init(tag, 0, syslog.LOG_LOCAL0);
+        _syslog.init(tag, syslog.LOG_PID, syslog.LOG_LOCAL0);
     }
 
     public function log (level :LogLevel, message :String)

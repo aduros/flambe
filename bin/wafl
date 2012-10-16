@@ -2,30 +2,23 @@
 #
 # Locates a Flambe haxelib install and runs its bundled waf
 
-import os, sys
+import os, subprocess, sys
 env = os.environ
 join = os.path.join
 
 try:
-    # TODO(bruno): This may need to be changed in Haxe 3?
-    from platform import system
-    if system() == "Windows":
-        lib = join(env["HAXEPATH"], "lib", "flambe")
-    else:
-        with open(join(os.path.expanduser("~"), ".haxelib")) as f:
-            lib = join(f.read(), "flambe")
+    # The directory containing all installed versions of flambe
+    lib = join(subprocess.check_output(["haxelib", "config"]).rstrip(), "flambe")
 
-    dev = join(lib, ".dev")
-    current = join(lib, ".current")
-
-    if os.path.isfile(dev):
-        with open(dev) as f:
+    # Use the dev version if it exists, otherwise try the current stable
+    try:
+        with open(join(lib, ".dev")) as f:
             flambe_root = join(f.read(), "..")
-    else:
-        with open(current) as f:
+    except IOError:
+        with open(join(lib, ".current")) as f:
             flambe_root = join(lib, f.read().replace(".", ","))
 
-except IOError:
+except Exception:
     print("Could not locate Flambe, run `haxelib install flambe`.")
     sys.exit(1)
 

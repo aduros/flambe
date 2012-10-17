@@ -90,6 +90,14 @@ class Library
         }
         return symbol.createSprite();
     }
+    
+    /**
+    * Returns a raw symbol object from the library
+    */
+    public function getSymbol(symbolName :String):Symbol 
+    {
+        return _symbols.get(symbolName);
+    }
 
     /**
      * Creates a movie sprite from a symbol name.

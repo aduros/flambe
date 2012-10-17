@@ -30,6 +30,26 @@ class MovieSprite extends Sprite
      * The playback speed multiplier of this movie, defaults to 1.0. Higher values will play faster.
      */
     public var speed (default, null) :AnimatedFloat;
+	
+    private function get_frame():Float 
+    {
+        return _frame;
+    }
+    
+    private function set_frame(value:Float):Float 
+    {
+        goto(value);
+        return _frame;
+    }
+    
+    public var frame(get_frame, set_frame):Float;
+    
+    private function get_totalFrames():Float 
+    {
+        return symbol.duration / symbol.frameRate;
+    }
+
+    public var totalFrames(get_totalFrames, null):Float;
 
     public function new (symbol :MovieSymbol)
     {
@@ -98,6 +118,10 @@ class MovieSprite extends Sprite
     {
         super.onUpdate(dt);
 
+        if (speed._ == 0)
+        {
+            return;
+        }
         speed.update(dt);
 
         _position += speed._*dt;
@@ -108,8 +132,13 @@ class MovieSprite extends Sprite
         var newFrame = _position*symbol.frameRate;
         goto(newFrame);
     }
+    
 
-    private function goto (newFrame :Float)
+    /**
+     * Go to a specific frame
+     * @param newFrame - First frame is zero
+     */
+    public function goto (newFrame :Float)
     {
         var wrapped = newFrame < _frame;
         if (wrapped) {
@@ -123,6 +152,62 @@ class MovieSprite extends Sprite
         }
 
         _frame = newFrame;
+        
+        if (_endPosition > 0 && _position >= _endPosition) {
+            stop();
+            _endPosition = 0;
+        }
+    }
+    
+    
+    
+    /**
+     * Set the speed to zero
+     */
+    public function stop():Void
+    {
+        speed._ = 0;
+    }
+    
+    /**
+     * Set the speed to 1
+     */
+    public function play():Void
+    {
+        speed._ = 1;
+    }
+    
+    
+    /**
+     * Set the speed to 1 and the endFrame that will trigger stop()
+     * @param    position from 
+     */
+    public function playTo(position:Float):Void
+    {
+        _endPosition = position;
+        speed._ = 1;
+    }
+    
+    
+    
+    /**
+     * Go to a specific frame and set speed to zero
+     * @param    newFrame First frame is zero
+     */
+    public function gotoAndStop(newFrame:Float):Void
+    {
+        speed._ = 0;
+        goto(newFrame);
+    }
+    
+    /**
+     * Go to a specific frame and set speed to 1
+     * @param    newFrame First frame is zero
+     */
+    public function gotoAndPlay(newFrame:Float):Void
+    {
+        speed._ = 1;
+        goto(newFrame);
     }
 
     inline private function getPosition () :Float
@@ -139,6 +224,13 @@ class MovieSprite extends Sprite
 
     private var _position :Float;
     private var _frame :Float;
+    
+    /**
+     * Last position to stop at
+     */
+    private var _endPosition:Float = 0;
+    
+    private var _frameSprite:Sprite;
 }
 
 private class LayerAnimator

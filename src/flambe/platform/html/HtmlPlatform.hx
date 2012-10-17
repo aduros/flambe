@@ -206,7 +206,7 @@ class HtmlPlatform
         _lastUpdate = Date.now().getTime();
         _skipFrame = false;
 
-        // Use requestAnimationFrame if available, otherwise a 60 FPS setInterval
+        // Use requestAnimationFrame if available, otherwise a fixed FPS setInterval
         // https://developer.mozilla.org/en/DOM/window.mozRequestAnimationFrame
         var requestAnimationFrame = HtmlUtil.loadExtension("requestAnimationFrame").value;
         if (requestAnimationFrame != null) {
@@ -222,6 +222,8 @@ class HtmlPlatform
                 log.warn("No monotonic timer support, falling back to the system date");
             }
 
+            // Do we need to minimize the mainloop calls with requestAnimationFrame?
+            _checkDT = (System.FPS<60) ? true : false;
             var updateFrame = null;
             updateFrame = function (now :Float) {
                 update(hasPerfNow ? performance.now() : now);
@@ -233,7 +235,7 @@ class HtmlPlatform
             log.warn("No requestAnimationFrame support, falling back to setInterval");
             (untyped Lib.window).setInterval(function () {
                 update(Date.now().getTime());
-            }, 1000/60);
+            }, 1000/System.FPS);
         }
     }
 
@@ -299,6 +301,13 @@ class HtmlPlatform
     private function update (now :Float)
     {
         var dt = (now - _lastUpdate)/1000;
+	
+	// Minimize update calls using delta time?
+	if (_checkDT && dt < System.FPS / 1000)
+        {
+	    return;
+        }
+	
         _lastUpdate = now;
 
         if (_skipFrame) {
@@ -360,4 +369,5 @@ class HtmlPlatform
 
     private var _lastUpdate :Float;
     private var _skipFrame :Bool;
+    private var _checkDT :Bool;
 }

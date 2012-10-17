@@ -26,6 +26,11 @@ import flambe.web.Web;
 class System
 {
     /**
+     * Configurable FPS
+     * */	
+    public static var FPS:Int = 60;
+	
+    /**
      * The entity at the root of the hierarchy.
      */
     public static var root (default, null) :Entity = new Entity();

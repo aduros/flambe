@@ -35,7 +35,7 @@ class Value<A>
 
     /**
      * Immediately calls a listener with the current value, and again whenever the value changes.
-     * @return A handle that can be disposed to stop watching for changes.
+     * @returns A handle that can be disposed to stop watching for changes.
      */
     public function watch (listener :Listener2<A,A>) :Disposable
     {

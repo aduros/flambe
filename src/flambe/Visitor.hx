@@ -11,7 +11,7 @@ interface Visitor
 {
     /**
      * Called when the visitor descends into a new entity in the tree.
-     * @return False to ignore this entity, pruning it from iteration.
+     * @returns False to ignore this entity, pruning it from iteration.
      */
     function enterEntity (entity :Entity) :Bool;
 

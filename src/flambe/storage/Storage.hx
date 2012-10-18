@@ -18,7 +18,7 @@ interface Storage
     /**
      * Add a key to the storage, replacing any existing value.
      * @param value An object that can be serialized with haxe.Serializer.
-     * @return True if the value was successfully serialized and persisted.
+     * @returns True if the value was successfully serialized and persisted.
      */
     function set (key :String, value :Dynamic) :Bool;
 

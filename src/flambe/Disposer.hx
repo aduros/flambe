@@ -32,7 +32,7 @@ class Disposer extends Component
 
     /**
      * Remove a Disposable from this disposer.
-     * @return True if the disposable was removed.
+     * @returns True if the disposable was removed.
      */
     public function remove (disposable :Disposable) :Bool
     {

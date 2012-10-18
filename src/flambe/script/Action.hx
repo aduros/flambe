@@ -16,7 +16,7 @@ interface Action
      *
      * @param dt The time elapsed since the last frame, in seconds.
      * @param actor The entity of the Script that this action was added to.
-     * @return The amount of time in seconds spent this frame to finish the action, which may be
+     * @returns The amount of time in seconds spent this frame to finish the action, which may be
      *   less than dt. Or -1 if the action is not yet finished.
      */
     function update (dt :Float, actor :Entity) :Float;

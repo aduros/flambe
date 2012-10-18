@@ -142,6 +142,10 @@ class Sprite extends Component
         return _viewMatrix;
     }
 
+    /**
+     * Convenience method to set the anchor position.
+     * @returns This instance, for chaining.
+     */
     public function setAnchor (x :Float, y :Float) :Sprite
     {
         anchorX._ = x;
@@ -149,6 +153,10 @@ class Sprite extends Component
         return this;
     }
 
+    /**
+     * Convenience method to center the anchor.
+     * @returns This instance, for chaining.
+     */
     public function centerAnchor () :Sprite
     {
         anchorX._ = getNaturalWidth()/2;
@@ -156,6 +164,10 @@ class Sprite extends Component
         return this;
     }
 
+    /**
+     * Convenience method to set the position.
+     * @returns This instance, for chaining.
+     */
     public function setXY (x :Float, y :Float) :Sprite
     {
         this.x._ = x;
@@ -163,6 +175,10 @@ class Sprite extends Component
         return this;
     }
 
+    /**
+     * Convenience method to uniformly set the scale.
+     * @returns This instance, for chaining.
+     */
     public function setScale (scale :Float) :Sprite
     {
         scaleX._ = scale;
@@ -170,6 +186,10 @@ class Sprite extends Component
         return this;
     }
 
+    /**
+     * Convenience method to set the scale.
+     * @returns This instance, for chaining.
+     */
     public function setScaleXY (scaleX :Float, scaleY :Float) :Sprite
     {
         this.scaleX._ = scaleX;

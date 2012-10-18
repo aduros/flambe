@@ -39,7 +39,10 @@ class FillSprite extends Sprite
         return height._;
     }
 
-    /** Convenience method to set the width and height. */
+    /**
+     * Convenience method to set the width and height.
+     * @returns This instance, for chaining.
+     */
     public function setSize (width :Float, height :Float) :FillSprite
     {
         this.width._ = width;

@@ -31,6 +31,10 @@ class Entity
         _children = [];
     }
 
+    /**
+     * Add a component to this entity.
+     * @returns This instance, for chaining.
+     */
     public function add (comp :Component) :Entity
     {
         var name = comp.getName();
@@ -48,6 +52,9 @@ class Entity
         return this;
     }
 
+    /**
+     * Remove a component from this entity.
+     */
     public function remove (comp :Component)
     {
         if (comp.owner == this) {
@@ -67,7 +74,7 @@ class Entity
     }
 
     /**
-     * Gets a component of a given class from this Entity.
+     * Gets a component of a given class from this entity.
      */
     @:macro
     public function get<A> (self :Expr, componentClass :ExprRequire<Class<A>>) :ExprRequire<A>
@@ -98,6 +105,9 @@ class Entity
         };
     }
 
+    /**
+     * Gets a component by name from this entity.
+     */
     inline public function getComponent (name :String) :Component
     {
         return untyped _compMap[name];

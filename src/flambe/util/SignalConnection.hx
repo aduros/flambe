@@ -25,6 +25,7 @@ class SignalConnection
 
     /**
      * Tells the connection to dispose itself after being used once.
+     * @returns This instance, for chaining.
      */
     public function once ()
     {

@@ -70,7 +70,7 @@ class Library
     /**
      * Retrieve a name symbol from this library, or null if not found.
      */
-    inline public function symbol (symbolName :String) :Symbol
+    inline public function getSymbol (symbolName :String) :Symbol
     {
         return _symbols.get(symbolName);
     }

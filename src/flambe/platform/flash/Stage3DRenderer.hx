@@ -19,8 +19,6 @@ import flambe.display.Texture;
 class Stage3DRenderer
     implements Renderer
 {
-    private static var log = Log.log; // http://code.google.com/p/haxe/issues/detail?id=365
-
     public function new ()
     {
         _textures = [];
@@ -65,7 +63,7 @@ class Stage3DRenderer
             }
         }
 
-        log.warn("No free Stage3Ds available");
+        Log.warn("No free Stage3Ds available");
         onError();
     }
 
@@ -102,12 +100,12 @@ class Stage3DRenderer
         var stage3D :Stage3D = event.target;
         _context3D = stage3D.context3D;
 
-        log.info("Created new Stage3D context", ["driver", _context3D.driverInfo]);
+        Log.info("Created new Stage3D context", ["driver", _context3D.driverInfo]);
 
 #if !flambe_debug_renderer
         // BitmapRenderer is faster than carrying on with a software driver
         if (_context3D.driverInfo.indexOf("Software") != -1) {
-            log.warn("Detected a slow Stage3D driver, refusing to go on");
+            Log.warn("Detected a slow Stage3D driver, refusing to go on");
             var ref = _context3D;
             onError();
             ref.dispose();
@@ -139,9 +137,9 @@ class Stage3DRenderer
         _stage3D = null;
 
         if (event != null) {
-            log.warn("Unexpected Stage3D error", ["error", event.text]);
+            Log.warn("Unexpected Stage3D error", ["error", event.text]);
         }
-        log.warn("Falling back to BitmapRenderer");
+        Log.warn("Falling back to BitmapRenderer");
 
         // Fall back to software renderering
         FlashPlatform.instance.renderer = new BitmapRenderer();

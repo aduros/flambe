@@ -16,8 +16,6 @@ using Lambda;
 
 class BasicAssetPackLoader
 {
-    private static var log = Log.log; // http://code.google.com/p/haxe/issues/detail?id=365
-
     public var promise (default, null) :Promise<AssetPack>;
 
     public function new (manifest :Manifest)
@@ -52,7 +50,7 @@ class BasicAssetPackLoader
                 var placeholder = createPlaceholder(bestEntry);
 
                 if (placeholder != null) {
-                    log.warn("Using an asset placeholder",
+                    Log.warn("Using an asset placeholder",
                         ["name", bestEntry.name, "type", bestEntry.type]);
                     handleLoad(bestEntry, placeholder);
 
@@ -159,7 +157,7 @@ class BasicAssetPackLoader
 
     private function handleError (message :String)
     {
-        log.warn("Error loading asset pack", ["error", message]);
+        Log.warn("Error loading asset pack", ["error", message]);
         promise.error.emit(message);
     }
 

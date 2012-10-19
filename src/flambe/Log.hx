@@ -4,16 +4,10 @@
 
 package flambe;
 
-import flambe.util.Logger;
+import flambe.util.PackageLog;
 
 /**
- * Flambe's internal logger. Games should use their own by calling System.logger().
+ * Flambe's internal logger. Games should use their own by calling System.logger() or extending
+ * PackageLog.
  */
-class Log
-{
-#if server
-    public static var log = flambe.server.Node.logger("flambe");
-#else
-    public static var log = System.logger("flambe");
-#end
-}
+class Log extends PackageLog {}

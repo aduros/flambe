@@ -19,8 +19,6 @@ using Lambda;
  */
 class MainLoop
 {
-    private static var log = Log.log; // http://code.google.com/p/haxe/issues/detail?id=365
-
     public function new ()
     {
         _updateVisitor = new UpdateVisitor();
@@ -33,7 +31,7 @@ class MainLoop
         if (dt <= 0) {
             // This can happen on platforms that don't have monotonic timestamps and are prone to
             // system clock adjustment
-            log.warn("Zero or negative time elapsed since the last frame!", ["dt", dt]);
+            Log.warn("Zero or negative time elapsed since the last frame!", ["dt", dt]);
             return;
         }
         if (dt > 1) {

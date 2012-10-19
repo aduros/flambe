@@ -14,8 +14,6 @@ using StringTools;
  */
 class Font
 {
-    private static var log = Log.log; // http://code.google.com/p/haxe/issues/detail?id=365
-
     /**
      * The name that was used to load this font.
      */
@@ -167,7 +165,7 @@ class Font
             if (glyph != null) {
                 list.push(glyph);
             } else {
-                log.warn("Requested a missing character from font",
+                Log.warn("Requested a missing character from font",
                     ["font", name, "charCode", charCode]);
             }
         }

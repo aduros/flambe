@@ -30,8 +30,6 @@ import flambe.web.Web;
 class HtmlPlatform
     implements Platform
 {
-    private static var log :Logger; // This needs to be initialized later
-
     public static var instance (default, null) :HtmlPlatform = new HtmlPlatform();
 
     public var mainLoop (default, null) :MainLoop;
@@ -43,8 +41,7 @@ class HtmlPlatform
 
     public function init ()
     {
-        log = Log.log;
-        log.info("Initializing HTML platform");
+        Log.info("Initializing HTML platform");
 
         var canvas :Dynamic = null;
         try {
@@ -219,7 +216,7 @@ class HtmlPlatform
                 // performance.now is relative to navigationStart, rather than a timestamp
                 _lastUpdate = performance.now();
             } else {
-                log.warn("No monotonic timer support, falling back to the system date");
+                Log.warn("No monotonic timer support, falling back to the system date");
             }
 
             var updateFrame = null;
@@ -230,7 +227,7 @@ class HtmlPlatform
             requestAnimationFrame(updateFrame, canvas);
 
         } else {
-            log.warn("No requestAnimationFrame support, falling back to setInterval");
+            Log.warn("No requestAnimationFrame support, falling back to setInterval");
             (untyped Lib.window).setInterval(function () {
                 update(Date.now().getTime());
             }, 1000/60);
@@ -260,7 +257,7 @@ class HtmlPlatform
             if (localStorage != null) {
                 _storage = new HtmlStorage(localStorage);
             } else {
-                log.warn("localStorage is unavailable, falling back to unpersisted storage");
+                Log.warn("localStorage is unavailable, falling back to unpersisted storage");
                 _storage = new DummyStorage();
             }
         }
@@ -281,7 +278,7 @@ class HtmlPlatform
         try {
             return Reflect.callMethod(null, func, params);
         } catch (e :Dynamic) {
-            log.warn("Error calling native method", ["error", e]);
+            Log.warn("Error calling native method", ["error", e]);
             return null;
         }
     }

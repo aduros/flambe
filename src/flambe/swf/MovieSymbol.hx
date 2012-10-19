@@ -176,7 +176,7 @@ class MovieKeyframe
                 supported = false;
             }
             if (!supported) {
-                Log.log.warn("Flump skewing is not yet supported");
+                Log.warn("Flump skewing is not yet supported");
             }
             rotation = FMath.toDegrees(skewX);
         }

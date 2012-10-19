@@ -14,8 +14,6 @@ import flambe.util.Value;
 class HtmlStage
     implements Stage
 {
-    private static var log = Log.log; // http://code.google.com/p/haxe/issues/detail?id=365
-
     public var width (getWidth, null) :Int;
     public var height (getHeight, null) :Int;
     public var orientation (default, null) :Value<Orientation>;
@@ -35,7 +33,7 @@ class HtmlStage
         // one screen pixel
         scaleFactor = computeScaleFactor(canvas);
         if (scaleFactor != 1) {
-            log.info("Reversing device DPI scaling", ["scaleFactor", scaleFactor]);
+            Log.info("Reversing device DPI scaling", ["scaleFactor", scaleFactor]);
             HtmlUtil.setVendorStyle(_canvas, "transform-origin", "top left");
             HtmlUtil.setVendorStyle(_canvas, "transform", "scale(" + (1/scaleFactor) + ")");
         }
@@ -67,7 +65,7 @@ class HtmlStage
         HtmlUtil.addVendorListener(Lib.document, "fullscreenerror", function (_) {
             // No useful error message since the event provides no reason. See the error conditions
             // at http://dvcs.w3.org/hg/fullscreen/raw-file/tip/Overview.html#dom-element-requestfullscreen
-            log.warn("Error when requesting fullscreen");
+            Log.warn("Error when requesting fullscreen");
         }, false);
 #end
         updateFullscreen();

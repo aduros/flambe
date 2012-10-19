@@ -11,8 +11,6 @@ using flambe.util.Strings;
  */
 class MessageBundle
 {
-    private static var log = Log.log; // http://code.google.com/p/haxe/issues/detail?id=365
-
     public var config (default, null) :Config;
 
     /**
@@ -40,7 +38,7 @@ class MessageBundle
     {
         var value = config.get(path);
         if (value == null) {
-            log.warn("Requested a missing translation from bundle", ["path", path]);
+            Log.warn("Requested a missing translation from bundle", ["path", path]);
             missingTranslation.emit(path);
             return path; // Return the best we can
         }

@@ -9,8 +9,6 @@ import flambe.storage.Storage;
 class DummyStorage
     implements Storage
 {
-    private static var log = Log.log; // http://code.google.com/p/haxe/issues/detail?id=365
-
     public var supported (isSupported, null) :Bool;
 
     public function new ()

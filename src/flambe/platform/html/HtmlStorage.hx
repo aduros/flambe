@@ -12,8 +12,6 @@ import flambe.storage.Storage;
 class HtmlStorage
     implements Storage
 {
-    private static var log = Log.log; // http://code.google.com/p/haxe/issues/detail?id=365
-
     public var supported (isSupported, null) :Bool;
 
     public function new (storage :Dynamic)
@@ -36,7 +34,7 @@ class HtmlStorage
             serializer.serialize(value);
             encoded = serializer.toString();
         } catch (error :Dynamic) {
-            log.warn("Storage serialization failed", ["message", error]);
+            Log.warn("Storage serialization failed", ["message", error]);
             return false;
         }
 
@@ -45,7 +43,7 @@ class HtmlStorage
         } catch (error :Dynamic) {
             // setItem may throw a QuotaExceededError:
             // http://dev.w3.org/html5/webstorage/#dom-localstorage
-            log.warn("localStorage.setItem failed", ["message", error.message]);
+            Log.warn("localStorage.setItem failed", ["message", error.message]);
             return false;
         }
         return true;
@@ -58,7 +56,7 @@ class HtmlStorage
             encoded = _storage.getItem(PREFIX + key);
         } catch (error :Dynamic) {
             // This should never happen, but it sometimes does in Firefox and IE
-            log.warn("localStorage.getItem failed", ["message", error.message]);
+            Log.warn("localStorage.getItem failed", ["message", error.message]);
             return null;
         }
 
@@ -66,7 +64,7 @@ class HtmlStorage
             try {
                 return Unserializer.run(encoded);
             } catch (error :Dynamic) {
-                log.warn("Storage unserialization failed", ["message", error]);
+                Log.warn("Storage unserialization failed", ["message", error]);
             }
         }
         return null;
@@ -78,7 +76,7 @@ class HtmlStorage
             _storage.removeItem(PREFIX + key);
         } catch (error :Dynamic) {
             // This should never happen, but it sometimes does in Firefox and IE
-            log.warn("localStorage.removeItem failed", ["message", error.message]);
+            Log.warn("localStorage.removeItem failed", ["message", error.message]);
         }
     }
 
@@ -88,7 +86,7 @@ class HtmlStorage
             _storage.clear();
         } catch (error :Dynamic) {
             // This should never happen, but it sometimes does in Firefox and IE
-            log.warn("localStorage.clear failed", ["message", error.message]);
+            Log.warn("localStorage.clear failed", ["message", error.message]);
         }
     }
 

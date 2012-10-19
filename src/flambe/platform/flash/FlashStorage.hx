@@ -14,8 +14,6 @@ import flambe.storage.Storage;
 class FlashStorage
     implements Storage
 {
-    private static var log = Log.log; // http://code.google.com/p/haxe/issues/detail?id=365
-
     public var supported (isSupported, null) :Bool;
 
     public function new (so :SharedObject)
@@ -38,7 +36,7 @@ class FlashStorage
             serializer.serialize(value);
             encoded = serializer.toString();
         } catch (error :Dynamic) {
-            log.warn("Storage serialization failed", ["message", error]);
+            Log.warn("Storage serialization failed", ["message", error]);
             return false;
         }
 
@@ -53,7 +51,7 @@ class FlashStorage
             try {
                 return Unserializer.run(encoded);
             } catch (error :Dynamic) {
-                log.warn("Storage unserialization failed", ["message", error]);
+                Log.warn("Storage unserialization failed", ["message", error]);
             }
         }
         return null;

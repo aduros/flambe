@@ -36,8 +36,6 @@ import flambe.web.Web;
 class FlashPlatform
     implements Platform
 {
-    private static var log :Logger; // This needs to be initialized later
-
     public static var instance (default, null) :FlashPlatform = new FlashPlatform();
 
     public var mainLoop (default, null) :MainLoop;
@@ -49,8 +47,7 @@ class FlashPlatform
 
     public function init ()
     {
-        log = Log.log;
-        log.info("Initializing Flash platform");
+        Log.info("Initializing Flash platform");
 
         var stage = Lib.current.stage;
 
@@ -117,7 +114,7 @@ class FlashPlatform
                 _storage = new FlashStorage(SharedObject.getLocal("flambe"));
             } catch (err :Dynamic) {
                 // SharedObject.getLocal may throw an error
-                log.warn("SharedObject is unavailable, falling back to unpersisted storage");
+                Log.warn("SharedObject is unavailable, falling back to unpersisted storage");
                 _storage = new DummyStorage();
             }
         }
@@ -151,7 +148,7 @@ class FlashPlatform
             if (AirWeb.shouldUse()) {
                 _web = new AirWeb(_stage.nativeStage);
             } else {
-                log.warn("StageWebView is unavailable");
+                Log.warn("StageWebView is unavailable");
                 _web = new FlashWeb();
             }
 #else

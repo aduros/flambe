@@ -13,6 +13,7 @@ import flambe.Visitor;
 #if !macro
 @:autoBuild(flambe.platform.ComponentBuilder.build())
 #end
+@:componentBase
 class Component
     implements Disposable
 {

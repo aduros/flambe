@@ -79,7 +79,8 @@ class Stage3DRenderer
         texture.maxV = bitmapData.height / h2;
 
         if (bitmapData.width != w2 || bitmapData.height != h2) {
-            var resized = new BitmapData(w2, h2, bitmapData.transparent);
+            // Resize up to the next power of two, padding with transparent black
+            var resized = new BitmapData(w2, h2, bitmapData.transparent, 0x00000000);
             resized.copyPixels(bitmapData,
                 new Rectangle(0, 0, bitmapData.width, bitmapData.height), new Point(0, 0));
             bitmapData = resized;

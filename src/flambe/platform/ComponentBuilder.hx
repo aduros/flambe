@@ -40,11 +40,27 @@ class ComponentBuilder
 
     private static function getComponentName (cl :ClassType) :String
     {
-        var name = null;
-        while (!cl.meta.has(":componentBase")) {
-            name = cl.name;
-            cl = cl.superClass.t.get();
+        // Traverse up to the last non-component base
+        while (true) {
+            var superClass = cl.superClass.t.get();
+            if (superClass.meta.has(":componentBase")) {
+                break;
+            }
+            cl = superClass;
         }
+
+        // Look up the ID, otherwise generate one
+        var fullName = cl.pack.concat([cl.name]).join(".");
+        var name = _nameCache.get(fullName);
+        if (name == null) {
+            name = cl.name + "_" + _nextId;
+            _nameCache.set(fullName, name);
+            ++_nextId;
+        }
+
         return name;
     }
+
+    private static var _nameCache = new Hash<String>();
+    private static var _nextId = 0;
 }

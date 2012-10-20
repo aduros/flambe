@@ -8,7 +8,7 @@ join = os.path.join
 
 try:
     # The directory containing all installed versions of flambe
-    lib = join(subprocess.check_output(["haxelib", "config"]).rstrip(), "flambe")
+    lib = join(subprocess.check_output(["haxelib", "config"]).rstrip().decode("utf-8"), "flambe")
 
     # Use the dev version if it exists, otherwise try the current stable
     try:

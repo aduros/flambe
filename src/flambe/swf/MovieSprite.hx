@@ -197,7 +197,7 @@ private class LayerAnimator
 
         var kf = keyframes[keyframeIdx];
         var visible = kf.visible;
-        sprite.visible._ = visible;
+        sprite.visible = visible;
         if (!visible) {
             return; // Don't bother animating invisible layers
         }

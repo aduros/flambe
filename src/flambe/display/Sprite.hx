@@ -63,9 +63,9 @@ class Sprite extends Component
     public var blendMode :BlendMode;
 
     /**
-     * True if this sprite should be drawn.
+     * Whether this sprite should be drawn.
      */
-    public var visible (default, null) :Value<Bool>;
+    public var visible :Bool;
 
     /**
      * Emitted when the pointer is pressed down over this sprite.
@@ -92,12 +92,12 @@ class Sprite extends Component
         rotation = new AnimatedFloat(0, dirtyMatrix);
         scaleX = new AnimatedFloat(1, dirtyMatrix);
         scaleY = new AnimatedFloat(1, dirtyMatrix);
-
-        alpha = new AnimatedFloat(1);
         anchorX = new AnimatedFloat(0, dirtyMatrix);
         anchorY = new AnimatedFloat(0, dirtyMatrix);
-        visible = new Value<Bool>(true);
+
+        alpha = new AnimatedFloat(1);
         blendMode = null;
+        visible = true;
     }
 
     /**

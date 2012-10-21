@@ -195,7 +195,7 @@ class BasicPointer
     {
         while (true) {
             var sprite = entity.get(Sprite);
-            if (sprite != null && !sprite.visible._) {
+            if (sprite != null && !sprite.visible) {
                 // Ignore invisible sprites
                 return false;
             }

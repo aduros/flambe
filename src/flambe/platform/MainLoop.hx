@@ -61,7 +61,7 @@ class MainLoop
     {
         var drawCtx = renderer.willRender();
         if (drawCtx != null) {
-            _drawVisitor.drawCtx = drawCtx;
+            _drawVisitor.init(drawCtx);
             System.root.visit(_drawVisitor, false, true);
             renderer.didRender();
         }
@@ -157,9 +157,12 @@ private class Timestep
 private class DrawVisitor
     implements Visitor
 {
-    public var drawCtx :DrawingContext;
-
     public function new () {}
+
+    inline public function init (drawCtx :DrawingContext)
+    {
+        _drawCtx = drawCtx;
+    }
 
     public function enterEntity (entity :Entity) :Bool
     {
@@ -179,7 +182,7 @@ private class DrawVisitor
     public function leaveEntity (entity :Entity)
     {
         if (entity.has(Sprite)) {
-            drawCtx.restore();
+            _drawCtx.restore();
         }
     }
 
@@ -199,40 +202,42 @@ private class DrawVisitor
             return false;
         }
 
-        drawCtx.save();
+        _drawCtx.save();
 
         if (alpha < 1) {
-            drawCtx.multiplyAlpha(alpha);
+            _drawCtx.multiplyAlpha(alpha);
         }
 
         if (sprite.blendMode != null) {
-            drawCtx.setBlendMode(sprite.blendMode);
+            _drawCtx.setBlendMode(sprite.blendMode);
         }
 
         var x = sprite.x._;
         var y = sprite.y._;
         if (x != 0 || y != 0) {
-            drawCtx.translate(x, y);
+            _drawCtx.translate(x, y);
         }
 
         var rotation = sprite.rotation._;
         if (rotation != 0) {
-            drawCtx.rotate(rotation);
+            _drawCtx.rotate(rotation);
         }
 
         var scaleX = sprite.scaleX._;
         var scaleY = sprite.scaleY._;
         if (scaleX != 1 || scaleY != 1) {
-            drawCtx.scale(scaleX, scaleY);
+            _drawCtx.scale(scaleX, scaleY);
         }
 
         var anchorX = sprite.anchorX._;
         var anchorY = sprite.anchorY._;
         if (anchorX != 0 || anchorY != 0) {
-            drawCtx.translate(-anchorX, -anchorY);
+            _drawCtx.translate(-anchorX, -anchorY);
         }
 
-        sprite.draw(drawCtx);
+        sprite.draw(_drawCtx);
         return true;
     }
+
+    private var _drawCtx :DrawingContext = null;
 }

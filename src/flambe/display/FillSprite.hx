@@ -12,21 +12,21 @@ import flambe.util.Value;
  */
 class FillSprite extends Sprite
 {
-    public var color (default, null) :Value<Int>;
+    public var color :Int;
     public var width (default, null) :AnimatedFloat;
     public var height (default, null) :AnimatedFloat;
 
     public function new (color :Int, width :Float, height :Float)
     {
         super();
-        this.color = new Value<Int>(color);
+        this.color = color;
         this.width = new AnimatedFloat(width);
         this.height = new AnimatedFloat(height);
     }
 
     override public function draw (ctx :DrawingContext)
     {
-        ctx.fillRect(color._, 0, 0, width._, height._);
+        ctx.fillRect(color, 0, 0, width._, height._);
     }
 
     override public function getNaturalWidth () :Float

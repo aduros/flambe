@@ -53,7 +53,7 @@ class MainLoop
         }
 
         // Then update the entity hierarchy
-        _updateVisitor.dt = dt;
+        _updateVisitor.init(dt);
         System.root.visit(_updateVisitor, true, true);
     }
 
@@ -90,25 +90,68 @@ class MainLoop
 private class UpdateVisitor
     implements Visitor
 {
-    public var dt :Float;
-
     public function new ()
     {
+        _step = new Timestep();
+    }
+
+    inline public function init (dt :Float)
+    {
+        _step.dt = dt;
     }
 
     public function enterEntity (entity :Entity) :Bool
     {
+        var speed = entity.get(SpeedAdjuster);
+        if (speed != null) {
+            var scale = speed.scale._;
+            if (scale <= 0) {
+                // This entity is paused, avoid descending into children. But do update the speed
+                // adjuster (so it can still be animated)
+                speed.onUpdate(_step.dt);
+                return false;
+            }
+            if (scale != 1) {
+                // Push this entity onto the timestep stack
+                var prev = _step;
+                var prevDt = prev.dt;
+                _step = new Timestep();
+                _step.dt = prevDt * scale;
+                _step.entity = entity;
+                _step.next = prev;
+
+                // Let the adjuster know the previous delta, so it doesn't affect itself
+                speed._internal_realDt = prevDt;
+            }
+        }
+
         return true;
     }
 
     public function leaveEntity (entity :Entity)
     {
+        // If this entity caused a speed adjustment, pop it off the timestep stack
+        if (entity == _step.entity) {
+            _step = _step.next;
+        }
     }
 
     public function acceptComponent (component :Component)
     {
-        component.onUpdate(dt);
+        component.onUpdate(_step.dt);
     }
+
+    private var _step :Timestep;
+}
+
+private class Timestep
+{
+    public var entity :Entity = null;
+    public var dt :Float = 0;
+
+    public var next :Timestep = null;
+
+    public function new () {}
 }
 
 private class DrawVisitor
@@ -116,9 +159,7 @@ private class DrawVisitor
 {
     public var drawCtx :DrawingContext;
 
-    public function new ()
-    {
-    }
+    public function new () {}
 
     public function enterEntity (entity :Entity) :Bool
     {

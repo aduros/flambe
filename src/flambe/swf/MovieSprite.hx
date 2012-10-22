@@ -31,6 +31,11 @@ class MovieSprite extends Sprite
      */
     public var speed (default, null) :AnimatedFloat;
 
+    /**
+     * Whether this movie is currently paused.
+     */
+    public var paused :Bool = false;
+
     public function new (symbol :MovieSymbol)
     {
         super();
@@ -100,13 +105,15 @@ class MovieSprite extends Sprite
 
         speed.update(dt);
 
-        _position += speed._*dt;
-        if (_position > symbol.duration) {
-            _position = _position % symbol.duration;
-        }
+        if (!paused) {
+            _position += speed._*dt;
+            if (_position > symbol.duration) {
+                _position = _position % symbol.duration;
+            }
 
-        var newFrame = _position*symbol.frameRate;
-        goto(newFrame);
+            var newFrame = _position*symbol.frameRate;
+            goto(newFrame);
+        }
     }
 
     private function goto (newFrame :Float)

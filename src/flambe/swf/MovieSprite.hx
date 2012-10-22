@@ -234,12 +234,12 @@ private class LayerAnimator
             }
 
             var nextKf = keyframes[keyframeIdx + 1];
-            x += (nextKf.x-kf.x) * interp;
-            y += (nextKf.y-kf.y) * interp;
-            scaleX += (nextKf.scaleX-kf.scaleX) * interp;
-            scaleY += (nextKf.scaleY-kf.scaleY) * interp;
-            rotation += (nextKf.rotation-kf.rotation) * interp;
-            alpha += (nextKf.alpha-kf.alpha) * interp;
+            x += (nextKf.x-x) * interp;
+            y += (nextKf.y-y) * interp;
+            scaleX += (nextKf.scaleX-scaleX) * interp;
+            scaleY += (nextKf.scaleY-scaleY) * interp;
+            rotation += (nextKf.rotation-rotation) * interp;
+            alpha += (nextKf.alpha-alpha) * interp;
         }
 
         sprite.x._ = x;

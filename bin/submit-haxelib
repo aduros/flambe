@@ -63,5 +63,7 @@ case "$CONFIRM" in
         haxelib submit $ARCHIVE
         git tag flambe-$VERSION
         git tag flambe-$VERSION --git-dir=$DEMOS_ROOT
+
+        xdg-open "mailto:flambe@googlegroups.com?subject=Flambe $VERSION released"
         ;;
 esac

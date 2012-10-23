@@ -270,7 +270,7 @@ class Sprite extends Component
         if (isMatrixDirty()) {
             var parentSprite = getParentSprite();
             var parentViewMatrix = if (parentSprite != null)
-                parentSprite.getViewMatrix() else IDENTITY;
+                parentSprite.getViewMatrix() else _identity;
             _viewMatrix.copyFrom(parentViewMatrix);
             _viewMatrix.translate(x._, y._);
             _viewMatrix.rotate(FMath.toRadians(rotation._));
@@ -327,7 +327,7 @@ class Sprite extends Component
         }
     }
 
-    private static var IDENTITY = new Matrix();
+    private static var _identity = new Matrix();
     private static var _scratchPoint = new Point();
 
     // All sprites that have input event listeners attached, in screen depth order.

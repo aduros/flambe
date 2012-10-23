@@ -6,6 +6,12 @@ package flambe.math;
 
 /**
  * A 2D matrix.
+ *
+ * <pre>
+ * [ m00 m01 m02 ]
+ * [ m10 m11 m12 ]
+ * [  0   0   1  ]
+ * </pre>
  */
 class Matrix
 {
@@ -31,16 +37,6 @@ class Matrix
         m12 = 0;
     }
 
-    public function copyFrom (source :Matrix)
-    {
-        m00 = source.m00;
-        m01 = source.m01;
-        m02 = source.m02;
-        m10 = source.m10;
-        m11 = source.m11;
-        m12 = source.m12;
-    }
-
     public function translate (x :Float, y :Float)
     {
         m02 += m00*x + m01*y;
@@ -50,9 +46,9 @@ class Matrix
     public function scale (x :Float, y :Float)
     {
         m00 *= x;
+        m10 *= x;
         m11 *= y;
         m01 *= y;
-        m10 *= x;
     }
 
     public function rotate (angle :Float)
@@ -89,7 +85,7 @@ class Matrix
     /**
      * Calculate the determinant of this matrix.
      */
-    public function determinant ()
+    public function determinant () :Float
     {
         return m00*m11 - m01*m10;
     }
@@ -109,6 +105,26 @@ class Matrix
         result.x = (x*m11 - y*m01) / det;
         result.y = (y*m00 - x*m10) / det;
         return true;
+    }
+
+    public function copyFrom (source :Matrix)
+    {
+        m00 = source.m00;
+        m01 = source.m01;
+        m02 = source.m02;
+        m10 = source.m10;
+        m11 = source.m11;
+        m12 = source.m12;
+    }
+
+    /**
+     * Creates a copy of this matrix.
+     */
+    public function clone ()
+    {
+        var clone = new Matrix();
+        clone.copyFrom(this);
+        return clone;
     }
 
 #if debug

@@ -39,8 +39,6 @@ class Point
 
     /**
      * The dot product of two vectors.
-     * @param x X-coordinate of the second vector.
-     * @param y Y-coordinate of the second vector.
      */
     public function dot (x :Float, y :Float) :Float
     {
@@ -57,7 +55,7 @@ class Point
     }
 
     /**
-     * The vector magnitude (length) of this vector.
+     * The magnitude (length) of this vector.
      */
     public function magnitude () :Float
     {
@@ -66,8 +64,6 @@ class Point
 
     /**
      * The distance between this point and another point.
-     * @param x X-coordinate of the second point.
-     * @param y Y-coordinate of the second point.
      */
     public function distanceTo (x :Float, y :Float) :Float
     {
@@ -77,14 +73,18 @@ class Point
     /**
      * The squared distance between this point and another point. This is a faster operation than
      * distanceTo.
-     * @param x X-coordinate of the second point.
-     * @param y Y-coordinate of the second point.
      */
     public function distanceToSquared (x :Float, y :Float) :Float
     {
         var dx = this.x-x;
         var dy = this.y-y;
         return dx*dx + dy*dy;
+    }
+
+    public function copyFrom (source :Point)
+    {
+        x = source.x;
+        y = source.y;
     }
 
     /**

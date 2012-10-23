@@ -55,11 +55,15 @@ class FMath
 
     public static function clamp (value :Float, min :Float, max :Float) :Float
     {
-        return (value < min) ? min : (value > max) ? max : value;
+        return if (value < min) min
+            else if (value > max) max
+            else value;
     }
 
     public static function sign (value :Float) :Int
     {
-        return (value < 0) ? -1 : (value > 0) ? 1 : 0;
+        return if (value < 0) -1
+            else if (value > 0) 1
+            else 0;
     }
 }

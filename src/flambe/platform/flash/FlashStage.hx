@@ -5,6 +5,7 @@
 package flambe.platform.flash;
 
 #if flambe_air
+import flambe.System;
 import flash.events.StageOrientationEvent;
 #end
 import flash.display.StageDisplayState;
@@ -38,7 +39,7 @@ class FlashStage
         resize = new Signal0();
 
         nativeStage.scaleMode = NO_SCALE;
-        nativeStage.frameRate = 60;
+        nativeStage.frameRate = System.FPS;
         nativeStage.showDefaultContextMenu = false;
         nativeStage.addEventListener(Event.RESIZE, onResize);
 

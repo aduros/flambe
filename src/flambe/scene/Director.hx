@@ -34,8 +34,8 @@ class Director extends Component
     {
         completeTransition();
 
-        if (scenes.length > 0) {
-            var oldTop = topScene;
+        var oldTop = getTopScene();
+        if (oldTop != null) {
             playTransition(oldTop, scene, transition, function () {
                 add(scene);
                 hide(oldTop);
@@ -50,8 +50,8 @@ class Director extends Component
     {
         completeTransition();
 
-        if (scenes.length > 0) {
-            var oldTop = topScene;
+        var oldTop = getTopScene();
+        if (oldTop != null) {
             if (scenes.length > 1) {
                 var newTop = scenes[scenes.length-2];
                 playTransition(oldTop, newTop, transition, function () {
@@ -72,15 +72,15 @@ class Director extends Component
     {
         completeTransition();
 
-        if (scenes.length > 0) {
-            var oldTop = topScene;
+        var oldTop = getTopScene();
+        if (oldTop != null) {
             if (oldTop == scene) {
                 return; // We're already there
             }
 
             playTransition(oldTop, scene, transition, function () {
                 var oldTop = scenes.pop();
-                while (scenes.length > 0 && topScene != scene) {
+                while (scenes.length > 0 && scenes[scenes.length-1] != scene) {
                     scenes.pop().dispose(); // Don't emit a hide, just dispose them
                 }
                 if (scenes.length == 0) {
@@ -121,15 +121,17 @@ class Director extends Component
         if (_transitor != null) {
             _transitor.visit(visitor);
         } else {
-            if (scenes.length > 0) {
-                topScene.visit(visitor, true, true);
+            var scene = getTopScene();
+            if (scene != null) {
+                scene.visit(visitor, true, true);
             }
         }
     }
 
-    inline private function getTopScene () :Entity
+    private function getTopScene () :Entity
     {
-        return scenes[scenes.length-1];
+        var ll = scenes.length;
+        return (ll > 0) ? scenes[ll-1] : null;
     }
 
     inline private function isTransitioning () :Bool
@@ -179,8 +181,9 @@ class Director extends Component
         visibleScenes = scenes.slice(ii, scenes.length);
 
         // Notify the new top scene that it's being shown
-        if (scenes.length > 0) {
-            show(topScene);
+        var scene = getTopScene();
+        if (scene != null) {
+            show(scene);
         }
     }
 

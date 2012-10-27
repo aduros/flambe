@@ -24,7 +24,6 @@ class BasicKeyboard
         down = new Signal1();
         up = new Signal1();
         _keyStates = new IntHash();
-        _id = 0;
     }
 
     public function isSupported () :Bool
@@ -49,7 +48,7 @@ class BasicKeyboard
     {
         if (!isCodeDown(keyCode)) {
             _keyStates.set(keyCode, true);
-            _sharedEvent._internal_init(++_id, keyCode.toKey());
+            _sharedEvent._internal_init(_sharedEvent.id+1, keyCode.toKey());
             down.emit(_sharedEvent);
         }
     }
@@ -61,13 +60,12 @@ class BasicKeyboard
     {
         if (isCodeDown(keyCode)) {
             _keyStates.remove(keyCode);
-            _sharedEvent._internal_init(++_id, keyCode.toKey());
+            _sharedEvent._internal_init(_sharedEvent.id+1, keyCode.toKey());
             up.emit(_sharedEvent);
         }
     }
 
     private static var _sharedEvent = new KeyboardEvent();
 
-    private var _id :Int;
     private var _keyStates :IntHash<Bool>;
 }

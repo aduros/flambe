@@ -32,6 +32,7 @@ class MouseEvent
 
     /** @private */ public function new ()
     {
+        _internal_init(0, 0, 0, null);
     }
 
     /**

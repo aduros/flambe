@@ -31,7 +31,6 @@ class BasicPointer
         down = new Signal1();
         move = new Signal1();
         up = new Signal1();
-        _id = 0;
         _x = x;
         _y = y;
         _isDown = isDown;
@@ -173,7 +172,7 @@ class BasicPointer
     {
         _x = viewX;
         _y = viewY;
-        _sharedEvent._internal_init(++_id, viewX, viewY, source);
+        _sharedEvent._internal_init(_sharedEvent.id+1, viewX, viewY, source);
     }
 
     /**
@@ -230,7 +229,6 @@ class BasicPointer
     private static var _sharedEvent = new PointerEvent();
     private static var _scratchPoint = new Point();
 
-    private var _id :Int;
     private var _x :Float;
     private var _y :Float;
     private var _isDown :Bool;

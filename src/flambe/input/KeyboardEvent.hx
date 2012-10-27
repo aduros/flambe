@@ -22,6 +22,7 @@ class KeyboardEvent
 
     /** @private */ public function new ()
     {
+        _internal_init(0, null);
     }
 
     /**

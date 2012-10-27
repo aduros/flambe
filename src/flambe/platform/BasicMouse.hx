@@ -36,7 +36,6 @@ class BasicMouse
         move = new Signal1();
         up = new Signal1();
         scroll = new Signal1();
-        _id = 0;
         _x = 0;
         _y = 0;
         _cursor = Default;
@@ -125,7 +124,7 @@ class BasicMouse
     {
         _x = viewX;
         _y = viewY;
-        _sharedEvent._internal_init(++_id, viewX, viewY, button);
+        _sharedEvent._internal_init(_sharedEvent.id+1, viewX, viewY, button);
     }
 
     private static var _sharedEvent = new MouseEvent();
@@ -133,7 +132,6 @@ class BasicMouse
     private var _pointer :BasicPointer;
     private var _source :EventSource;
 
-    private var _id :Int;
     private var _x :Float;
     private var _y :Float;
     private var _cursor :MouseCursor;

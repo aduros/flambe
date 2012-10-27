@@ -86,6 +86,7 @@ class Sprite extends Component
     {
         var dirtyMatrix = function (_,_) {
             _localMatrixDirty = true;
+            _viewMatrixDirty = true;
         };
         x = new AnimatedFloat(0, dirtyMatrix);
         y = new AnimatedFloat(0, dirtyMatrix);
@@ -134,6 +135,12 @@ class Sprite extends Component
     {
         return localX >= 0 && localX < getNaturalWidth()
             && localY >= 0 && localY < getNaturalHeight();
+    }
+
+    public function getLocalMatrix () :Matrix
+    {
+        updateLocalMatrix();
+        return _localMatrix;
     }
 
     public function getViewMatrix () :Matrix
@@ -217,33 +224,17 @@ class Sprite extends Component
         // See subclasses
     }
 
-    override public function onAdded ()
+    private function isViewMatrixDirty () :Bool
     {
-        if (_listenerCount > 0) {
-            // TODO(bruno): Insert in screen depth order
-            // TODO(bruno): This is really leak prone, switch over to a safer system
-            _internal_interactiveSprites.unshift(this);
-        }
-    }
-
-    override public function onRemoved ()
-    {
-        if (_listenerCount > 0) {
-            _internal_interactiveSprites.remove(this);
-        }
-    }
-
-    private function isMatrixDirty () :Bool
-    {
-        if (_localMatrixDirty) {
+        if (_viewMatrixDirty) {
             return true;
         }
         var parentSprite = getParentSprite();
         if (parentSprite == null) {
             return false;
         }
-        return _parentMatrixUpdateCount != parentSprite._matrixUpdateCount
-            || parentSprite.isMatrixDirty();
+        return _parentViewMatrixUpdateCount != parentSprite._viewMatrixUpdateCount
+            || parentSprite.isViewMatrixDirty();
     }
 
     private function getParentSprite () :Sprite
@@ -262,12 +253,27 @@ class Sprite extends Component
         return null;
     }
 
+    private function updateLocalMatrix ()
+    {
+        if (_localMatrix == null) {
+            _localMatrix = new Matrix();
+        }
+        if (_localMatrixDirty) {
+            _localMatrixDirty = false;
+            _localMatrix.identity();
+            _localMatrix.translate(x._, y._);
+            _localMatrix.scale(scaleX._, scaleY._);
+            _localMatrix.rotate(FMath.toRadians(rotation._));
+            _localMatrix.translate(-anchorX._, -anchorY._);
+        }
+    }
+
     private function updateViewMatrix ()
     {
         if (_viewMatrix == null) {
             _viewMatrix = new Matrix();
         }
-        if (isMatrixDirty()) {
+        if (isViewMatrixDirty()) {
             var parentSprite = getParentSprite();
             var parentViewMatrix = if (parentSprite != null)
                 parentSprite.getViewMatrix() else _identity;
@@ -277,11 +283,11 @@ class Sprite extends Component
             _viewMatrix.scale(scaleX._, scaleY._);
             _viewMatrix.translate(-anchorX._, -anchorY._);
 
-            _localMatrixDirty = false;
+            _viewMatrixDirty = false;
             if (parentSprite != null) {
-                _parentMatrixUpdateCount = parentSprite._matrixUpdateCount;
+                _parentViewMatrixUpdateCount = parentSprite._viewMatrixUpdateCount;
             }
-            ++_matrixUpdateCount;
+            ++_viewMatrixUpdateCount;
         }
     }
 
@@ -311,39 +317,28 @@ class Sprite extends Component
 
     /** @private */ public function _internal_onListenersAdded (count :Int)
     {
-        if (_listenerCount == 0 && owner != null) {
-            // TODO(bruno): Insert in screen depth order
-            // TODO(bruno): This is really leak prone, switch over to a safer system
-            _internal_interactiveSprites.unshift(this);
-        }
-        _listenerCount += count;
+        // TODO(bruno): Mark the sprite as interactive
     }
 
     /** @private */ public function _internal_onListenersRemoved (count :Int)
     {
-        _listenerCount -= count;
-        if (_listenerCount == 0 && owner != null) {
-            _internal_interactiveSprites.remove(this);
-        }
+        // TODO(bruno): Mark the sprite as non-interactive?
     }
 
     private static var _identity = new Matrix();
     private static var _scratchPoint = new Point();
 
-    // All sprites that have input event listeners attached, in screen depth order.
-    // Used to optimize picking.
-    /** @private */ public static var _internal_interactiveSprites :Array<Sprite> = [];
-
-    private var _viewMatrix :Matrix;
+    private var _localMatrix :Matrix = null;
     private var _localMatrixDirty :Bool = false;
-    private var _matrixUpdateCount :Int = 0;
-    private var _parentMatrixUpdateCount :Int = 0;
+
+    private var _viewMatrix :Matrix = null;
+    private var _viewMatrixDirty :Bool = false;
+    private var _viewMatrixUpdateCount :Int = 0;
+    private var _parentViewMatrixUpdateCount :Int = 0;
 
     /** @private */ public var _internal_pointerDown :Signal1<PointerEvent>;
     /** @private */ public var _internal_pointerMove :Signal1<PointerEvent>;
     /** @private */ public var _internal_pointerUp :Signal1<PointerEvent>;
-
-    private var _listenerCount :Int = 0;
 }
 
 import flambe.util.Signal1;

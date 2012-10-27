@@ -28,7 +28,7 @@ class Entity
 #elseif js
         _compMap = {};
 #end
-        _children = [];
+        _internal_children = [];
     }
 
     /**
@@ -134,10 +134,10 @@ class Entity
 
         if (visitChildren) {
             var ii = 0;
-            while (ii < _children.length) {
-                var child = _children[ii];
+            while (ii < _internal_children.length) {
+                var child = _internal_children[ii];
                 if (child == null) {
-                    _children.splice(ii, 1);
+                    _internal_children.splice(ii, 1);
                 } else {
                     child.visit(visitor, visitComponents, visitChildren);
                     ++ii;
@@ -154,14 +154,14 @@ class Entity
             entity.parent.removeChild(entity);
         }
         entity.parent = this;
-        _children.push(entity);
+        _internal_children.push(entity);
     }
 
     public function removeChild (entity :Entity)
     {
-        var idx = _children.indexOf(entity);
+        var idx = _internal_children.indexOf(entity);
         if (idx >= 0) {
-            _children[idx] = null;
+            _internal_children[idx] = null;
             entity.parent = null;
         }
     }
@@ -173,10 +173,10 @@ class Entity
     public function disposeChildren ()
     {
         var ii = 0;
-        while (ii < _children.length) {
-            var child = _children[ii];
+        while (ii < _internal_children.length) {
+            var child = _internal_children[ii];
             if (child != null) {
-                _children[ii] = null;
+                _internal_children[ii] = null;
                 child.parent = null;
                 child.dispose();
             }
@@ -230,5 +230,5 @@ class Entity
     private var _comps :Array<Component>;
 
     private var _parent :Entity;
-    private var _children :Array<Entity>;
+    /** @private */ public var _internal_children :Array<Entity>;
 }

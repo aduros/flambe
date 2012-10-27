@@ -4,10 +4,11 @@
 
 package flambe.platform;
 
-import flambe.display.Sprite;
 import flambe.Entity;
+import flambe.display.Sprite;
 import flambe.input.Pointer;
 import flambe.input.PointerEvent;
+import flambe.math.Point;
 import flambe.scene.Director;
 import flambe.util.Signal1;
 
@@ -180,46 +181,54 @@ class BasicPointer
      */
     private static function getEntityUnderPoint (x :Float, y :Float) :Entity
     {
-        for (sprite in Sprite._internal_interactiveSprites) {
-            if (sprite.contains(x, y) && isClickable(sprite.owner)) {
-                return sprite.owner;
-            }
-        }
-        return null;
+        return hitTest(System.root, x, y);
     }
 
-    /**
-     * Checks if the entity's sprite, and all its parents' sprites, are clickable.
-     */
-    private static function isClickable (entity :Entity) :Bool
+    private static function hitTest (entity :Entity, x :Float, y :Float) :Entity
     {
-        while (true) {
-            var sprite = entity.get(Sprite);
-            if (sprite != null && !sprite.visible) {
-                // Ignore invisible sprites
-                return false;
+        var sprite = entity.get(Sprite);
+        if (sprite != null) {
+            if (!sprite.visible) {
+                return null; // Prune invisible sprites
             }
-
-            var parent = entity.parent;
-            if (parent != null) {
-                var director = parent.get(Director);
-                if (director != null) {
-                    var idx = director.scenes.indexOf(entity);
-                    if (idx >= 0 && idx != director.scenes.length-1) {
-                        // Ignore scenes that aren't the top scene
-                        return false;
-                    }
-                }
-                entity = parent;
-
-            } else {
-                break;
+            if (sprite.getLocalMatrix().inverseTransform(x, y, _scratchPoint)) {
+                x = _scratchPoint.x;
+                y = _scratchPoint.y;
             }
         }
-        return true;
+
+        // Hit test all children, front to back
+        var children = entity._internal_children;
+        var ii = children.length - 1;
+        while (ii >= 0) {
+            var child = children[ii];
+            if (child != null) {
+                var result = hitTest(child, x, y);
+                if (result != null) {
+                    return result;
+                }
+            }
+            --ii;
+        }
+
+        // Hit test the top director scene, if any
+        var director = entity.get(Director);
+        if (director != null) {
+            var topScene = director.topScene;
+            if (topScene != null) {
+                var result = hitTest(topScene, x, y);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+
+        // Finally, if we got this far, hit test the actual sprite
+        return (sprite != null && sprite.containsLocal(x, y)) ? entity : null;
     }
 
     private static var _sharedEvent = new PointerEvent();
+    private static var _scratchPoint = new Point();
 
     private var _id :Int;
     private var _x :Float;

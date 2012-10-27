@@ -67,19 +67,14 @@ class Matrix
         m11 = t11;
     }
 
-    public function transformX (x :Float, y :Float) :Float
+    public function transform (x :Float, y :Float, ?result :Point) :Point
     {
-        return x*m00 + y*m01 + m02;
-    }
-
-    public function transformY (x :Float, y :Float) :Float
-    {
-        return x*m10 + y*m11 + m12;
-    }
-
-    public function transformPoint (x :Float, y :Float) :Point
-    {
-        return new Point(transformX(x, y), transformY(x, y));
+        if (result == null) {
+            result = new Point();
+        }
+        result.x = x*m00 + y*m01 + m02;
+        result.y = x*m10 + y*m11 + m12;
+        return result;
     }
 
     /**

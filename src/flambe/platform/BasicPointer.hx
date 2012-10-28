@@ -68,7 +68,7 @@ class BasicPointer
 
         // Take a snapshot of the entire event bubbling chain
         var chain = [];
-        var target = getSpriteUnderPoint(viewX, viewY);
+        var target = Sprite.hitTest(System.root, viewX, viewY);
         if (target != null) {
             var entity = target.owner;
             do {
@@ -104,7 +104,7 @@ class BasicPointer
     {
         // Take a snapshot of the entire event bubbling chain
         var chain = [];
-        var target = getSpriteUnderPoint(viewX, viewY);
+        var target = Sprite.hitTest(System.root, viewX, viewY);
         if (target != null) {
             var entity = target.owner;
             do {
@@ -148,7 +148,7 @@ class BasicPointer
 
         // Take a snapshot of the entire event bubbling chain
         var chain = [];
-        var target = getSpriteUnderPoint(viewX, viewY);
+        var target = Sprite.hitTest(System.root, viewX, viewY);
         if (target != null) {
             var entity = target.owner;
             do {
@@ -182,54 +182,6 @@ class BasicPointer
         _x = viewX;
         _y = viewY;
         _sharedEvent._internal_init(_sharedEvent.id+1, viewX, viewY, target, source);
-    }
-
-    private static function getSpriteUnderPoint (x :Float, y :Float) :Sprite
-    {
-        return hitTest(System.root, x, y);
-    }
-
-    private static function hitTest (entity :Entity, x :Float, y :Float) :Sprite
-    {
-        var sprite = entity.get(Sprite);
-        if (sprite != null) {
-            if (!sprite.visible || !sprite.pointerEnabled) {
-                return null; // Prune invisible or non-interactive subtrees
-            }
-            if (sprite.getLocalMatrix().inverseTransform(x, y, _scratchPoint)) {
-                x = _scratchPoint.x;
-                y = _scratchPoint.y;
-            }
-        }
-
-        // Hit test the top director scene, if any
-        var director = entity.get(Director);
-        if (director != null) {
-            var scene = director.topScene;
-            if (scene != null) {
-                var result = hitTest(scene, x, y);
-                if (result != null) {
-                    return result;
-                }
-            }
-        }
-
-        // Hit test all children, front to back
-        var children = entity._internal_children;
-        var ii = children.length - 1;
-        while (ii >= 0) {
-            var child = children[ii];
-            if (child != null) {
-                var result = hitTest(child, x, y);
-                if (result != null) {
-                    return result;
-                }
-            }
-            --ii;
-        }
-
-        // Finally, if we got this far, hit test the actual sprite
-        return (sprite != null && sprite.containsLocal(x, y)) ? sprite : null;
     }
 
     private static var _sharedEvent = new PointerEvent();

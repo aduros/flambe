@@ -10,6 +10,7 @@ import flambe.input.PointerEvent;
 import flambe.math.FMath;
 import flambe.math.Matrix;
 import flambe.math.Point;
+import flambe.scene.Director;
 import flambe.util.Signal1;
 import flambe.util.Value;
 
@@ -105,6 +106,54 @@ class Sprite extends Component
         anchorX = new AnimatedFloat(0, dirtyMatrix);
         anchorY = new AnimatedFloat(0, dirtyMatrix);
         alpha = new AnimatedFloat(1);
+    }
+
+    /**
+     * Search for a sprite in the entity hierarchy lying under the given point, in local
+     * coordinates. Ignores sprites that are invisible or not pointerEnabled during traversal.
+     * Returns null if neither the entity or its children contain a sprite under the given point.
+     */
+    public static function hitTest (entity :Entity, x :Float, y :Float) :Sprite
+    {
+        var sprite = entity.get(Sprite);
+        if (sprite != null) {
+            if (!sprite._flags.containsAll(VISIBLE | POINTER_ENABLED)) {
+                return null; // Prune invisible or non-interactive subtrees
+            }
+            if (sprite.getLocalMatrix().inverseTransform(x, y, _scratchPoint)) {
+                x = _scratchPoint.x;
+                y = _scratchPoint.y;
+            }
+        }
+
+        // Hit test the top director scene, if any
+        var director = entity.get(Director);
+        if (director != null) {
+            var scene = director.topScene;
+            if (scene != null) {
+                var result = hitTest(scene, x, y);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+
+        // Hit test all children, front to back
+        var children = entity._internal_children;
+        var ii = children.length - 1;
+        while (ii >= 0) {
+            var child = children[ii];
+            if (child != null) {
+                var result = hitTest(child, x, y);
+                if (result != null) {
+                    return result;
+                }
+            }
+            --ii;
+        }
+
+        // Finally, if we got this far, hit test the actual sprite
+        return (sprite != null && sprite.containsLocal(x, y)) ? sprite : null;
     }
 
     /**

@@ -105,6 +105,7 @@ class Sprite extends Component
         scaleY = new AnimatedFloat(1, dirtyMatrix);
         anchorX = new AnimatedFloat(0, dirtyMatrix);
         anchorY = new AnimatedFloat(0, dirtyMatrix);
+
         alpha = new AnimatedFloat(1);
     }
 
@@ -197,9 +198,7 @@ class Sprite extends Component
         if (_flags.contains(LOCAL_MATRIX_DIRTY)) {
             _flags = _flags.remove(LOCAL_MATRIX_DIRTY);
 
-            _localMatrix.identity();
-            _localMatrix.translate(x._, y._);
-            _localMatrix.scale(scaleX._, scaleY._);
+            _localMatrix.set(scaleX._, 0, 0, scaleY._, x._, y._);
             _localMatrix.rotate(FMath.toRadians(rotation._));
             _localMatrix.translate(-anchorX._, -anchorY._);
         }

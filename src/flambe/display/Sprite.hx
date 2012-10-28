@@ -13,6 +13,8 @@ import flambe.math.Point;
 import flambe.util.Signal1;
 import flambe.util.Value;
 
+using flambe.util.BitSets;
+
 class Sprite extends Component
 {
     /**
@@ -65,7 +67,7 @@ class Sprite extends Component
     /**
      * Whether this sprite should be drawn.
      */
-    public var visible :Bool = true;
+    public var visible (getVisible, setVisible) :Bool;
 
     /**
      * Emitted when the pointer is pressed down over this sprite.
@@ -85,13 +87,14 @@ class Sprite extends Component
     /**
      * Whether this sprite or any children should receive pointer events. Defaults to true.
      */
-    public var pointerEnabled :Bool = true;
+    public var pointerEnabled (getPointerEnabled, setPointerEnabled) :Bool;
 
     public function new ()
     {
+        _flags = VISIBLE | POINTER_ENABLED | LOCAL_MATRIX_DIRTY | VIEW_MATRIX_DIRTY;
+
         var dirtyMatrix = function (_,_) {
-            _localMatrixDirty = true;
-            _viewMatrixDirty = true;
+            _flags = _flags.add(LOCAL_MATRIX_DIRTY | VIEW_MATRIX_DIRTY);
         };
         x = new AnimatedFloat(0, dirtyMatrix);
         y = new AnimatedFloat(0, dirtyMatrix);
@@ -228,7 +231,7 @@ class Sprite extends Component
 
     private function isViewMatrixDirty () :Bool
     {
-        if (_viewMatrixDirty) {
+        if (_flags.contains(VIEW_MATRIX_DIRTY)) {
             return true;
         }
         var parentSprite = getParentSprite();
@@ -257,11 +260,11 @@ class Sprite extends Component
 
     private function updateLocalMatrix ()
     {
-        if (_localMatrixDirty) {
+        if (_flags.contains(LOCAL_MATRIX_DIRTY)) {
             if (_localMatrix == null) {
                 _localMatrix = new Matrix();
             }
-            _localMatrixDirty = false;
+            _flags = _flags.remove(LOCAL_MATRIX_DIRTY);
 
             _localMatrix.identity();
             _localMatrix.translate(x._, y._);
@@ -287,7 +290,7 @@ class Sprite extends Component
             _viewMatrix.scale(scaleX._, scaleY._);
             _viewMatrix.translate(-anchorX._, -anchorY._);
 
-            _viewMatrixDirty = false;
+            _flags = _flags.remove(VIEW_MATRIX_DIRTY);
             if (parentSprite != null) {
                 _parentViewMatrixUpdateCount = parentSprite._viewMatrixUpdateCount;
             }
@@ -319,14 +322,42 @@ class Sprite extends Component
         return _internal_pointerUp;
     }
 
+    inline private function getVisible () :Bool
+    {
+        return _flags.contains(VISIBLE);
+    }
+
+    private function setVisible (visible :Bool) :Bool
+    {
+        _flags = _flags.set(VISIBLE, visible);
+        return visible;
+    }
+
+    inline private function getPointerEnabled () :Bool
+    {
+        return _flags.contains(POINTER_ENABLED);
+    }
+
+    private function setPointerEnabled (pointerEnabled :Bool) :Bool
+    {
+        _flags = _flags.set(POINTER_ENABLED, pointerEnabled);
+        return pointerEnabled;
+    }
+
     private static var _identity = new Matrix();
     private static var _scratchPoint = new Point();
 
+    // Various flags
+    private static inline var VISIBLE = (1<<0);
+    private static inline var POINTER_ENABLED = (1<<1);
+    private static inline var LOCAL_MATRIX_DIRTY = (1<<2);
+    private static inline var VIEW_MATRIX_DIRTY = (1<<3);
+
+    private var _flags :Int;
+
     private var _localMatrix :Matrix = null;
-    private var _localMatrixDirty :Bool = true;
 
     private var _viewMatrix :Matrix = null;
-    private var _viewMatrixDirty :Bool = true;
     private var _viewMatrixUpdateCount :Int = 0;
     private var _parentViewMatrixUpdateCount :Int = 0;
 

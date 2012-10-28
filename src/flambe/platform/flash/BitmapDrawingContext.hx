@@ -48,13 +48,7 @@ class BitmapDrawingContext
             current.next = state;
         }
 
-#if flash11
-        state.matrix.copyFrom(current.matrix);
-#else
-        var to = state.matrix, from = current.matrix;
-        to.a = from.a; to.c = from.c; to.tx = from.tx;
-        to.b = from.b; to.d = from.d; to.ty = from.ty;
-#end
+        FlashUtil.copyMatrix(state.matrix, current.matrix);
         state.color.alphaMultiplier = current.color.alphaMultiplier;
         state.blendMode = current.blendMode;
         _stateList = state;
@@ -97,6 +91,21 @@ class BitmapDrawingContext
         matrix.b = b*cos + d*sin;
         matrix.c = c*cos - a*sin;
         matrix.d = d*cos - b*sin;
+    }
+
+    public function transform (m00 :Float, m10 :Float, m01 :Float, m11 :Float, m02 :Float, m12 :Float)
+    {
+        flushGraphics();
+
+        var matrix = getTopState().matrix;
+        _scratchMatrix.a = m00;
+        _scratchMatrix.b = m10;
+        _scratchMatrix.c = m01;
+        _scratchMatrix.d = m11;
+        _scratchMatrix.tx = m02;
+        _scratchMatrix.ty = m12;
+        _scratchMatrix.concat(matrix);
+        FlashUtil.copyMatrix(matrix, _scratchMatrix);
     }
 
     public function restore ()

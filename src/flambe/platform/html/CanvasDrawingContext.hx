@@ -42,6 +42,11 @@ class CanvasDrawingContext
         _canvasCtx.rotate(FMath.toRadians(rotation));
     }
 
+    public function transform (m00 :Float, m10 :Float, m01 :Float, m11 :Float, m02 :Float, m12 :Float)
+    {
+        _canvasCtx.transform(m00, m10, m01, m11, m02, m12);
+    }
+
     public function restore ()
     {
         _canvasCtx.restore();

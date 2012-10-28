@@ -10,6 +10,7 @@ interface DrawingContext
     function translate (x :Float, y :Float) :Void;
     function scale (x :Float, y :Float) :Void;
     function rotate (rotation :Float) :Void;
+    function transform (m00 :Float, m10 :Float, m01 :Float, m11 :Float, m02 :Float, m12 :Float) :Void;
     function multiplyAlpha (factor :Float) :Void;
     function setBlendMode (blendMode :BlendMode) :Void;
     function restore () :Void;

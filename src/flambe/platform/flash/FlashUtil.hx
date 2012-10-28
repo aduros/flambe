@@ -10,6 +10,7 @@ import flash.display.StageAspectRatio;
 #end
 import flash.errors.Error;
 import flash.events.ErrorEvent;
+import flash.geom.Matrix;
 import flash.ui.Mouse;
 
 import flambe.display.Orientation;
@@ -32,6 +33,16 @@ class FlashUtil
         } else {
             return error.toString();
         }
+    }
+
+    #if flash11 inline #end public static function copyMatrix (to :Matrix, from :Matrix)
+    {
+#if flash11
+        to.copyFrom(from);
+#else
+        to.a = from.a; to.c = from.c; to.tx = from.tx;
+        to.b = from.b; to.d = from.d; to.ty = from.ty;
+#end
     }
 
 #if flambe_air

@@ -34,8 +34,12 @@ class Stage3DDrawingContext
 #end
 
         _stateList = new DrawingState();
-        _scratchVector = new Vector<Float>(12, true);
+        _scratchMatrix3D = new Matrix3D();
+        _scratchVector12 = new Vector<Float>(12, true);
         _scratchVector3D = new Vector3D();
+
+        _scratchTransformVector = new Vector<Float>(16, true);
+        _scratchMatrix3D.copyRawDataTo(_scratchTransformVector);
 
         _drawImageShader = new DrawImage(_context3D);
         _drawPatternShader = new DrawPattern(_context3D);
@@ -95,6 +99,20 @@ class Stage3DDrawingContext
         state.matrix.prependRotation(rotation, Vector3D.Z_AXIS);
     }
 
+    public function transform (m00 :Float, m10 :Float, m01 :Float, m11 :Float, m02 :Float, m12 :Float)
+    {
+        var state = getTopState();
+        var scratch = _scratchTransformVector;
+        scratch[0*4 + 0] = m00;
+        scratch[0*4 + 1] = m10;
+        scratch[1*4 + 0] = m01;
+        scratch[1*4 + 1] = m11;
+        scratch[3*4 + 0] = m02;
+        scratch[3*4 + 1] = m12;
+        _scratchMatrix3D.copyRawDataFrom(scratch);
+        state.matrix.prepend(_scratchMatrix3D);
+    }
+
     public function restore ()
     {
         Assert.that(_stateList.prev != null, "Can't restore without a previous save");
@@ -149,7 +167,7 @@ class Stage3DDrawingContext
         var u2 = flashTexture.maxU*(sourceX + sourceW) / w;
         var v2 = flashTexture.maxV*(sourceY + sourceH) / h;
 
-        var scratch = _scratchVector;
+        var scratch = _scratchVector12;
 
         scratch[0] = x1;
         scratch[1] = y1;
@@ -205,7 +223,7 @@ class Stage3DDrawingContext
         var flashTexture :FlashTexture = cast texture;
         var state = getTopState();
         var alpha = state.alpha;
-        var scratch = _scratchVector;
+        var scratch = _scratchVector12;
         var x2 = x + width;
         var y2 = y + height;
         var u = flashTexture.maxU * (width / flashTexture.width);
@@ -264,7 +282,7 @@ class Stage3DDrawingContext
         flushBatch();
 
         var state = getTopState();
-        var scratch = _scratchVector;
+        var scratch = _scratchVector12;
         var x2 = x + width;
         var y2 = y + height;
 
@@ -423,9 +441,12 @@ class Stage3DDrawingContext
 
     private var _context3D :Context3D;
 
-    private var _stateList :DrawingState;
+    private var _scratchMatrix3D :Matrix3D;
     private var _scratchVector3D :Vector3D;
-    private var _scratchVector :Vector<Float>;
+    private var _scratchVector12 :Vector<Float>;
+    private var _scratchTransformVector :Vector<Float>;
+
+    private var _stateList :DrawingState;
     private var _projMatrix :Matrix3D;
 
     private var _batchData :Vector<Float>;

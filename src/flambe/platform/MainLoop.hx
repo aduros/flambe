@@ -212,28 +212,8 @@ private class DrawVisitor
             _drawCtx.setBlendMode(sprite.blendMode);
         }
 
-        var x = sprite.x._;
-        var y = sprite.y._;
-        if (x != 0 || y != 0) {
-            _drawCtx.translate(x, y);
-        }
-
-        var rotation = sprite.rotation._;
-        if (rotation != 0) {
-            _drawCtx.rotate(rotation);
-        }
-
-        var scaleX = sprite.scaleX._;
-        var scaleY = sprite.scaleY._;
-        if (scaleX != 1 || scaleY != 1) {
-            _drawCtx.scale(scaleX, scaleY);
-        }
-
-        var anchorX = sprite.anchorX._;
-        var anchorY = sprite.anchorY._;
-        if (anchorX != 0 || anchorY != 0) {
-            _drawCtx.translate(-anchorX, -anchorY);
-        }
+        var matrix = sprite.getLocalMatrix();
+        _drawCtx.transform(matrix.m00, matrix.m10, matrix.m01, matrix.m11, matrix.m02, matrix.m12);
 
         sprite.draw(_drawCtx);
         return true;

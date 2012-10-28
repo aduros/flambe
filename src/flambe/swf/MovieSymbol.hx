@@ -110,7 +110,8 @@ class MovieKeyframe
     public var y (default, null) :Float;
     public var scaleX (default, null) :Float;
     public var scaleY (default, null) :Float;
-    public var rotation (default, null) :Float;
+    public var skewX (default, null) :Float;
+    public var skewY (default, null) :Float;
 
     public var pivotX (default, null) :Float;
     public var pivotY (default, null) :Float;
@@ -133,7 +134,8 @@ class MovieKeyframe
         y = 0;
         scaleX = 1;
         scaleY = 1;
-        rotation = 0;
+        skewX = 0;
+        skewY = 0;
         pivotX = 0;
         pivotY = 0;
         alpha = 1;
@@ -162,23 +164,8 @@ class MovieKeyframe
 
         var skew = reader.skew;
         if (skew != null) {
-            var skewX = skew[0];
-            var skewY = skew[1];
-            var supported = true;
-            if (Math.abs(skewX - FMath.PI) <= 0.01) {
-                scaleY *= -1;
-            } else {
-                supported = false;
-            }
-            if (Math.abs(skewY - FMath.PI) <= 0.01) {
-                scaleX *= -1;
-            } else {
-                supported = false;
-            }
-            if (!supported) {
-                Log.warn("Flump skewing is not yet supported");
-            }
-            rotation = FMath.toDegrees(skewX);
+            skewX = skew[0];
+            skewY = skew[1];
         }
 
         var pivot = reader.pivot;

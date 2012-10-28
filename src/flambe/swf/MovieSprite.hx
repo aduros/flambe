@@ -213,7 +213,8 @@ private class LayerAnimator
         var y = kf.y;
         var scaleX = kf.scaleX;
         var scaleY = kf.scaleY;
-        var rotation = kf.rotation;
+        var skewX = kf.skewX;
+        var skewY = kf.skewY;
         var alpha = kf.alpha;
 
         if (keyframeIdx < finalFrame) {
@@ -238,18 +239,26 @@ private class LayerAnimator
             y += (nextKf.y-y) * interp;
             scaleX += (nextKf.scaleX-scaleX) * interp;
             scaleY += (nextKf.scaleY-scaleY) * interp;
-            rotation += (nextKf.rotation-rotation) * interp;
+            skewX += (nextKf.skewX-skewX) * interp;
+            skewY += (nextKf.skewY-skewY) * interp;
             alpha += (nextKf.alpha-alpha) * interp;
         }
 
-        sprite.x._ = x;
-        sprite.y._ = y;
-        sprite.scaleX._ = scaleX;
-        sprite.scaleY._ = scaleY;
-        sprite.rotation._ = rotation;
+        // From an identity matrix, append the skew
+        var matrix = sprite.getLocalMatrix();
+        var sinX = Math.sin(skewX), cosX = Math.cos(skewX);
+        var sinY = Math.sin(skewY), cosY = Math.cos(skewY);
+        matrix.set(cosY, sinY, -sinX, cosX, 0, 0);
+
+        // Append the scale
+        matrix.scale(scaleX, scaleY);
+
+        // Append the translation, and prepend the pivot
+        var pivotX = kf.pivotX, pivotY = kf.pivotY;
+        matrix.m02 = x - matrix.m00*pivotX - matrix.m01*pivotY;
+        matrix.m12 = y - matrix.m10*pivotY - matrix.m11*pivotY;
+
         sprite.alpha._ = alpha;
-        sprite.anchorX._ = kf.pivotX;
-        sprite.anchorY._ = kf.pivotY;
     }
 
     // Only created if there are multiple symbols on this layer. If it does exist, the appropriate

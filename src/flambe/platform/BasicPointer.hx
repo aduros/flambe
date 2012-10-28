@@ -193,8 +193,8 @@ class BasicPointer
     {
         var sprite = entity.get(Sprite);
         if (sprite != null) {
-            if (!sprite.visible) {
-                return null; // Prune invisible sprites
+            if (!sprite.visible || !sprite.pointerEnabled) {
+                return null; // Prune invisible or non-interactive subtrees
             }
             if (sprite.getLocalMatrix().inverseTransform(x, y, _scratchPoint)) {
                 x = _scratchPoint.x;

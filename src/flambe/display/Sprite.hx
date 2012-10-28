@@ -60,12 +60,12 @@ class Sprite extends Component
     /**
      * The blend mode used to draw this sprite, or null to use its parent's blend mode.
      */
-    public var blendMode :BlendMode;
+    public var blendMode :BlendMode = null;
 
     /**
      * Whether this sprite should be drawn.
      */
-    public var visible :Bool;
+    public var visible :Bool = true;
 
     /**
      * Emitted when the pointer is pressed down over this sprite.
@@ -82,6 +82,11 @@ class Sprite extends Component
      */
     public var pointerUp (getPointerUp, null) :Signal1<PointerEvent>;
 
+    /**
+     * Whether this sprite or any children should receive pointer events. Defaults to true.
+     */
+    public var pointerEnabled :Bool = true;
+
     public function new ()
     {
         var dirtyMatrix = function (_,_) {
@@ -95,10 +100,7 @@ class Sprite extends Component
         scaleY = new AnimatedFloat(1, dirtyMatrix);
         anchorX = new AnimatedFloat(0, dirtyMatrix);
         anchorY = new AnimatedFloat(0, dirtyMatrix);
-
         alpha = new AnimatedFloat(1);
-        blendMode = null;
-        visible = true;
     }
 
     /**

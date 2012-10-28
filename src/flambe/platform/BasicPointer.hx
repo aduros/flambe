@@ -68,24 +68,27 @@ class BasicPointer
 
         // Take a snapshot of the entire event bubbling chain
         var chain = [];
-        var entity = getEntityUnderPoint(viewX, viewY);
-        while (entity != null) {
-            var sprite = entity.get(Sprite);
-            if (sprite != null) {
-                // Avoid calling the public getter and lazily instanciating this signal
-                var signal = sprite._internal_pointerDown;
-                if (signal != null && signal.hasListeners()) {
-                    chain.push(signal.clone());
+        var target = getSpriteUnderPoint(viewX, viewY);
+        if (target != null) {
+            var entity = target.owner;
+            do {
+                var sprite = entity.get(Sprite);
+                if (sprite != null) {
+                    // Avoid calling the public getter and lazily instanciating this signal
+                    var signal = sprite._internal_pointerDown;
+                    if (signal != null && signal.hasListeners()) {
+                        chain.push(signal.clone());
+                    }
                 }
-            }
-            entity = entity.parent;
+                entity = entity.parent;
+            } while (entity != null);
         }
         if (down.hasListeners()) {
             chain.push(down.clone());
         }
 
         // Finally, emit the event up the chain
-        prepare(viewX, viewY, source);
+        prepare(viewX, viewY, target, source);
         for (signal in chain) {
             signal.emit(_sharedEvent);
             if (_sharedEvent._internal_stopped) {
@@ -101,24 +104,27 @@ class BasicPointer
     {
         // Take a snapshot of the entire event bubbling chain
         var chain = [];
-        var entity = getEntityUnderPoint(viewX, viewY);
-        while (entity != null) {
-            var sprite = entity.get(Sprite);
-            if (sprite != null) {
-                // Avoid calling the public getter and lazily instanciating this signal
-                var signal = sprite._internal_pointerMove;
-                if (signal != null && signal.hasListeners()) {
-                    chain.push(signal.clone());
+        var target = getSpriteUnderPoint(viewX, viewY);
+        if (target != null) {
+            var entity = target.owner;
+            do {
+                var sprite = entity.get(Sprite);
+                if (sprite != null) {
+                    // Avoid calling the public getter and lazily instanciating this signal
+                    var signal = sprite._internal_pointerMove;
+                    if (signal != null && signal.hasListeners()) {
+                        chain.push(signal.clone());
+                    }
                 }
-            }
-            entity = entity.parent;
+                entity = entity.parent;
+            } while (entity != null);
         }
         if (move.hasListeners()) {
             chain.push(move.clone());
         }
 
         // Finally, emit the event up the chain
-        prepare(viewX, viewY, source);
+        prepare(viewX, viewY, target, source);
         for (signal in chain) {
             signal.emit(_sharedEvent);
             if (_sharedEvent._internal_stopped) {
@@ -142,24 +148,27 @@ class BasicPointer
 
         // Take a snapshot of the entire event bubbling chain
         var chain = [];
-        var entity = getEntityUnderPoint(viewX, viewY);
-        while (entity != null) {
-            var sprite = entity.get(Sprite);
-            if (sprite != null) {
-                // Avoid calling the public getter and lazily instanciating this signal
-                var signal = sprite._internal_pointerUp;
-                if (signal != null && signal.hasListeners()) {
-                    chain.push(signal.clone());
+        var target = getSpriteUnderPoint(viewX, viewY);
+        if (target != null) {
+            var entity = target.owner;
+            do {
+                var sprite = entity.get(Sprite);
+                if (sprite != null) {
+                    // Avoid calling the public getter and lazily instanciating this signal
+                    var signal = sprite._internal_pointerUp;
+                    if (signal != null && signal.hasListeners()) {
+                        chain.push(signal.clone());
+                    }
                 }
-            }
-            entity = entity.parent;
+                entity = entity.parent;
+            } while (entity != null);
         }
         if (up.hasListeners()) {
             chain.push(up.clone());
         }
 
         // Finally, emit the event up the chain
-        prepare(viewX, viewY, source);
+        prepare(viewX, viewY, target, source);
         for (signal in chain) {
             signal.emit(_sharedEvent);
             if (_sharedEvent._internal_stopped) {
@@ -168,22 +177,19 @@ class BasicPointer
         }
     }
 
-    private function prepare (viewX :Float, viewY :Float, source :EventSource)
+    private function prepare (viewX :Float, viewY :Float, target :Sprite, source :EventSource)
     {
         _x = viewX;
         _y = viewY;
-        _sharedEvent._internal_init(_sharedEvent.id+1, viewX, viewY, source);
+        _sharedEvent._internal_init(_sharedEvent.id+1, viewX, viewY, target, source);
     }
 
-    /**
-     * Get the top-most, visible entity that owns a sprite with a mouse signal listener.
-     */
-    private static function getEntityUnderPoint (x :Float, y :Float) :Entity
+    private static function getSpriteUnderPoint (x :Float, y :Float) :Sprite
     {
         return hitTest(System.root, x, y);
     }
 
-    private static function hitTest (entity :Entity, x :Float, y :Float) :Entity
+    private static function hitTest (entity :Entity, x :Float, y :Float) :Sprite
     {
         var sprite = entity.get(Sprite);
         if (sprite != null) {
@@ -213,9 +219,9 @@ class BasicPointer
         // Hit test the top director scene, if any
         var director = entity.get(Director);
         if (director != null) {
-            var topScene = director.topScene;
-            if (topScene != null) {
-                var result = hitTest(topScene, x, y);
+            var scene = director.topScene;
+            if (scene != null) {
+                var result = hitTest(scene, x, y);
                 if (result != null) {
                     return result;
                 }
@@ -223,7 +229,7 @@ class BasicPointer
         }
 
         // Finally, if we got this far, hit test the actual sprite
-        return (sprite != null && sprite.containsLocal(x, y)) ? entity : null;
+        return (sprite != null && sprite.containsLocal(x, y)) ? sprite : null;
     }
 
     private static var _sharedEvent = new PointerEvent();

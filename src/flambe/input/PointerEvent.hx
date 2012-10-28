@@ -4,6 +4,8 @@
 
 package flambe.input;
 
+import flambe.display.Sprite;
+
 enum EventSource
 {
     Mouse (event :MouseEvent);
@@ -28,6 +30,13 @@ class PointerEvent
     public var viewY (default, null) :Float;
 
     /**
+     * The deepest sprite lying under the pointer that caused the event, if any. The target does not
+     * necessarily have a pointer event listener connected to it. This event starts at the target,
+     * and propagates upwards to its parents.
+     */
+    public var target (default, null) :Sprite;
+
+    /**
      * The source that this event originated from. This can be used to determine if the event came
      * from a mouse or a touch.
      */
@@ -40,7 +49,7 @@ class PointerEvent
 
     /** @private */ public function new ()
     {
-        _internal_init(0, 0, 0, null);
+        _internal_init(0, 0, 0, null, null);
     }
 
     /**
@@ -65,16 +74,17 @@ class PointerEvent
         }
 
         var event = new PointerEvent();
-        event._internal_init(id, viewX, viewY, sourceCopy);
+        event._internal_init(id, viewX, viewY, target, sourceCopy);
         return event;
     }
 
     /** @private */ public function _internal_init (
-        id :Int, viewX :Float, viewY :Float, source :EventSource)
+        id :Int, viewX :Float, viewY :Float, target :Sprite, source :EventSource)
     {
         this.id = id;
         this.viewX = viewX;
         this.viewY = viewY;
+        this.target = target;
         this.source = source;
         _internal_stopped = false;
     }

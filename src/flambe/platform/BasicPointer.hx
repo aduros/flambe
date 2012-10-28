@@ -202,6 +202,18 @@ class BasicPointer
             }
         }
 
+        // Hit test the top director scene, if any
+        var director = entity.get(Director);
+        if (director != null) {
+            var scene = director.topScene;
+            if (scene != null) {
+                var result = hitTest(scene, x, y);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+
         // Hit test all children, front to back
         var children = entity._internal_children;
         var ii = children.length - 1;
@@ -214,18 +226,6 @@ class BasicPointer
                 }
             }
             --ii;
-        }
-
-        // Hit test the top director scene, if any
-        var director = entity.get(Director);
-        if (director != null) {
-            var scene = director.topScene;
-            if (scene != null) {
-                var result = hitTest(scene, x, y);
-                if (result != null) {
-                    return result;
-                }
-            }
         }
 
         // Finally, if we got this far, hit test the actual sprite

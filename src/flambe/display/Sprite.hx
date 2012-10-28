@@ -91,7 +91,8 @@ class Sprite extends Component
 
     public function new ()
     {
-        _flags = VISIBLE | POINTER_ENABLED | LOCAL_MATRIX_DIRTY | VIEW_MATRIX_DIRTY;
+        _flags = VISIBLE | POINTER_ENABLED | VIEW_MATRIX_DIRTY;
+        _localMatrix = new Matrix();
 
         var dirtyMatrix = function (_,_) {
             _flags = _flags.add(LOCAL_MATRIX_DIRTY | VIEW_MATRIX_DIRTY);
@@ -144,13 +145,40 @@ class Sprite extends Component
 
     public function getLocalMatrix () :Matrix
     {
-        updateLocalMatrix();
+        if (_flags.contains(LOCAL_MATRIX_DIRTY)) {
+            _flags = _flags.remove(LOCAL_MATRIX_DIRTY);
+
+            _localMatrix.identity();
+            _localMatrix.translate(x._, y._);
+            _localMatrix.scale(scaleX._, scaleY._);
+            _localMatrix.rotate(FMath.toRadians(rotation._));
+            _localMatrix.translate(-anchorX._, -anchorY._);
+        }
         return _localMatrix;
     }
 
     public function getViewMatrix () :Matrix
     {
-        updateViewMatrix();
+        if (isViewMatrixDirty()) {
+            if (_viewMatrix == null) {
+                _viewMatrix = new Matrix();
+            }
+
+            var parentSprite = getParentSprite();
+            var parentViewMatrix = if (parentSprite != null)
+                parentSprite.getViewMatrix() else _identity;
+            _viewMatrix.copyFrom(parentViewMatrix);
+            _viewMatrix.translate(x._, y._);
+            _viewMatrix.rotate(FMath.toRadians(rotation._));
+            _viewMatrix.scale(scaleX._, scaleY._);
+            _viewMatrix.translate(-anchorX._, -anchorY._);
+
+            _flags = _flags.remove(VIEW_MATRIX_DIRTY);
+            if (parentSprite != null) {
+                _parentViewMatrixUpdateCount = parentSprite._viewMatrixUpdateCount;
+            }
+            ++_viewMatrixUpdateCount;
+        }
         return _viewMatrix;
     }
 
@@ -258,46 +286,6 @@ class Sprite extends Component
         return null;
     }
 
-    private function updateLocalMatrix ()
-    {
-        if (_flags.contains(LOCAL_MATRIX_DIRTY)) {
-            if (_localMatrix == null) {
-                _localMatrix = new Matrix();
-            }
-            _flags = _flags.remove(LOCAL_MATRIX_DIRTY);
-
-            _localMatrix.identity();
-            _localMatrix.translate(x._, y._);
-            _localMatrix.scale(scaleX._, scaleY._);
-            _localMatrix.rotate(FMath.toRadians(rotation._));
-            _localMatrix.translate(-anchorX._, -anchorY._);
-        }
-    }
-
-    private function updateViewMatrix ()
-    {
-        if (isViewMatrixDirty()) {
-            if (_viewMatrix == null) {
-                _viewMatrix = new Matrix();
-            }
-
-            var parentSprite = getParentSprite();
-            var parentViewMatrix = if (parentSprite != null)
-                parentSprite.getViewMatrix() else _identity;
-            _viewMatrix.copyFrom(parentViewMatrix);
-            _viewMatrix.translate(x._, y._);
-            _viewMatrix.rotate(FMath.toRadians(rotation._));
-            _viewMatrix.scale(scaleX._, scaleY._);
-            _viewMatrix.translate(-anchorX._, -anchorY._);
-
-            _flags = _flags.remove(VIEW_MATRIX_DIRTY);
-            if (parentSprite != null) {
-                _parentViewMatrixUpdateCount = parentSprite._viewMatrixUpdateCount;
-            }
-            ++_viewMatrixUpdateCount;
-        }
-    }
-
     private function getPointerDown ()
     {
         if (_internal_pointerDown == null) {
@@ -355,7 +343,7 @@ class Sprite extends Component
 
     private var _flags :Int;
 
-    private var _localMatrix :Matrix = null;
+    private var _localMatrix :Matrix;
 
     private var _viewMatrix :Matrix = null;
     private var _viewMatrixUpdateCount :Int = 0;

@@ -255,11 +255,12 @@ class Sprite extends Component
 
     private function updateLocalMatrix ()
     {
-        if (_localMatrix == null) {
-            _localMatrix = new Matrix();
-        }
         if (_localMatrixDirty) {
+            if (_localMatrix == null) {
+                _localMatrix = new Matrix();
+            }
             _localMatrixDirty = false;
+
             _localMatrix.identity();
             _localMatrix.translate(x._, y._);
             _localMatrix.scale(scaleX._, scaleY._);
@@ -270,10 +271,11 @@ class Sprite extends Component
 
     private function updateViewMatrix ()
     {
-        if (_viewMatrix == null) {
-            _viewMatrix = new Matrix();
-        }
         if (isViewMatrixDirty()) {
+            if (_viewMatrix == null) {
+                _viewMatrix = new Matrix();
+            }
+
             var parentSprite = getParentSprite();
             var parentViewMatrix = if (parentSprite != null)
                 parentSprite.getViewMatrix() else _identity;
@@ -294,7 +296,7 @@ class Sprite extends Component
     private function getPointerDown ()
     {
         if (_internal_pointerDown == null) {
-            _internal_pointerDown = new NotifyingSignal1(this);
+            _internal_pointerDown = new Signal1();
         }
         return _internal_pointerDown;
     }
@@ -302,7 +304,7 @@ class Sprite extends Component
     private function getPointerMove ()
     {
         if (_internal_pointerMove == null) {
-            _internal_pointerMove = new NotifyingSignal1(this);
+            _internal_pointerMove = new Signal1();
         }
         return _internal_pointerMove;
     }
@@ -310,85 +312,23 @@ class Sprite extends Component
     private function getPointerUp ()
     {
         if (_internal_pointerUp == null) {
-            _internal_pointerUp = new NotifyingSignal1(this);
+            _internal_pointerUp = new Signal1();
         }
         return _internal_pointerUp;
-    }
-
-    /** @private */ public function _internal_onListenersAdded (count :Int)
-    {
-        // TODO(bruno): Mark the sprite as interactive
-    }
-
-    /** @private */ public function _internal_onListenersRemoved (count :Int)
-    {
-        // TODO(bruno): Mark the sprite as non-interactive?
     }
 
     private static var _identity = new Matrix();
     private static var _scratchPoint = new Point();
 
     private var _localMatrix :Matrix = null;
-    private var _localMatrixDirty :Bool = false;
+    private var _localMatrixDirty :Bool = true;
 
     private var _viewMatrix :Matrix = null;
-    private var _viewMatrixDirty :Bool = false;
+    private var _viewMatrixDirty :Bool = true;
     private var _viewMatrixUpdateCount :Int = 0;
     private var _parentViewMatrixUpdateCount :Int = 0;
 
     /** @private */ public var _internal_pointerDown :Signal1<PointerEvent>;
     /** @private */ public var _internal_pointerMove :Signal1<PointerEvent>;
     /** @private */ public var _internal_pointerUp :Signal1<PointerEvent>;
-}
-
-import flambe.util.Signal1;
-import flambe.util.SignalConnection;
-import flambe.util.SignalImpl;
-
-private class NotifyingSignal1<A> extends Signal1<A>
-{
-    public function new (sprite :Sprite)
-    {
-        super();
-        _sprite = sprite;
-    }
-
-    override private function createImpl () :SignalImpl
-    {
-        return new NotifyingSignalImpl(_sprite);
-    }
-
-    private var _sprite :Sprite;
-}
-
-private class NotifyingSignalImpl extends SignalImpl
-{
-    public function new (sprite :Sprite)
-    {
-        super();
-        _sprite = sprite;
-    }
-
-    override public function connect (listener :Dynamic, prioritize :Bool) :SignalConnection
-    {
-        _sprite._internal_onListenersAdded(1);
-        return super.connect(listener, prioritize);
-    }
-
-    override public function disconnect (connection :SignalConnection) :Bool
-    {
-        if (super.disconnect(connection)) {
-            _sprite._internal_onListenersRemoved(1);
-            return true;
-        }
-        return false;
-    }
-
-    override public function disconnectAll ()
-    {
-        _sprite._internal_onListenersRemoved(_connections.length);
-        super.disconnectAll();
-    }
-
-    private var _sprite :Sprite;
 }

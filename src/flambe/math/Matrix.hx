@@ -29,12 +29,13 @@ class Matrix
 
     public function identity ()
     {
-        m00 = 1;
-        m01 = 0;
-        m02 = 0;
-        m10 = 0;
-        m11 = 1;
-        m12 = 0;
+        set(1, 0, 0, 1, 0, 0);
+    }
+
+    public function set (m00 :Float, m10 :Float, m01 :Float, m11 :Float, m02 :Float, m12 :Float)
+    {
+        this.m00 = m00; this.m01 = m01; this.m02 = m02;
+        this.m10 = m10; this.m11 = m11; this.m12 = m12;
     }
 
     public function translate (x :Float, y :Float)
@@ -47,8 +48,8 @@ class Matrix
     {
         m00 *= x;
         m10 *= x;
-        m11 *= y;
         m01 *= y;
+        m11 *= y;
     }
 
     public function rotate (angle :Float)
@@ -104,12 +105,7 @@ class Matrix
 
     public function copyFrom (source :Matrix)
     {
-        m00 = source.m00;
-        m01 = source.m01;
-        m02 = source.m02;
-        m10 = source.m10;
-        m11 = source.m11;
-        m12 = source.m12;
+        set(source.m00, source.m10, source.m01, source.m11, source.m02, source.m12);
     }
 
     /**

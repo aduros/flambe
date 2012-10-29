@@ -9,6 +9,7 @@ import flambe.display.Sprite;
 import flambe.math.FMath;
 import flambe.swf.MovieSymbol;
 
+using flambe.util.BitSets;
 using flambe.util.Strings;
 
 /**
@@ -34,7 +35,7 @@ class MovieSprite extends Sprite
     /**
      * Whether this movie is currently paused.
      */
-    public var paused :Bool = false;
+    public var paused (isPaused, setPaused) :Bool;
 
     public function new (symbol :MovieSymbol)
     {
@@ -105,7 +106,7 @@ class MovieSprite extends Sprite
 
         speed.update(dt);
 
-        if (!paused) {
+        if (!isPaused()) {
             _position += speed._*dt;
             if (_position > symbol.duration) {
                 _position = _position % symbol.duration;
@@ -140,6 +141,17 @@ class MovieSprite extends Sprite
     private function setPosition (position :Float) :Float
     {
         return _position = FMath.clamp(position, 0, symbol.duration);
+    }
+
+    inline private function isPaused () :Bool
+    {
+        return _flags.contains(Sprite.MOVIESPRITE_PAUSED);
+    }
+
+    private function setPaused (paused :Bool)
+    {
+        _flags = _flags.set(Sprite.MOVIESPRITE_PAUSED, paused);
+        return paused;
     }
 
     private var _animators :Array<LayerAnimator>;
@@ -264,5 +276,5 @@ private class LayerAnimator
     // Only created if there are multiple symbols on this layer. If it does exist, the appropriate
     // sprite is swapped in at keyframe changes. If it doesn't, the sprite is only added to the
     // parent on layer creation.
-    private var _sprites :Array<Sprite>;
+    private var _sprites :Array<Sprite> = null;
 }

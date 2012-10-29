@@ -7,23 +7,28 @@ package flambe.display;
 import flambe.display.Font;
 import flambe.math.FMath;
 
+using flambe.util.BitSets;
+
 /**
  * A sprite that displays a line of text using a bitmap font.
  */
 class TextSprite extends Sprite
 {
-    public var text (default, setText) :String;
+    public var text (getText, setText) :String;
     public var font (getFont, setFont) :Font;
 
     public function new (font :Font, ?text :String = "")
     {
         super();
         _font = font;
-        setText(text);
+        _text = text;
+        _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
     }
 
     override public function draw (ctx :DrawingContext)
     {
+        updateGlyphs();
+
         var ii = 0;
         var ll = _glyphs.length;
         while (ii < ll) {
@@ -36,18 +41,25 @@ class TextSprite extends Sprite
 
     override public function getNaturalWidth () :Float
     {
+        updateGlyphs();
         return _width;
     }
 
     override public function getNaturalHeight () :Float
     {
+        updateGlyphs();
         return _height;
+    }
+
+    inline private function getText () :String
+    {
+        return _text;
     }
 
     private function setText (text :String) :String
     {
-        this.text = text;
-        invalidate();
+        _text = text;
+        _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
         return text;
     }
 
@@ -59,39 +71,44 @@ class TextSprite extends Sprite
     private function setFont (font :Font) :Font
     {
         _font = font;
-        invalidate();
+        _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
         return font;
     }
 
-    private function invalidate ()
+    private function updateGlyphs ()
     {
-        _glyphs = font.getGlyphs(text);
-        _offsets = [0];
-        _width = 0;
-        _height = 0;
+        if (_flags.contains(Sprite.TEXTSPRITE_DIRTY)) {
+            _flags = _flags.remove(Sprite.TEXTSPRITE_DIRTY);
 
-        var ii = 0;
-        var ll = _glyphs.length;
-        while (ii < ll) {
-            var glyph = _glyphs[ii];
-            ++ii;
+            _glyphs = font.getGlyphs(text);
+            _offsets = [0];
+            _width = 0;
+            _height = 0;
 
-            if (ii == ll) {
-                // Last glyph, only advance up until its right edge
-                _width += glyph.width;
-            } else {
-                var nextGlyph = _glyphs[ii];
-                _width += glyph.xAdvance + glyph.getKerning(nextGlyph.charCode);
-                _offsets.push(_width);
+            var ii = 0;
+            var ll = _glyphs.length;
+            while (ii < ll) {
+                var glyph = _glyphs[ii];
+                ++ii;
+
+                if (ii == ll) {
+                    // Last glyph, only advance up until its right edge
+                    _width += glyph.width;
+                } else {
+                    var nextGlyph = _glyphs[ii];
+                    _width += glyph.xAdvance + glyph.getKerning(nextGlyph.charCode);
+                    _offsets.push(_width);
+                }
+                _height = FMath.max(_height, glyph.height + glyph.yOffset);
             }
-            _height = FMath.max(_height, glyph.height + glyph.yOffset);
         }
     }
 
-    private var _glyphs :Array<Glyph>;
-    private var _offsets :Array<Float>;
-    private var _font :Font;
+    private var _glyphs :Array<Glyph> = null;
+    private var _offsets :Array<Float> = null;
+    private var _font :Font = null;
+    private var _text :String = null;
 
-    private var _width :Float;
-    private var _height :Float;
+    private var _width :Float = 0;
+    private var _height :Float = 0;
 }

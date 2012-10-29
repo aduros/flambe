@@ -389,6 +389,7 @@ class Sprite extends Component
     private static inline var LOCAL_MATRIX_DIRTY = 1 << 2;
     private static inline var VIEW_MATRIX_DIRTY = 1 << 3;
     private static inline var MOVIESPRITE_PAUSED = 1 << 4;
+    private static inline var TEXTSPRITE_DIRTY = 1 << 5;
 
     private var _flags :Int;
 

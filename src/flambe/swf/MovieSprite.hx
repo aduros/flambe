@@ -111,14 +111,18 @@ class MovieSprite extends Sprite
             if (_position > symbol.duration) {
                 _position = _position % symbol.duration;
             }
-
-            var newFrame = _position*symbol.frameRate;
-            goto(newFrame);
         }
+
+        var newFrame = _position*symbol.frameRate;
+        goto(newFrame);
     }
 
     private function goto (newFrame :Float)
     {
+        if (_frame == newFrame) {
+            return; // No change
+        }
+
         var wrapped = newFrame < _frame;
         if (wrapped) {
             for (animator in _animators) {

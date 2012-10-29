@@ -88,7 +88,7 @@ class Sprite extends Component
     /**
      * Whether this sprite or any children should receive pointer events. Defaults to true.
      */
-    public var pointerEnabled (getPointerEnabled, setPointerEnabled) :Bool;
+    public var pointerEnabled (isPointerEnabled, setPointerEnabled) :Bool;
 
     public function new ()
     {
@@ -369,7 +369,7 @@ class Sprite extends Component
         return visible;
     }
 
-    inline private function getPointerEnabled () :Bool
+    inline private function isPointerEnabled () :Bool
     {
         return _flags.contains(POINTER_ENABLED);
     }

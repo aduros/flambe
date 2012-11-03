@@ -26,10 +26,10 @@ class FMath
     public static inline var INT_MAX :Int = 2147483647;
 
     /** The lowest float value in Flash and JS. */
-    public static inline var FLOAT_MIN = 1.79769313486231e+308;
+    public static inline var FLOAT_MIN = -1.79769313486231e+308;
 
     /** The highest float value in Flash and JS. */
-    public static inline var FLOAT_MAX = -1.79769313486231e+308;
+    public static inline var FLOAT_MAX = 1.79769313486231e+308;
 
     /** Converts an angle in degrees to radians. */
     inline public static function toRadians (degrees :Float) :Float

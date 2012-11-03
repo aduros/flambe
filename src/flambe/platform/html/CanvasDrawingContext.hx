@@ -54,6 +54,14 @@ class CanvasDrawingContext
 
     public function drawImage (texture :Texture, x :Float, y :Float)
     {
+        if (_firstDraw) {
+            _firstDraw = false;
+            _canvasCtx.globalCompositeOperation = "copy";
+            drawImage(texture, x, y);
+            _canvasCtx.globalCompositeOperation = "source-over";
+            return;
+        }
+
         var htmlTexture :HtmlTexture = cast texture;
         _canvasCtx.drawImage(htmlTexture.image, x, y);
     }
@@ -61,6 +69,14 @@ class CanvasDrawingContext
     public function drawSubImage (texture :Texture, destX :Float, destY :Float,
         sourceX :Float, sourceY :Float, sourceW :Float, sourceH :Float)
     {
+        if (_firstDraw) {
+            _firstDraw = false;
+            _canvasCtx.globalCompositeOperation = "copy";
+            drawSubImage(texture, destX, destY, sourceX, sourceY, sourceW, sourceH);
+            _canvasCtx.globalCompositeOperation = "source-over";
+            return;
+        }
+
         var htmlTexture :HtmlTexture = cast texture;
         _canvasCtx.drawImage(htmlTexture.image,
             Std.int(sourceX), Std.int(sourceY), Std.int(sourceW), Std.int(sourceH),
@@ -69,8 +85,15 @@ class CanvasDrawingContext
 
     public function drawPattern (texture :Texture, x :Float, y :Float, width :Float, height :Float)
     {
-        var htmlTexture :HtmlTexture = cast texture;
+        if (_firstDraw) {
+            _firstDraw = false;
+            _canvasCtx.globalCompositeOperation = "copy";
+            drawPattern(texture, x, y, width, height);
+            _canvasCtx.globalCompositeOperation = "source-over";
+            return;
+        }
 
+        var htmlTexture :HtmlTexture = cast texture;
         if (htmlTexture.pattern == null) {
             htmlTexture.pattern = _canvasCtx.createPattern(htmlTexture.image, "repeat");
         }
@@ -80,6 +103,14 @@ class CanvasDrawingContext
 
     public function fillRect (color :Int, x :Float, y :Float, width :Float, height :Float)
     {
+        if (_firstDraw) {
+            _firstDraw = false;
+            _canvasCtx.globalCompositeOperation = "copy";
+            fillRect(color, x, y, width, height);
+            _canvasCtx.globalCompositeOperation = "source-over";
+            return;
+        }
+
         // Use slice() here rather than Haxe's substr monkey patch
         _canvasCtx.fillStyle = untyped "#" + ("00000" + color.toString(16)).slice(-6);
         _canvasCtx.fillRect(Std.int(x), Std.int(y), Std.int(width), Std.int(height));
@@ -100,5 +131,13 @@ class CanvasDrawingContext
         _canvasCtx.globalCompositeOperation = op;
     }
 
+    public function willRender ()
+    {
+        // Disable blending for the first draw call. This squeezes a bit of performance out of games
+        // that have a single large background sprite, especially on older devices
+        _firstDraw = true;
+    }
+
     private var _canvasCtx :Dynamic;
+    private var _firstDraw :Bool = true;
 }

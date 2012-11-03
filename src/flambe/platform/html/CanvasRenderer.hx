@@ -22,6 +22,7 @@ class CanvasRenderer
 
     public function willRender () :DrawingContext
     {
+        _drawCtx.willRender();
         return _drawCtx;
     }
 
@@ -30,5 +31,5 @@ class CanvasRenderer
         // Nothing
     }
 
-    private var _drawCtx :DrawingContext;
+    private var _drawCtx :CanvasDrawingContext;
 }

@@ -30,11 +30,11 @@ class PointerEvent
     public var viewY (default, null) :Float;
 
     /**
-     * The deepest sprite lying under the pointer that caused the event, if any. The target does not
-     * necessarily have a pointer event listener connected to it. This event starts at the target,
-     * and propagates upwards to its parents.
+     * The deepest sprite lying under the pointer that caused the event, if any. The hit sprite does
+     * not necessarily have a pointer event listener connected to it. This event starts at the hit
+     * sprite, and propagates upwards to its parents.
      */
-    public var target (default, null) :Sprite;
+    public var hit (default, null) :Sprite;
 
     /**
      * The source that this event originated from. This can be used to determine if the event came

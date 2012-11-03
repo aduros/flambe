@@ -80,7 +80,7 @@ class Stage3DRenderer
 
         if (bitmapData.width != w2 || bitmapData.height != h2) {
             // Resize up to the next power of two, padding with transparent black
-            var resized = new BitmapData(w2, h2, bitmapData.transparent, 0x00000000);
+            var resized = new BitmapData(w2, h2, true, 0x00000000);
             resized.copyPixels(bitmapData,
                 new Rectangle(0, 0, bitmapData.width, bitmapData.height), new Point(0, 0));
             bitmapData = resized;

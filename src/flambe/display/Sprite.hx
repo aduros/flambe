@@ -208,9 +208,9 @@ class Sprite extends Component
     {
         if (isViewMatrixDirty()) {
             var parentSprite = getParentSprite();
-            var parentViewMatrix = (parentSprite != null) ?
-                parentSprite.getViewMatrix() : _identity;
-            _viewMatrix = Matrix.multiply(parentViewMatrix, getLocalMatrix(), _viewMatrix);
+            _viewMatrix = (parentSprite != null)
+                ? Matrix.multiply(parentSprite.getViewMatrix(), getLocalMatrix(), _viewMatrix)
+                : getLocalMatrix().clone(_viewMatrix);
 
             _flags = _flags.remove(VIEW_MATRIX_DIRTY);
             if (parentSprite != null) {
@@ -371,7 +371,6 @@ class Sprite extends Component
         return pointerEnabled;
     }
 
-    private static var _identity = new Matrix();
     private static var _scratchPoint = new Point();
 
     // Various flags used by Sprite and subclasses

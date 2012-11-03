@@ -9,6 +9,17 @@ package flambe.display;
  * https://en.wikipedia.org/wiki/Blend_modes
  */
 enum BlendMode {
+    /** Blends the source color on top of the destination, respecting transparency. */
     Normal;
+
+    /** Adds the source and destination colors, lightening the final image. */
     Add;
+
+    /**
+     * Ignores the destination color, and copies the source without handling transparency. NOTE:
+     * Supported only in the Stage3D renderer, everywhere else it's the same as Normal.
+     *
+     * This is an experimental blend mode and may be modified or removed in the future.
+     */
+    CopyExperimental;
 }

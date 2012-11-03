@@ -127,6 +127,12 @@ class CanvasDrawingContext
         switch (blendMode) {
             case Normal: op = "source-over";
             case Add: op = "lighter";
+            case CopyExperimental:
+                // No, we can't use the canvas "copy" globalCompositeOperation, as it's unbounded.
+                // ie. Drawing a small square with copy will erase the ENTIRE rest of the stage.
+                // Maybe this could be properly implemented with a mask, but that will probably kill
+                // performance, which is sort of half the point of using copy.
+                op = "source-over";
         };
         _canvasCtx.globalCompositeOperation = op;
     }

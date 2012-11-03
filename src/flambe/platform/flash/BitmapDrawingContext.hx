@@ -210,6 +210,7 @@ class BitmapDrawingContext
         switch (blendMode) {
             case Normal: state.blendMode = null;
             case Add: state.blendMode = flash.display.BlendMode.ADD;
+            case CopyExperimental: state.blendMode = null; // Unsupported!
         };
     }
 

@@ -408,6 +408,8 @@ class Stage3DDrawingContext
                 _context3D.setBlendFactors(SOURCE_ALPHA, ONE_MINUS_SOURCE_ALPHA);
             case Add:
                 _context3D.setBlendFactors(ONE, ONE);
+            case CopyExperimental:
+                _context3D.setBlendFactors(ONE, ZERO);
             }
         }
 

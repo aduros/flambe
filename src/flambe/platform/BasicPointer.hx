@@ -68,9 +68,9 @@ class BasicPointer
 
         // Take a snapshot of the entire event bubbling chain
         var chain = [];
-        var target = Sprite.hitTest(System.root, viewX, viewY);
-        if (target != null) {
-            var entity = target.owner;
+        var hit = Sprite.hitTest(System.root, viewX, viewY);
+        if (hit != null) {
+            var entity = hit.owner;
             do {
                 var sprite = entity.get(Sprite);
                 if (sprite != null) {
@@ -88,7 +88,7 @@ class BasicPointer
         }
 
         // Finally, emit the event up the chain
-        prepare(viewX, viewY, target, source);
+        prepare(viewX, viewY, hit, source);
         for (signal in chain) {
             signal.emit(_sharedEvent);
             if (_sharedEvent._internal_stopped) {
@@ -104,9 +104,9 @@ class BasicPointer
     {
         // Take a snapshot of the entire event bubbling chain
         var chain = [];
-        var target = Sprite.hitTest(System.root, viewX, viewY);
-        if (target != null) {
-            var entity = target.owner;
+        var hit = Sprite.hitTest(System.root, viewX, viewY);
+        if (hit != null) {
+            var entity = hit.owner;
             do {
                 var sprite = entity.get(Sprite);
                 if (sprite != null) {
@@ -124,7 +124,7 @@ class BasicPointer
         }
 
         // Finally, emit the event up the chain
-        prepare(viewX, viewY, target, source);
+        prepare(viewX, viewY, hit, source);
         for (signal in chain) {
             signal.emit(_sharedEvent);
             if (_sharedEvent._internal_stopped) {
@@ -148,9 +148,9 @@ class BasicPointer
 
         // Take a snapshot of the entire event bubbling chain
         var chain = [];
-        var target = Sprite.hitTest(System.root, viewX, viewY);
-        if (target != null) {
-            var entity = target.owner;
+        var hit = Sprite.hitTest(System.root, viewX, viewY);
+        if (hit != null) {
+            var entity = hit.owner;
             do {
                 var sprite = entity.get(Sprite);
                 if (sprite != null) {
@@ -168,7 +168,7 @@ class BasicPointer
         }
 
         // Finally, emit the event up the chain
-        prepare(viewX, viewY, target, source);
+        prepare(viewX, viewY, hit, source);
         for (signal in chain) {
             signal.emit(_sharedEvent);
             if (_sharedEvent._internal_stopped) {
@@ -177,11 +177,11 @@ class BasicPointer
         }
     }
 
-    private function prepare (viewX :Float, viewY :Float, target :Sprite, source :EventSource)
+    private function prepare (viewX :Float, viewY :Float, hit :Sprite, source :EventSource)
     {
         _x = viewX;
         _y = viewY;
-        _sharedEvent._internal_init(_sharedEvent.id+1, viewX, viewY, target, source);
+        _sharedEvent._internal_init(_sharedEvent.id+1, viewX, viewY, hit, source);
     }
 
     private static var _sharedEvent = new PointerEvent();

@@ -74,17 +74,17 @@ class PointerEvent
         }
 
         var event = new PointerEvent();
-        event._internal_init(id, viewX, viewY, target, sourceCopy);
+        event._internal_init(id, viewX, viewY, hit, sourceCopy);
         return event;
     }
 
     /** @private */ public function _internal_init (
-        id :Int, viewX :Float, viewY :Float, target :Sprite, source :EventSource)
+        id :Int, viewX :Float, viewY :Float, hit :Sprite, source :EventSource)
     {
         this.id = id;
         this.viewX = viewX;
         this.viewY = viewY;
-        this.target = target;
+        this.hit = hit;
         this.source = source;
         _internal_stopped = false;
     }

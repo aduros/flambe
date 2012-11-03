@@ -21,7 +21,7 @@ class Point
     /**
      * Re-assign the coordinates of this point.
      */
-    public function setXY (x :Float, y :Float)
+    public function set (x :Float, y :Float)
     {
         this.x = x;
         this.y = y;
@@ -81,18 +81,16 @@ class Point
         return dx*dx + dy*dy;
     }
 
-    public function copyFrom (source :Point)
-    {
-        x = source.x;
-        y = source.y;
-    }
-
     /**
      * Creates a copy of this point.
      */
-    public function clone () :Point
+    public function clone (?result :Point) :Point
     {
-        return new Point(x, y);
+        if (result == null) {
+            return new Point(x, y);
+        }
+        result.set(x, y);
+        return result;
     }
 
 #if debug

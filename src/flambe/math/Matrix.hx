@@ -135,19 +135,16 @@ class Matrix
         return result;
     }
 
-    public function copyFrom (source :Matrix)
-    {
-        set(source.m00, source.m10, source.m01, source.m11, source.m02, source.m12);
-    }
-
     /**
      * Creates a copy of this matrix.
      */
-    public function clone ()
+    public function clone (?result :Matrix) :Matrix
     {
-        var clone = new Matrix();
-        clone.copyFrom(this);
-        return clone;
+        if (result == null) {
+            result = new Matrix();
+        }
+        result.set(m00, m10, m01, m11, m02, m12);
+        return result;
     }
 
 #if debug

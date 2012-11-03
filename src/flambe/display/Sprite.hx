@@ -210,7 +210,7 @@ class Sprite extends Component
             var parentSprite = getParentSprite();
             var parentViewMatrix = (parentSprite != null) ?
                 parentSprite.getViewMatrix() : _identity;
-            _viewMatrix = Matrix.multiply(getLocalMatrix(), parentViewMatrix, _viewMatrix);
+            _viewMatrix = Matrix.multiply(parentViewMatrix, getLocalMatrix(), _viewMatrix);
 
             _flags = _flags.remove(VIEW_MATRIX_DIRTY);
             if (parentSprite != null) {

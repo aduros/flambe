@@ -198,8 +198,7 @@ class Sprite extends Component
         if (_flags.contains(LOCAL_MATRIX_DIRTY)) {
             _flags = _flags.remove(LOCAL_MATRIX_DIRTY);
 
-            _localMatrix.set(scaleX._, 0, 0, scaleY._, x._, y._);
-            _localMatrix.rotate(FMath.toRadians(rotation._));
+            _localMatrix.compose(x._, y._, scaleX._, scaleY._, FMath.toRadians(rotation._));
             _localMatrix.translate(-anchorX._, -anchorY._);
         }
         return _localMatrix;

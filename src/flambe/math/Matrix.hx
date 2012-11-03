@@ -27,15 +27,22 @@ class Matrix
         identity();
     }
 
+    public function set (m00 :Float, m10 :Float, m01 :Float, m11 :Float, m02 :Float, m12 :Float)
+    {
+        this.m00 = m00; this.m01 = m01; this.m02 = m02;
+        this.m10 = m10; this.m11 = m11; this.m12 = m12;
+    }
+
     public function identity ()
     {
         set(1, 0, 0, 1, 0, 0);
     }
 
-    public function set (m00 :Float, m10 :Float, m01 :Float, m11 :Float, m02 :Float, m12 :Float)
+    public function compose (x :Float, y :Float, scaleX :Float, scaleY :Float, rotation :Float)
     {
-        this.m00 = m00; this.m01 = m01; this.m02 = m02;
-        this.m10 = m10; this.m11 = m11; this.m12 = m12;
+        var sin = Math.sin(rotation);
+        var cos = Math.cos(rotation);
+        set(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, x, y);
     }
 
     public function translate (x :Float, y :Float)
@@ -52,10 +59,10 @@ class Matrix
         m11 *= y;
     }
 
-    public function rotate (angle :Float)
+    public function rotate (rotation :Float)
     {
-        var sin = Math.sin(angle);
-        var cos = Math.cos(angle);
+        var sin = Math.sin(rotation);
+        var cos = Math.cos(rotation);
 
         var t00 = m00*cos + m01*sin;
         var t01 = -m00*sin + m01*cos;

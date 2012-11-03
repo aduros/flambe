@@ -53,12 +53,13 @@ class SignalImpl
     public function emit (args :Array<Dynamic>)
     {
         var snapshot = _connections;
-        for (connection in snapshot) {
+        var ii = 0, ll = snapshot.length;
+        while (ii < ll) {
+            var connection = snapshot[ii];
             var listener = connection._internal_listener;
 
             // If the connection wasn't already disposed
             if (listener != null) {
-
                 Reflect.callMethod(null, listener, args);
 
                 // If this a once() connection, make sure it's removed
@@ -66,6 +67,7 @@ class SignalImpl
                     connection.dispose();
                 }
             }
+            ++ii;
         }
     }
 

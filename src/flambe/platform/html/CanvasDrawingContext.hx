@@ -44,7 +44,7 @@ class CanvasDrawingContext
 
     public function transform (m00 :Float, m10 :Float, m01 :Float, m11 :Float, m02 :Float, m12 :Float)
     {
-        _canvasCtx.transform(m00, m10, m01, m11, m02, m12);
+        _canvasCtx.transform(m00, m10, m01, m11, Std.int(m02), Std.int(m12));
     }
 
     public function restore ()
@@ -63,7 +63,7 @@ class CanvasDrawingContext
         }
 
         var htmlTexture :HtmlTexture = cast texture;
-        _canvasCtx.drawImage(htmlTexture.image, x, y);
+        _canvasCtx.drawImage(htmlTexture.image, Std.int(x), Std.int(y));
     }
 
     public function drawSubImage (texture :Texture, destX :Float, destY :Float,

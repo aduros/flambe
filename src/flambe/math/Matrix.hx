@@ -110,6 +110,31 @@ class Matrix
         return true;
     }
 
+    public static function multiply (lhs :Matrix, rhs :Matrix, ?result :Matrix) :Matrix
+    {
+        if (result == null) {
+            result = new Matrix();
+        }
+
+        // First row
+        var a = lhs.m00*rhs.m00 + lhs.m01*rhs.m10;
+        var b = lhs.m00*rhs.m01 + lhs.m01*rhs.m11;
+        var c = lhs.m00*rhs.m02 + lhs.m01*rhs.m12 + lhs.m02;
+        result.m00 = a;
+        result.m01 = b;
+        result.m02 = c;
+
+        // Second row
+        a = lhs.m10*rhs.m00 + lhs.m11*rhs.m10;
+        b = lhs.m10*rhs.m01 + lhs.m11*rhs.m11;
+        c = lhs.m10*rhs.m02 + lhs.m11*rhs.m12 + lhs.m12;
+        result.m10 = a;
+        result.m11 = b;
+        result.m12 = c;
+
+        return result;
+    }
+
     public function copyFrom (source :Matrix)
     {
         set(source.m00, source.m10, source.m01, source.m11, source.m02, source.m12);

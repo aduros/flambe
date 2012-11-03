@@ -207,18 +207,10 @@ class Sprite extends Component
     public function getViewMatrix () :Matrix
     {
         if (isViewMatrixDirty()) {
-            if (_viewMatrix == null) {
-                _viewMatrix = new Matrix();
-            }
-
             var parentSprite = getParentSprite();
-            var parentViewMatrix = if (parentSprite != null)
-                parentSprite.getViewMatrix() else _identity;
-            _viewMatrix.copyFrom(parentViewMatrix);
-            _viewMatrix.translate(x._, y._);
-            _viewMatrix.rotate(FMath.toRadians(rotation._));
-            _viewMatrix.scale(scaleX._, scaleY._);
-            _viewMatrix.translate(-anchorX._, -anchorY._);
+            var parentViewMatrix = (parentSprite != null) ?
+                parentSprite.getViewMatrix() : _identity;
+            _viewMatrix = Matrix.multiply(getLocalMatrix(), parentViewMatrix, _viewMatrix);
 
             _flags = _flags.remove(VIEW_MATRIX_DIRTY);
             if (parentSprite != null) {

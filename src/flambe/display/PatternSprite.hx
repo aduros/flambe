@@ -15,12 +15,20 @@ class PatternSprite extends Sprite
     public var width (default, null) :AnimatedFloat;
     public var height (default, null) :AnimatedFloat;
 
-    public function new (texture :Texture)
+    public function new (texture :Texture, ?width :Float = -1, ?height :Float = -1)
     {
         super();
         this.texture = texture;
-        this.width = new AnimatedFloat(texture.width);
-        this.height = new AnimatedFloat(texture.height);
+
+        if (width < 0) {
+            width = texture.width;
+        }
+        this.width = new AnimatedFloat(width);
+
+        if (height < 0) {
+            height = texture.height;
+        }
+        this.height = new AnimatedFloat(height);
     }
 
     override public function draw (ctx :DrawingContext)

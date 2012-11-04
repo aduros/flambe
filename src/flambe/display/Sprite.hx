@@ -325,7 +325,7 @@ class Sprite extends Component
         return null;
     }
 
-    private function getPointerDown ()
+    private function getPointerDown () :Signal1<PointerEvent>
     {
         if (_internal_pointerDown == null) {
             _internal_pointerDown = new Signal1();
@@ -333,7 +333,7 @@ class Sprite extends Component
         return _internal_pointerDown;
     }
 
-    private function getPointerMove ()
+    private function getPointerMove () :Signal1<PointerEvent>
     {
         if (_internal_pointerMove == null) {
             _internal_pointerMove = new Signal1();
@@ -341,7 +341,7 @@ class Sprite extends Component
         return _internal_pointerMove;
     }
 
-    private function getPointerUp ()
+    private function getPointerUp () :Signal1<PointerEvent>
     {
         if (_internal_pointerUp == null) {
             _internal_pointerUp = new Signal1();

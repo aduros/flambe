@@ -46,6 +46,17 @@ class PatternSprite extends Sprite
         return height._;
     }
 
+    /**
+     * Convenience method to set the width and height.
+     * @returns This instance, for chaining.
+     */
+    public function setSize (width :Float, height :Float) :PatternSprite
+    {
+        this.width._ = width;
+        this.height._ = height;
+        return this;
+    }
+
     override public function onUpdate (dt :Float)
     {
         super.onUpdate(dt);

@@ -23,7 +23,7 @@ class ComponentBuilder
         var name = Context.makeExpr(getComponentName(cl), pos);
         var componentType = TPath({pack: cl.pack, name: cl.name, params: []});
 
-        return Macros.buildFields(macro {
+        var fields = Macros.buildFields(macro {
             function inline__public__static__getFrom (entity :flambe.Entity) :$componentType {
                 return cast entity.getComponent($name);
             }
@@ -31,22 +31,29 @@ class ComponentBuilder
             function inline__public__static__hasIn (entity :flambe.Entity) :Bool {
                 return entity.getComponent($name) != null;
             }
+        });
 
-            function override__public__getName () :String {
-                return $name;
-            }
-        }).concat(Context.getBuildFields());
+        // Only override getName if this component directly extends a @:componentBase and creates a
+        // new namespace
+        if (extendsComponentBase(cl)) {
+            fields = fields.concat(Macros.buildFields(macro {
+                function override__public__getName () :String {
+                    return $name;
+                }
+            }));
+        }
+
+        return fields.concat(Context.getBuildFields());
     }
 
     private static function getComponentName (cl :ClassType) :String
     {
         // Traverse up to the last non-component base
         while (true) {
-            var superClass = cl.superClass.t.get();
-            if (superClass.meta.has(":componentBase")) {
+            if (extendsComponentBase(cl)) {
                 break;
             }
-            cl = superClass;
+            cl = cl.superClass.t.get();
         }
 
         // Look up the ID, otherwise generate one
@@ -59,6 +66,12 @@ class ComponentBuilder
         }
 
         return name;
+    }
+
+    private static function extendsComponentBase (cl :ClassType)
+    {
+        var superClass = cl.superClass.t.get();
+        return superClass.meta.has(":componentBase");
     }
 
     private static var _nameCache = new Hash<String>();

@@ -120,7 +120,11 @@ class FlambeMain
         var mainClass = hasPackage ? mainClassFull.substr(idx+1) : mainClassFull;
         var mainClassPackage = hasPackage ? mainClassFull.substr(0, idx) : "";
 
-        FileSystem.createDirectory(outputDir);
+        try {
+            FileSystem.createDirectory(outputDir);
+        } catch (error :Dynamic) {
+            // The directory probably already exists, press on
+        }
         FileSystem.createDirectory(outputDir + "/etc");
         FileSystem.createDirectory(outputDir + "/assets");
         FileSystem.createDirectory(outputDir + "/assets/bootstrap");

@@ -120,19 +120,20 @@ class FlambeMain
         var mainClass = hasPackage ? mainClassFull.substr(idx+1) : mainClassFull;
         var mainClassPackage = hasPackage ? mainClassFull.substr(0, idx) : "";
 
+        Sys.println("");
         try {
-            FileSystem.createDirectory(outputDir);
+            createDirectory(outputDir);
         } catch (error :Dynamic) {
             // The directory probably already exists, press on
         }
-        FileSystem.createDirectory(outputDir + "/etc");
-        FileSystem.createDirectory(outputDir + "/assets");
-        FileSystem.createDirectory(outputDir + "/assets/bootstrap");
+        createDirectory(outputDir + "/etc");
+        createDirectory(outputDir + "/assets");
+        createDirectory(outputDir + "/assets/bootstrap");
 
         var srcDir = outputDir;
         for (dir in ["src"].concat(hasPackage ? mainClassPackage.split(".") : [])) {
             srcDir += "/" + dir;
-            FileSystem.createDirectory(srcDir);
+            createDirectory(srcDir);
         }
 
         var templateDir = _libDir + "/template";
@@ -149,7 +150,7 @@ class FlambeMain
 
         // For AIR
         copyTemplate(ctx, templateDir + "/air-desc.xml.tmpl", outputDir + "/etc/air-desc.xml");
-        File.copy(templateDir + "/air-cert.pfx", outputDir + "/etc/air-cert.pfx");
+        copyFile(templateDir + "/air-cert.pfx", outputDir + "/etc/air-cert.pfx");
 
         // For FlashDevelop
         copyTemplate(ctx, templateDir + "/app.hxproj.tmpl", outputDir + "/" + name + ".hxproj");
@@ -185,7 +186,31 @@ class FlambeMain
     private static function copyTemplate (ctx :Dynamic, from :String, to :String)
     {
         var template = new Template(File.getContent(from));
-        File.saveContent(to, template.execute(ctx));
+        wrapErrors(to, function () File.saveContent(to, template.execute(ctx)));
+    }
+
+    private static function copyFile (from :String, to :String)
+    {
+        wrapErrors(to, function () File.copy(from, to));
+    }
+
+    private static function createDirectory (dir :String)
+    {
+        wrapErrors(dir, false, function () FileSystem.createDirectory(dir));
+    }
+
+    private static function wrapErrors (path :String, verbose :Bool=true, func :Void->Void)
+    {
+        try {
+            func();
+        } catch (error :Dynamic) {
+            // Throw a more human readable error
+            throw "Failed to create " + path + "! " +
+                "Make sure you have write access and it doesn't already exist.";
+        }
+        if (verbose) {
+            Sys.println("Created " + path);
+        }
     }
 
     private static function cleanPath (path :String) :String

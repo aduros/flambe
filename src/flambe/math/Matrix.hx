@@ -148,7 +148,7 @@ class Matrix
     }
 
 #if debug
-    public function toString () :String
+    @:keep public function toString () :String
     {
         return m00 + " " + m01 + " " + m02 + " \\ " +
             m10 + " " + m11 + " " + m12;

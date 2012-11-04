@@ -94,7 +94,7 @@ class Point
     }
 
 #if debug
-    public function toString () :String
+    @:keep public function toString () :String
     {
         return "(" + x + "," + y + ")";
     }

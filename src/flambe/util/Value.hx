@@ -69,7 +69,7 @@ class Value<A>
     }
 
 #if debug
-    public function toString () :String
+    @:keep public function toString () :String
     {
         return cast _value;
     }

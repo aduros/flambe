@@ -276,6 +276,16 @@ class Sprite extends Component
         return this;
     }
 
+    /**
+     * Convenience method to set pointerEnabled to false.
+     * @returns This instance, for chaining.
+     */
+    public function disablePointer () :Sprite
+    {
+        pointerEnabled = false;
+        return this;
+    }
+
     override public function onUpdate (dt :Float)
     {
         x.update(dt);

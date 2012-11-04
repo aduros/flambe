@@ -113,7 +113,7 @@ class FlambeMain
         var mainClassFull;
         do {
             mainClassFull = read("Main class, including package", capitalName + "Main");
-        } while(!~/^([a-z][a-z0-9]*\.)*[A-Z][A-Za-z0-9]*/.match(mainClassFull));
+        } while(!~/^([a-z][a-z0-9]*\.)*[A-Z][A-Za-z0-9]*$/.match(mainClassFull));
 
         var idx = mainClassFull.lastIndexOf(".");
         var hasPackage = (idx >= 0);

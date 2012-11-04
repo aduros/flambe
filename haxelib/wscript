@@ -17,3 +17,10 @@ def build(ctx):
         classpath = [ ctx.path.find_dir("src"), ctx.path.find_dir("../src") ],
         target="run.n",
         flags="-main FlambeMain")
+
+# Helper command to build the .n and test the "new" command
+# Run it with `wafl test`
+def test(ctx):
+    Scripting.run_command("build")
+    import os
+    os.execlp("neko", "neko", "build/run.n", "new", "/tmp")

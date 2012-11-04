@@ -10,6 +10,7 @@ import flambe.input.PointerEvent;
 import flambe.math.FMath;
 import flambe.math.Matrix;
 import flambe.math.Point;
+import flambe.math.Rectangle;
 import flambe.scene.Director;
 import flambe.util.Signal1;
 import flambe.util.Value;
@@ -155,6 +156,26 @@ class Sprite extends Component
 
         // Finally, if we got this far, hit test the actual sprite
         return (sprite != null && sprite.containsLocal(x, y)) ? sprite : null;
+    }
+
+    /**
+     * Calculate the bounding box of an entity hierarchy. Returns the smallest rectangle in local
+     * coordinates that fully encloses all child sprites.
+     */
+    public static function getBounds (entity :Entity, ?result :Rectangle) :Rectangle
+    {
+        if (result == null) {
+            result = new Rectangle();
+        }
+
+        // The width and height of this rectangle are hijacked to store the bottom right corner
+        result.set(FMath.FLOAT_MAX, FMath.FLOAT_MAX, FMath.FLOAT_MIN, FMath.FLOAT_MIN);
+        getBoundsImpl(entity, null, result);
+
+        // Convert back to a true width and height
+        result.width -= result.x;
+        result.height -= result.y;
+        return result;
     }
 
     /**
@@ -379,6 +400,59 @@ class Sprite extends Component
     {
         _flags = _flags.set(POINTER_ENABLED, pointerEnabled);
         return pointerEnabled;
+    }
+
+    private static function getBoundsImpl (entity :Entity, matrix :Matrix, result :Rectangle)
+    {
+        var sprite = entity.get(Sprite);
+        if (sprite != null) {
+            matrix = (matrix != null)
+                ? Matrix.multiply(matrix, sprite.getLocalMatrix()) // Allocation!
+                : sprite.getLocalMatrix();
+
+            // Extend the rectangle out to fit this sprite
+            var width = sprite.getNaturalWidth(), height = sprite.getNaturalHeight();
+            extendRect(matrix, 0, 0, result);
+            extendRect(matrix, width, 0, result);
+            extendRect(matrix, width, height, result);
+            extendRect(matrix, 0, height, result);
+        }
+
+        // Recurse into all visible director scenes
+        var director = entity.get(Director);
+        if (director != null) {
+            var scenes = director.visibleScenes;
+            var ii = 0, ll = scenes.length;
+            while (ii < ll) {
+                getBoundsImpl(scenes[ii], matrix, result);
+                ++ii;
+            }
+        }
+
+        // Recurse into all children
+        var children = entity._internal_children;
+        var ii = 0, ll = children.length;
+        while (ii < ll) {
+            var child = children[ii];
+            if (child != null) {
+                getBoundsImpl(child, matrix, result);
+            }
+            ++ii;
+        }
+    }
+
+    private static function extendRect (matrix :Matrix, x :Float, y :Float, rect :Rectangle)
+    {
+        var p = matrix.transform(x, y, _scratchPoint);
+        x = p.x;
+        y = p.y;
+
+        // The width and height of the rectangle are treated like the bottom right point, rather
+        // than a true width and height offset
+        if (x < rect.x) rect.x = x;
+        if (y < rect.y) rect.y = y;
+        if (x > rect.width) rect.width = x;
+        if (y > rect.height) rect.height = y;
     }
 
     private static var _scratchPoint = new Point();

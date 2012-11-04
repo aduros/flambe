@@ -260,19 +260,19 @@ private class LayerAnimator
             alpha += (nextKf.alpha-alpha) * interp;
         }
 
-        // From an identity matrix, append the skew
+        // From an identity matrix, append the translation, then skew
         var matrix = sprite.getLocalMatrix();
         var sinX = Math.sin(skewX), cosX = Math.cos(skewX);
         var sinY = Math.sin(skewY), cosY = Math.cos(skewY);
-        matrix.set(cosY, sinY, -sinX, cosX, 0, 0);
+        matrix.set(cosY, sinY, -sinX, cosX, x, y);
 
         // Append the scale
         matrix.scale(scaleX, scaleY);
 
-        // Append the translation, and prepend the pivot
-        var pivotX = kf.pivotX, pivotY = kf.pivotY;
-        matrix.m02 = x - matrix.m00*pivotX - matrix.m01*pivotY;
-        matrix.m12 = y - matrix.m10*pivotY - matrix.m11*pivotY;
+        // Append the pivot
+        var pivotX = kf.pivotX + sprite.anchorX._;
+        var pivotY = kf.pivotY + sprite.anchorY._;
+        matrix.translate(-pivotX, -pivotY);
 
         sprite.alpha._ = alpha;
     }

@@ -26,4 +26,33 @@ class Rectangle
         this.width = width;
         this.height = height;
     }
+
+    /**
+     * Returns true if this rectangle contains the given point.
+     */
+    public function contains (x :Float, y :Float) :Bool
+    {
+        x -= this.x;
+        y -= this.y;
+        return x >= 0 && y >= 0 && x <= width && y <= height;
+    }
+
+    /**
+     * Creates a copy of this rectangle.
+     */
+    public function clone (?result :Rectangle) :Rectangle
+    {
+        if (result == null) {
+            result = new Rectangle();
+        }
+        result.set(x, y, width, height);
+        return result;
+    }
+
+#if debug
+    @:keep public function toString () :String
+    {
+        return "(" + x + "," + y + " " + width + "x" + height + ")";
+    }
+#end
 }

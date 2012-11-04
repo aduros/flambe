@@ -214,6 +214,11 @@ class Sprite extends Component
             && localY >= 0 && localY < getNaturalHeight();
     }
 
+    /**
+     * Returns the local transformation matrix, relative to the parent. This matrix may be modified
+     * to position the sprite, but any changes will be invalidated when the x, y, scaleX, scaleY,
+     * rotation, anchorX, or anchorY properties are updated.
+     */
     public function getLocalMatrix () :Matrix
     {
         if (_flags.contains(LOCAL_MATRIX_DIRTY)) {
@@ -225,6 +230,9 @@ class Sprite extends Component
         return _localMatrix;
     }
 
+    /**
+     * Returns the view transformation matrix, relative to the root. Do NOT modify this matrix.
+     */
     public function getViewMatrix () :Matrix
     {
         if (isViewMatrixDirty()) {

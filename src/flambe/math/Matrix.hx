@@ -33,11 +33,17 @@ class Matrix
         this.m10 = m10; this.m11 = m11; this.m12 = m12;
     }
 
+    /**
+     * Sets this matrix to the identity matrix.
+     */
     public function identity ()
     {
         set(1, 0, 0, 1, 0, 0);
     }
 
+    /**
+     * Set this matrix to a translation, scale, and rotation, in that order.
+     */
     public function compose (x :Float, y :Float, scaleX :Float, scaleY :Float, rotation :Float)
     {
         var sin = Math.sin(rotation);
@@ -110,6 +116,9 @@ class Matrix
         return true;
     }
 
+    /**
+     * Multiply two matrices and return the result.
+     */
     public static function multiply (lhs :Matrix, rhs :Matrix, ?result :Matrix) :Matrix
     {
         if (result == null) {

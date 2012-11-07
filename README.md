@@ -43,7 +43,8 @@ See the [install guide] on the wiki.
 ## Hacking
 
 To build and develop Flambe from source, clone this repository and run
-`haxelib dev flambe /path/to/flambe/src` to use it. Patches and pull
+`haxelib dev flambe /path/to/flambe/src` to use it. When you want to go
+back to a stable release, run `haxelib dev flambe`. Patches and pull
 requests are welcome!
 
 Are things not working? I'd be happy to help, open an [issue], ask on

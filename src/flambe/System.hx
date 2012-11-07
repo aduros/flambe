@@ -185,6 +185,8 @@ class System
         flambe.platform.flash.FlashPlatform.instance;
 #elseif html
         flambe.platform.html.HtmlPlatform.instance;
+#elseif (cpp || neko)
+		flambe.platform.nme.NMEPlatform.instance;
 #else
         null;
 #end

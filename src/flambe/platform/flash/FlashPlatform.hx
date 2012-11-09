@@ -95,6 +95,7 @@ class FlashPlatform
 
         _lastUpdate = Lib.getTimer();
         _skipFrame = false;
+        _initTime = Date.now().getTime();
     }
 
     public function loadAssetPack (manifest :Manifest) :Promise<AssetPack>
@@ -181,6 +182,11 @@ class FlashPlatform
 #end
     }
 
+    public function getTime () :Float
+    {
+        return (_initTime+Lib.getTimer()) / 1000;
+    }
+
     private function onKeyDown (event :KeyboardEvent)
     {
         event.preventDefault();
@@ -195,7 +201,7 @@ class FlashPlatform
     private function onEnterFrame (_)
     {
         var now = Lib.getTimer();
-        var dt = (now - _lastUpdate)/1000;
+        var dt = (now-_lastUpdate) / 1000;
         _lastUpdate = now;
 
         if (_skipFrame) {
@@ -234,4 +240,5 @@ class FlashPlatform
 
     private var _lastUpdate :Int;
     private var _skipFrame :Bool;
+    private var _initTime :Float;
 }

@@ -293,9 +293,14 @@ class HtmlPlatform
         return null;
     }
 
+    public function getTime () :Float
+    {
+        return HtmlUtil.now() / 1000;
+    }
+
     private function update (now :Float)
     {
-        var dt = (now - _lastUpdate)/1000;
+        var dt = (now-_lastUpdate) / 1000;
         _lastUpdate = now;
 
         if (_skipFrame) {

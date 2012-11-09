@@ -37,4 +37,6 @@ interface Platform
     function callNative (funcName :String, params :Array<Dynamic>) :Dynamic;
 
     function createLogHandler (tag :String) :LogHandler;
+
+    function getTime () :Float;
 }

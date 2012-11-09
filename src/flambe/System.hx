@@ -86,6 +86,12 @@ class System
     public static var hidden (default, null) :Value<Bool> = new Value<Bool>(false);
 
     /**
+     * Gets the current clock time, in <b>seconds</b> since January 1, 1970. Depending on the
+     * platform, this may be slightly more efficient than Date.now().getTime().
+     */
+    public static var time (getTime, null) :Float;
+
+    /**
      * Starts up Flambe, this should usually be the first thing a game does.
      */
     public static function init ()
@@ -125,6 +131,12 @@ class System
     {
         // No need to assertCalledInit here, this should be callable from static initializers
         return new Logger(_platform.createLogHandler(tag));
+    }
+
+    inline private static function getTime () :Float
+    {
+        #if debug assertCalledInit(); #end
+        return _platform.getTime();
     }
 
     inline private static function getStage () :Stage

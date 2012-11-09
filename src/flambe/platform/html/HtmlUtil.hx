@@ -114,4 +114,11 @@ class HtmlUtil
             default: return Portrait;
         }
     }
+
+    /** Gets the current time in milliseconds since the Unix epoch. */
+    inline public static function now () :Float
+    {
+        // Same thing as Date.now().getTime(), but avoids creating a Date object
+        return (untyped Date).now();
+    }
 }

@@ -200,7 +200,7 @@ class HtmlPlatform
             });
         }
 
-        _lastUpdate = Date.now().getTime();
+        _lastUpdate = HtmlUtil.now();
         _skipFrame = false;
 
         // Use requestAnimationFrame if available, otherwise a 60 FPS setInterval
@@ -229,7 +229,7 @@ class HtmlPlatform
         } else {
             Log.warn("No requestAnimationFrame support, falling back to setInterval");
             (untyped Lib.window).setInterval(function () {
-                update(Date.now().getTime());
+                update(HtmlUtil.now());
             }, 1000/60);
         }
     }

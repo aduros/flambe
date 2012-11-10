@@ -13,8 +13,8 @@ class Node
     public static var console (_console, null) :Dynamic;
     public static var process (_process, null) :Dynamic;
 
-    // FIXME(bruno): Multiple loggers with different tags is not supported
-    public static function logger (tag :String) :Logger
+    // FIXME(bruno): Creating multiple loggers with different tags are not supported
+    public static function createLogger (tag :String) :Logger
     {
         var handler :LogHandler = new flambe.platform.html.HtmlLogHandler(tag);
 #if !debug

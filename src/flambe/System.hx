@@ -127,7 +127,7 @@ class System
      * function. In JS, logging goes to the console object. Logging is stripped from non-debug
      * builds.
      */
-    inline public static function logger (tag :String) :Logger
+    inline public static function createLogger (tag :String) :Logger
     {
         // No need to assertCalledInit here, this should be callable from static initializers
         return new Logger(_platform.createLogHandler(tag));

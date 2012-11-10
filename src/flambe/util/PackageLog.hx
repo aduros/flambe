@@ -40,8 +40,8 @@ class PackageLog
 
         var tag = Context.makeExpr(cl.pack.join("."), pos);
         var logger = Context.defined("server")
-            ? macro flambe.server.Node.logger($tag)
-            : macro flambe.System.logger($tag);
+            ? macro flambe.server.Node.createLogger($tag)
+            : macro flambe.System.createLogger($tag);
 
         return Macros.buildFields(macro {
             var public__static__logger :flambe.util.Logger = $logger;

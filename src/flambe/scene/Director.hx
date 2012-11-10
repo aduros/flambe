@@ -24,10 +24,27 @@ class Director extends Component
     /** Whether the director is currently transitioning between scenes. */
     public var transitioning (isTransitioning, null) :Bool;
 
+    /** The ideal width of the director's scenes. Used by some transitions. */
+    public var width (getWidth, null) :Float;
+
+    /** The ideal height of the director's scenes. Used by some transitions. */
+    public var height (getHeight, null) :Float;
+
     public function new ()
     {
         scenes = [];
         visibleScenes = [];
+    }
+
+    /**
+     * Sets the ideal size of the scenes in this director. By default, the size is the full stage
+     * width and height. This size is used by some transitions, such as SlideTransition.
+     */
+    public function setSize (width :Float, height :Float) :Director
+    {
+        _width = width;
+        _height = height;
+        return this;
     }
 
     public function pushScene (scene :Entity, ?transition :Transition)
@@ -211,14 +228,26 @@ class Director extends Component
             visibleScenes.push(to);
 
             _transitor = new Transitor(from, to, transition, onComplete);
-            _transitor.init();
+            _transitor.init(this);
         } else {
             onComplete();
             invalidateVisibility();
         }
     }
 
-    private var _transitor :Transitor;
+    private function getWidth () :Float
+    {
+        return (_width < 0) ? System.stage.width : _width;
+    }
+
+    private function getHeight () :Float
+    {
+        return (_height < 0) ? System.stage.height : _height;
+    }
+
+    private var _transitor :Transitor = null;
+    private var _width :Float = -1;
+    private var _height :Float = -1;
 }
 
 private class Transitor
@@ -231,9 +260,9 @@ private class Transitor
         _onComplete = onComplete;
     }
 
-    public function init ()
+    public function init (director :Director)
     {
-        _transition.init(_from, _to);
+        _transition.init(director, _from, _to);
     }
 
     public function visit (visitor :Visitor)

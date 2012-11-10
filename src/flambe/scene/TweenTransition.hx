@@ -17,9 +17,9 @@ class TweenTransition extends Transition
         _ease = (ease != null) ? ease : Ease.linear;
     }
 
-    override public function init (from :Entity, to :Entity)
+    override public function init (director :Director, from :Entity, to :Entity)
     {
-        super.init(from, to);
+        super.init(director, from, to);
         _elapsed = 0;
     }
 

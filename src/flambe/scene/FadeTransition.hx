@@ -17,9 +17,9 @@ class FadeTransition extends TweenTransition
         super(duration, ease);
     }
 
-    override public function init (from :Entity, to :Entity)
+    override public function init (director :Director, from :Entity, to :Entity)
     {
-        super.init(from, to);
+        super.init(director, from, to);
         var sprite = _to.get(Sprite);
         if (sprite == null) {
             _to.add(sprite = new Sprite());

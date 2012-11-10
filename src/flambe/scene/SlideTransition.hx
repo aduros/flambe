@@ -4,7 +4,6 @@
 
 package flambe.scene;
 
-import flambe.System;
 import flambe.animation.Ease;
 import flambe.display.Sprite;
 
@@ -58,19 +57,19 @@ class SlideTransition extends TweenTransition
         return this;
     }
 
-    override public function init (from :Entity, to :Entity)
+    override public function init (director :Director, from :Entity, to :Entity)
     {
-        super.init(from, to);
+        super.init(director, from, to);
 
         switch (_direction) {
         case UP:
-            _x = 0; _y = -System.stage.height;
+            _x = 0; _y = -_director.height;
         case DOWN:
-            _x = 0; _y = System.stage.height;
+            _x = 0; _y = _director.height;
         case LEFT:
-            _x = -System.stage.width; _y = 0;
+            _x = -_director.width; _y = 0;
         case RIGHT:
-            _x = System.stage.width; _y = 0;
+            _x = _director.width; _y = 0;
         }
 
         var sprite = _from.get(Sprite);

@@ -11,11 +11,13 @@ class Transition
 {
     /**
      * Called by the Director to start the transition.
+     * @param director The director that requested the transition.
      * @param from The old scene being transitioned from.
      * @param to The new scene being transitioned to.
      */
-    public function init (from :Entity, to :Entity)
+    public function init (director :Director, from :Entity, to :Entity)
     {
+        _director = director;
         _from = from;
         _to = to;
     }
@@ -39,6 +41,7 @@ class Transition
         // See subclasses
     }
 
+    private var _director :Director;
     private var _from :Entity;
     private var _to :Entity;
 }

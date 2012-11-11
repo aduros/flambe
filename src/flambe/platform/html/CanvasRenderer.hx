@@ -23,13 +23,30 @@ class CanvasRenderer
     public function willRender () :DrawingContext
     {
         _drawCtx.willRender();
+#if debug
+        return (_inspector != null) ? _inspector : _drawCtx;
+#else
         return _drawCtx;
+#end
     }
 
     public function didRender ()
     {
-        // Nothing
+#if debug
+        if (_inspector != null) {
+            _inspector.show();
+            _inspector = null;
+        }
+#end
     }
+
+#if debug
+    public function inspectNextFrame ()
+    {
+        _inspector = new InspectorDrawingContext(_drawCtx);
+    }
+    private var _inspector :InspectorDrawingContext;
+#end
 
     private var _drawCtx :CanvasDrawingContext;
 }

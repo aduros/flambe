@@ -144,6 +144,12 @@ class CanvasDrawingContext
         _firstDraw = true;
     }
 
+    // Used by InspectorDrawingContext to take a snapshot of the canvas
+    public function toDataURL ()
+    {
+        return _canvasCtx.canvas.toDataURL("image/png");
+    }
+
     private var _canvasCtx :Dynamic;
     private var _firstDraw :Bool = true;
 }

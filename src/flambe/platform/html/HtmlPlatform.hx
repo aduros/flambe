@@ -33,7 +33,7 @@ class HtmlPlatform
     public static var instance (default, null) :HtmlPlatform = new HtmlPlatform();
 
     public var mainLoop (default, null) :MainLoop;
-    public var renderer :Renderer;
+    public var renderer :CanvasRenderer;
 
     private function new ()
     {
@@ -168,6 +168,12 @@ class HtmlPlatform
             switch (event.type) {
             case "keydown":
                 event.preventDefault();
+#if debug
+                if (event.ctrlKey && event.keyCode == KeyCodes.I) {
+                    renderer.inspectNextFrame();
+                    return;
+                }
+#end
                 _keyboard.submitDown(event.keyCode);
             case "keyup":
                 _keyboard.submitUp(event.keyCode);

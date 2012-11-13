@@ -16,9 +16,9 @@ class SignalConnection
     public var stayInList (default, null) :Bool;
 
     /** @private */
-    public function new (signal :SignalImpl, listener :Dynamic)
+    public function new (signal :SignalBase, listener :Dynamic)
     {
-        _internal_signal = signal;
+        _signal = signal;
         _internal_listener = listener;
         stayInList = true;
     }
@@ -38,11 +38,14 @@ class SignalConnection
      */
     public function dispose ()
     {
-        if (_internal_signal != null) {
-            _internal_signal.disconnect(this);
+        if (_signal != null) {
+            _signal._internal_disconnect(this);
+            _signal = null;
         }
     }
 
+    /** @private */ public var _internal_next :SignalConnection;
+
     /** @private */ public var _internal_listener :Dynamic;
-    /** @private */ public var _internal_signal :SignalImpl;
+    private var _signal :SignalBase;
 }

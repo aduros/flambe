@@ -12,16 +12,14 @@ typedef Listener1<A> = A -> Void;
 /**
  * A one-argument signal. See Signal0 and Signal2 for different arities.
  */
-class Signal1<A>
+class Signal1<A> extends SignalBase
 {
     /**
      * @param listener An optional listener to immediately connect to the signal.
      */
     public function new (?listener :Listener1<A>)
     {
-        if (listener != null) {
-            connect(listener);
-        }
+        super(listener);
     }
 
     /**
@@ -31,46 +29,14 @@ class Signal1<A>
      */
     public function connect (listener :Listener1<A>, prioritize :Bool = false) :SignalConnection
     {
-        if (_impl == null) {
-            _impl = createImpl();
-        }
-        return _impl.connect(listener, prioritize);
+        return connectImpl(listener, prioritize);
     }
 
     /**
      * Emit the signal, notifying each connected listener.
      */
-    public function emit (arg1 :A)
+    inline public function emit (arg1 :A)
     {
-        if (_impl != null) {
-            _impl.emit([ arg1 ]);
-        }
+        emit1(arg1);
     }
-
-    /**
-     * @returns A shallow copy of this signal.
-     */
-    public function clone () :Signal1<A>
-    {
-        var copy = new Signal1<A>();
-        if (_impl != null) {
-            copy._impl = _impl.clone();
-        }
-        return copy;
-    }
-
-    /**
-     * @returns True if this signal has at least one listener.
-     */
-    public function hasListeners () :Bool
-    {
-        return _impl != null && _impl.hasListeners();
-    }
-
-    private function createImpl () :SignalImpl
-    {
-        return new SignalImpl();
-    }
-
-    private var _impl :SignalImpl;
 }

@@ -74,27 +74,25 @@ class BasicPointer
             do {
                 var sprite = entity.get(Sprite);
                 if (sprite != null) {
-                    // Avoid calling the public getter and lazily instanciating this signal
-                    var signal = sprite._internal_pointerDown;
-                    if (signal != null && signal.hasListeners()) {
-                        chain.push(signal.clone());
-                    }
+                    chain.push(sprite);
                 }
                 entity = entity.parent;
             } while (entity != null);
         }
-        if (down.hasListeners()) {
-            chain.push(down.clone());
-        }
 
         // Finally, emit the event up the chain
         prepare(viewX, viewY, hit, source);
-        for (signal in chain) {
-            signal.emit(_sharedEvent);
-            if (_sharedEvent._internal_stopped) {
-                break;
+        for (sprite in chain) {
+            // Avoid calling the public getter and lazily instanciating this signal
+            var signal = sprite._internal_pointerDown;
+            if (signal != null) {
+                signal.emit(_sharedEvent);
+                if (_sharedEvent._internal_stopped) {
+                    return;
+                }
             }
         }
+        down.emit(_sharedEvent);
     }
 
     /**
@@ -110,27 +108,25 @@ class BasicPointer
             do {
                 var sprite = entity.get(Sprite);
                 if (sprite != null) {
-                    // Avoid calling the public getter and lazily instanciating this signal
-                    var signal = sprite._internal_pointerMove;
-                    if (signal != null && signal.hasListeners()) {
-                        chain.push(signal.clone());
-                    }
+                    chain.push(sprite);
                 }
                 entity = entity.parent;
             } while (entity != null);
         }
-        if (move.hasListeners()) {
-            chain.push(move.clone());
-        }
 
         // Finally, emit the event up the chain
         prepare(viewX, viewY, hit, source);
-        for (signal in chain) {
-            signal.emit(_sharedEvent);
-            if (_sharedEvent._internal_stopped) {
-                break;
+        for (sprite in chain) {
+            // Avoid calling the public getter and lazily instanciating this signal
+            var signal = sprite._internal_pointerMove;
+            if (signal != null) {
+                signal.emit(_sharedEvent);
+                if (_sharedEvent._internal_stopped) {
+                    return;
+                }
             }
         }
+        move.emit(_sharedEvent);
     }
 
     /**
@@ -143,9 +139,6 @@ class BasicPointer
         }
         _isDown = false;
 
-        _x = viewX;
-        _y = viewY;
-
         // Take a snapshot of the entire event bubbling chain
         var chain = [];
         var hit = Sprite.hitTest(System.root, viewX, viewY);
@@ -154,27 +147,25 @@ class BasicPointer
             do {
                 var sprite = entity.get(Sprite);
                 if (sprite != null) {
-                    // Avoid calling the public getter and lazily instanciating this signal
-                    var signal = sprite._internal_pointerUp;
-                    if (signal != null && signal.hasListeners()) {
-                        chain.push(signal.clone());
-                    }
+                    chain.push(sprite);
                 }
                 entity = entity.parent;
             } while (entity != null);
         }
-        if (up.hasListeners()) {
-            chain.push(up.clone());
-        }
 
         // Finally, emit the event up the chain
         prepare(viewX, viewY, hit, source);
-        for (signal in chain) {
-            signal.emit(_sharedEvent);
-            if (_sharedEvent._internal_stopped) {
-                break;
+        for (sprite in chain) {
+            // Avoid calling the public getter and lazily instanciating this signal
+            var signal = sprite._internal_pointerUp;
+            if (signal != null) {
+                signal.emit(_sharedEvent);
+                if (_sharedEvent._internal_stopped) {
+                    return;
+                }
             }
         }
+        up.emit(_sharedEvent);
     }
 
     private function prepare (viewX :Float, viewY :Float, hit :Sprite, source :EventSource)

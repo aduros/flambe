@@ -45,6 +45,28 @@ class ReactiveTest extends TestCase
         signal.connect(function (n) fired = 300, true);
         signal.emit(0);
         assertEquals(fired, 200);
+
+        signal = new Signal1();
+        var conn2 = null;
+        var conn1 = signal.connect(function (n) {
+            conn2.dispose();
+        });
+        conn2 = signal.connect(function (n) {
+            fired = 1;
+        });
+        fired = 0;
+        signal.emit(1); // conn2 still fires
+        assertEquals(fired, 1);
+        fired = 0;
+        signal.emit(1); // conn2 doesn't fire
+        assertEquals(fired, 0);
+
+        signal = new Signal1(function (n) {
+            if (n != 1) {
+                signal.emit(1);
+            }
+        });
+        assertThrows("Assertion failed! Cannot emit while already emitting!", function () signal.emit(0));
     }
 
     public function testValues ()

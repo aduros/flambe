@@ -9,8 +9,6 @@ import flash.display.BitmapData;
 import flash.display.Stage3D;
 import flash.events.ErrorEvent;
 import flash.events.Event;
-import flash.geom.Point;
-import flash.geom.Rectangle;
 import flash.Lib;
 
 import flambe.display.DrawingContext;
@@ -21,8 +19,6 @@ class Stage3DRenderer
 {
     public function new ()
     {
-        _textures = [];
-
         // Use the first available Stage3D
         var stage = Lib.current.stage;
         for (stage3D in stage.stage3Ds) {
@@ -47,9 +43,17 @@ class Stage3DRenderer
 
     public function createTexture (bitmapData :Dynamic) :Texture
     {
-        var texture = new Stage3DTexture(cast bitmapData);
-        _textures.push(texture);
-        uploadToContext3D(texture);
+        var bitmapData :BitmapData = cast bitmapData;
+        var texture = new Stage3DTexture(bitmapData.width, bitmapData.height);
+        texture.init(_context3D, false);
+        texture.uploadBitmapData(bitmapData);
+        return texture;
+    }
+
+    public function createEmptyTexture (width :Int, height :Int) :Texture
+    {
+        var texture = new Stage3DTexture(width, height);
+        texture.init(_context3D, true);
         return texture;
     }
 
@@ -67,49 +71,20 @@ class Stage3DRenderer
         _drawCtx.didRender();
     }
 
-    private function uploadToContext3D (texture :Stage3DTexture)
-    {
-        var bitmapData = texture.bitmapData;
-
-        // Use a resized copy if necessary
-        var w2 = nextPowerOfTwo(bitmapData.width);
-        var h2 = nextPowerOfTwo(bitmapData.height);
-
-        texture.maxU = bitmapData.width / w2;
-        texture.maxV = bitmapData.height / h2;
-
-        if (bitmapData.width != w2 || bitmapData.height != h2) {
-            // Resize up to the next power of two, padding with transparent black
-            var resized = new BitmapData(w2, h2, true, 0x00000000);
-            resized.copyPixels(bitmapData,
-                new Rectangle(0, 0, bitmapData.width, bitmapData.height), new Point(0, 0));
-            bitmapData = resized;
-        }
-
-        // TODO(bruno): Look into compressed textures
-        var nativeTexture = _context3D.createTexture(
-            bitmapData.width, bitmapData.height, BGRA, false);
-
-        // TODO(bruno): Upload different mip maps?
-        nativeTexture.uploadFromBitmapData(bitmapData);
-
-        texture.nativeTexture = nativeTexture;
-    }
-
     private function onContext3DCreate (event :Event)
     {
         var stage3D :Stage3D = event.target;
+        var contextLost = _context3D != null;
         _context3D = stage3D.context3D;
 
         Log.info("Created new Stage3D context", ["driver", _context3D.driverInfo]);
 
-        // Re-upload any lost textures to the GPU
-        for (texture in _textures) {
-            uploadToContext3D(texture);
-        }
-
         _drawCtx = new Stage3DDrawingContext(_context3D);
         onResize(null);
+
+        if (contextLost) {
+            // TODO(bruno): Emit a signal so the game can handle it
+        }
     }
 
     private function onError (event :ErrorEvent)
@@ -125,17 +100,6 @@ class Stage3DRenderer
         }
     }
 
-    private static function nextPowerOfTwo (n :Int)
-    {
-        var p = 1;
-        while (p < n) {
-            p <<= 1;
-        }
-        return p;
-    }
-
     private var _drawCtx :Stage3DDrawingContext;
     private var _context3D :Context3D;
-
-    private var _textures :Array<Stage3DTexture>;
 }

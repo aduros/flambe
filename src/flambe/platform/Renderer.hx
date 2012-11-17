@@ -15,6 +15,11 @@ interface Renderer
     function createTexture (data :Dynamic) :Texture;
 
     /**
+     * Creates a texture, initialized to transparent black.
+     */
+    function createEmptyTexture (width :Int, height :Int) :Texture;
+
+    /**
      * Notifies the renderer that things are about to be drawn. Returns the drawing context that
      * should be used, or null if no context is currently available.
      */

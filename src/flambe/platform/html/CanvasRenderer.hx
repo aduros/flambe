@@ -32,6 +32,17 @@ class CanvasRenderer
         return texture;
     }
 
+    public function createEmptyTexture (width :Int, height :Int) :Texture
+    {
+        var canvas :Dynamic = Lib.document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+
+        var texture = new CanvasTexture();
+        texture.image = canvas;
+        return texture;
+    }
+
     public function willRender () :DrawingContext
     {
         _drawCtx.willRender();

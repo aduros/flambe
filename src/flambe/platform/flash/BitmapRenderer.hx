@@ -31,6 +31,11 @@ class BitmapRenderer
         return new BitmapTexture(cast bitmapData);
     }
 
+    public function createEmptyTexture (width :Int, height :Int) :Texture
+    {
+        throw "Not yet implemented";
+    }
+
     public function willRender () :DrawingContext
     {
         _screen.lock();

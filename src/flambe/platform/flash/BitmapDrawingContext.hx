@@ -134,8 +134,8 @@ class BitmapDrawingContext
     {
         beginGraphics();
 
-        var flashTexture = Lib.as(texture, FlashTexture);
-        _graphics.beginBitmapFill(flashTexture.bitmapData);
+        var texture = Lib.as(texture, BitmapTexture);
+        _graphics.beginBitmapFill(texture.bitmapData);
         _graphics.drawRect(x, y, width, height);
     }
 
@@ -218,7 +218,7 @@ class BitmapDrawingContext
     {
         flushGraphics();
 
-        var flashTexture = Lib.as(texture, FlashTexture);
+        var texture = Lib.as(texture, BitmapTexture);
         var state = getTopState();
         var matrix = state.matrix;
 
@@ -231,12 +231,12 @@ class BitmapDrawingContext
                 sourceRect = _scratchRect;
                 sourceRect.x = 0;
                 sourceRect.y = 0;
-                sourceRect.width = flashTexture.width;
-                sourceRect.height = flashTexture.height;
+                sourceRect.width = texture.width;
+                sourceRect.height = texture.height;
             }
             _scratchPoint.x = matrix.tx + destX;
             _scratchPoint.y = matrix.ty + destY;
-            _buffer.copyPixels(flashTexture.bitmapData, sourceRect, _scratchPoint);
+            _buffer.copyPixels(texture.bitmapData, sourceRect, _scratchPoint);
 
         } else {
             var copy = null;
@@ -252,15 +252,15 @@ class BitmapDrawingContext
                     // TODO(bruno): Optimize?
                     var scratch = new BitmapData(
                         Std.int(sourceRect.width), Std.int(sourceRect.height),
-                        flashTexture.bitmapData.transparent);
+                        texture.bitmapData.transparent);
                     _scratchPoint.x = 0;
                     _scratchPoint.y = 0;
-                    scratch.copyPixels(flashTexture.bitmapData, sourceRect, _scratchPoint);
+                    scratch.copyPixels(texture.bitmapData, sourceRect, _scratchPoint);
                     _buffer.draw(scratch, matrix, state.color, state.blendMode, null, true);
                     scratch.dispose();
                 }
             } else {
-                _buffer.draw(flashTexture.bitmapData, matrix,
+                _buffer.draw(texture.bitmapData, matrix,
                     state.color, state.blendMode, null, true);
             }
             if (copy != null) {

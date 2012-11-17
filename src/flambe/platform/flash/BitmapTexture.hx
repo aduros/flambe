@@ -8,7 +8,7 @@ import flash.display.BitmapData;
 
 import flambe.display.Texture;
 
-class FlashTexture
+class BitmapTexture
     implements Texture
 {
     public var width (getWidth, null) :Int;
@@ -16,16 +16,7 @@ class FlashTexture
 
     public var bitmapData (default, null) :BitmapData;
 
-#if flash11
-    public var nativeTexture :flash.display3D.textures.Texture;
-
-    // The UV texture coordinates for the bottom right corner of the image. These are less than one
-    // if the texture had to be resized to a power of 2.
-    public var maxU :Float;
-    public var maxV :Float;
-#end
-
-    public function new (bitmapData)
+    public function new (bitmapData :BitmapData)
     {
         this.bitmapData = bitmapData;
     }

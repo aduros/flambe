@@ -22,14 +22,29 @@ class Stage3DRenderer
     public function new ()
     {
         _textures = [];
-        _events = new EventGroup();
+
+        // Use the first available Stage3D
+        var stage = Lib.current.stage;
+        for (stage3D in stage.stage3Ds) {
+            if (stage3D.context3D == null) {
+                stage.addEventListener(Event.RESIZE, onResize);
+
+                stage3D.addEventListener(Event.CONTEXT3D_CREATE, onContext3DCreate);
+                stage3D.addEventListener(ErrorEvent.ERROR, onError);
+                stage3D.requestContext3D();
+                return;
+            }
+        }
+
+        Log.error("No free Stage3Ds available!");
     }
 
     public function createTexture (bitmapData :Dynamic) :Texture
     {
-        var texture = new FlashTexture(cast bitmapData);
+        var texture = new Stage3DTexture(cast bitmapData);
         _textures.push(texture);
         uploadToContext3D(texture);
+        return texture;
     }
 
     public function willRender () :DrawingContext
@@ -46,28 +61,7 @@ class Stage3DRenderer
         _drawCtx.didRender();
     }
 
-    public function init ()
-    {
-        var stage = Lib.current.stage;
-
-        // Use the first available Stage3D
-        for (stage3D in stage.stage3Ds) {
-            if (stage3D.context3D == null) {
-                _events.addListener(stage, Event.RESIZE, onResize);
-
-                _stage3D = stage3D;
-                _events.addListener(_stage3D, Event.CONTEXT3D_CREATE, onContext3DCreate);
-                _events.addDisposingListener(_stage3D, ErrorEvent.ERROR, onError);
-                _stage3D.requestContext3D();
-                return;
-            }
-        }
-
-        Log.warn("No free Stage3Ds available");
-        onError();
-    }
-
-    private function uploadToContext3D (texture :FlashTexture)
+    private function uploadToContext3D (texture :Stage3DTexture)
     {
         var bitmapData = texture.bitmapData;
 
@@ -103,17 +97,6 @@ class Stage3DRenderer
 
         Log.info("Created new Stage3D context", ["driver", _context3D.driverInfo]);
 
-#if !flambe_debug_renderer
-        // BitmapRenderer is faster than carrying on with a software driver
-        if (_context3D.driverInfo.indexOf("Software") != -1) {
-            Log.warn("Detected a slow Stage3D driver, refusing to go on");
-            var ref = _context3D;
-            onError();
-            ref.dispose();
-            return;
-        }
-#end
-
         // Re-upload any lost textures to the GPU
         for (texture in _textures) {
             uploadToContext3D(texture);
@@ -123,27 +106,9 @@ class Stage3DRenderer
         onResize(null);
     }
 
-    private function onError (?event :ErrorEvent)
+    private function onError (event :ErrorEvent)
     {
-        _events.dispose();
-
-        // Free up any Stage3D textures that will no longer be needed
-        for (texture in _textures) {
-            texture.nativeTexture = null;
-        }
-        _textures = null;
-
-        _drawCtx = null;
-        _context3D = null;
-        _stage3D = null;
-
-        if (event != null) {
-            Log.warn("Unexpected Stage3D error", ["error", event.text]);
-        }
-        Log.warn("Falling back to BitmapRenderer");
-
-        // Fall back to software renderering
-        FlashPlatform.instance.renderer = new BitmapRenderer();
+        Log.error("Unexpected Stage3D failure!", ["error", event.text]);
     }
 
     private function onResize (_)
@@ -165,9 +130,6 @@ class Stage3DRenderer
 
     private var _drawCtx :Stage3DDrawingContext;
     private var _context3D :Context3D;
-    private var _stage3D :Stage3D;
 
-    private var _events :EventGroup;
-
-    private var _textures :Array<FlashTexture>;
+    private var _textures :Array<Stage3DTexture>;
 }

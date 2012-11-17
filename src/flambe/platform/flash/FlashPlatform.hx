@@ -63,9 +63,7 @@ class FlashPlatform
         _keyboard = new BasicKeyboard();
 
 #if flash11
-        var stage3DRenderer = new Stage3DRenderer();
-        _renderer = stage3DRenderer;
-        stage3DRenderer.init();
+        _renderer = new Stage3DRenderer();
 #else
         _renderer = new BitmapRenderer();
 #end

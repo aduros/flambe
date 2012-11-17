@@ -28,7 +28,7 @@ class BitmapRenderer
 
     public function createTexture (bitmapData :Dynamic) :Texture
     {
-        return new FlashTexture(cast bitmapData);
+        return new BitmapTexture(cast bitmapData);
     }
 
     public function willRender () :DrawingContext

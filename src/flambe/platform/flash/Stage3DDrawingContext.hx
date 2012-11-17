@@ -142,10 +142,10 @@ class Stage3DDrawingContext
     public function drawSubImage (texture :Texture, destX :Float, destY :Float,
         sourceX :Float, sourceY :Float, sourceW :Float, sourceH :Float)
     {
-        var flashTexture :FlashTexture = cast texture;
-        if (_nextTexture != flashTexture) {
+        var texture = Lib.as(texture, Stage3DTexture);
+        if (_nextTexture != texture) {
             flushBatch();
-            _nextTexture = flashTexture;
+            _nextTexture = texture;
         }
 
         var state = getTopState();
@@ -159,13 +159,13 @@ class Stage3DDrawingContext
 
         var x1 = destX;
         var y1 = destY;
-        var u1 = flashTexture.maxU*sourceX / w;
-        var v1 = flashTexture.maxV*sourceY / h;
+        var u1 = texture.maxU*sourceX / w;
+        var v1 = texture.maxV*sourceY / h;
 
         var x2 = x1 + sourceW;
         var y2 = y1 + sourceH;
-        var u2 = flashTexture.maxU*(sourceX + sourceW) / w;
-        var v2 = flashTexture.maxV*(sourceY + sourceH) / h;
+        var u2 = texture.maxU*(sourceX + sourceW) / w;
+        var v2 = texture.maxV*(sourceY + sourceH) / h;
 
         var scratch = _scratchVector12;
 
@@ -220,14 +220,14 @@ class Stage3DDrawingContext
     {
         flushBatch();
 
-        var flashTexture :FlashTexture = cast texture;
+        var texture = Lib.as(texture, Stage3DTexture);
         var state = getTopState();
         var alpha = state.alpha;
         var scratch = _scratchVector12;
         var x2 = x + width;
         var y2 = y + height;
-        var u = flashTexture.maxU * (width / flashTexture.width);
-        var v = flashTexture.maxV * (height / flashTexture.height);
+        var u = texture.maxU * (width / texture.width);
+        var v = texture.maxV * (height / texture.height);
 
         var data = _batchData;
         data[0] = x;
@@ -255,8 +255,8 @@ class Stage3DDrawingContext
         data[19] = alpha;
 
         var maxUV = _scratchVector3D;
-        maxUV.x = flashTexture.maxU;
-        maxUV.y = flashTexture.maxV;
+        maxUV.x = texture.maxU;
+        maxUV.y = texture.maxV;
         maxUV.z = 0;
         maxUV.w = 0;
 
@@ -264,7 +264,7 @@ class Stage3DDrawingContext
             model: state.matrix,
             proj: _projMatrix,
         }, {
-            texture: flashTexture.nativeTexture,
+            texture: texture.nativeTexture,
             maxUV: maxUV,
         });
 
@@ -462,7 +462,7 @@ class Stage3DDrawingContext
     private var _fillRectShader :FillRect;
 
     private var _quads :Int;
-    private var _nextTexture :FlashTexture;
+    private var _nextTexture :Stage3DTexture;
     private var _nextBlendMode :BlendMode;
 }
 

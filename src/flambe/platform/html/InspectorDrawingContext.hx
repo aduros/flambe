@@ -116,7 +116,7 @@ class InspectorDrawingContext
 
     private function linkTexture (texture :Texture)
     {
-        var texture :HtmlTexture = cast texture;
+        var texture :CanvasTexture = cast texture;
     }
 
     private function logMethod (method :String, ?texture :Texture, ?params :Array<Dynamic>)
@@ -131,7 +131,7 @@ class InspectorDrawingContext
         }
         _htmlOutput += "<b style='color:" + color + "'>"+method+"</b>";
         if (texture != null) {
-            var texture :HtmlTexture = cast texture;
+            var texture :CanvasTexture = cast texture;
             _htmlOutput += " <a href='" + texture.image.src + "'>" + texture.image.src + "</a>";
         }
         if (params != null) {

@@ -6,7 +6,7 @@ package flambe.platform.html;
 
 import flambe.display.Texture;
 
-class HtmlTexture
+class CanvasTexture
     implements Texture
 {
     public var width (getWidth, null) :Int;

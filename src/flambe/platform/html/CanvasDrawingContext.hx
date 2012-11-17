@@ -62,7 +62,7 @@ class CanvasDrawingContext
             return;
         }
 
-        var htmlTexture :HtmlTexture = cast texture;
+        var htmlTexture :CanvasTexture = cast texture;
         _canvasCtx.drawImage(htmlTexture.image, Std.int(x), Std.int(y));
     }
 
@@ -77,7 +77,7 @@ class CanvasDrawingContext
             return;
         }
 
-        var htmlTexture :HtmlTexture = cast texture;
+        var htmlTexture :CanvasTexture = cast texture;
         _canvasCtx.drawImage(htmlTexture.image,
             Std.int(sourceX), Std.int(sourceY), Std.int(sourceW), Std.int(sourceH),
             Std.int(destX), Std.int(destY), Std.int(sourceW), Std.int(sourceH));
@@ -93,7 +93,7 @@ class CanvasDrawingContext
             return;
         }
 
-        var htmlTexture :HtmlTexture = cast texture;
+        var htmlTexture :CanvasTexture = cast texture;
         if (htmlTexture.pattern == null) {
             htmlTexture.pattern = _canvasCtx.createPattern(htmlTexture.image, "repeat");
         }

@@ -19,7 +19,7 @@ class CanvasRenderer
 
     public function createTexture (image :Dynamic) :Texture
     {
-        var texture = new HtmlTexture();
+        var texture = new CanvasTexture();
         if (CANVAS_TEXTURES) {
             var canvas :Dynamic = Lib.document.createElement("canvas");
             canvas.width = image.width;

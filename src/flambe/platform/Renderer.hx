@@ -10,9 +10,9 @@ import flambe.display.Texture;
 interface Renderer
 {
     /**
-     * Assign a texture to this renderer.
+     * Creates a texture from some data source.
      */
-    function uploadTexture (texture :Texture) :Void;
+    function createTexture (data :Dynamic) :Texture;
 
     /**
      * Notifies the renderer that things are about to be drawn. Returns the drawing context that

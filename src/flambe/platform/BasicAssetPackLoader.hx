@@ -18,8 +18,9 @@ class BasicAssetPackLoader
 {
     public var promise (default, null) :Promise<AssetPack>;
 
-    public function new (manifest :Manifest)
+    public function new (platform :Platform, manifest :Manifest)
     {
+        _platform = platform;
         promise = new Promise();
         _bytesLoaded = new Hash();
         _pack = new BasicAssetPack(manifest);
@@ -160,6 +161,8 @@ class BasicAssetPackLoader
         Log.warn("Error loading asset pack", ["error", message]);
         promise.error.emit(message);
     }
+
+    private var _platform :Platform;
 
     // How many assets are still loading
     private var _assetsRemaining :Int;

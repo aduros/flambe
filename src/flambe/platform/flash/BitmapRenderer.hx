@@ -26,9 +26,9 @@ class BitmapRenderer
         onResize(null);
     }
 
-    public function uploadTexture (texture :Texture)
+    public function createTexture (bitmapData :Dynamic) :Texture
     {
-        // Nothing
+        return new FlashTexture(cast bitmapData);
     }
 
     public function willRender () :DrawingContext

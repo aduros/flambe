@@ -33,7 +33,6 @@ class HtmlPlatform
     public static var instance (default, null) :HtmlPlatform = new HtmlPlatform();
 
     public var mainLoop (default, null) :MainLoop;
-    public var renderer :CanvasRenderer;
 
     private function new ()
     {
@@ -67,7 +66,7 @@ class HtmlPlatform
         _mouse = new HtmlMouse(_pointer, canvas);
         _keyboard = new BasicKeyboard();
 
-        renderer = new CanvasRenderer(canvas);
+        _renderer = new CanvasRenderer(canvas);
         mainLoop = new MainLoop();
 
         _container = canvas.parentNode;
@@ -170,7 +169,7 @@ class HtmlPlatform
                 event.preventDefault();
 #if debug
                 if (event.ctrlKey && event.keyCode == KeyCodes.I) {
-                    renderer.inspectNextFrame();
+                    _renderer.inspectNextFrame();
                     return;
                 }
 #end
@@ -242,7 +241,7 @@ class HtmlPlatform
 
     public function loadAssetPack (manifest :Manifest) :Promise<AssetPack>
     {
-        return new HtmlAssetPackLoader(manifest).promise;
+        return new HtmlAssetPackLoader(this, manifest).promise;
     }
 
     public function getStage () :Stage
@@ -315,7 +314,7 @@ class HtmlPlatform
         }
 
         mainLoop.update(dt);
-        mainLoop.render(renderer);
+        mainLoop.render(_renderer);
     }
 
     public function getPointer () :Pointer
@@ -346,6 +345,11 @@ class HtmlPlatform
         return _web;
     }
 
+    public function getRenderer () :Renderer
+    {
+        return _renderer;
+    }
+
     private function getX (event :Dynamic, bounds :Dynamic) :Float
     {
         return _stage.scaleFactor*(event.clientX - bounds.left);
@@ -363,6 +367,7 @@ class HtmlPlatform
     private var _keyboard :BasicKeyboard;
     private var _storage :Storage;
     private var _web :Web;
+    private var _renderer :CanvasRenderer;
 
     private var _container :Dynamic;
 

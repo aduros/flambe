@@ -16,40 +16,22 @@ import flambe.util.Signal1;
 
 class HtmlAssetPackLoader extends BasicAssetPackLoader
 {
-    public function new (manifest :Manifest)
+    public function new (platform :HtmlPlatform, manifest :Manifest)
     {
-        super(manifest);
+        super(platform, manifest);
     }
 
     override private function loadEntry (entry :AssetEntry)
     {
         switch (entry.type) {
         case Image:
-            var image :Image = untyped __js__ ("new Image()");
+            var image :Image = untyped __new__("Image");
             image.onload = function (_) {
-                image.onload = null;
-                image.onerror = null;
-
-                var texture = new HtmlTexture();
-                if (CANVAS_TEXTURES) {
-                    var canvas :Dynamic = Lib.document.createElement("canvas");
-                    canvas.width = image.width;
-                    canvas.height = image.height;
-                    canvas.getContext("2d").drawImage(image, 0, 0);
-                    image = null; // Free it up
-                    texture.image = canvas;
-                } else {
-                    texture.image = image;
-                }
-
-                var renderer = HtmlPlatform.instance.renderer;
-                renderer.uploadTexture(texture);
-                handleLoad(entry, texture);
+                handleLoad(entry, _platform.getRenderer().createTexture(image));
             };
             image.onerror = function (_) {
                 handleError("Failed to load image: " + entry.url);
             };
-
             image.src = entry.url;
 
         case Audio:
@@ -163,14 +145,6 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         handleProgress(entry, entry.bytes);
         super.handleLoad(entry, asset);
     }
-
-    /** If true, blit loaded images to a canvas and use that as the texture. */
-    private static var CANVAS_TEXTURES :Bool = (function () {
-        // On iOS, canvas textures are way faster
-        // http://jsperf.com/drawimage-vs-canvaspattern/8
-        var pattern = ~/(iPhone|iPod|iPad)/;
-        return pattern.match(Lib.window.navigator.userAgent);
-    })();
 
     private static var _audioFormats :Array<String>;
 

@@ -22,21 +22,20 @@ interface Platform
 {
     function init () :Void;
 
+    function getKeyboard () :Keyboard;
+    function getMouse () :Mouse;
+    function getPointer () :Pointer;
     function getStage () :Stage;
     function getStorage () :Storage;
-    function getPointer () :Pointer;
-    function getMouse () :Mouse;
     function getTouch () :Touch;
-    function getKeyboard () :Keyboard;
     function getWeb () :Web;
 
-    function getLocale () :String;
-
-    function loadAssetPack (manifest :Manifest) :Promise<AssetPack>;
+    function getRenderer () :Renderer;
 
     function callNative (funcName :String, params :Array<Dynamic>) :Dynamic;
-
     function createLogHandler (tag :String) :LogHandler;
+    function loadAssetPack (manifest :Manifest) :Promise<AssetPack>;
 
+    function getLocale () :String;
     function getTime () :Float;
 }

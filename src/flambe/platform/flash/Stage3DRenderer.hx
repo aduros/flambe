@@ -25,11 +25,11 @@ class Stage3DRenderer
         _events = new EventGroup();
     }
 
-    public function uploadTexture (texture :Texture)
+    public function createTexture (bitmapData :Dynamic) :Texture
     {
-        var flashTexture = cast texture;
-        _textures.push(flashTexture);
-        uploadToContext3D(flashTexture);
+        var texture = new FlashTexture(cast bitmapData);
+        _textures.push(texture);
+        uploadToContext3D(texture);
     }
 
     public function willRender () :DrawingContext

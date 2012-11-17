@@ -21,13 +21,12 @@ import flash.system.LoaderContext;
 
 import flambe.asset.AssetEntry;
 import flambe.asset.Manifest;
-import flambe.platform.BasicAssetPackLoader;
 
 class FlashAssetPackLoader extends BasicAssetPackLoader
 {
-    public function new (manifest :Manifest)
+    public function new (platform :FlashPlatform, manifest :Manifest)
     {
-        super(manifest);
+        super(platform, manifest);
     }
 
     override private function loadEntry (entry :AssetEntry)
@@ -46,10 +45,7 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
                 dispatcher = loader.contentLoaderInfo;
                 create = function () {
                     var bitmap :Bitmap = cast loader.content;
-                    var texture = new FlashTexture(bitmap.bitmapData);
-                    var renderer = FlashPlatform.instance.renderer;
-                    renderer.uploadTexture(texture);
-                    return texture;
+                    return _platform.getRenderer().createTexture(bitmap.bitmapData);
                 };
 
                 var ctx = new LoaderContext();

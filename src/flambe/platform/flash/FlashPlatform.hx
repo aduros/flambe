@@ -39,7 +39,6 @@ class FlashPlatform
     public static var instance (default, null) :FlashPlatform = new FlashPlatform();
 
     public var mainLoop (default, null) :MainLoop;
-    public var renderer :Renderer;
 
     private function new ()
     {
@@ -65,10 +64,10 @@ class FlashPlatform
 
 #if flash11
         var stage3DRenderer = new Stage3DRenderer();
-        renderer = stage3DRenderer;
+        _renderer = stage3DRenderer;
         stage3DRenderer.init();
 #else
-        renderer = new BitmapRenderer();
+        _renderer = new BitmapRenderer();
 #end
         mainLoop = new MainLoop();
 
@@ -100,7 +99,7 @@ class FlashPlatform
 
     public function loadAssetPack (manifest :Manifest) :Promise<AssetPack>
     {
-        return new FlashAssetPackLoader(manifest).promise;
+        return new FlashAssetPackLoader(this, manifest).promise;
     }
 
     public function getStage () :Stage
@@ -159,6 +158,11 @@ class FlashPlatform
         return _web;
     }
 
+    public function getRenderer () :Renderer
+    {
+        return _renderer;
+    }
+
     public function getLocale () :String
     {
         return Capabilities.language;
@@ -215,7 +219,7 @@ class FlashPlatform
 
     private function onRender (_)
     {
-        mainLoop.render(renderer);
+        mainLoop.render(_renderer);
     }
 
     private function onUncaughtError (event :UncaughtErrorEvent)
@@ -237,6 +241,7 @@ class FlashPlatform
     private var _keyboard :BasicKeyboard;
     private var _storage :Storage;
     private var _web :Web;
+    private var _renderer :Renderer;
 
     private var _lastUpdate :Int;
     private var _skipFrame :Bool;

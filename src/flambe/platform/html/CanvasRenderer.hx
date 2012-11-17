@@ -4,6 +4,8 @@
 
 package flambe.platform.html;
 
+import js.Lib;
+
 import flambe.display.DrawingContext;
 import flambe.display.Texture;
 
@@ -15,9 +17,19 @@ class CanvasRenderer
         _drawCtx = new CanvasDrawingContext(canvas);
     }
 
-    public function uploadTexture (texture :Texture)
+    public function createTexture (image :Dynamic) :Texture
     {
-        // Nothing
+        var texture = new HtmlTexture();
+        if (CANVAS_TEXTURES) {
+            var canvas :Dynamic = Lib.document.createElement("canvas");
+            canvas.width = image.width;
+            canvas.height = image.height;
+            canvas.getContext("2d").drawImage(image, 0, 0);
+            texture.image = canvas;
+        } else {
+            texture.image = image;
+        }
+        return texture;
     }
 
     public function willRender () :DrawingContext
@@ -47,6 +59,14 @@ class CanvasRenderer
     }
     private var _inspector :InspectorDrawingContext;
 #end
+
+    /** If true, blit loaded images to a canvas and use that as the texture. */
+    private static var CANVAS_TEXTURES :Bool = (function () {
+        // On iOS, canvas textures are way faster
+        // http://jsperf.com/drawimage-vs-canvaspattern/8
+        var pattern = ~/(iPhone|iPod|iPad)/;
+        return pattern.match(Lib.window.navigator.userAgent);
+    })();
 
     private var _drawCtx :CanvasDrawingContext;
 }

@@ -27,7 +27,7 @@ enum Key
     Semicolon; Shift; Slash; Space; Tab;
 
     // Android keys
-    Back; Menu; Search;
+    Menu; Search;
 
     /**
      * Used if the environment sends an unknown key code.

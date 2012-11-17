@@ -191,8 +191,9 @@ class FlashPlatform
 
     private function onKeyDown (event :KeyboardEvent)
     {
-        event.preventDefault();
-        _keyboard.submitDown(event.keyCode);
+        if (_keyboard.submitDown(event.keyCode)) {
+            event.preventDefault();
+        }
     }
 
     private function onKeyUp (event :KeyboardEvent)

@@ -4,6 +4,7 @@
 
 package flambe.input;
 
+import flambe.util.Signal0;
 import flambe.util.Signal1;
 
 /**
@@ -26,6 +27,13 @@ interface Keyboard
      * Emitted when a key is released.
      */
     var up (default, null) :Signal1<KeyboardEvent>;
+
+    /**
+     * Emitted when a hardware back button is pressed. If no listeners are connected to this signal
+     * when the back button is pressed, the platform's default action will be taken (which is
+     * usually to close the app). Only supported on Android.
+     */
+    var backButton (default, null) :Signal0;
 
     /**
      * @returns True if the given key is currently being held down.

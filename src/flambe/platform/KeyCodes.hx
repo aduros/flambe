@@ -226,7 +226,6 @@ class KeyCodes
             case SPACE: return Key.Space;
             case TAB: return Key.Tab;
 
-            case BACK: return Key.Back;
             case MENU: return Key.Menu;
             case SEARCH: return Key.Search;
         }
@@ -342,7 +341,6 @@ class KeyCodes
             case Key.Space: return SPACE;
             case Key.Tab: return TAB;
 
-            case Key.Back: return BACK;
             case Key.Menu: return MENU;
             case Key.Search: return SEARCH;
 

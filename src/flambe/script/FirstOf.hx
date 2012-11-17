@@ -6,7 +6,7 @@ using Lambda;
 
 /**
  * An action that manages a list of other actions, running them together in parallel until the
- * first of them finish.
+ * first of them finishes.
  */
 class FirstOf
     implements Action
@@ -38,9 +38,7 @@ class FirstOf
 
     public function update (dt :Float, actor :Entity) :Float
     {
-        var done = true;
-        for (ii in 0..._runningActions.length) {
-            var action = _runningActions[ii];
+        for (action in _runningActions) {
             if (action != null) {
                 var spent = action.update(dt, actor);
                 if (spent >= 0) {

@@ -29,7 +29,7 @@ class DrawPattern extends Shader
 
         function fragment (texture :Texture, maxUV :Float2) {
             var color = texture.get(_uv % maxUV);
-            color.a *= _alpha;
+            color *= _alpha;
             out = color;
         }
     }

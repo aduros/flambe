@@ -6,7 +6,6 @@ package flambe.platform.html;
 
 import js.Dom;
 import js.Lib;
-import js.XMLHttpRequest;
 
 import haxe.Http;
 
@@ -56,7 +55,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         case Audio:
             // If we made it this far, we definitely support audio and can play this asset
             if (WebAudioSound.supported) {
-                var req = untyped __new__(XMLHttpRequest);
+                var req = untyped __new__("XMLHttpRequest");
                 req.open("GET", entry.url, true);
                 req.responseType = "arraybuffer";
 

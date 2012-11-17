@@ -194,7 +194,7 @@ class Manifest
             return false;
         }
 
-        var xhr :Dynamic = new js.XMLHttpRequest();
+        var xhr :Dynamic = untyped __new__("XMLHttpRequest");
         return (xhr.withCredentials != null);
 #else
         // Assumes you have a valid crossdomain.xml

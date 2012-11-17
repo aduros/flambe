@@ -31,7 +31,13 @@ class Stage3DRenderer
 
                 stage3D.addEventListener(Event.CONTEXT3D_CREATE, onContext3DCreate);
                 stage3D.addEventListener(ErrorEvent.ERROR, onError);
-                stage3D.requestContext3D();
+
+                // The constrained profile is only available in 11.4
+                if ((untyped stage3D).requestContext3D.length >= 2) {
+                    (untyped stage3D).requestContext3D("auto", "baselineConstrained");
+                } else {
+                    stage3D.requestContext3D();
+                }
                 return;
             }
         }

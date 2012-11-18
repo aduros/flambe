@@ -18,4 +18,9 @@ interface Texture
      * The height of this texture, in pixels.
      */
     var height (getHeight, null) :Int;
+
+    /**
+     * The DrawingContext that draws to this texture.
+     */
+    var ctx (getContext, null) :DrawingContext;
 }

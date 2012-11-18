@@ -4,6 +4,7 @@
 
 package flambe.platform.html;
 
+import flambe.display.DrawingContext;
 import flambe.display.Texture;
 
 class CanvasTexture
@@ -11,6 +12,7 @@ class CanvasTexture
 {
     public var width (getWidth, null) :Int;
     public var height (getHeight, null) :Int;
+    public var ctx (getContext, null) :DrawingContext;
 
     // The Image (or sometimes Canvas) used for most draw calls
     public var image :Dynamic;
@@ -31,4 +33,15 @@ class CanvasTexture
     {
         return image.height;
     }
+
+    private function getContext () :CanvasDrawingContext
+    {
+        if (_ctx == null) {
+            // FIXME(bruno): Ensure image is a canvas element
+            _ctx = new CanvasDrawingContext(image);
+        }
+        return _ctx;
+    }
+
+    private var _ctx :CanvasDrawingContext = null;
 }

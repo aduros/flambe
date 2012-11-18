@@ -6,6 +6,7 @@ package flambe.platform.flash;
 
 import flash.display.BitmapData;
 
+import flambe.display.DrawingContext;
 import flambe.display.Texture;
 
 class BitmapTexture
@@ -13,6 +14,7 @@ class BitmapTexture
 {
     public var width (getWidth, null) :Int;
     public var height (getHeight, null) :Int;
+    public var ctx (getContext, null) :DrawingContext;
 
     public var bitmapData (default, null) :BitmapData;
 
@@ -30,4 +32,21 @@ class BitmapTexture
     {
         return bitmapData.height;
     }
+
+    public function flush ()
+    {
+        if (_ctx != null) {
+            _ctx.flushGraphics();
+        }
+    }
+
+    private function getContext () :BitmapDrawingContext
+    {
+        if (_ctx == null) {
+            _ctx = new BitmapDrawingContext(bitmapData);
+        }
+        return _ctx;
+    }
+
+    private var _ctx :BitmapDrawingContext = null;
 }

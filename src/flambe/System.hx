@@ -7,6 +7,7 @@ package flambe;
 import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
 import flambe.display.Stage;
+import flambe.display.Texture;
 import flambe.input.Keyboard;
 import flambe.input.Mouse;
 import flambe.input.Pointer;
@@ -120,6 +121,15 @@ class System
     {
         #if debug assertCalledInit(); #end
         return _platform.callNative(funcName, params);
+    }
+
+    /**
+     * Creates a new blank Texture, initialized to transparent black.
+     */
+    public static function createTexture (width :Int, height :Int) :Texture
+    {
+        #if debug assertCalledInit(); #end
+        return _platform.getRenderer().createEmptyTexture(width, height);
     }
 
     /**

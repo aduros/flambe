@@ -33,7 +33,7 @@ class BitmapRenderer
 
     public function createEmptyTexture (width :Int, height :Int) :Texture
     {
-        throw "Not yet implemented";
+        return new BitmapTexture(new BitmapData(width, height, true, 0x00000000));
     }
 
     public function willRender () :DrawingContext

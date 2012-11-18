@@ -62,8 +62,8 @@ class CanvasDrawingContext
             return;
         }
 
-        var htmlTexture :CanvasTexture = cast texture;
-        _canvasCtx.drawImage(htmlTexture.image, Std.int(x), Std.int(y));
+        var texture :CanvasTexture = cast texture;
+        _canvasCtx.drawImage(texture.image, Std.int(x), Std.int(y));
     }
 
     public function drawSubImage (texture :Texture, destX :Float, destY :Float,
@@ -77,8 +77,8 @@ class CanvasDrawingContext
             return;
         }
 
-        var htmlTexture :CanvasTexture = cast texture;
-        _canvasCtx.drawImage(htmlTexture.image,
+        var texture :CanvasTexture = cast texture;
+        _canvasCtx.drawImage(texture.image,
             Std.int(sourceX), Std.int(sourceY), Std.int(sourceW), Std.int(sourceH),
             Std.int(destX), Std.int(destY), Std.int(sourceW), Std.int(sourceH));
     }
@@ -93,11 +93,11 @@ class CanvasDrawingContext
             return;
         }
 
-        var htmlTexture :CanvasTexture = cast texture;
-        if (htmlTexture.pattern == null) {
-            htmlTexture.pattern = _canvasCtx.createPattern(htmlTexture.image, "repeat");
+        var texture :CanvasTexture = cast texture;
+        if (texture.pattern == null) {
+            texture.pattern = _canvasCtx.createPattern(texture.image, "repeat");
         }
-        _canvasCtx.fillStyle = htmlTexture.pattern;
+        _canvasCtx.fillStyle = texture.pattern;
         _canvasCtx.fillRect(Std.int(x), Std.int(y), Std.int(width), Std.int(height));
     }
 

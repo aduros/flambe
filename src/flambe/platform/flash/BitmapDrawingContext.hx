@@ -30,10 +30,6 @@ class BitmapDrawingContext
         _buffer = buffer;
         _stateList = new DrawingState();
         _shape = new Shape();
-        _pixel = new BitmapData(1, 1, false);
-        _scratchRect = new Rectangle();
-        _scratchPoint = new Point();
-        _scratchMatrix = new Matrix();
     }
 
     public function save ()
@@ -135,6 +131,7 @@ class BitmapDrawingContext
         beginGraphics();
 
         var texture = Lib.as(texture, BitmapTexture);
+        texture.flush();
         _graphics.beginBitmapFill(texture.bitmapData);
         _graphics.drawRect(x, y, width, height);
     }
@@ -191,8 +188,8 @@ class BitmapDrawingContext
             _scratchMatrix.ty = y;
             _scratchMatrix.concat(matrix);
 
-            _pixel.setPixel(0, 0, color);
-            _buffer.draw(_pixel, _scratchMatrix, state.color, state.blendMode);
+            _scratchPixel.setPixel(0, 0, color);
+            _buffer.draw(_scratchPixel, _scratchMatrix, state.color, state.blendMode);
         }
     }
 
@@ -219,6 +216,7 @@ class BitmapDrawingContext
         flushGraphics();
 
         var texture = Lib.as(texture, BitmapTexture);
+        texture.flush();
         var state = getTopState();
         var matrix = state.matrix;
 
@@ -274,7 +272,7 @@ class BitmapDrawingContext
         return _stateList;
     }
 
-    private function flushGraphics ()
+    public function flushGraphics ()
     {
         // If we're in vector graphics mode, push it out to the screen buffer
         if (_graphics != null) {
@@ -292,6 +290,14 @@ class BitmapDrawingContext
         }
     }
 
+    // Reusable instances to avoid tons of allocation
+    private static var _scratchPoint = new Point();
+    private static var _scratchRect = new Rectangle();
+    private static var _scratchMatrix = new Matrix();
+
+    // A 1x1 BitmapData used to optimize fillRect's worst-case
+    private static var _scratchPixel = new BitmapData(1, 1, false);
+
     private var _stateList :DrawingState;
     private var _buffer :BitmapData;
 
@@ -300,14 +306,6 @@ class BitmapDrawingContext
 
     // The vector graphic commands pending drawing, or null if we're not in vector graphics mode
     private var _graphics :Graphics;
-
-    // A 1x1 BitmapData used to optimize fillRect's worst-case
-    private var _pixel :BitmapData;
-
-    // Reusable instances to avoid tons of allocation
-    private var _scratchPoint :Point;
-    private var _scratchRect :Rectangle;
-    private var _scratchMatrix :Matrix;
 }
 
 private class DrawingState

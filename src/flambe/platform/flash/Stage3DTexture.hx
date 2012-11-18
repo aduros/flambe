@@ -8,6 +8,7 @@ import flash.display.BitmapData;
 import flash.display3D.Context3D;
 import flash.geom.Point;
 
+import flambe.display.DrawingContext;
 import flambe.display.Texture;
 
 class Stage3DTexture
@@ -15,6 +16,7 @@ class Stage3DTexture
 {
     public var width (getWidth, null) :Int;
     public var height (getHeight, null) :Int;
+    public var ctx (getContext, null) :DrawingContext;
 
     public var nativeTexture (default, null) :flash.display3D.textures.Texture;
 
@@ -56,6 +58,12 @@ class Stage3DTexture
     inline private function getHeight () :Int
     {
         return _height;
+    }
+
+    private function getContext () :Stage3DDrawingContext
+    {
+        throw "Not yet implemented";
+        return null;
     }
 
     private static function nextPowerOfTwo (n :Int)

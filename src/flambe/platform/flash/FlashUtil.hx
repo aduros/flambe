@@ -35,16 +35,6 @@ class FlashUtil
         }
     }
 
-    #if flash11 inline #end public static function copyMatrix (to :Matrix, from :Matrix)
-    {
-#if flash11
-        to.copyFrom(from);
-#else
-        to.a = from.a; to.c = from.c; to.tx = from.tx;
-        to.b = from.b; to.d = from.d; to.ty = from.ty;
-#end
-    }
-
 #if flambe_air
     /** Convert an AIR stage orientation to a Flambe orientation. */
     public static function orientation (orient :StageOrientation) :Orientation

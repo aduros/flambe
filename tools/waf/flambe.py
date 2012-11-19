@@ -34,7 +34,7 @@ def configure(ctx):
 @feature("flambe")
 def apply_flambe(ctx):
     Utils.def_attrs(ctx, platforms="flash html",
-        classpath="", flags="", libs="", asset_base=None, flash_version="10.1", main=None,
+        classpath="", flags="", libs="", asset_base=None, flash_version="11", main=None,
         dead_code_elimination=True, air_cert="etc/air-cert.pfx", air_desc="etc/air-desc.xml",
         air_password=None, ios_profile="etc/ios.mobileprovision")
 

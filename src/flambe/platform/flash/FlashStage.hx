@@ -70,11 +70,7 @@ class FlashStage
 
     public function isFullscreenSupported () :Bool
     {
-#if flash10_2
         return nativeStage.allowsFullScreen;
-#else
-        return true;
-#end
     }
 
 #if flambe_air

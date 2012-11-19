@@ -53,20 +53,13 @@ class FlashPlatform
         _stage = new FlashStage(stage);
         _pointer = new BasicPointer();
         _mouse = FlashMouse.shouldUse() ? new FlashMouse(_pointer, stage) : new DummyMouse();
-
 #if flambe_air
         _touch = AirTouch.shouldUse() ? new AirTouch(_pointer, stage) : new DummyTouch();
 #else
         _touch = new DummyTouch();
 #end
-
         _keyboard = new BasicKeyboard();
-
-#if flash11
         _renderer = new Stage3DRenderer();
-#else
-        _renderer = new BitmapRenderer();
-#end
         mainLoop = new MainLoop();
 
         stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);

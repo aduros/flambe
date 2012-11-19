@@ -27,6 +27,13 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         case Image:
             var image :Image = untyped __new__("Image");
             image.onload = function (_) {
+#if debug
+                if (image.width > 1024 || image.height > 1024) {
+                    Log.warn("Images larger than 1024px on a side will prevent GPU acceleration" +
+                        " on some platforms (iOS)", ["url", entry.url,
+                        "width", image.width, "height", image.height]);
+                }
+#end
                 handleLoad(entry, _platform.getRenderer().createTexture(image));
             };
             image.onerror = function (_) {

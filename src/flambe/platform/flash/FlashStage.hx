@@ -46,11 +46,6 @@ class FlashStage
         nativeStage.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
         onFullscreen();
 
-        // If we're running in a mobile browser, go full screen on a pointer event
-        if (Capabilities.playerType == "PlugIn" && FlashUtil.isMobile()) {
-            nativeStage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
-        }
-
         orientation = new Value<Orientation>(null);
 #if flambe_air
         nativeStage.addEventListener(StageOrientationEvent.ORIENTATION_CHANGE, onOrientationChange);
@@ -96,33 +91,13 @@ class FlashStage
 #else
     public function lockOrientation (orient :Orientation)
     {
-        if (!FlashUtil.isMobile()) {
-            return;
-        }
-
-        // http://www.kongregate.com/pages/flash-sizing-zen#device_orientation
-        // Only works in full screen. AIR has something less whack, but this works in the browser
-        switch (orient) {
-        case Portrait:
-            // Unimplemented
-        case Landscape:
-            if (_orientHack == null) {
-                _orientHack = new Video(0, 0);
-                _orientHack.visible = false;
-                nativeStage.addChild(_orientHack);
-            }
-        }
+        // AIR only
     }
 
     public function unlockOrientation ()
     {
-        if (_orientHack != null) {
-            _orientHack.parent.removeChild(_orientHack);
-            _orientHack = null;
-        }
+        // AIR only
     }
-
-    private var _orientHack :Video;
 #end
 
     public function requestResize (width :Int, height :Int)
@@ -139,11 +114,6 @@ class FlashStage
             Log.warn("Error when changing fullscreen", ["enable", enable,
                 "error", FlashUtil.getErrorMessage(error)]);
         }
-    }
-
-    private function onMouseDown (_)
-    {
-        requestFullscreen(true);
     }
 
     private function onResize (_)

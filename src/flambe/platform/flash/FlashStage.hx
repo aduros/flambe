@@ -98,6 +98,9 @@ class FlashStage
     {
         // AIR only
     }
+
+    // TODO(bruno): Dead code elimination issue? Check if this is fixed in haxe3 or report
+    @:keep private static var _hack = Portrait;
 #end
 
     public function requestResize (width :Int, height :Int)

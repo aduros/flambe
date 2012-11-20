@@ -241,10 +241,10 @@ class Stage3DDrawingContext
 
         var offset = _batcher.prepareFillRect(state.blendMode);
         var data = _batcher.data;
+        var r = (color & 0xff0000) / 0xff0000;
+        var g = (color & 0x00ff00) / 0x00ff00;
+        var b = (color & 0x0000ff) / 0x0000ff;
         var a = state.alpha;
-        var r = a * ((color>>16) & 0xff) / 255.0;
-        var g = a * ((color>>8) & 0xff) / 255.0;
-        var b = a * (color & 0xff) / 255.0;
 
         data[  offset] = scratch[0];
         data[++offset] = scratch[1];

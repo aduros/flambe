@@ -14,13 +14,15 @@ class FillRect extends Shader
     static var SRC = {
         var input :{
             pos :Float2,
-            color: Float4,
+            rgb: Float3,
+            alpha: Float,
         };
 
         var _color :Float4;
 
         function vertex () {
-            _color = color;
+            _color.rgb = rgb*alpha;
+            _color.a = alpha;
             out = pos.xyzw;
         }
 

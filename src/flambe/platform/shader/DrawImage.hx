@@ -28,9 +28,7 @@ class DrawImage extends Shader
         }
 
         function fragment (texture :Texture) {
-            var color = texture.get(_uv);
-            color *= _alpha;
-            out = color;
+            out = texture.get(_uv) * _alpha;
         }
     }
 }

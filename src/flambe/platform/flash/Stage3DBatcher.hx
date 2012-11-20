@@ -88,8 +88,9 @@ class Stage3DBatcher
             flush();
             offset = 0;
         } else {
-            offset = _quads*4*elementsPerVertex;
-            if (offset >= Std.int(data.length)) {
+            var elements = 4*elementsPerVertex;
+            offset = _quads*elements;
+            if (offset + elements >= Std.int(data.length)) {
                 resize(2*_maxQuads);
             }
         }
@@ -102,6 +103,10 @@ class Stage3DBatcher
         if (_quads < 1) {
             return;
         }
+
+#if flambe_debug_renderer
+        trace("Flushing " + _quads + " / " + _maxQuads + " quads");
+#end
 
         switch (_lastBlendMode) {
             case Normal: _context3D.setBlendFactors(ONE, ONE_MINUS_SOURCE_ALPHA);
@@ -135,9 +140,6 @@ class Stage3DBatcher
         _context3D.drawTriangles(_quadIndices, 0, _quads*2);
         _lastShader.unbind();
 
-#if flambe_debug_renderer
-        trace("Flushed a batch of " + _quads + " quads");
-#end
         _quads = 0;
     }
 

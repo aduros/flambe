@@ -27,23 +27,27 @@ class Stage3DTexture
 
     public function new (width :Int, height :Int)
     {
-        _width = nextPowerOfTwo(width);
-        _height = nextPowerOfTwo(height);
+        _width = width;
+        _height = height;
 
-        maxU = width / _width;
-        maxV = height / _height;
+        _widthPow2 = nextPowerOfTwo(width);
+        _heightPow2 = nextPowerOfTwo(height);
+
+        maxU = width / _widthPow2;
+        maxV = height / _heightPow2;
     }
 
     public function init (context3D :Context3D, optimizeForRenderToTexture :Bool)
     {
-        nativeTexture = context3D.createTexture(_width, _height, BGRA, optimizeForRenderToTexture);
+        nativeTexture = context3D.createTexture(_widthPow2, _heightPow2,
+            BGRA, optimizeForRenderToTexture);
     }
 
     public function uploadBitmapData (bitmapData :BitmapData)
     {
-        if (_width != bitmapData.width || _height != bitmapData.height) {
+        if (_widthPow2 != bitmapData.width || _heightPow2 != bitmapData.height) {
             // Resize up to the next power of two, padding with transparent black
-            var resized = new BitmapData(_width, _height, true, 0x00000000);
+            var resized = new BitmapData(_widthPow2, _heightPow2, true, 0x00000000);
             resized.copyPixels(bitmapData, bitmapData.rect, new Point(0, 0));
             bitmapData = resized;
         }
@@ -66,7 +70,7 @@ class Stage3DTexture
         return null;
     }
 
-    private static function nextPowerOfTwo (n :Int)
+    private static function nextPowerOfTwo (n :Int) :Int
     {
         var p = 1;
         while (p < n) {
@@ -77,4 +81,7 @@ class Stage3DTexture
 
     private var _width :Int;
     private var _height :Int;
+
+    private var _widthPow2 :Int;
+    private var _heightPow2 :Int;
 }

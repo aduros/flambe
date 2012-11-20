@@ -14,15 +14,18 @@ class FillRect extends Shader
     static var SRC = {
         var input :{
             pos :Float2,
+            color: Float4,
         };
 
-        // Since fillRect is never batched, the model transform can happen on the GPU
-        function vertex (model :Matrix, proj :Matrix) {
-            out = pos.xyzw * model * proj;
+        var _color :Float4;
+
+        function vertex () {
+            _color = color;
+            out = pos.xyzw;
         }
 
-        function fragment (color :Float4) {
-            out = color;
+        function fragment () {
+            out = _color;
         }
     }
 }

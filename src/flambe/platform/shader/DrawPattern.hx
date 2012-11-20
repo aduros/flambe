@@ -21,10 +21,10 @@ class DrawPattern extends Shader
         var _uv :Float2;
         var _alpha :Float;
 
-        function vertex (model :Matrix, proj :Matrix) {
+        function vertex () {
             _uv = uv;
             _alpha = alpha;
-            out = pos.xyzw * model * proj;
+            out = pos.xyzw;
         }
 
         function fragment (texture :Texture, maxUV :Float2) {

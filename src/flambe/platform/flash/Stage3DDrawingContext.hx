@@ -5,15 +5,10 @@
 package flambe.platform.flash;
 
 import flash.display3D.Context3D;
-import flash.display3D.IndexBuffer3D;
-import flash.display3D.Program3D;
-import flash.display3D.VertexBuffer3D;
 import flash.geom.Matrix3D;
 import flash.geom.Vector3D;
 import flash.Lib;
 import flash.Vector;
-
-import haxe.FastList;
 
 import flambe.display.BlendMode;
 import flambe.display.DrawingContext;
@@ -26,38 +21,11 @@ import flambe.util.Assert;
 class Stage3DDrawingContext
     implements DrawingContext
 {
-    public function new (context3D :Context3D)
+    public function new (context3D :Context3D, batcher :Stage3DBatcher)
     {
         _context3D = context3D;
-#if flambe_debug_renderer
-        _context3D.enableErrorChecking = true;
-#end
-
+        _batcher = batcher;
         _stateList = new DrawingState();
-        _scratchMatrix3D = new Matrix3D();
-        _scratchVector12 = new Vector<Float>(12, true);
-        _scratchVector3D = new Vector3D();
-
-        _scratchTransformVector = new Vector<Float>(16, true);
-        _scratchMatrix3D.copyRawDataTo(_scratchTransformVector);
-
-        _drawImageShader = new DrawImage(_context3D);
-        _drawPatternShader = new DrawPattern(_context3D);
-
-        // TODO(bruno): _singleIndices contains indices for one quad. This shouldn't be necessary,
-        // we should just be able to reuse the first 6 elements of _batchIndices, but I can't seem
-        // to get drawTriangles to accept a sliced index buffer. It wants to use the entire thing
-        // every time. Perhaps test this on different hardware.
-        var v = new Vector<UInt>(6, true);
-        v[0] = 0; v[1] = 1; v[2] = 2; v[3] = 2; v[4] = 3; v[5] = 0;
-        _singleIndices = _context3D.createIndexBuffer(6);
-        _singleIndices.uploadFromVector(v, 0, 6);
-
-        _fillRectShader = new FillRect(_context3D);
-        _fillRectVerts = _context3D.createVertexBuffer(4, 2);
-
-        _batchData = new Vector<Float>(0, true);
-        expandBatch();
     }
 
     public function save ()
@@ -119,21 +87,6 @@ class Stage3DDrawingContext
         _stateList = _stateList.prev;
     }
 
-    private function addQuadToBatch ()
-    {
-        if (_quads >= MAX_BATCH_QUADS) {
-            flushBatch();
-            return 0;
-        }
-
-        var offset = _quads*4*ELEMENTS_PER_VERTEX;
-        if (offset >= cast _batchData.length) {
-            expandBatch();
-        }
-        ++_quads;
-        return offset;
-    }
-
     public function drawImage (texture :Texture, destX :Float, destY :Float)
     {
         drawSubImage(texture, destX, destY, 0, 0, texture.width, texture.height);
@@ -143,180 +96,183 @@ class Stage3DDrawingContext
         sourceX :Float, sourceY :Float, sourceW :Float, sourceH :Float)
     {
         var texture = Lib.as(texture, Stage3DTexture);
-        if (_nextTexture != texture) {
-            flushBatch();
-            _nextTexture = texture;
-        }
-
         var state = getTopState();
-        if (state.blendMode != _nextBlendMode) {
-            flushBatch();
-            _nextBlendMode = state.blendMode;
-        }
-
-        var w = texture.width;
-        var h = texture.height;
 
         var x1 = destX;
         var y1 = destY;
-        var u1 = texture.maxU*sourceX / w;
-        var v1 = texture.maxV*sourceY / h;
-
         var x2 = x1 + sourceW;
         var y2 = y1 + sourceH;
-        var u2 = texture.maxU*(sourceX + sourceW) / w;
-        var v2 = texture.maxV*(sourceY + sourceH) / h;
-
-        var scratch = _scratchVector12;
+        var scratch = _scratchQuadVector;
 
         scratch[0] = x1;
         scratch[1] = y1;
-        scratch[2] = 0;
+        // scratch[2] = 0;
 
         scratch[3] = x2;
         scratch[4] = y1;
-        scratch[5] = 0;
+        // scratch[5] = 0;
 
         scratch[6] = x2;
         scratch[7] = y2;
-        scratch[8] = 0;
+        // scratch[8] = 0;
 
         scratch[9] = x1;
         scratch[10] = y2;
-        scratch[11] = 0;
+        // scratch[11] = 0;
 
         state.matrix.transformVectors(scratch, scratch);
 
-        var offset = addQuadToBatch();
-        var data = _batchData;
+        var offset = _batcher.prepareDrawImage(state.blendMode, texture);
+        var data = _batcher.data;
         var alpha = state.alpha;
+        var w = texture.width;
+        var h = texture.height;
+        var u1 = texture.maxU*sourceX / w;
+        var v1 = texture.maxV*sourceY / h;
+        var u2 = texture.maxU*(sourceX + sourceW) / w;
+        var v2 = texture.maxV*(sourceY + sourceH) / h;
 
-        data[offset] = scratch[0];
-        data[offset+1] = scratch[1];
-        data[offset+2] = u1;
-        data[offset+3] = v1;
-        data[offset+4] = alpha;
+        data[  offset] = scratch[0];
+        data[++offset] = scratch[1];
+        data[++offset] = u1;
+        data[++offset] = v1;
+        data[++offset] = alpha;
 
-        data[offset+5] = scratch[3];
-        data[offset+6] = scratch[4];
-        data[offset+7] = u2;
-        data[offset+8] = v1;
-        data[offset+9] = alpha;
+        data[++offset] = scratch[3];
+        data[++offset] = scratch[4];
+        data[++offset] = u2;
+        data[++offset] = v1;
+        data[++offset] = alpha;
 
-        data[offset+10] = scratch[6];
-        data[offset+11] = scratch[7];
-        data[offset+12] = u2;
-        data[offset+13] = v2;
-        data[offset+14] = alpha;
+        data[++offset] = scratch[6];
+        data[++offset] = scratch[7];
+        data[++offset] = u2;
+        data[++offset] = v2;
+        data[++offset] = alpha;
 
-        data[offset+15] = scratch[9];
-        data[offset+16] = scratch[10];
-        data[offset+17] = u1;
-        data[offset+18] = v2;
-        data[offset+19] = alpha;
+        data[++offset] = scratch[9];
+        data[++offset] = scratch[10];
+        data[++offset] = u1;
+        data[++offset] = v2;
+        data[++offset] = alpha;
     }
 
     public function drawPattern (texture :Texture, x :Float, y :Float, width :Float, height :Float)
     {
-        flushBatch();
-
         var texture = Lib.as(texture, Stage3DTexture);
         var state = getTopState();
-        var alpha = state.alpha;
-        var scratch = _scratchVector12;
         var x2 = x + width;
         var y2 = y + height;
-        var u = texture.maxU * (width / texture.width);
-        var v = texture.maxV * (height / texture.height);
+        var scratch = _scratchQuadVector;
 
-        var data = _batchData;
-        data[0] = x;
-        data[1] = y;
-        data[2] = 0;
-        data[3] = 0;
-        data[4] = alpha;
+        scratch[0] = x;
+        scratch[1] = y;
+        // scratch[2] = 0;
 
-        data[5] = x2;
-        data[6] = y;
-        data[7] = u;
-        data[8] = 0;
-        data[9] = alpha;
+        scratch[3] = x2;
+        scratch[4] = y;
+        // scratch[5] = 0;
 
-        data[10] = x2;
-        data[11] = y2;
-        data[12] = u;
-        data[13] = v;
-        data[14] = alpha;
+        scratch[6] = x2;
+        scratch[7] = y2;
+        // scratch[8] = 0;
 
-        data[15] = x;
-        data[16] = y2;
-        data[17] = 0;
-        data[18] = v;
-        data[19] = alpha;
+        scratch[9] = x;
+        scratch[10] = y2;
+        // scratch[11] = 0;
 
-        var maxUV = _scratchVector3D;
-        maxUV.x = texture.maxU;
-        maxUV.y = texture.maxV;
-        maxUV.z = 0;
-        maxUV.w = 0;
+        state.matrix.transformVectors(scratch, scratch);
 
-        _drawPatternShader.init({
-            model: state.matrix,
-            proj: _projMatrix,
-        }, {
-            texture: texture.nativeTexture,
-            maxUV: maxUV,
-        });
+        var offset = _batcher.prepareDrawPattern(state.blendMode, texture);
+        var data = _batcher.data;
+        var u2 = texture.maxU * (width / texture.width);
+        var v2 = texture.maxV * (height / texture.height);
+        var alpha = state.alpha;
 
-        _batchVerts.uploadFromVector(data, 0, 4);
-        _drawPatternShader.bind(_batchVerts);
+        data[  offset] = scratch[0];
+        data[++offset] = scratch[1];
+        data[++offset] = 0;
+        data[++offset] = 0;
+        data[++offset] = alpha;
 
-        // TODO(bruno): Batching similar patterns?
-        _context3D.drawTriangles(_batchIndices, 0, 2);
+        data[++offset] = scratch[3];
+        data[++offset] = scratch[4];
+        data[++offset] = u2;
+        data[++offset] = 0;
+        data[++offset] = alpha;
 
-        _drawPatternShader.unbind();
+        data[++offset] = scratch[6];
+        data[++offset] = scratch[7];
+        data[++offset] = u2;
+        data[++offset] = v2;
+        data[++offset] = alpha;
+
+        data[++offset] = scratch[9];
+        data[++offset] = scratch[10];
+        data[++offset] = 0;
+        data[++offset] = v2;
+        data[++offset] = alpha;
     }
 
     public function fillRect (color :Int, x :Float, y :Float, width :Float, height :Float)
     {
-        flushBatch();
-
         var state = getTopState();
-        var scratch = _scratchVector12;
         var x2 = x + width;
         var y2 = y + height;
+        var scratch = _scratchQuadVector;
 
         scratch[0] = x;
         scratch[1] = y;
-        scratch[2] = x2;
-        scratch[3] = y;
-        scratch[4] = x2;
-        scratch[5] = y2;
-        scratch[6] = x;
+        // scratch[2] = 0;
+
+        scratch[3] = x2;
+        scratch[4] = y;
+        // scratch[5] = 0;
+
+        scratch[6] = x2;
         scratch[7] = y2;
+        // scratch[8] = 0;
 
-        var color4 = _scratchVector3D;
-        var alpha = state.alpha;
-        color4.x = alpha * ((color>>16) & 0xff) / 255.0;
-        color4.y = alpha * ((color>>8) & 0xff) / 255.0;
-        color4.z = alpha * (color & 0xff) / 255.0;
-        color4.w = alpha;
+        scratch[9] = x;
+        scratch[10] = y2;
+        // scratch[11] = 0;
 
-        _fillRectShader.init({
-            model: state.matrix,
-            proj: _projMatrix,
-        }, {
-            color: color4,
-        });
+        state.matrix.transformVectors(scratch, scratch);
 
-        _fillRectVerts.uploadFromVector(scratch, 0, 4);
-        _fillRectShader.bind(_fillRectVerts);
+        var offset = _batcher.prepareFillRect(state.blendMode);
+        var data = _batcher.data;
+        var a = state.alpha;
+        var r = a * ((color>>16) & 0xff) / 255.0;
+        var g = a * ((color>>8) & 0xff) / 255.0;
+        var b = a * (color & 0xff) / 255.0;
 
-        // TODO(bruno): Batch multiple common fillRects into a single draw call
-        // _context3D.drawTriangles(_batchIndices, 0, 2);
-        _context3D.drawTriangles(_singleIndices);
+        data[  offset] = scratch[0];
+        data[++offset] = scratch[1];
+        data[++offset] = r;
+        data[++offset] = g;
+        data[++offset] = b;
+        data[++offset] = a;
 
-        _fillRectShader.unbind();
+        data[++offset] = scratch[3];
+        data[++offset] = scratch[4];
+        data[++offset] = r;
+        data[++offset] = g;
+        data[++offset] = b;
+        data[++offset] = a;
+
+        data[++offset] = scratch[6];
+        data[++offset] = scratch[7];
+        data[++offset] = r;
+        data[++offset] = g;
+        data[++offset] = b;
+        data[++offset] = a;
+
+        data[++offset] = scratch[9];
+        data[++offset] = scratch[10];
+        data[++offset] = r;
+        data[++offset] = g;
+        data[++offset] = b;
+        data[++offset] = a;
     }
 
     public function multiplyAlpha (factor :Float)
@@ -329,28 +285,14 @@ class Stage3DDrawingContext
         getTopState().blendMode = blendMode;
     }
 
-    public function willRender ()
-    {
-        // Context3D requires clear() be called before each frame
-        _context3D.clear(1.0, 1.0, 1.0);
-    }
-
-    public function didRender ()
-    {
-        flushBatch();
-        _context3D.present();
-#if flambe_debug_renderer
-        trace("==================");
-#end
-    }
-
     public function resize (width :Int, height :Int)
     {
         // TODO(bruno): Vary anti-alias quality depending on the environment
         _context3D.configureBackBuffer(width, height, 2, false);
 
-        // Create an orthographic projection matrix
-        _projMatrix = new Matrix3D(Vector.ofArray([
+        // Reinitialize the stack from an orthographic projection matrix
+        _stateList = new DrawingState();
+        _stateList.matrix = new Matrix3D(Vector.ofArray([
             2/width, 0, 0, 0,
             0, -2/height, 0, 0,
             0, 0, -1, 0,
@@ -358,113 +300,24 @@ class Stage3DDrawingContext
         ]));
     }
 
-    private function expandBatch ()
-    {
-        var oldSize = Std.int(_batchData.length/(4*ELEMENTS_PER_VERTEX));
-        var newSize = (oldSize == 0) ? 16 : 2*oldSize;
-
-        _batchData.fixed = false;
-        _batchData.length = 4*ELEMENTS_PER_VERTEX*newSize;
-        _batchData.fixed = true;
-
-        var indices = new Vector<UInt>(6*newSize, true);
-        for (ii in 0...newSize) {
-            indices[ii*6] = ii*4;
-            indices[ii*6 + 1] = ii*4 + 1;
-            indices[ii*6 + 2] = ii*4 + 2;
-            indices[ii*6 + 3] = ii*4 + 2;
-            indices[ii*6 + 4] = ii*4 + 3;
-            indices[ii*6 + 5] = ii*4;
-        }
-
-        if (_batchIndices != null) {
-            _batchIndices.dispose();
-        }
-        _batchIndices = _context3D.createIndexBuffer(indices.length);
-        _batchIndices.uploadFromVector(indices, 0, indices.length);
-
-        if (_batchVerts != null) {
-            _batchVerts.dispose();
-        }
-        _batchVerts = _context3D.createVertexBuffer(4*newSize, ELEMENTS_PER_VERTEX);
-
-#if flambe_debug_renderer
-        trace("Expanded batch to " + newSize);
-#end
-    }
-
-    private function flushBatch ()
-    {
-        if (_quads < 1) {
-            return;
-        }
-
-#if flambe_debug_renderer
-        trace("Flushing batch of " + _quads + " quads");
-#end
-
-        if (_nextBlendMode != null) {
-            switch (_nextBlendMode) {
-            case Normal:
-                _context3D.setBlendFactors(ONE, ONE_MINUS_SOURCE_ALPHA);
-            case Add:
-                _context3D.setBlendFactors(ONE, ONE);
-            case CopyExperimental:
-                _context3D.setBlendFactors(ONE, ZERO);
-            }
-        }
-
-        _drawImageShader.init({
-            proj: _projMatrix,
-        }, {
-            texture: _nextTexture.nativeTexture,
-        });
-
-        // Can't seem to be able to upload only the part of _batchData that we care about, so upload
-        // the whole damn thing. Hrmm.
-        // _batchVerts.uploadFromVector(_batchData, 0, _quads*4);
-        _batchVerts.uploadFromVector(_batchData, 0, Std.int(_batchData.length/ELEMENTS_PER_VERTEX));
-        _drawImageShader.bind(_batchVerts);
-
-        _context3D.drawTriangles(_batchIndices, 0, 2*_quads);
-
-        _drawImageShader.unbind();
-        _quads = 0;
-        _nextTexture = null;
-        _nextBlendMode = null;
-    }
-
     inline private function getTopState () :DrawingState
     {
         return _stateList;
     }
 
-    private static inline var ELEMENTS_PER_VERTEX = 5;
-    private static inline var MAX_BATCH_QUADS = 256;
+    private static var _scratchMatrix3D = new Matrix3D();
+    private static var _scratchQuadVector = new Vector<Float>(12, true);
+    private static var _scratchTransformVector = (function () {
+        var v = new Vector<Float>(16, true);
+        new Matrix3D().copyRawDataTo(v);
+        return v;
+    })();
 
     private var _context3D :Context3D;
 
-    private var _scratchMatrix3D :Matrix3D;
-    private var _scratchVector3D :Vector3D;
-    private var _scratchVector12 :Vector<Float>;
-    private var _scratchTransformVector :Vector<Float>;
-
     private var _stateList :DrawingState;
-    private var _projMatrix :Matrix3D;
 
-    private var _batchData :Vector<Float>;
-    private var _batchVerts :VertexBuffer3D;
-    private var _batchIndices :IndexBuffer3D;
-    private var _drawImageShader :DrawImage;
-    private var _drawPatternShader :DrawPattern;
-
-    private var _singleIndices :IndexBuffer3D;
-    private var _fillRectVerts :VertexBuffer3D;
-    private var _fillRectShader :FillRect;
-
-    private var _quads :Int;
-    private var _nextTexture :Stage3DTexture;
-    private var _nextBlendMode :BlendMode;
+    private var _batcher :Stage3DBatcher;
 }
 
 private class DrawingState

@@ -62,13 +62,16 @@ class Stage3DRenderer
         if (_drawCtx == null) {
             return null;
         }
-        _drawCtx.willRender();
+        _batcher.willRender();
         return _drawCtx;
     }
 
     public function didRender ()
     {
-        _drawCtx.didRender();
+        _batcher.didRender();
+#if flambe_debug_renderer
+        trace("==================");
+#end
     }
 
     private function onContext3DCreate (event :Event)
@@ -78,8 +81,12 @@ class Stage3DRenderer
         _context3D = stage3D.context3D;
 
         Log.info("Created new Stage3D context", ["driver", _context3D.driverInfo]);
+#if flambe_debug_renderer
+        _context3D.enableErrorChecking = true;
+#end
 
-        _drawCtx = new Stage3DDrawingContext(_context3D);
+        _batcher = new Stage3DBatcher(_context3D);
+        _drawCtx = new Stage3DDrawingContext(_context3D, _batcher);
         onResize(null);
 
         if (contextLost) {
@@ -100,6 +107,7 @@ class Stage3DRenderer
         }
     }
 
-    private var _drawCtx :Stage3DDrawingContext;
     private var _context3D :Context3D;
+    private var _batcher :Stage3DBatcher;
+    private var _drawCtx :Stage3DDrawingContext;
 }

@@ -5,7 +5,7 @@
 package flambe.math;
 
 /**
- * A 2D matrix.
+ * A 2D transform matrix.
  *
  * <pre>
  * [ m00 m01 m02 ]
@@ -16,10 +16,10 @@ package flambe.math;
 class Matrix
 {
     public var m00 :Float;
-    public var m01 :Float;
-    public var m02 :Float;
     public var m10 :Float;
+    public var m01 :Float;
     public var m11 :Float;
+    public var m02 :Float;
     public var m12 :Float;
 
     public function new ()

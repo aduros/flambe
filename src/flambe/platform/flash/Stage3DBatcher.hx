@@ -108,10 +108,13 @@ class Stage3DBatcher
         trace("Flushing " + _quads + " / " + _maxQuads + " quads");
 #end
 
-        switch (_lastBlendMode) {
-            case Normal: _context3D.setBlendFactors(ONE, ONE_MINUS_SOURCE_ALPHA);
-            case Add: _context3D.setBlendFactors(ONE, ONE);
-            case CopyExperimental: _context3D.setBlendFactors(ONE, ZERO);
+        if (_lastBlendMode != _currentBlendMode) {
+            switch (_lastBlendMode) {
+                case Normal: _context3D.setBlendFactors(ONE, ONE_MINUS_SOURCE_ALPHA);
+                case Add: _context3D.setBlendFactors(ONE, ONE);
+                case CopyExperimental: _context3D.setBlendFactors(ONE, ZERO);
+            }
+            _currentBlendMode = _lastBlendMode;
         }
 
         var vertexBuffer = null;
@@ -184,9 +187,13 @@ class Stage3DBatcher
 
     private var _context3D :Context3D;
 
+    // Used to keep track of context changes requiring a flush
     private var _lastBlendMode :BlendMode;
     private var _lastShader :Shader;
     private var _lastTexture :Stage3DTexture;
+
+    // Used to avoid redundant Context3D calls
+    private var _currentBlendMode :BlendMode;
 
     private var _drawImageShader :DrawImage;
     private var _drawPatternShader :DrawPattern;

@@ -25,8 +25,9 @@ class Stage3DTexture
     public var maxU (default, null) :Float;
     public var maxV (default, null) :Float;
 
-    public function new (width :Int, height :Int)
+    public function new (renderer :Stage3DRenderer, width :Int, height :Int)
     {
+        _renderer = renderer;
         _width = width;
         _height = height;
 
@@ -66,8 +67,11 @@ class Stage3DTexture
 
     private function getContext () :Stage3DDrawingContext
     {
-        throw "Not yet implemented";
-        return null;
+        if (_ctx == null) {
+            _ctx = _renderer.createDrawingContext(this);
+            _ctx.reset(_widthPow2, _heightPow2);
+        }
+        return _ctx;
     }
 
     private static function nextPowerOfTwo (n :Int) :Int
@@ -84,4 +88,7 @@ class Stage3DTexture
 
     private var _widthPow2 :Int;
     private var _heightPow2 :Int;
+
+    private var _renderer :Stage3DRenderer;
+    private var _ctx :Stage3DDrawingContext;
 }

@@ -32,55 +32,75 @@ class Stage3DBatcher
 
     public function willRender ()
     {
-        // Context3D requires clear() be called before each frame
+        // Switch to the back buffer
+        if (_currentRenderTarget != null) {
+#if flambe_debug_renderer
+            trace("Resetting render target to back buffer");
+#end
+            flush();
+            _context3D.setRenderToBackBuffer();
+            _currentRenderTarget = null;
+        }
+        // And clear it as required by Stage3D
         _context3D.clear(1.0, 1.0, 1.0);
     }
 
     public function didRender ()
     {
+        // Flush any remaining quads and present the back buffer
         flush();
         _context3D.present();
 
         _lastTexture = null;
         // _lastBlendMode = null;
         _lastShader = null;
+
+        // present() resets the render target to the back buffer
+        _currentRenderTarget = null;
     }
 
     /** Adds a quad to the batch, using the DrawImage shader. */
-    public function prepareDrawImage (blendMode :BlendMode, texture :Stage3DTexture) :Int
+    public function prepareDrawImage (renderTarget :Stage3DTexture, blendMode :BlendMode,
+        texture :Stage3DTexture) :Int
     {
         if (texture != _lastTexture) {
             flush();
             _lastTexture = texture;
         }
-        return prepareQuad(5, blendMode, _drawImageShader);
+        return prepareQuad(5, renderTarget, blendMode, _drawImageShader);
     }
 
     /** Adds a quad to the batch, using the DrawPattern shader. */
-    public function prepareDrawPattern (blendMode :BlendMode, texture :Stage3DTexture) :Int
+    public function prepareDrawPattern (renderTarget :Stage3DTexture, blendMode :BlendMode,
+        texture :Stage3DTexture) :Int
     {
         if (texture != _lastTexture) {
             flush();
             _lastTexture = texture;
         }
-        return prepareQuad(5, blendMode, _drawPatternShader);
+        return prepareQuad(5, renderTarget, blendMode, _drawPatternShader);
     }
 
     /** Adds a quad to the batch, using the FillRect shader. */
-    public function prepareFillRect (blendMode :BlendMode) :Int
+    public function prepareFillRect (renderTarget :Stage3DTexture, blendMode :BlendMode) :Int
     {
-        return prepareQuad(6, blendMode, _fillRectShader);
+        return prepareQuad(6, renderTarget, blendMode, _fillRectShader);
     }
 
-    private function prepareQuad (elementsPerVertex :Int, blendMode :BlendMode, shader :Shader) :Int
+    private function prepareQuad (elementsPerVertex :Int, renderTarget :Stage3DTexture,
+        blendMode :BlendMode, shader :Shader) :Int
     {
-        if (shader != _lastShader) {
+        if (renderTarget != _lastRenderTarget) {
             flush();
-            _lastShader = shader;
+            _lastRenderTarget = renderTarget;
         }
         if (blendMode != _lastBlendMode) {
             flush();
             _lastBlendMode = blendMode;
+        }
+        if (shader != _lastShader) {
+            flush();
+            _lastShader = shader;
         }
 
         var offset;
@@ -108,7 +128,23 @@ class Stage3DBatcher
         trace("Flushing " + _quads + " / " + _maxQuads + " quads");
 #end
 
+        if (_lastRenderTarget != _currentRenderTarget) {
+#if flambe_debug_renderer
+            trace("Changing render target: " + _lastRenderTarget);
+#end
+            if (_lastRenderTarget != null) {
+                _context3D.setRenderToTexture(_lastRenderTarget.nativeTexture, false, 2);
+            } else {
+                _context3D.setRenderToBackBuffer();
+            }
+            _context3D.clear(0, 0, 0, 0); // Required :(
+            _currentRenderTarget = _lastRenderTarget;
+        }
+
         if (_lastBlendMode != _currentBlendMode) {
+#if flambe_debug_renderer
+            trace("Changing blend mode: " + _lastBlendMode);
+#end
             switch (_lastBlendMode) {
                 case Normal: _context3D.setBlendFactors(ONE, ONE_MINUS_SOURCE_ALPHA);
                 case Add: _context3D.setBlendFactors(ONE, ONE);
@@ -189,11 +225,13 @@ class Stage3DBatcher
 
     // Used to keep track of context changes requiring a flush
     private var _lastBlendMode :BlendMode;
+    private var _lastRenderTarget :Stage3DTexture;
     private var _lastShader :Shader;
     private var _lastTexture :Stage3DTexture;
 
     // Used to avoid redundant Context3D calls
     private var _currentBlendMode :BlendMode;
+    private var _currentRenderTarget :Stage3DTexture;
 
     private var _drawImageShader :DrawImage;
     private var _drawPatternShader :DrawPattern;

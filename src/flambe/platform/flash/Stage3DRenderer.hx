@@ -44,7 +44,7 @@ class Stage3DRenderer
     public function createTexture (bitmapData :Dynamic) :Texture
     {
         var bitmapData :BitmapData = cast bitmapData;
-        var texture = new Stage3DTexture(bitmapData.width, bitmapData.height);
+        var texture = new Stage3DTexture(this, bitmapData.width, bitmapData.height);
         texture.init(_context3D, false);
         texture.uploadBitmapData(bitmapData);
         return texture;
@@ -52,13 +52,21 @@ class Stage3DRenderer
 
     public function createEmptyTexture (width :Int, height :Int) :Texture
     {
-        var texture = new Stage3DTexture(width, height);
+        var texture = new Stage3DTexture(this, width, height);
         texture.init(_context3D, true);
         return texture;
     }
 
+    public function createDrawingContext (renderTarget :Stage3DTexture) :Stage3DDrawingContext
+    {
+        return new Stage3DDrawingContext(_context3D, _batcher, renderTarget);
+    }
+
     public function willRender () :DrawingContext
     {
+#if flambe_debug_renderer
+        trace(">>> begin");
+#end
         if (_drawCtx == null) {
             return null;
         }
@@ -70,7 +78,7 @@ class Stage3DRenderer
     {
         _batcher.didRender();
 #if flambe_debug_renderer
-        trace("==================");
+        trace("<<< end");
 #end
     }
 
@@ -86,7 +94,7 @@ class Stage3DRenderer
 #end
 
         _batcher = new Stage3DBatcher(_context3D);
-        _drawCtx = new Stage3DDrawingContext(_context3D, _batcher);
+        _drawCtx = createDrawingContext(null);
         onResize(null);
 
         if (contextLost) {
@@ -101,9 +109,10 @@ class Stage3DRenderer
 
     private function onResize (_)
     {
-        if (_drawCtx != null) {
+        if (_context3D != null) {
             var stage = Lib.current.stage;
-            _drawCtx.resize(stage.stageWidth, stage.stageHeight);
+            _context3D.configureBackBuffer(stage.stageWidth, stage.stageHeight, 2, false);
+            _drawCtx.reset(stage.stageWidth, stage.stageHeight);
         }
     }
 

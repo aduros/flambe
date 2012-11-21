@@ -21,11 +21,15 @@ import flambe.util.Assert;
 class Stage3DDrawingContext
     implements DrawingContext
 {
-    public function new (context3D :Context3D, batcher :Stage3DBatcher)
+    public function new (context3D :Context3D, batcher :Stage3DBatcher,
+        renderTarget :Stage3DTexture)
     {
         _context3D = context3D;
         _batcher = batcher;
-        _stateList = new DrawingState();
+        _renderTarget = renderTarget;
+
+        // Call reset() to set the size first
+        // _stateList = new DrawingState();
     }
 
     public function save ()
@@ -122,7 +126,7 @@ class Stage3DDrawingContext
 
         state.matrix.transformVectors(scratch, scratch);
 
-        var offset = _batcher.prepareDrawImage(state.blendMode, texture);
+        var offset = _batcher.prepareDrawImage(_renderTarget, state.blendMode, texture);
         var data = _batcher.data;
         var alpha = state.alpha;
         var w = texture.width;
@@ -183,7 +187,7 @@ class Stage3DDrawingContext
 
         state.matrix.transformVectors(scratch, scratch);
 
-        var offset = _batcher.prepareDrawPattern(state.blendMode, texture);
+        var offset = _batcher.prepareDrawPattern(_renderTarget, state.blendMode, texture);
         var data = _batcher.data;
         var u2 = texture.maxU * (width / texture.width);
         var v2 = texture.maxV * (height / texture.height);
@@ -239,7 +243,7 @@ class Stage3DDrawingContext
 
         state.matrix.transformVectors(scratch, scratch);
 
-        var offset = _batcher.prepareFillRect(state.blendMode);
+        var offset = _batcher.prepareFillRect(_renderTarget, state.blendMode);
         var data = _batcher.data;
         var r = (color & 0xff0000) / 0xff0000;
         var g = (color & 0x00ff00) / 0x00ff00;
@@ -285,11 +289,8 @@ class Stage3DDrawingContext
         getTopState().blendMode = blendMode;
     }
 
-    public function resize (width :Int, height :Int)
+    public function reset (width :Int, height :Int)
     {
-        // TODO(bruno): Vary anti-alias quality depending on the environment
-        _context3D.configureBackBuffer(width, height, 2, false);
-
         // Reinitialize the stack from an orthographic projection matrix
         _stateList = new DrawingState();
         _stateList.matrix = new Matrix3D(Vector.ofArray([
@@ -314,10 +315,10 @@ class Stage3DDrawingContext
     })();
 
     private var _context3D :Context3D;
+    private var _batcher :Stage3DBatcher;
+    private var _renderTarget :Stage3DTexture;
 
     private var _stateList :DrawingState;
-
-    private var _batcher :Stage3DBatcher;
 }
 
 private class DrawingState

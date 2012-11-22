@@ -15,21 +15,12 @@ class CanvasRenderer
     public function new (canvas :Dynamic)
     {
         _drawCtx = new CanvasDrawingContext(canvas);
+        _drawCtx.clear();
     }
 
     public function createTexture (image :Dynamic) :Texture
     {
-        var texture = new CanvasTexture();
-        if (CANVAS_TEXTURES) {
-            var canvas :Dynamic = Lib.document.createElement("canvas");
-            canvas.width = image.width;
-            canvas.height = image.height;
-            canvas.getContext("2d").drawImage(image, 0, 0);
-            texture.image = canvas;
-        } else {
-            texture.image = image;
-        }
-        return texture;
+        return new CanvasTexture(CANVAS_TEXTURES ? HtmlUtil.createCanvas(image) : image);
     }
 
     public function createEmptyTexture (width :Int, height :Int) :Texture
@@ -37,10 +28,7 @@ class CanvasRenderer
         var canvas :Dynamic = Lib.document.createElement("canvas");
         canvas.width = width;
         canvas.height = height;
-
-        var texture = new CanvasTexture();
-        texture.image = canvas;
-        return texture;
+        return new CanvasTexture(canvas);
     }
 
     public function willRender () :DrawingContext

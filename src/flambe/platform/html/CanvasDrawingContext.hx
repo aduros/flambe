@@ -16,10 +16,13 @@ class CanvasDrawingContext
     public function new (canvas :Dynamic)
     {
         _canvasCtx = canvas.getContext("2d");
+    }
 
-        // Initialize to the standard opaque white
+    public function clear ()
+    {
+        // Clear to opaque white
         _canvasCtx.fillStyle = "#ffffff";
-        _canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+        _canvasCtx.fillRect(0, 0, _canvasCtx.canvas.width, _canvasCtx.canvas.height);
     }
 
     public function save ()
@@ -151,5 +154,5 @@ class CanvasDrawingContext
     }
 
     private var _canvasCtx :Dynamic;
-    private var _firstDraw :Bool = true;
+    private var _firstDraw :Bool = false;
 }

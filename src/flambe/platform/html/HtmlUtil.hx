@@ -121,4 +121,19 @@ class HtmlUtil
         // Same thing as Date.now().getTime(), but avoids creating a Date object
         return (untyped Date).now();
     }
+
+    public static function createCanvas (source :Dynamic) :Dynamic
+    {
+        var canvas :Dynamic = Lib.document.createElement("canvas");
+        canvas.width = source.width;
+        canvas.height = source.height;
+
+        var ctx = canvas.getContext("2d");
+        ctx.save();
+        ctx.globalCompositeOperation = "copy";
+        ctx.drawImage(source, 0, 0);
+        ctx.restore();
+
+        return canvas;
+    }
 }

@@ -19,7 +19,9 @@ try:
             flambe_root = join(lib, f.read().replace(".", ","))
 
 except Exception:
-    print("Could not locate Flambe, run `haxelib install flambe`.")
+    import traceback
+    traceback.print_exc()
+    print("Could not locate Flambe, please run `haxelib install flambe` or report this issue.")
     sys.exit(1)
 
 # We can't just use runpy because waf contains null bytes, so open and exec it manually, leaving out

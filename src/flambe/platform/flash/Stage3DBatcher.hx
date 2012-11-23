@@ -215,7 +215,7 @@ class Stage3DBatcher
         return offset;
     }
 
-    public function flush ()
+    private function flush ()
     {
         if (_quads < 1) {
             return;

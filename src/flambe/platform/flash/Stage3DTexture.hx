@@ -79,6 +79,9 @@ class Stage3DTexture
 
     public function writePixels (pixels :Bytes, x :Int, y :Int, sourceW :Int, sourceH :Int)
     {
+        var sourceWPow2 = nextPowerOfTwo(sourceW);
+        var sourceHPow2 = nextPowerOfTwo(sourceH);
+
         var copy = Bytes.alloc(4*sourceW*sourceH);
         var ii = copy.length - 1;
         while (ii >= 0) {
@@ -92,14 +95,19 @@ class Stage3DTexture
         }
 
         // Load the pixels into a BitmapData
-        var bitmapData = new BitmapData(sourceW, sourceH);
+        var bitmapData = new BitmapData(sourceWPow2, sourceHPow2, true, 0x00000000);
         bitmapData.setPixels(new Rectangle(0, 0, sourceW, sourceH), copy.getData());
 
-        // Since there's no way to update a texture's subregion in Stage3D, create a temporary
-        // texture and draw it to this texture at the right position
-        // TODO(bruno): Optimize for the case where the whole texture is updated
-        var temp = _renderer.createTexture(bitmapData);
-        drawTexture(temp, x, y, 0, 0, sourceW, sourceH);
+        if (x == 0 && y == 0 && sourceWPow2 == _widthPow2 && sourceHPow2 == _heightPow2) {
+            // Replace the entire texture
+            nativeTexture.uploadFromBitmapData(bitmapData);
+        } else {
+            // Since there's no way to update a texture's subregion in Stage3D, create a temporary
+            // texture and draw it to this one at the right position
+            var temp = _renderer.createEmptyTexture(sourceW, sourceH);
+            temp.nativeTexture.uploadFromBitmapData(bitmapData);
+            drawTexture(temp, x, y, 0, 0, sourceW, sourceH);
+        }
     }
 
     inline private function getWidth () :Int

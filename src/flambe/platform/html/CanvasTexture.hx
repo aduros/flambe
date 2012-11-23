@@ -36,12 +36,19 @@ class CanvasTexture
     {
         var ctx2d = getContext2d();
         var imageData = ctx2d.createImageData(sourceW, sourceH);
-        var data = imageData.data;
-        var size = 4*sourceW*sourceH;
-        // TODO(bruno): Use data.set where TypedArrays are available
-        for (ii in 0...size) {
-            data[ii] = pixels.get(ii);
+        var data :Dynamic = imageData.data;
+        if (data.set != null) {
+            // Data is a Uint8ClampedArray, copy it in one swoop
+            data.set(pixels.getData());
+        } else {
+            // Data is a normal array, copy it manually
+            var size = 4*sourceW*sourceH;
+            for (ii in 0...size) {
+                data[ii] = pixels.get(ii);
+            }
         }
+
+        // Draw the pixels, and invalidate our contents
         ctx2d.putImageData(imageData, x, y, 0, 0, sourceW, sourceH);
         dirtyContents();
     }

@@ -16,8 +16,17 @@ class Strings
      */
     public static function getFileExtension (fileName :String) :String
     {
-        var start = fileName.lastIndexOf(".") + 1;
-        return (start > 1 && start < fileName.length) ? fileName.substr(start) : null;
+        var dot = fileName.lastIndexOf(".");
+        return (dot > 0) ? fileName.substr(dot+1) : null;
+    }
+
+    /**
+     * Returns a file name without its extension.
+     */
+    public static function removeFileExtension (fileName :String) :String
+    {
+        var dot = fileName.lastIndexOf(".");
+        return (dot > 0) ? fileName.substr(0, dot) : fileName;
     }
 
     public static function hashCode (str :String) :Int

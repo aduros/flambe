@@ -11,8 +11,8 @@ import flambe.display.Texture;
 import flambe.sound.Sound;
 import flambe.util.Promise;
 
-using flambe.util.Strings;
 using Lambda;
+using flambe.util.Strings;
 
 class BasicAssetPackLoader
 {
@@ -193,6 +193,9 @@ private class BasicAssetPack
 
     public function getTexture (name :String, required :Bool = true) :Texture
     {
+#if debug
+        warnOnExtension(name);
+#end
         var texture = textures.get(name);
         if (texture == null && required) {
             throw "Missing texture".withFields(["name", name]);
@@ -202,6 +205,9 @@ private class BasicAssetPack
 
     public function getSound (name :String, required :Bool = true) :Sound
     {
+#if debug
+        warnOnExtension(name);
+#end
         var sound = sounds.get(name);
         if (sound == null && required) {
             throw "Missing sound".withFields(["name", name]);
@@ -221,6 +227,15 @@ private class BasicAssetPack
     public function getManifest () :Manifest
     {
         return _manifest;
+    }
+
+    private static function warnOnExtension (path :String)
+    {
+        var ext = path.getFileExtension();
+        if (ext != null && ext.length == 3) {
+            Log.warn("Requested asset \"" + path + "\" should not have a file extension," +
+                " did you mean \"" + path.removeFileExtension() + "\"?");
+        }
     }
 
     private var _manifest :Manifest;

@@ -42,7 +42,7 @@ class Library
         }
 
         for (atlasObject in reader.atlases) {
-            var atlas = pack.getTexture(baseDir + "/" + atlasObject.file);
+            var atlas = pack.getTexture(baseDir + "/" + atlasObject.file.removeFileExtension());
             for (textureObject in atlasObject.textures) {
                 var bitmap = new BitmapSymbol(textureObject, atlas);
                 _symbols.set(bitmap.name, bitmap);

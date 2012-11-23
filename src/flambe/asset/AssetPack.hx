@@ -19,22 +19,22 @@ interface AssetPack
     var manifest (getManifest, null) :Manifest;
 
     /**
-     * Gets a texture by name from the asset pack. Textures are cached, so it's safe to request the
-     * same texture multiple times.
+     * Gets a texture by name from the asset pack. The name must NOT contain a filename extension.
+     * Textures are cached, so it's safe to get the same texture multiple times.
      * @param required If true and the asset was not found, an error is thrown.
      */
     function getTexture (name :String, required :Bool = true) :Texture;
 
     /**
      * Gets a sound by name from the asset pack. The name must NOT contain a filename extension.
-     * Sounds are cached, so it's safe to request the same sound multiple times.
+     * Sounds are cached, so it's safe to get the same sound multiple times.
      * @param required If true and the asset was not found, an error is thrown.
      */
     function getSound (name :String, required :Bool = true) :Sound;
 
     /**
      * Gets a file by name from the asset pack, returning its contents as a string. Files are
-     * cached, so it's safe to request the same file multiple times.
+     * cached, so it's safe to get the same file multiple times.
      * @param required If true and the asset was not found, an error is thrown.
      */
     function getFile (name :String, required :Bool = true) :String;

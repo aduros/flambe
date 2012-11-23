@@ -7,6 +7,7 @@ package flambe.display;
 import flambe.asset.AssetPack;
 
 using StringTools;
+using flambe.util.Strings;
 
 /**
  * A bitmap font, created in any tool that exports the BMFont format, such as the original BMFont
@@ -61,7 +62,7 @@ class Font
                             file = pair.getString();
                     }
                 }
-                pages.set(pageId, pack.getTexture(basePath + file));
+                pages.set(pageId, pack.getTexture(basePath + file.removeFileExtension()));
 
             case "char":
                 var glyph = null;

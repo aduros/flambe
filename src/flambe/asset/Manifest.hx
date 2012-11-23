@@ -9,8 +9,8 @@ import haxe.rtti.Meta;
 import flambe.asset.AssetEntry;
 import flambe.platform.ManifestBuilder;
 
-using flambe.util.Strings;
 using StringTools;
+using flambe.util.Strings;
 
 /**
  * An asset manifest contains all the information needed to load an asset pack. A manifest is
@@ -156,10 +156,10 @@ class Manifest
                 var path = packName + "/" + name + "?v=" + asset.md5;
 
                 var type = inferType(name);
-                if (type == Audio) {
+                if (type == Image || type == Audio) {
                     // If this an asset that not all platforms may support, trim the extension from
                     // the name. We'll only load one of the assets if this creates a name collision.
-                    name = name.substr(0, name.lastIndexOf("."));
+                    name = name.removeFileExtension();
                 }
 
                 var base = crossOriginBase;

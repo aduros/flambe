@@ -205,11 +205,11 @@ class Stage3DBatcher
             flush();
             offset = 0;
         } else {
-            var elements = 4*elementsPerVertex;
-            offset = _quads*elements;
-            if (offset + elements >= Std.int(data.length)) {
+            if (_quads >= _maxQuads) {
+                // Expand the index and vertex buffers
                 resize(2*_maxQuads);
             }
+            offset = _quads*4*elementsPerVertex;
         }
         ++_quads;
         return offset;

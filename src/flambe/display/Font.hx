@@ -33,7 +33,7 @@ class Font
         this.name = name;
         _glyphs = new IntHash();
 
-        var parser = new ConfigParser(pack.loadFile(name + ".fnt"));
+        var parser = new ConfigParser(pack.getFile(name + ".fnt"));
         var pages = new IntHash<Texture>();
 
         // The basename of the font's path, where we'll find the textures
@@ -61,7 +61,7 @@ class Font
                             file = pair.getString();
                     }
                 }
-                pages.set(pageId, pack.loadTexture(basePath + file));
+                pages.set(pageId, pack.getTexture(basePath + file));
 
             case "char":
                 var glyph = null;

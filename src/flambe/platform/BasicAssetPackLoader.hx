@@ -191,7 +191,7 @@ private class BasicAssetPack
         files = new Hash();
     }
 
-    public function loadTexture (name :String, required :Bool = true) :Texture
+    public function getTexture (name :String, required :Bool = true) :Texture
     {
         var texture = textures.get(name);
         if (texture == null && required) {
@@ -200,7 +200,7 @@ private class BasicAssetPack
         return texture;
     }
 
-    public function loadSound (name :String, required :Bool = true) :Sound
+    public function getSound (name :String, required :Bool = true) :Sound
     {
         var sound = sounds.get(name);
         if (sound == null && required) {
@@ -209,7 +209,7 @@ private class BasicAssetPack
         return sound;
     }
 
-    public function loadFile (name :String, required :Bool = true) :String
+    public function getFile (name :String, required :Bool = true) :String
     {
         var file = files.get(name);
         if (file == null && required) {

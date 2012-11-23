@@ -30,7 +30,7 @@ class Library
     {
         _symbols = new Hash();
 
-        var reader :Format = Json.parse(pack.loadFile(baseDir + "/library.json"));
+        var reader :Format = Json.parse(pack.getFile(baseDir + "/library.json"));
 
         frameRate = reader.frameRate;
 
@@ -42,7 +42,7 @@ class Library
         }
 
         for (atlasObject in reader.atlases) {
-            var atlas = pack.loadTexture(baseDir + "/" + atlasObject.file);
+            var atlas = pack.getTexture(baseDir + "/" + atlasObject.file);
             for (textureObject in atlasObject.textures) {
                 var bitmap = new BitmapSymbol(textureObject, atlas);
                 _symbols.set(bitmap.name, bitmap);

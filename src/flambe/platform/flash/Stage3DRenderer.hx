@@ -17,6 +17,8 @@ import flambe.display.Texture;
 class Stage3DRenderer
     implements Renderer
 {
+    public var batcher (default, null) :Stage3DBatcher;
+
     public function new ()
     {
         // Use the first available Stage3D
@@ -41,7 +43,7 @@ class Stage3DRenderer
         Log.error("No free Stage3Ds available!");
     }
 
-    public function createTexture (bitmapData :Dynamic) :Texture
+    public function createTexture (bitmapData :Dynamic) :Stage3DTexture
     {
         var bitmapData :BitmapData = cast bitmapData;
         var texture = new Stage3DTexture(this, bitmapData.width, bitmapData.height);
@@ -50,7 +52,7 @@ class Stage3DRenderer
         return texture;
     }
 
-    public function createEmptyTexture (width :Int, height :Int) :Texture
+    public function createEmptyTexture (width :Int, height :Int) :Stage3DTexture
     {
         var texture = new Stage3DTexture(this, width, height);
         texture.init(_context3D, true);
@@ -59,7 +61,7 @@ class Stage3DRenderer
 
     public function createDrawingContext (renderTarget :Stage3DTexture) :Stage3DDrawingContext
     {
-        return new Stage3DDrawingContext(_context3D, _batcher, renderTarget);
+        return new Stage3DDrawingContext(_context3D, batcher, renderTarget);
     }
 
     public function willRender () :DrawingContext
@@ -70,13 +72,13 @@ class Stage3DRenderer
         if (_drawCtx == null) {
             return null;
         }
-        _batcher.willRender();
+        batcher.willRender();
         return _drawCtx;
     }
 
     public function didRender ()
     {
-        _batcher.didRender();
+        batcher.didRender();
 #if flambe_debug_renderer
         trace("<<< end");
 #end
@@ -93,7 +95,7 @@ class Stage3DRenderer
         _context3D.enableErrorChecking = true;
 #end
 
-        _batcher = new Stage3DBatcher(_context3D);
+        batcher = new Stage3DBatcher(_context3D);
         _drawCtx = createDrawingContext(null);
         onResize(null);
 
@@ -117,6 +119,5 @@ class Stage3DRenderer
     }
 
     private var _context3D :Context3D;
-    private var _batcher :Stage3DBatcher;
     private var _drawCtx :Stage3DDrawingContext;
 }

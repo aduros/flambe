@@ -4,10 +4,13 @@
 
 package flambe.platform.flash;
 
+import flash.Lib;
 import flash.Vector;
+import flash.display.BitmapData;
 import flash.display3D.Context3D;
 import flash.display3D.IndexBuffer3D;
 import flash.display3D.VertexBuffer3D;
+import flash.geom.Matrix3D;
 import flash.geom.Vector3D;
 
 import format.hxsl.Shader;
@@ -16,6 +19,7 @@ import flambe.display.BlendMode;
 import flambe.platform.shader.DrawImage;
 import flambe.platform.shader.DrawPattern;
 import flambe.platform.shader.FillRect;
+import flambe.util.Assert;
 
 class Stage3DBatcher
 {
@@ -34,15 +38,15 @@ class Stage3DBatcher
     {
         // Switch to the back buffer
         if (_currentRenderTarget != null) {
+            flush();
 #if flambe_debug_renderer
             trace("Resetting render target to back buffer");
 #end
-            flush();
             _context3D.setRenderToBackBuffer();
-            _currentRenderTarget = null;
+            _currentRenderTarget = _lastRenderTarget = null;
         }
         // And clear it as required by Stage3D
-        _context3D.clear(1.0, 1.0, 1.0);
+        _context3D.clear(1, 1, 1);
     }
 
     public function didRender ()
@@ -57,6 +61,99 @@ class Stage3DBatcher
 
         // present() resets the render target to the back buffer
         _currentRenderTarget = null;
+    }
+
+    /** Reads the pixels out from a texture. May return a BitmapData larger than requested. */
+    public function readPixels (texture :Stage3DTexture, x :Int, y :Int,
+        width :Int, height :Int) :BitmapData
+    {
+        // Turns out Stage3D doesn't make it easy to get data out of a texture. So we have to:
+        //   1. Resize the back buffer
+        //   2. Draw the texture to the back buffer
+        //   3. Call drawToBitmapData (which only works on the back buffer)
+        //   4. Restore the back buffer
+        //
+        // Oy.
+
+        // Flush any pending draws before the back buffer is messed with
+        flush();
+
+        // The minimum back buffer size is 50x50
+        if (width < 50) width = 50;
+        if (height < 50) height = 50;
+
+        var scratch = new Vector<Float>(12, true);
+        var x1 = -x;
+        var y1 = -y;
+        var x2 = x1 + texture.width;
+        var y2 = y1 + texture.height;
+
+        scratch[0] = x1;
+        scratch[1] = y1;
+        // scratch[2] = 0;
+
+        scratch[3] = x2;
+        scratch[4] = y1;
+        // scratch[5] = 0;
+
+        scratch[6] = x2;
+        scratch[7] = y2;
+        // scratch[8] = 0;
+
+        scratch[9] = x1;
+        scratch[10] = y2;
+        // scratch[11] = 0;
+
+        var ortho = new Matrix3D(Vector.ofArray([
+            2/width, 0, 0, 0,
+            0, -2/height, 0, 0,
+            0, 0, -1, 0,
+            -1, 1, 0, 1,
+        ]));
+        ortho.transformVectors(scratch, scratch);
+
+        var offset = prepareDrawImage(null, CopyExperimental, texture);
+        data[  offset] = scratch[0];
+        data[++offset] = scratch[1];
+        data[++offset] = 0;
+        data[++offset] = 0;
+        data[++offset] = 1;
+
+        data[++offset] = scratch[3];
+        data[++offset] = scratch[4];
+        data[++offset] = texture.maxU;
+        data[++offset] = 0;
+        data[++offset] = 1;
+
+        data[++offset] = scratch[6];
+        data[++offset] = scratch[7];
+        data[++offset] = texture.maxU;
+        data[++offset] = texture.maxV;
+        data[++offset] = 1;
+
+        data[++offset] = scratch[9];
+        data[++offset] = scratch[10];
+        data[++offset] = 0;
+        data[++offset] = texture.maxV;
+        data[++offset] = 1;
+
+        // Create a temporary back buffer of the given size, and draw the texture on it
+        _context3D.configureBackBuffer(width, height, 2, false);
+        _context3D.setRenderToBackBuffer();
+        _context3D.clear(0, 0, 0, 0);
+        _lastRenderTarget = _currentRenderTarget = null;
+        flush();
+
+        // Read out the temporary back buffer
+        var pixels = new BitmapData(width, height);
+        _context3D.drawToBitmapData(pixels);
+
+        // Restore the back buffer to its previous state
+        var stage = Lib.current.stage;
+        _context3D.configureBackBuffer(stage.stageWidth, stage.stageHeight, 2, false);
+        _context3D.clear(1, 1, 1);
+
+        return pixels;
     }
 
     /** Adds a quad to the batch, using the DrawImage shader. */
@@ -118,25 +215,19 @@ class Stage3DBatcher
         return offset;
     }
 
-    private function flush ()
+    public function flush ()
     {
         if (_quads < 1) {
             return;
         }
 
-#if flambe_debug_renderer
-        trace("Flushing " + _quads + " / " + _maxQuads + " quads");
-#end
-
         if (_lastRenderTarget != _currentRenderTarget) {
-#if flambe_debug_renderer
-            trace("Changing render target: " + _lastRenderTarget);
-#end
             if (_lastRenderTarget != null) {
                 _context3D.setRenderToTexture(_lastRenderTarget.nativeTexture, false, 2);
             } else {
                 _context3D.setRenderToBackBuffer();
             }
+            Log.warn("Changing render target, clearing it first as required by Stage3D");
             _context3D.clear(0, 0, 0, 0); // Required :(
             _currentRenderTarget = _lastRenderTarget;
         }
@@ -179,6 +270,9 @@ class Stage3DBatcher
         _context3D.drawTriangles(_quadIndices, 0, _quads*2);
         _lastShader.unbind();
 
+#if flambe_debug_renderer
+        trace("Flushed " + _quads + " / " + _maxQuads + " quads");
+#end
         _quads = 0;
     }
 

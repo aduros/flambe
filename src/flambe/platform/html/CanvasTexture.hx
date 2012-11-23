@@ -4,6 +4,8 @@
 
 package flambe.platform.html;
 
+import haxe.io.Bytes;
+
 import flambe.display.DrawingContext;
 import flambe.display.Texture;
 
@@ -25,6 +27,30 @@ class CanvasTexture
         this.image = image;
     }
 
+    public function readPixels (x :Int, y :Int, width :Int, height :Int) :Bytes
+    {
+        return Bytes.ofData(getContext2d().getImageData(x, y, width, height).data);
+    }
+
+    public function writePixels (pixels :Bytes, x :Int, y :Int, sourceW :Int, sourceH :Int)
+    {
+        var ctx2d = getContext2d();
+        var imageData = ctx2d.createImageData(sourceW, sourceH);
+        var data = imageData.data;
+        var size = 4*sourceW*sourceH;
+        // TODO(bruno): Use data.set where TypedArrays are available
+        for (ii in 0...size) {
+            data[ii] = pixels.get(ii);
+        }
+        ctx2d.putImageData(imageData, x, y, 0, 0, sourceW, sourceH);
+        dirtyContents();
+    }
+
+    inline public function dirtyContents ()
+    {
+        pattern = null;
+    }
+
     inline private function getWidth () :Int
     {
         return image.width;
@@ -38,17 +64,23 @@ class CanvasTexture
     private function getContext () :CanvasDrawingContext
     {
         if (_ctx == null) {
-            // Convert the image to a canvas if necessary. Why not have the image be a canvas to
-            // begin with, you ask? Some browsers (notably Android 4) render canvases a LOT slower
-            // than image elements, so we avoid using a canvas unless absolutely necessary. One day
-            // when Android's browser joins the modern age, this can be simplified.
-            // http://jsperf.com/canvas-drawimage
-            if (!Std.is(image, untyped HTMLCanvasElement)) {
-                image = HtmlUtil.createCanvas(image);
-            }
+            getContext2d(); // Force conversion
             _ctx = new InternalDrawingContext(this);
         }
         return _ctx;
+    }
+
+    private function getContext2d () :Dynamic
+    {
+        // Convert the image to a canvas when necessary. Why not have the image be a canvas to
+        // begin with, you ask? Some browsers (notably Android 4) render canvases a LOT slower
+        // than image elements, so we avoid using a canvas unless absolutely necessary. One day
+        // when Android's browser joins the modern age, this can be simplified.
+        // http://jsperf.com/canvas-drawimage
+        if (!Std.is(image, untyped HTMLCanvasElement)) {
+            image = HtmlUtil.createCanvas(image);
+        }
+        return image.getContext("2d");
     }
 
     private var _ctx :CanvasDrawingContext = null;
@@ -66,32 +98,27 @@ private class InternalDrawingContext extends CanvasDrawingContext
     override public function drawImage (texture :Texture, x :Float, y :Float)
     {
         super.drawImage(texture, x, y);
-        clearPattern();
+        _renderTarget.dirtyContents();
     }
 
     override public function drawSubImage (texture :Texture, destX :Float, destY :Float,
         sourceX :Float, sourceY :Float, sourceW :Float, sourceH :Float)
     {
         super.drawSubImage(texture, destX, destY, sourceX, sourceY, sourceW, sourceH);
-        clearPattern();
+        _renderTarget.dirtyContents();
     }
 
     override public function drawPattern (texture :Texture, x :Float, y :Float,
         width :Float, height :Float)
     {
         super.drawPattern(texture, x, y, width, height);
-        clearPattern();
+        _renderTarget.dirtyContents();
     }
 
     override public function fillRect (color :Int, x :Float, y :Float, width :Float, height :Float)
     {
         super.fillRect(color, x, y, width, height);
-        clearPattern();
-    }
-
-    inline private function clearPattern ()
-    {
-        _renderTarget.pattern = null;
+        _renderTarget.dirtyContents();
     }
 
     private var _renderTarget :CanvasTexture;

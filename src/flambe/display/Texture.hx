@@ -4,6 +4,8 @@
 
 package flambe.display;
 
+import haxe.io.Bytes;
+
 /**
  * A loaded texture image.
  */
@@ -23,4 +25,8 @@ interface Texture
      * The DrawingContext that draws to this texture.
      */
     var ctx (getContext, null) :DrawingContext;
+
+    function readPixels (x :Int, y :Int, width :Int, height :Int) :Bytes;
+
+    function writePixels (pixels :Bytes, x :Int, y :Int, sourceW :Int, sourceH :Int) :Void;
 }

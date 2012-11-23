@@ -4,7 +4,7 @@
 
 package flambe.platform;
 
-import flambe.display.DrawingContext;
+import flambe.display.Graphics;
 import flambe.display.Texture;
 
 interface Renderer
@@ -23,7 +23,7 @@ interface Renderer
      * Notifies the renderer that things are about to be drawn. Returns the drawing context that
      * should be used, or null if no context is currently available.
      */
-    function willRender () :DrawingContext;
+    function willRender () :Graphics;
 
     /**
      * Notifies the renderer that drawing the frame is complete.

@@ -31,9 +31,9 @@ class PatternSprite extends Sprite
         this.height = new AnimatedFloat(height);
     }
 
-    override public function draw (ctx :DrawingContext)
+    override public function draw (g :Graphics)
     {
-        ctx.drawPattern(texture, 0, 0, width._, height._);
+        g.drawPattern(texture, 0, 0, width._, height._);
     }
 
     override public function getNaturalWidth () :Float

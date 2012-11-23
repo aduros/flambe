@@ -24,9 +24,9 @@ class FillSprite extends Sprite
         this.height = new AnimatedFloat(height);
     }
 
-    override public function draw (ctx :DrawingContext)
+    override public function draw (g :Graphics)
     {
-        ctx.fillRect(color, 0, 0, width._, height._);
+        g.fillRect(color, 0, 0, width._, height._);
     }
 
     override public function getNaturalWidth () :Float

@@ -22,9 +22,9 @@ interface Texture
     var height (getHeight, null) :Int;
 
     /**
-     * The DrawingContext that draws to this texture.
+     * The Graphics that draws to this texture.
      */
-    var ctx (getContext, null) :DrawingContext;
+    var graphics (getGraphics, null) :Graphics;
 
     function readPixels (x :Int, y :Int, width :Int, height :Int) :Bytes;
 

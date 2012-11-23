@@ -25,7 +25,7 @@ class TextSprite extends Sprite
         _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
     }
 
-    override public function draw (ctx :DrawingContext)
+    override public function draw (g :Graphics)
     {
         updateGlyphs();
 
@@ -34,7 +34,7 @@ class TextSprite extends Sprite
         while (ii < ll) {
             var glyph = _glyphs[ii];
             var offset = _offsets[ii];
-            glyph.draw(ctx, offset, 0);
+            glyph.draw(g, offset, 0);
             ++ii;
         }
     }

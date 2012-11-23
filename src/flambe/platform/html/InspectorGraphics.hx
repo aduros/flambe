@@ -11,61 +11,61 @@ package flambe.platform.html;
 import js.Lib;
 
 import flambe.display.BlendMode;
-import flambe.display.DrawingContext;
+import flambe.display.Graphics;
 import flambe.display.Texture;
 
 /**
  * Logs all draw calls during a frame, and shows a nice summary. Very useful for spotting texture
  * swapping, overdraw, and rendering glitches. Press CTRL-I to bring up the inspector.
  */
-class InspectorDrawingContext
-    implements DrawingContext
+class InspectorGraphics
+    implements Graphics
 {
-    public function new (ctx :CanvasDrawingContext)
+    public function new (graphics :CanvasGraphics)
     {
-        _ctx = ctx;
+        _graphics = graphics;
     }
 
     public function save ()
     {
         logMethod("save");
-        _ctx.save();
+        _graphics.save();
     }
 
     public function translate (x :Float, y :Float)
     {
         logMethod("translate", [x, y]);
-        _ctx.translate(x, y);
+        _graphics.translate(x, y);
     }
 
     public function scale (x :Float, y :Float)
     {
         logMethod("scale", [x, y]);
-        _ctx.scale(x, y);
+        _graphics.scale(x, y);
     }
 
     public function rotate (rotation :Float)
     {
         logMethod("rotate", [rotation]);
-        _ctx.rotate(rotation);
+        _graphics.rotate(rotation);
     }
 
     public function transform (m00 :Float, m10 :Float, m01 :Float, m11 :Float, m02 :Float, m12 :Float)
     {
         logMethod("transform", [m00, m10, m01, m11, m02, m12]);
-        _ctx.transform(m00, m10, m01, m11, m02, m12);
+        _graphics.transform(m00, m10, m01, m11, m02, m12);
     }
 
     public function restore ()
     {
         logMethod("restore");
-        _ctx.restore();
+        _graphics.restore();
     }
 
     public function drawImage (texture :Texture, x :Float, y :Float)
     {
         logMethod("drawImage", texture, [x, y]);
-        _ctx.drawImage(texture, x, y);
+        _graphics.drawImage(texture, x, y);
         snapshot();
     }
 
@@ -73,34 +73,34 @@ class InspectorDrawingContext
         sourceX :Float, sourceY :Float, sourceW :Float, sourceH :Float)
     {
         logMethod("drawSubImage", texture, [destX, destY, sourceX, sourceY, sourceW, sourceH]);
-        _ctx.drawSubImage(texture, destX, destY, sourceX, sourceY, sourceW, sourceH);
+        _graphics.drawSubImage(texture, destX, destY, sourceX, sourceY, sourceW, sourceH);
         snapshot();
     }
 
     public function drawPattern (texture :Texture, x :Float, y :Float, width :Float, height :Float)
     {
         logMethod("drawPattern", texture, [x, y, width, height]);
-        _ctx.drawPattern(texture, x, y, width, height);
+        _graphics.drawPattern(texture, x, y, width, height);
         snapshot();
     }
 
     public function fillRect (color :Int, x :Float, y :Float, width :Float, height :Float)
     {
         logMethod("fillRect", [color, x, y, width, height]);
-        _ctx.fillRect(color, x, y, width, height);
+        _graphics.fillRect(color, x, y, width, height);
         snapshot();
     }
 
     public function multiplyAlpha (factor :Float)
     {
         logMethod("multiplyAlpha", [factor]);
-        _ctx.multiplyAlpha(factor);
+        _graphics.multiplyAlpha(factor);
     }
 
     public function setBlendMode (blendMode :BlendMode)
     {
         logMethod("setBlendMode", [Type.enumConstructor(blendMode)]);
-        _ctx.setBlendMode(blendMode);
+        _graphics.setBlendMode(blendMode);
     }
 
     public function show ()
@@ -144,10 +144,10 @@ class InspectorDrawingContext
     {
         var MAX_SIZE = 400;
         _htmlOutput += "<img style='max-width:" + MAX_SIZE + "px; max-height:" + MAX_SIZE +
-            "px;' src='" + _ctx.toDataURL() + "'><br>";
+            "px;' src='" + _graphics.toDataURL() + "'><br>";
     }
 
-    private var _ctx :CanvasDrawingContext;
+    private var _graphics :CanvasGraphics;
 
     private var _htmlOutput :String = "";
 

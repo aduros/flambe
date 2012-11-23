@@ -5,7 +5,7 @@
 package flambe.platform;
 
 import flambe.Component;
-import flambe.display.DrawingContext;
+import flambe.display.Graphics;
 import flambe.display.Sprite;
 import flambe.Entity;
 import flambe.scene.Director;
@@ -59,9 +59,9 @@ class MainLoop
 
     public function render (renderer :Renderer)
     {
-        var drawCtx = renderer.willRender();
-        if (drawCtx != null) {
-            _drawVisitor.init(drawCtx);
+        var graphics = renderer.willRender();
+        if (graphics != null) {
+            _drawVisitor.init(graphics);
             System.root.visit(_drawVisitor, false, true);
             renderer.didRender();
         }
@@ -159,9 +159,9 @@ private class DrawVisitor
 {
     public function new () {}
 
-    inline public function init (drawCtx :DrawingContext)
+    inline public function init (graphics :Graphics)
     {
-        _drawCtx = drawCtx;
+        _graphics = graphics;
     }
 
     public function enterEntity (entity :Entity) :Bool
@@ -182,7 +182,7 @@ private class DrawVisitor
     public function leaveEntity (entity :Entity)
     {
         if (entity.has(Sprite)) {
-            _drawCtx.restore();
+            _graphics.restore();
         }
     }
 
@@ -202,22 +202,22 @@ private class DrawVisitor
             return false;
         }
 
-        _drawCtx.save();
+        _graphics.save();
 
         if (alpha < 1) {
-            _drawCtx.multiplyAlpha(alpha);
+            _graphics.multiplyAlpha(alpha);
         }
 
         if (sprite.blendMode != null) {
-            _drawCtx.setBlendMode(sprite.blendMode);
+            _graphics.setBlendMode(sprite.blendMode);
         }
 
         var matrix = sprite.getLocalMatrix();
-        _drawCtx.transform(matrix.m00, matrix.m10, matrix.m01, matrix.m11, matrix.m02, matrix.m12);
+        _graphics.transform(matrix.m00, matrix.m10, matrix.m01, matrix.m11, matrix.m02, matrix.m12);
 
-        sprite.draw(_drawCtx);
+        sprite.draw(_graphics);
         return true;
     }
 
-    private var _drawCtx :DrawingContext = null;
+    private var _graphics :Graphics = null;
 }

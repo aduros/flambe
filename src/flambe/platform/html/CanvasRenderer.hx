@@ -6,7 +6,7 @@ package flambe.platform.html;
 
 import js.Lib;
 
-import flambe.display.DrawingContext;
+import flambe.display.Graphics;
 import flambe.display.Texture;
 
 class CanvasRenderer
@@ -14,7 +14,7 @@ class CanvasRenderer
 {
     public function new (canvas :Dynamic)
     {
-        _drawCtx = new CanvasDrawingContext(canvas);
+        _drawCtx = new CanvasGraphics(canvas);
         _drawCtx.clear();
     }
 
@@ -31,7 +31,7 @@ class CanvasRenderer
         return new CanvasTexture(canvas);
     }
 
-    public function willRender () :DrawingContext
+    public function willRender () :Graphics
     {
         _drawCtx.willRender();
 #if debug
@@ -54,9 +54,9 @@ class CanvasRenderer
 #if debug
     public function inspectNextFrame ()
     {
-        _inspector = new InspectorDrawingContext(_drawCtx);
+        _inspector = new InspectorGraphics(_drawCtx);
     }
-    private var _inspector :InspectorDrawingContext;
+    private var _inspector :InspectorGraphics;
 #end
 
     /** If true, blit loaded images to a canvas and use that as the texture. */
@@ -67,5 +67,5 @@ class CanvasRenderer
         return pattern.match(Lib.window.navigator.userAgent);
     })();
 
-    private var _drawCtx :CanvasDrawingContext;
+    private var _drawCtx :CanvasGraphics;
 }

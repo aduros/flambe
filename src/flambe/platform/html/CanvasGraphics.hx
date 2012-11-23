@@ -5,13 +5,13 @@
 package flambe.platform.html;
 
 import flambe.display.BlendMode;
-import flambe.display.DrawingContext;
+import flambe.display.Graphics;
 import flambe.display.Texture;
 import flambe.math.FMath;
 
 // TODO(bruno): Remove pixel snapping once most browsers get canvas acceleration.
-class CanvasDrawingContext
-    implements DrawingContext
+class CanvasGraphics
+    implements Graphics
 {
     public function new (canvas :Dynamic)
     {
@@ -147,7 +147,7 @@ class CanvasDrawingContext
         _firstDraw = true;
     }
 
-    // Used by InspectorDrawingContext to take a snapshot of the canvas
+    // Used by InspectorGraphics to take a snapshot of the canvas
     public function toDataURL ()
     {
         return _canvasCtx.canvas.toDataURL("image/png");

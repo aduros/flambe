@@ -4,7 +4,7 @@
 
 package flambe.swf;
 
-import flambe.display.DrawingContext;
+import flambe.display.Graphics;
 import flambe.display.Sprite;
 
 /**
@@ -25,9 +25,9 @@ class BitmapSprite extends Sprite
         anchorY._ = symbol.anchorY;
     }
 
-    override public function draw (ctx :DrawingContext)
+    override public function draw (g :Graphics)
     {
-        ctx.drawSubImage(symbol.atlas, 0, 0, symbol.x, symbol.y, symbol.width, symbol.height);
+        g.drawSubImage(symbol.atlas, 0, 0, symbol.x, symbol.y, symbol.width, symbol.height);
     }
 
     override public function getNaturalWidth () :Float

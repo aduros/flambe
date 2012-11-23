@@ -13,7 +13,7 @@ import flash.geom.Rectangle;
 
 import haxe.io.Bytes;
 
-import flambe.display.DrawingContext;
+import flambe.display.Graphics;
 import flambe.display.Texture;
 
 class Stage3DTexture
@@ -21,7 +21,7 @@ class Stage3DTexture
 {
     public var width (getWidth, null) :Int;
     public var height (getHeight, null) :Int;
-    public var ctx (getContext, null) :DrawingContext;
+    public var graphics (getGraphics, null) :Graphics;
 
     public var nativeTexture (default, null) :flash.display3D.textures.Texture;
 
@@ -120,13 +120,13 @@ class Stage3DTexture
         return _height;
     }
 
-    private function getContext () :Stage3DDrawingContext
+    private function getGraphics () :Stage3DGraphics
     {
-        if (_ctx == null) {
-            _ctx = _renderer.createDrawingContext(this);
-            _ctx.reset(_widthPow2, _heightPow2);
+        if (_graphics == null) {
+            _graphics = _renderer.createGraphics(this);
+            _graphics.reset(_widthPow2, _heightPow2);
         }
-        return _ctx;
+        return _graphics;
     }
 
     private function drawTexture (source :Stage3DTexture, destX :Int, destY :Int,
@@ -210,5 +210,5 @@ class Stage3DTexture
     private var _heightPow2 :Int;
 
     private var _renderer :Stage3DRenderer;
-    private var _ctx :Stage3DDrawingContext;
+    private var _graphics :Stage3DGraphics;
 }

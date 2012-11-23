@@ -6,7 +6,7 @@ package flambe.platform.html;
 
 import haxe.io.Bytes;
 
-import flambe.display.DrawingContext;
+import flambe.display.Graphics;
 import flambe.display.Texture;
 
 class CanvasTexture
@@ -14,7 +14,7 @@ class CanvasTexture
 {
     public var width (getWidth, null) :Int;
     public var height (getHeight, null) :Int;
-    public var ctx (getContext, null) :DrawingContext;
+    public var graphics (getGraphics, null) :Graphics;
 
     // The Image (or sometimes Canvas) used for most draw calls
     public var image (default, null) :Dynamic;
@@ -68,13 +68,13 @@ class CanvasTexture
         return image.height;
     }
 
-    private function getContext () :CanvasDrawingContext
+    private function getGraphics () :CanvasGraphics
     {
-        if (_ctx == null) {
+        if (_graphics == null) {
             getContext2d(); // Force conversion
-            _ctx = new InternalDrawingContext(this);
+            _graphics = new InternalGraphics(this);
         }
-        return _ctx;
+        return _graphics;
     }
 
     private function getContext2d () :Dynamic
@@ -90,11 +90,11 @@ class CanvasTexture
         return image.getContext("2d");
     }
 
-    private var _ctx :CanvasDrawingContext = null;
+    private var _graphics :CanvasGraphics = null;
 }
 
-// A DrawingContext that invalidates its texture's cached pattern after every draw call
-private class InternalDrawingContext extends CanvasDrawingContext
+// A Graphics that invalidates its texture's cached pattern after every draw call
+private class InternalGraphics extends CanvasGraphics
 {
     public function new (renderTarget :CanvasTexture)
     {

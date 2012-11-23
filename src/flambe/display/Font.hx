@@ -215,13 +215,13 @@ class Glyph
     }
 
     /**
-     * Draws this glyph to a DrawingContext surface.
+     * Draws this glyph to a Graphics surface.
      */
-    public function draw (ctx :DrawingContext, destX :Float, destY :Float)
+    public function draw (g :Graphics, destX :Float, destY :Float)
     {
         // Avoid drawing whitespace
         if (width > 0) {
-            ctx.drawSubImage(page, destX + xOffset, destY + yOffset, x, y, width, height);
+            g.drawSubImage(page, destX + xOffset, destY + yOffset, x, y, width, height);
         }
     }
 

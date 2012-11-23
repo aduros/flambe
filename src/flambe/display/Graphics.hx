@@ -4,7 +4,7 @@
 
 package flambe.display;
 
-interface DrawingContext
+interface Graphics
 {
     function save () :Void;
     function translate (x :Float, y :Float) :Void;

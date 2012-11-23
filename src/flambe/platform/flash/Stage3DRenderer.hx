@@ -11,7 +11,7 @@ import flash.events.ErrorEvent;
 import flash.events.Event;
 import flash.Lib;
 
-import flambe.display.DrawingContext;
+import flambe.display.Graphics;
 import flambe.display.Texture;
 
 class Stage3DRenderer
@@ -59,12 +59,12 @@ class Stage3DRenderer
         return texture;
     }
 
-    public function createDrawingContext (renderTarget :Stage3DTexture) :Stage3DDrawingContext
+    public function createGraphics (renderTarget :Stage3DTexture) :Stage3DGraphics
     {
-        return new Stage3DDrawingContext(_context3D, batcher, renderTarget);
+        return new Stage3DGraphics(_context3D, batcher, renderTarget);
     }
 
-    public function willRender () :DrawingContext
+    public function willRender () :Graphics
     {
 #if flambe_debug_renderer
         trace(">>> begin");
@@ -96,7 +96,7 @@ class Stage3DRenderer
 #end
 
         batcher = new Stage3DBatcher(_context3D);
-        _drawCtx = createDrawingContext(null);
+        _drawCtx = createGraphics(null);
         onResize(null);
 
         if (contextLost) {
@@ -119,5 +119,5 @@ class Stage3DRenderer
     }
 
     private var _context3D :Context3D;
-    private var _drawCtx :Stage3DDrawingContext;
+    private var _drawCtx :Stage3DGraphics;
 }

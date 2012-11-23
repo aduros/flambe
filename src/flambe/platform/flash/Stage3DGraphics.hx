@@ -11,15 +11,15 @@ import flash.Lib;
 import flash.Vector;
 
 import flambe.display.BlendMode;
-import flambe.display.DrawingContext;
+import flambe.display.Graphics;
 import flambe.display.Texture;
 import flambe.platform.shader.DrawImage;
 import flambe.platform.shader.DrawPattern;
 import flambe.platform.shader.FillRect;
 import flambe.util.Assert;
 
-class Stage3DDrawingContext
-    implements DrawingContext
+class Stage3DGraphics
+    implements Graphics
 {
     public function new (context3D :Context3D, batcher :Stage3DBatcher,
         renderTarget :Stage3DTexture)

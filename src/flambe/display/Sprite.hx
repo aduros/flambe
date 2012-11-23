@@ -328,9 +328,9 @@ class Sprite extends Component
     }
 
     /**
-     * Draws this sprite to the given DrawingContext.
+     * Draws this sprite to the given Graphics.
      */
-    public function draw (ctx :DrawingContext)
+    public function draw (g :Graphics)
     {
         // See subclasses
     }

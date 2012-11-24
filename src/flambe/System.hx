@@ -140,8 +140,16 @@ class System
      */
     public static function createTexture (width :Int, height :Int) :Texture
     {
-        #if debug assertCalledInit(); #end
+#if debug
+        assertCalledInit();
+        var texture = _platform.getRenderer().createEmptyTexture(width, height);
+        if (texture == null) {
+            Log.warn("Failed to create texture. Is the GPU context unavailable?");
+        }
+        return texture;
+#else
         return _platform.getRenderer().createEmptyTexture(width, height);
+#end
     }
 
     /**

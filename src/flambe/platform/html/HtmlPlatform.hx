@@ -67,6 +67,8 @@ class HtmlPlatform
         _keyboard = new BasicKeyboard();
 
         _renderer = new CanvasRenderer(canvas);
+        System.hasGPU._ = true;
+
         mainLoop = new MainLoop();
 
         _container = canvas.parentNode;

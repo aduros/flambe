@@ -93,6 +93,18 @@ class System
     public static var time (getTime, null) :Float;
 
     /**
+     * Whether the app currently has a GPU context. In some renderers (Stage3D) the GPU and all its
+     * resources may be destroyed at any time by the system. On renderers that don't need to worry
+     * about reclaiming GPU resources (HTML5 canvas) this is always true.
+     *
+     * <p>
+     * When this becomes false, all Textures and Graphics objects are destroyed and become invalid.
+     * When it returns to true, apps should reload its textures.
+     * </p>
+     */
+    public static var hasGPU (default, null) :Value<Bool> = new Value<Bool>(false);
+
+    /**
      * Starts up Flambe, this should usually be the first thing a game does.
      */
     public static function init ()

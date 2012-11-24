@@ -87,7 +87,6 @@ class Stage3DRenderer
     private function onContext3DCreate (event :Event)
     {
         var stage3D :Stage3D = event.target;
-        var contextLost = _context3D != null;
         _context3D = stage3D.context3D;
 
         Log.info("Created new Stage3D context", ["driver", _context3D.driverInfo]);
@@ -99,9 +98,9 @@ class Stage3DRenderer
         _drawCtx = createGraphics(null);
         onResize(null);
 
-        if (contextLost) {
-            // TODO(bruno): Emit a signal so the game can handle it
-        }
+        // Signal that the GPU context was (re)created
+        System.hasGPU._ = false;
+        System.hasGPU._ = true;
     }
 
     private function onError (event :ErrorEvent)

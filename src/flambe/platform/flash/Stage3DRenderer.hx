@@ -45,6 +45,10 @@ class Stage3DRenderer
 
     public function createTexture (bitmapData :Dynamic) :Stage3DTexture
     {
+        if (_context3D == null) {
+            return null; // No Stage3D context yet
+        }
+
         var bitmapData :BitmapData = cast bitmapData;
         var texture = new Stage3DTexture(this, bitmapData.width, bitmapData.height);
         texture.init(_context3D, false);
@@ -54,6 +58,10 @@ class Stage3DRenderer
 
     public function createEmptyTexture (width :Int, height :Int) :Stage3DTexture
     {
+        if (_context3D == null) {
+            return null; // No Stage3D context yet
+        }
+
         var texture = new Stage3DTexture(this, width, height);
         texture.init(_context3D, true);
         return texture;

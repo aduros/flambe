@@ -162,6 +162,11 @@ class BasicAssetPackLoader
         promise.error.emit(message);
     }
 
+    private function handleTextureError (entry :AssetEntry)
+    {
+        handleError("Failed to create texture: " + entry.url + ". Is the GPU context unavailable?");
+    }
+
     private var _platform :Platform;
 
     // How many assets are still loading

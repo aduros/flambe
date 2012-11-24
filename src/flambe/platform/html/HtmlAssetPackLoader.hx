@@ -34,7 +34,12 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                         "width", image.width, "height", image.height]);
                 }
 #end
-                handleLoad(entry, _platform.getRenderer().createTexture(image));
+                var texture = _platform.getRenderer().createTexture(image);
+                if (texture != null) {
+                    handleLoad(entry, texture);
+                } else {
+                    handleTextureError(entry);
+                }
             };
             image.onerror = function (_) {
                 handleError("Failed to load image: " + entry.url);

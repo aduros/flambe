@@ -80,7 +80,12 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
                 handleError(error.message);
                 return;
             }
-            handleLoad(entry, asset);
+            if (asset != null) {
+                handleLoad(entry, asset);
+            } else {
+                // Assume this is a failed createTexture()
+                handleTextureError(entry);
+            }
         });
         events.addDisposingListener(dispatcher, IOErrorEvent.IO_ERROR, onError);
         events.addDisposingListener(dispatcher, SecurityErrorEvent.SECURITY_ERROR, onError);

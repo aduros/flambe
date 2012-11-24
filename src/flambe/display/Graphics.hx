@@ -12,6 +12,7 @@ interface Graphics
     function rotate (rotation :Float) :Void;
     function transform (m00 :Float, m10 :Float, m01 :Float, m11 :Float, m02 :Float, m12 :Float) :Void;
     function multiplyAlpha (factor :Float) :Void;
+    function setAlpha (alpha :Float) :Void;
     function setBlendMode (blendMode :BlendMode) :Void;
     function restore () :Void;
 

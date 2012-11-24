@@ -284,6 +284,11 @@ class Stage3DGraphics
         getTopState().alpha *= factor;
     }
 
+    public function setAlpha (alpha :Float)
+    {
+        getTopState().alpha = alpha;
+    }
+
     public function setBlendMode (blendMode :BlendMode)
     {
         getTopState().blendMode = blendMode;

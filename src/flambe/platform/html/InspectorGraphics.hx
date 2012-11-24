@@ -97,6 +97,12 @@ class InspectorGraphics
         _graphics.multiplyAlpha(factor);
     }
 
+    public function setAlpha (alpha :Float)
+    {
+        logMethod("setAlpha", [alpha]);
+        _graphics.setAlpha(alpha);
+    }
+
     public function setBlendMode (blendMode :BlendMode)
     {
         logMethod("setBlendMode", [Type.enumConstructor(blendMode)]);

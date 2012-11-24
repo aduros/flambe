@@ -124,6 +124,11 @@ class CanvasGraphics
         _canvasCtx.globalAlpha *= factor;
     }
 
+    public function setAlpha (alpha :Float)
+    {
+        _canvasCtx.globalAlpha = alpha;
+    }
+
     public function setBlendMode (blendMode :BlendMode)
     {
         var op;

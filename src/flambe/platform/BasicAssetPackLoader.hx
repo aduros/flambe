@@ -60,7 +60,7 @@ class BasicAssetPackLoader
                     try {
                         loadEntry(bestEntry);
                     } catch (error :Dynamic) {
-                        handleError("Failed to load asset: " + error);
+                        handleError(bestEntry, "Unexpected error: " + error);
                     }
                 }
             }
@@ -156,15 +156,15 @@ class BasicAssetPackLoader
         promise.result = _pack;
     }
 
-    private function handleError (message :String)
+    private function handleError (entry :AssetEntry, message :String)
     {
-        Log.warn("Error loading asset pack", ["error", message]);
-        promise.error.emit(message);
+        Log.warn("Error loading asset pack", ["error", message, "url", entry.url]);
+        promise.error.emit(message.withFields(["url", entry.url]));
     }
 
     private function handleTextureError (entry :AssetEntry)
     {
-        handleError("Failed to create texture: " + entry.url + ". Is the GPU context unavailable?");
+        handleError(entry, "Failed to create texture. Is the GPU context unavailable?");
     }
 
     private var _platform :Platform;

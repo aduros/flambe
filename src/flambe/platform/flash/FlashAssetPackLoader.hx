@@ -39,33 +39,29 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
         // The function called to create the asset after its content loads
         var create :Void -> Dynamic;
 
-        try switch (entry.type) {
-            case Image:
-                var loader = new Loader();
-                dispatcher = loader.contentLoaderInfo;
-                create = function () {
-                    var bitmap :Bitmap = cast loader.content;
-                    return _platform.getRenderer().createTexture(bitmap.bitmapData);
-                };
+        switch (entry.type) {
+        case Image:
+            var loader = new Loader();
+            dispatcher = loader.contentLoaderInfo;
+            create = function () {
+                var bitmap :Bitmap = cast loader.content;
+                return _platform.getRenderer().createTexture(bitmap.bitmapData);
+            };
 
-                var ctx = new LoaderContext();
-                ctx.checkPolicyFile = true;
-                ctx.allowCodeImport = false;
-                loader.load(req, ctx);
+            var ctx = new LoaderContext();
+            ctx.checkPolicyFile = true;
+            ctx.allowCodeImport = false;
+            loader.load(req, ctx);
 
-            case Audio:
-                var sound = new Sound(req);
-                dispatcher = sound;
-                create = function () return new FlashSound(sound);
+        case Audio:
+            var sound = new Sound(req);
+            dispatcher = sound;
+            create = function () return new FlashSound(sound);
 
-            case Data:
-                var urlLoader = new URLLoader(req);
-                dispatcher = urlLoader;
-                create = function () return urlLoader.data;
-
-        } catch (error :Error) {
-            handleError(error.message);
-            return;
+        case Data:
+            var urlLoader = new URLLoader(req);
+            dispatcher = urlLoader;
+            create = function () return urlLoader.data;
         }
 
         var events = new EventGroup();
@@ -77,7 +73,7 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
             try {
                 asset = create();
             } catch (error :Error) {
-                handleError(error.message);
+                handleError(entry, error.message);
                 return;
             }
             if (asset != null) {
@@ -87,6 +83,10 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
                 handleTextureError(entry);
             }
         });
+
+        var onError = function (event :ErrorEvent) {
+            handleError(entry, event.text);
+        };
         events.addDisposingListener(dispatcher, IOErrorEvent.IO_ERROR, onError);
         events.addDisposingListener(dispatcher, SecurityErrorEvent.SECURITY_ERROR, onError);
     }
@@ -96,10 +96,5 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
         // TODO(bruno): Flash actually has an m4a decoder, but it's only accessible through the
         // horrendous NetStream API and not good old flash.media.Sound
         return (Capabilities.hasAudio && Capabilities.hasMP3) ? [ "mp3" ] : [];
-    }
-
-    private function onError (event :ErrorEvent)
-    {
-        handleError(event.text);
     }
 }

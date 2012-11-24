@@ -42,7 +42,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                 }
             };
             image.onerror = function (_) {
-                handleError("Failed to load image: " + entry.url);
+                handleError(entry, "Failed to load image");
             };
             image.src = entry.url;
 
@@ -67,7 +67,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                     });
                 };
                 req.onerror = function () {
-                    handleError("Failed to load audio " + entry.url);
+                    handleError(entry, "Failed to load audio");
                 };
                 // TODO(bruno): Handle progress events
                 req.send();
@@ -91,7 +91,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                 });
                 events.addDisposingListener(audio, "error", function (_) {
                     _mediaElements.remove(ref);
-                    handleError("Failed to load audio " + entry.url + ", code=" + audio.error.code);
+                    handleError(entry, "Failed to load audio: " + audio.error.code);
                 });
 
 
@@ -106,7 +106,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                 handleLoad(entry, data);
             };
             http.onError = function (error) {
-                handleError("Failed to load data " + entry.url + ", error=" + error);
+                handleError(entry, "Failed to load data: " + error);
             };
             http.request(false);
         }

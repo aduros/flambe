@@ -118,8 +118,10 @@ class Director extends Component
         owner.addChild(_root);
     }
 
-    override public function onDispose ()
+    override public function onRemoved ()
     {
+        completeTransition();
+
         for (scene in scenes) {
             scene.dispose();
         }

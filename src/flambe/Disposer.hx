@@ -10,8 +10,8 @@ import flambe.util.Signal1;
 import flambe.util.Signal2;
 
 /**
- * A component that manages a set of Disposable objects. When this component is disposed, all
- * attached Disposables are disposed as well.
+ * A component that manages a set of Disposable objects. When this component is removed from its
+ * owner, all managed Disposables are disposed.
  */
 class Disposer extends Component
 {
@@ -72,7 +72,7 @@ class Disposer extends Component
         return this;
     }
 
-    override public function onDispose ()
+    override public function onRemoved ()
     {
         var disposables = _disposables;
         _disposables = [];

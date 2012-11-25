@@ -95,12 +95,8 @@ class MoviePlayer extends Component
 
     override public function onRemoved ()
     {
-        owner.removeChild(_root);
-    }
-
-    override public function onDispose ()
-    {
         _root.dispose();
+        _oneshotSprite = _loopingSprite = null;
     }
 
     override public function onUpdate (dt :Float)

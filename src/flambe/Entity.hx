@@ -234,7 +234,6 @@ class Entity
 
             firstComponent.onRemoved();
             firstComponent._internal_init(null, null);
-            firstComponent.onDispose();
             firstComponent = next;
         }
 

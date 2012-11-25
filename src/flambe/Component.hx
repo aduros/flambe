@@ -35,16 +35,9 @@ class Component
     }
 
     /**
-     * Called before this component has been removed from an entity.
+     * Called just before this component has been removed from its entity.
      */
     public function onRemoved ()
-    {
-    }
-
-    /**
-     * Called when this component has been disposed.
-     */
-    public function onDispose ()
     {
     }
 
@@ -57,14 +50,13 @@ class Component
     }
 
     /**
-     * Removes this component from its owning entity and calls onDispose.
+     * Removes this component from its owning entity.
      */
     public function dispose ()
     {
         if (owner != null) {
             owner.remove(this);
         }
-        onDispose();
     }
 
     /** @private */ public function _internal_init (owner :Entity, next :Component)

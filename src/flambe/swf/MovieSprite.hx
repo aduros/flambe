@@ -86,17 +86,10 @@ class MovieSprite extends Sprite
     {
         super.onRemoved();
 
+        // Detach the animator content layers so they don't get disconnected during a disposal. This
+        // may be a little hacky as it prevents child components from ever being formally removed.
         for (animator in _animators) {
             owner.removeChild(animator.content);
-        }
-    }
-
-    override public function onDispose ()
-    {
-        super.onDispose();
-
-        for (animator in _animators) {
-            animator.content.dispose();
         }
     }
 

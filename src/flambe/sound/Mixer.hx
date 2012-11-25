@@ -43,7 +43,7 @@ class Mixer
         }
     }
 
-    override public function onDispose ()
+    override public function onRemoved ()
     {
         stopAll();
         _sounds = [];

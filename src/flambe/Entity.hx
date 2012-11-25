@@ -13,41 +13,75 @@ import flambe.util.Disposable;
 using Lambda;
 
 /**
- * A node in the entity hierarchy, and a collection of components.
+ * <p>A node in the entity hierarchy, and a collection of components.</p>
+ *
+ * <p>To iterate over the hierarchy, use the parent, firstChild, next and firstComponent fields. For
+ * example:</p>
+ *
+ * <pre>
+ * // Iterate over entity's children
+ * var child = entity.firstChild;
+ * while (child != null) {
+ *     var next = child.next; // Store in case the child is removed in process()
+ *     process(child);
+ *     child = next;
+ * }
+ * </pre>
  */
 class Entity
     implements Disposable
 {
-    public var parent (default, null) :Entity;
+    /** This entity's parent. */
+    public var parent (default, null) :Entity = null;
+
+    /** This entity's first child. */
+    public var firstChild (default, null) :Entity = null;
+
+    /** This entity's next sibling, for iteration. */
+    public var next (default, null) :Entity = null;
+
+    /** This entity's first component. */
+    public var firstComponent (default, null) :Component = null;
 
     public function new ()
     {
-        _comps = [];
 #if flash
         _compMap = cast new flash.utils.Dictionary();
 #elseif js
         _compMap = {};
 #end
-        _internal_children = [];
     }
 
     /**
      * Add a component to this entity.
      * @returns This instance, for chaining.
      */
-    public function add (comp :Component) :Entity
+    public function add (component :Component) :Entity
     {
-        var name = comp.getName();
+        var name = component.getName();
         var prev = getComponent(name);
         if (prev != null) {
+            // Remove the previous component under this name
+            // TODO(bruno): Dispose it?
             remove(prev);
         }
 
-        untyped _compMap[name] = comp;
-        _comps.push(comp);
+        untyped _compMap[name] = component;
 
-        comp._internal_setOwner(this);
-        comp.onAdded();
+        // Append it to the component list
+        var tail = null, p = firstComponent;
+        while (p != null) {
+            tail = p;
+            p = p.next;
+        }
+        if (tail != null) {
+            tail._internal_setNext(component);
+        } else {
+            firstComponent = component;
+        }
+
+        component._internal_init(this, null);
+        component.onAdded();
 
         return this;
     }
@@ -55,21 +89,34 @@ class Entity
     /**
      * Remove a component from this entity.
      */
-    public function remove (comp :Component)
+    public function remove (component :Component)
     {
-        if (comp.owner == this) {
-            var name = comp.getName();
+        var prev :Component = null, p = firstComponent;
+        while (p != null) {
+            if (p == component) {
+                // Splice out p
+                var next = p.next;
+                if (prev == null) {
+                    firstComponent = next;
+                } else {
+                    prev._internal_init(this, next);
+                }
+
+                // Remove it from the _compMap
+                var name = p.getName();
 #if flash
-            untyped __delete__(_compMap, name);
+                untyped __delete__(_compMap, name);
 #elseif js
-            untyped __js__("delete")(_compMap[name]);
+                untyped __js__("delete")(_compMap[name]);
 #end
-            var idx = _comps.indexOf(comp);
-            if (idx >= 0) {
-                _comps[idx] = null;
+
+                // Notify the component it was removed
+                p.onRemoved();
+                p._internal_init(null, null);
+                return;
             }
-            comp.onRemoved();
-            comp._internal_setOwner(null);
+            prev = p;
+            p = p.next;
         }
     }
 
@@ -113,56 +160,42 @@ class Entity
         return untyped _compMap[name];
     }
 
-    public function visit (visitor :Visitor, visitComponents :Bool, visitChildren :Bool)
-    {
-        if (!visitor.enterEntity(this)) {
-            return;
-        }
-
-        if (visitComponents) {
-            var ii = 0;
-            while (ii < _comps.length) {
-                var comp = _comps[ii];
-                if (comp == null) {
-                    _comps.splice(ii, 1);
-                } else {
-                    comp.visit(visitor);
-                    ++ii;
-                }
-            }
-        }
-
-        if (visitChildren) {
-            var ii = 0;
-            while (ii < _internal_children.length) {
-                var child = _internal_children[ii];
-                if (child == null) {
-                    _internal_children.splice(ii, 1);
-                } else {
-                    child.visit(visitor, visitComponents, visitChildren);
-                    ++ii;
-                }
-            }
-        }
-
-        visitor.leaveEntity(this);
-    }
-
     public function addChild (entity :Entity)
     {
         if (entity.parent != null) {
             entity.parent.removeChild(entity);
         }
         entity.parent = this;
-        _internal_children.push(entity);
+
+        // Append it to the sibling list
+        var tail = null, p = firstChild;
+        while (p != null) {
+            tail = p;
+            p = p.next;
+        }
+        if (tail != null) {
+            tail.next = entity;
+        } else {
+            firstChild = entity;
+        }
     }
 
     public function removeChild (entity :Entity)
     {
-        var idx = _internal_children.indexOf(entity);
-        if (idx >= 0) {
-            _internal_children[idx] = null;
-            entity.parent = null;
+        var prev :Entity = null, p = firstChild;
+        while (p != null) {
+            if (p == entity) {
+                // Splice out p
+                var next = p.next;
+                if (prev == null) {
+                    firstChild = next;
+                } else {
+                    prev.next = next;
+                }
+                return;
+            }
+            prev = p;
+            p = p.next;
         }
     }
 
@@ -172,15 +205,10 @@ class Entity
      */
     public function disposeChildren ()
     {
-        var ii = 0;
-        while (ii < _internal_children.length) {
-            var child = _internal_children[ii];
-            if (child != null) {
-                _internal_children[ii] = null;
-                child.parent = null;
-                child.dispose();
-            }
-            ++ii;
+        while (firstChild != null) {
+            var next = firstChild.next;
+            firstChild.dispose();
+            firstChild = next;
         }
     }
 
@@ -193,24 +221,19 @@ class Entity
             parent.removeChild(this);
         }
 
-        // Dispose components
-        var ii = 0;
-        while (ii < _comps.length) {
-            var comp = _comps[ii];
-            if (comp != null) {
-                var name = comp.getName();
-                _comps[ii] = null;
+        while (firstComponent != null) {
+            var next = firstComponent.next;
+            var name = firstComponent.getName();
 #if flash
-                untyped __delete__(_compMap, name);
+            untyped __delete__(_compMap, name);
 #elseif js
-                untyped __js__("delete")(_compMap[name]);
+            untyped __js__("delete")(_compMap[name]);
 #end
 
-                comp.onRemoved();
-                comp._internal_setOwner(null);
-                comp.onDispose();
-            }
-            ++ii;
+            firstComponent.onRemoved();
+            firstComponent._internal_init(null, null);
+            firstComponent.onDispose();
+            firstComponent = next;
         }
 
         disposeChildren();
@@ -221,8 +244,4 @@ class Entity
      * Object/Dictionary for the quickest possible lookups in this critical part of Flambe.
      */
     private var _compMap :Dynamic<Component>;
-
-    private var _comps :Array<Component>;
-
-    /** @private */ public var _internal_children :Array<Entity>;
 }

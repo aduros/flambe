@@ -129,17 +129,9 @@ class Sprite extends Component
         }
 
         // Hit test all children, front to back
-        var children = entity._internal_children;
-        var ii = children.length - 1;
-        while (ii >= 0) {
-            var child = children[ii];
-            if (child != null) {
-                var result = hitTest(child, x, y);
-                if (result != null) {
-                    return result;
-                }
-            }
-            --ii;
+        var result = hitTestBackwards(entity.firstChild, x, y);
+        if (result != null) {
+            return result;
         }
 
         // Finally, if we got this far, hit test the actual sprite
@@ -398,6 +390,15 @@ class Sprite extends Component
         return pointerEnabled;
     }
 
+    private static function hitTestBackwards (entity :Entity, x :Float, y :Float)
+    {
+        if (entity != null) {
+            var result = hitTestBackwards(entity.next, x, y);
+            return (result != null) ? result : hitTest(entity, x, y);
+        }
+        return null;
+    }
+
     private static function getBoundsImpl (entity :Entity, matrix :Matrix, result :Rectangle)
     {
         var sprite = entity.get(Sprite);
@@ -426,14 +427,11 @@ class Sprite extends Component
         }
 
         // Recurse into all children
-        var children = entity._internal_children;
-        var ii = 0, ll = children.length;
-        while (ii < ll) {
-            var child = children[ii];
-            if (child != null) {
-                getBoundsImpl(child, matrix, result);
-            }
-            ++ii;
+        var p = entity.firstChild;
+        while (p != null) {
+            var next = p.next;
+            getBoundsImpl(p, matrix, result);
+            p = next;
         }
     }
 

@@ -5,7 +5,6 @@
 package flambe;
 
 import flambe.util.Disposable;
-import flambe.Visitor;
 
 /**
  * Components are bits of data and logic that can be added to entities.
@@ -17,10 +16,11 @@ import flambe.Visitor;
 class Component
     implements Disposable
 {
-    /**
-     * The entity this component is attached to, or null.
-     */
+    /** The entity this component is attached to, or null. */
     public var owner (default, null) :Entity;
+
+    /** The owner's next component, for iteration. */
+    public var next (default, null) :Component;
 
     public function getName () :String
     {
@@ -67,13 +67,14 @@ class Component
         onDispose();
     }
 
-    public function visit (visitor :Visitor)
+    /** @private */ public function _internal_init (owner :Entity, next :Component)
     {
-        visitor.acceptComponent(this);
+        this.owner = owner;
+        this.next = next;
     }
 
-    /** @private */ inline public function _internal_setOwner (entity :Entity)
+    /** @private */ inline public function _internal_setNext (next :Component)
     {
-        owner = entity;
+        this.next = next;
     }
 }

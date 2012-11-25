@@ -142,7 +142,7 @@ class SignalBase
 
     private function listRemove (conn :SignalConnection)
     {
-        var prev = null, p = _head;
+        var prev :SignalConnection = null, p = _head;
         while (p != null) {
             if (p == conn) {
                 // Splice out p

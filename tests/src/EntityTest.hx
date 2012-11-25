@@ -6,7 +6,6 @@ import haxe.unit.TestCase;
 
 import flambe.Component;
 import flambe.Entity;
-import flambe.Visitor;
 
 class EntityTest extends TestCase
 {

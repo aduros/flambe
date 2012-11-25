@@ -128,18 +128,6 @@ class Sprite extends Component
             }
         }
 
-        // Hit test the top director scene, if any
-        var director = entity.get(Director);
-        if (director != null) {
-            var scene = director.topScene;
-            if (scene != null) {
-                var result = hitTest(scene, x, y);
-                if (result != null) {
-                    return result;
-                }
-            }
-        }
-
         // Hit test all children, front to back
         var children = entity._internal_children;
         var ii = children.length - 1;
@@ -426,10 +414,10 @@ class Sprite extends Component
             extendRect(matrix, 0, height, result);
         }
 
-        // Recurse into all visible director scenes
+        // Recurse into partially occluded director scenes
         var director = entity.get(Director);
         if (director != null) {
-            var scenes = director.visibleScenes;
+            var scenes = director.occludedScenes;
             var ii = 0, ll = scenes.length;
             while (ii < ll) {
                 getBoundsImpl(scenes[ii], matrix, result);

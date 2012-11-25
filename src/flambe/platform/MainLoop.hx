@@ -168,10 +168,10 @@ private class DrawVisitor
     {
         var didDraw = drawSprite(entity);
 
-        // Also recurse into a Director's visible scenes
+        // Also recurse into a Director's partially occluded scenes
         var director = entity.get(Director);
         if (director != null && didDraw) {
-            for (scene in director.visibleScenes) {
+            for (scene in director.occludedScenes) {
                 scene.visit(this, false, true);
             }
         }

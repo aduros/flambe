@@ -5,11 +5,11 @@
 package flambe.scene;
 
 import flambe.Component;
-import flambe.Visitor;
 
 /**
  * Manages a stack of scenes. Only the front-most scene receives game updates.
  */
+// TODO(bruno): Major robustness cleanup and testing needed here
 class Director extends Component
 {
     /** The front-most scene. */
@@ -18,8 +18,11 @@ class Director extends Component
     /** The complete list of scenes managed by this director, from back to front. */
     public var scenes (default, null) :Array<Entity>;
 
-    /** The list of scenes that are not occluded by an opaque scene, from back to front. */
-    public var visibleScenes (default, null) :Array<Entity>;
+    /**
+     * The scenes that are partially occluded by a transparent or transitioning scene, from back to
+     * front. These scenes are not updated, but they're still drawn.
+     */
+    public var occludedScenes (default, null) :Array<Entity>;
 
     /** Whether the director is currently transitioning between scenes. */
     public var transitioning (isTransitioning, null) :Bool;
@@ -33,7 +36,8 @@ class Director extends Component
     public function new ()
     {
         scenes = [];
-        visibleScenes = [];
+        occludedScenes = [];
+        _root = new Entity();
     }
 
     /**
@@ -54,7 +58,6 @@ class Director extends Component
         var oldTop = getTopScene();
         if (oldTop != null) {
             playTransition(oldTop, scene, transition, function () {
-                add(scene);
                 hide(oldTop);
             });
         } else {
@@ -69,13 +72,14 @@ class Director extends Component
 
         var oldTop = getTopScene();
         if (oldTop != null) {
-            if (scenes.length > 1) {
-                var newTop = scenes[scenes.length-2];
+            scenes.pop(); // Pop oldTop
+            var newTop = getTopScene();
+            if (newTop != null) {
                 playTransition(oldTop, newTop, transition, function () {
-                    hideAndDispose(scenes.pop());
+                    hideAndDispose(oldTop);
                 });
             } else {
-                hideAndDispose(scenes.pop());
+                hideAndDispose(oldTop);
                 invalidateVisibility();
             }
         }
@@ -95,14 +99,12 @@ class Director extends Component
                 return; // We're already there
             }
 
+            scenes.pop(); // Pop oldTop
+            while (scenes.length > 0 && scenes[scenes.length-1] != scene) {
+                scenes.pop().dispose(); // Don't emit a hide, just dispose them
+            }
+
             playTransition(oldTop, scene, transition, function () {
-                var oldTop = scenes.pop();
-                while (scenes.length > 0 && scenes[scenes.length-1] != scene) {
-                    scenes.pop().dispose(); // Don't emit a hide, just dispose them
-                }
-                if (scenes.length == 0) {
-                    add(scene);
-                }
                 hideAndDispose(oldTop);
             });
 
@@ -111,37 +113,26 @@ class Director extends Component
         }
     }
 
+    override public function onAdded ()
+    {
+        owner.addChild(_root);
+    }
+
     override public function onDispose ()
     {
         for (scene in scenes) {
             scene.dispose();
         }
         scenes = [];
+        occludedScenes = [];
 
-        if (_transitor != null) {
-            _transitor.dispose();
-            _transitor = null;
-        }
+        _root.dispose();
     }
 
     override public function onUpdate (dt :Float)
     {
         if (_transitor != null && _transitor.update(dt)) {
             completeTransition();
-        }
-    }
-
-    override public function visit (visitor :Visitor)
-    {
-        visitor.acceptComponent(this);
-
-        if (_transitor != null) {
-            _transitor.visit(visitor);
-        } else {
-            var scene = getTopScene();
-            if (scene != null) {
-                scene.visit(visitor, true, true);
-            }
         }
     }
 
@@ -158,8 +149,14 @@ class Director extends Component
 
     private function add (scene :Entity)
     {
+        var oldTop = getTopScene();
+        if (oldTop != null) {
+            _root.removeChild(oldTop);
+        }
+
+        scenes.remove(scene);
         scenes.push(scene);
-        scene._internal_setParent(owner);
+        _root.addChild(scene);
     }
 
     private function hide (scene :Entity)
@@ -195,7 +192,9 @@ class Director extends Component
                 break;
             }
         }
-        visibleScenes = scenes.slice(ii, scenes.length);
+
+        // All visible scenes up to, but not including, the top scene
+        occludedScenes = (scenes.length > 0) ? scenes.slice(ii, scenes.length-1) : [];
 
         // Notify the new top scene that it's being shown
         var scene = getTopScene();
@@ -206,7 +205,6 @@ class Director extends Component
 
     // Notes:
     // - Any method that modifies the scene stack should immediately call completeTransition.
-    // - If a transition is used, the method should only modify the stack in onComplete.
     private function completeTransition ()
     {
         if (_transitor != null) {
@@ -221,11 +219,10 @@ class Director extends Component
         transition :Transition, onComplete :Void->Void)
     {
         completeTransition();
+        add(to);
 
         if (transition != null) {
-            // Ensure the scene being transitioned to is rendered on top
-            visibleScenes.remove(to);
-            visibleScenes.push(to);
+            occludedScenes.push(from);
 
             _transitor = new Transitor(from, to, transition, onComplete);
             _transitor.init(this);
@@ -244,6 +241,9 @@ class Director extends Component
     {
         return (_height < 0) ? System.stage.height : _height;
     }
+
+    /** The container for the current scene. */
+    private var _root :Entity;
 
     private var _transitor :Transitor = null;
     private var _width :Float = -1;
@@ -265,12 +265,6 @@ private class Transitor
         _transition.init(director, _from, _to);
     }
 
-    public function visit (visitor :Visitor)
-    {
-        // _from.visit(visitor, true, true);
-        _to.visit(visitor, true, true);
-    }
-
     public function update (dt :Float) :Bool
     {
         return _transition.update(dt);
@@ -280,12 +274,6 @@ private class Transitor
     {
         _transition.complete();
         _onComplete();
-    }
-
-    public function dispose ()
-    {
-        _from.dispose();
-        _to.dispose();
     }
 
     private var _from :Entity;

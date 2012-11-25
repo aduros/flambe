@@ -95,7 +95,7 @@ class SlideTransition extends TweenTransition
 
     override public function complete ()
     {
-        _from.get(Sprite).setXY(_x, _y);
+        _from.get(Sprite).setXY(0, 0);
         _to.get(Sprite).setXY(0, 0);
     }
 

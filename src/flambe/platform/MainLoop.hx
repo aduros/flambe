@@ -5,11 +5,11 @@
 package flambe.platform;
 
 import flambe.Component;
+import flambe.Entity;
+import flambe.System;
 import flambe.display.Graphics;
 import flambe.display.Sprite;
-import flambe.Entity;
 import flambe.scene.Director;
-import flambe.System;
 
 using Lambda;
 
@@ -56,7 +56,7 @@ class MainLoop
     {
         var graphics = renderer.willRender();
         if (graphics != null) {
-            renderEntity(System.root, graphics);
+            Sprite.render(System.root, graphics);
             renderer.didRender();
         }
     }
@@ -105,52 +105,6 @@ class MainLoop
             var next = p.next;
             updateEntity(p, dt);
             p = next;
-        }
-    }
-
-    private static function renderEntity (entity :Entity, g :Graphics)
-    {
-        // Render this child's sprite
-        var sprite = entity.get(Sprite);
-        if (sprite != null) {
-            var alpha = sprite.alpha._;
-            if (!sprite.visible || alpha <= 0) {
-                return; // Prune traversal, this sprite and all children are invisible
-            }
-
-            g.save();
-            if (alpha < 1) {
-                g.multiplyAlpha(alpha);
-            }
-            if (sprite.blendMode != null) {
-                g.setBlendMode(sprite.blendMode);
-            }
-            var matrix = sprite.getLocalMatrix();
-            g.transform(matrix.m00, matrix.m10, matrix.m01, matrix.m11, matrix.m02, matrix.m12);
-
-            sprite.draw(g);
-        }
-
-        // Render any partially occluded director scenes
-        var director = entity.get(Director);
-        if (director != null) {
-            var scenes = director.occludedScenes;
-            for (scene in scenes) {
-                renderEntity(scene, g);
-            }
-        }
-
-        // Render all children
-        var p = entity.firstChild;
-        while (p != null) {
-            var next = p.next;
-            renderEntity(p, g);
-            p = next;
-        }
-
-        // If save() was called, unwind it
-        if (sprite != null) {
-            g.restore();
         }
     }
 

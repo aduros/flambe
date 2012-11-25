@@ -159,6 +159,55 @@ class Sprite extends Component
     }
 
     /**
+     * Renders an entity hierarchy to the given Graphics.
+     */
+    public static function render (entity :Entity, g :Graphics)
+    {
+        // Render this entity's sprite
+        var sprite = entity.get(Sprite);
+        if (sprite != null) {
+            var alpha = sprite.alpha._;
+            if (!sprite.visible || alpha <= 0) {
+                return; // Prune traversal, this sprite and all children are invisible
+            }
+
+            g.save();
+            if (alpha < 1) {
+                g.multiplyAlpha(alpha);
+            }
+            if (sprite.blendMode != null) {
+                g.setBlendMode(sprite.blendMode);
+            }
+            var matrix = sprite.getLocalMatrix();
+            g.transform(matrix.m00, matrix.m10, matrix.m01, matrix.m11, matrix.m02, matrix.m12);
+
+            sprite.draw(g);
+        }
+
+        // Render any partially occluded director scenes
+        var director = entity.get(Director);
+        if (director != null) {
+            var scenes = director.occludedScenes;
+            for (scene in scenes) {
+                render(scene, g);
+            }
+        }
+
+        // Render all children
+        var p = entity.firstChild;
+        while (p != null) {
+            var next = p.next;
+            render(p, g);
+            p = next;
+        }
+
+        // If save() was called, unwind it
+        if (sprite != null) {
+            g.restore();
+        }
+    }
+
+    /**
      * The "natural" width of this sprite, without any transformations being applied. Used for hit
      * testing.
      */

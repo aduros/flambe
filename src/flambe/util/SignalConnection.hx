@@ -44,7 +44,7 @@ class SignalConnection
         }
     }
 
-    /** @private */ public var _internal_next :SignalConnection;
+    /** @private */ public var _internal_next :SignalConnection = null;
 
     /** @private */ public var _internal_listener :Dynamic;
     private var _signal :SignalBase;

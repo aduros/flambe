@@ -93,9 +93,9 @@ class Entity
     {
         var prev :Component = null, p = firstComponent;
         while (p != null) {
+            var next = p.next;
             if (p == component) {
-                // Splice out p
-                var next = p.next;
+                // Splice out the component
                 if (prev == null) {
                     firstComponent = next;
                 } else {
@@ -116,7 +116,7 @@ class Entity
                 return;
             }
             prev = p;
-            p = p.next;
+            p = next;
         }
     }
 
@@ -184,18 +184,20 @@ class Entity
     {
         var prev :Entity = null, p = firstChild;
         while (p != null) {
+            var next = p.next;
             if (p == entity) {
-                // Splice out p
-                var next = p.next;
+                // Splice out the entity
                 if (prev == null) {
                     firstChild = next;
                 } else {
                     prev.next = next;
                 }
+                p.parent = null;
+                p.next = null;
                 return;
             }
             prev = p;
-            p = p.next;
+            p = next;
         }
     }
 

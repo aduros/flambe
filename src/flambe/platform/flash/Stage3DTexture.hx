@@ -55,6 +55,7 @@ class Stage3DTexture
             // Resize up to the next power of two, padding with transparent black
             var resized = new BitmapData(_widthPow2, _heightPow2, true, 0x00000000);
             resized.copyPixels(bitmapData, bitmapData.rect, new Point(0, 0));
+            drawBorder(resized, bitmapData.width, bitmapData.height);
             bitmapData = resized;
         }
         nativeTexture.uploadFromBitmapData(bitmapData);
@@ -97,6 +98,7 @@ class Stage3DTexture
         // Load the pixels into a BitmapData
         var bitmapData = new BitmapData(sourceWPow2, sourceHPow2, true, 0x00000000);
         bitmapData.setPixels(new Rectangle(0, 0, sourceW, sourceH), copy.getData());
+        drawBorder(bitmapData, sourceW, sourceH);
 
         if (x == 0 && y == 0 && sourceWPow2 == _widthPow2 && sourceHPow2 == _heightPow2) {
             // Replace the entire texture
@@ -201,6 +203,23 @@ class Stage3DTexture
             p <<= 1;
         }
         return p;
+    }
+
+    /**
+     * Extends the right and bottom edge pixels of a bitmap. This is to prevent artifacts caused by
+     * sampling the outer transparency when the edge pixels are sampled.
+     */
+    private static function drawBorder (bitmapData :BitmapData, width :Int, height :Int)
+    {
+        // Right edge
+        bitmapData.copyPixels(bitmapData,
+            new Rectangle(width-1, 0, 1, height), new Point(width, 0));
+
+        // Bottom edge
+        bitmapData.copyPixels(bitmapData,
+            new Rectangle(0, height-1, width, 1), new Point(0, height));
+
+        // Is a one pixel border enough?
     }
 
     private var _width :Int;

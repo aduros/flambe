@@ -160,6 +160,10 @@ class Entity
         return untyped _compMap[name];
     }
 
+    /**
+     * Adds a child to this entity.
+     * @returns This instance, for chaining.
+     */
     public function addChild (entity :Entity)
     {
         if (entity.parent != null) {
@@ -178,6 +182,8 @@ class Entity
         } else {
             firstChild = entity;
         }
+
+        return this;
     }
 
     public function removeChild (entity :Entity)

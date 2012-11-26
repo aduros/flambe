@@ -49,7 +49,7 @@ class CanvasTexture
         }
 
         // Draw the pixels, and invalidate our contents
-        ctx2d.putImageData(imageData, x, y, 0, 0, sourceW, sourceH);
+        ctx2d.putImageData(imageData, x, y);
         dirtyContents();
     }
 

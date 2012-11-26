@@ -246,6 +246,42 @@ class Entity
         disposeChildren();
     }
 
+#if debug
+    @:keep public function toString () :String
+    {
+        return toStringImpl("");
+    }
+#end
+
+    private function toStringImpl (indent :String) :String
+    {
+        var output = "";
+        var p = firstComponent;
+        while (p != null) {
+            output += p.getName();
+            if (p.next != null) {
+                output += ", ";
+            }
+            p = p.next;
+        }
+        output += "\n";
+
+        // Oof, Haxe doesn't support escaped unicode in string literals
+        var u2514 = String.fromCharCode(0x2514); // └
+        var u241c = String.fromCharCode(0x251c); // ├
+        var u2500 = String.fromCharCode(0x2500); // ─
+        var u2502 = String.fromCharCode(0x2502); // │
+
+        var p = firstChild;
+        while (p != null) {
+            var last = p.next == null;
+            output += indent + (last ? u2514 : u241c) + u2500+u2500+" ";
+            output += p.toStringImpl(indent + (last ? " " : u2502) + "   ");
+            p = p.next;
+        }
+        return output;
+    }
+
     /**
      * Maps String -> Component. Usually you would use a Haxe Hash here, but I'm dropping down to plain
      * Object/Dictionary for the quickest possible lookups in this critical part of Flambe.

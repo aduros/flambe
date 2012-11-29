@@ -212,9 +212,7 @@ class Entity
     public function disposeChildren ()
     {
         while (firstChild != null) {
-            var next = firstChild.next;
             firstChild.dispose();
-            firstChild = next;
         }
     }
 
@@ -228,18 +226,8 @@ class Entity
         }
 
         while (firstComponent != null) {
-            var next = firstComponent.next;
-#if flash
-            untyped __delete__(_compMap, firstComponent.name);
-#elseif js
-            untyped __js__("delete")(_compMap[firstComponent.name]);
-#end
-
-            firstComponent.onRemoved();
-            firstComponent._internal_init(null, null);
-            firstComponent = next;
+            firstComponent.dispose();
         }
-
         disposeChildren();
     }
 

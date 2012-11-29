@@ -156,11 +156,9 @@ class Matrix
         return result;
     }
 
-#if debug
-    @:keep public function toString () :String
+    #if debug @:keep #end public function toString () :String
     {
         return m00 + " " + m01 + " " + m02 + " \\ " +
             m10 + " " + m11 + " " + m12;
     }
-#end
 }

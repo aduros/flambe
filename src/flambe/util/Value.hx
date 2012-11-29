@@ -68,12 +68,10 @@ class Value<A>
         return _changed;
     }
 
-#if debug
-    @:keep public function toString () :String
+    #if debug @:keep #end public function toString () :String
     {
         return cast _value;
     }
-#end
 
     private var _value :A;
     private var _changed :Signal2<A,A>;

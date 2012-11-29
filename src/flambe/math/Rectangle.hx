@@ -49,10 +49,8 @@ class Rectangle
         return result;
     }
 
-#if debug
-    @:keep public function toString () :String
+    #if debug @:keep #end public function toString () :String
     {
         return "(" + x + "," + y + " " + width + "x" + height + ")";
     }
-#end
 }

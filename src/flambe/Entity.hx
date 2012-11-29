@@ -231,12 +231,10 @@ class Entity
         disposeChildren();
     }
 
-#if debug
-    @:keep public function toString () :String
+    #if debug @:keep #end public function toString () :String
     {
         return toStringImpl("");
     }
-#end
 
     private function toStringImpl (indent :String) :String
     {

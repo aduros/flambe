@@ -22,10 +22,11 @@ class Component
     /** The owner's next component, for iteration. */
     public var next (default, null) :Component;
 
-    public function getName () :String
-    {
-        return null; // Subclasses will automagically implement this
-    }
+    /**
+     * The component's name, generated based on its class. Components with the same name replace
+     * eachother when added to an entity.
+     */
+    public var name (getName, null) :String;
 
     /**
      * Called after this component has been added to an entity.
@@ -57,6 +58,11 @@ class Component
         if (owner != null) {
             owner.remove(this);
         }
+    }
+
+    private function getName () :String
+    {
+        return null; // Subclasses will automagically implement this
     }
 
     /** @private */ public function _internal_init (owner :Entity, next :Component)

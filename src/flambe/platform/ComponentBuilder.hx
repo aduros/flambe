@@ -37,7 +37,7 @@ class ComponentBuilder
         // new namespace
         if (extendsComponentBase(cl)) {
             fields = fields.concat(Macros.buildFields(macro {
-                function override__public__getName () :String {
+                function override__private__getName () :String {
                     return $name;
                 }
             }));

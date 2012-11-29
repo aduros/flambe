@@ -58,11 +58,10 @@ class Entity
      */
     public function add (component :Component) :Entity
     {
-        var name = component.getName();
+        var name = component.name;
         var prev = getComponent(name);
         if (prev != null) {
             // Remove the previous component under this name
-            // TODO(bruno): Dispose it?
             remove(prev);
         }
 
@@ -103,11 +102,10 @@ class Entity
                 }
 
                 // Remove it from the _compMap
-                var name = p.getName();
 #if flash
-                untyped __delete__(_compMap, name);
+                untyped __delete__(_compMap, p.name);
 #elseif js
-                untyped __js__("delete")(_compMap[name]);
+                untyped __js__("delete")(_compMap[p.name]);
 #end
 
                 // Notify the component it was removed
@@ -231,11 +229,10 @@ class Entity
 
         while (firstComponent != null) {
             var next = firstComponent.next;
-            var name = firstComponent.getName();
 #if flash
-            untyped __delete__(_compMap, name);
+            untyped __delete__(_compMap, firstComponent.name);
 #elseif js
-            untyped __js__("delete")(_compMap[name]);
+            untyped __js__("delete")(_compMap[firstComponent.name]);
 #end
 
             firstComponent.onRemoved();
@@ -258,7 +255,7 @@ class Entity
         var output = "";
         var p = firstComponent;
         while (p != null) {
-            output += p.getName();
+            output += p.name;
             if (p.next != null) {
                 output += ", ";
             }

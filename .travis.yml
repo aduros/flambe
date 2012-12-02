@@ -15,7 +15,7 @@ before_script:
     - curl http://haxe.org/file/hxinst-linux.tgz | tar zxf -
     - echo y | sudo ./hxinst-linux > /dev/null
     - echo | haxelib setup
-    - haxelib install format
-    - haxelib install nape
+    - haxelib install format || true
+    - haxelib install nape || true
 
 script: bin/run-travis

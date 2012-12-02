@@ -160,24 +160,32 @@ class Entity
 
     /**
      * Adds a child to this entity.
+     * @param append Whether to add the entity to the end or beginning of the child list.
      * @returns This instance, for chaining.
      */
-    public function addChild (entity :Entity)
+    public function addChild (entity :Entity, append :Bool=true)
     {
         if (entity.parent != null) {
             entity.parent.removeChild(entity);
         }
         entity.parent = this;
 
-        // Append it to the sibling list
-        var tail = null, p = firstChild;
-        while (p != null) {
-            tail = p;
-            p = p.next;
-        }
-        if (tail != null) {
-            tail.next = entity;
+        if (append) {
+            // Append it to the child list
+            var tail = null, p = firstChild;
+            while (p != null) {
+                tail = p;
+                p = p.next;
+            }
+            if (tail != null) {
+                tail.next = entity;
+            } else {
+                firstChild = entity;
+            }
+
         } else {
+            // Prepend it to the child list
+            entity.next = firstChild;
             firstChild = entity;
         }
 

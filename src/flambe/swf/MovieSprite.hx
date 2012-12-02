@@ -8,6 +8,7 @@ import flambe.animation.AnimatedFloat;
 import flambe.display.Sprite;
 import flambe.math.FMath;
 import flambe.swf.MovieSymbol;
+import flambe.util.Signal0;
 
 using flambe.util.BitSets;
 using flambe.util.Strings;
@@ -17,14 +18,10 @@ using flambe.util.Strings;
  */
 class MovieSprite extends Sprite
 {
-    /**
-     * The symbol this sprite displays.
-     */
+    /** The symbol this sprite displays. */
     public var symbol (default, null) :MovieSymbol;
 
-    /**
-     * The current playback position in seconds.
-     */
+    /** The current playback position in seconds. */
     public var position (getPosition, setPosition) :Float;
 
     /**
@@ -32,10 +29,11 @@ class MovieSprite extends Sprite
      */
     public var speed (default, null) :AnimatedFloat;
 
-    /**
-     * Whether this movie is currently paused.
-     */
+    /** Whether this movie is currently paused. */
     public var paused (isPaused, setPaused) :Bool;
+
+    /** Emitted when this movie loops back to the beginning. */
+    public var looped (getLooped, null) :Signal0;
 
     public function new (symbol :MovieSymbol)
     {
@@ -99,15 +97,21 @@ class MovieSprite extends Sprite
 
         speed.update(dt);
 
+        var looped = false;
         if (!isPaused()) {
             _position += speed._*dt;
             if (_position > symbol.duration) {
                 _position = _position % symbol.duration;
+                looped = true;
             }
         }
 
         var newFrame = _position*symbol.frameRate;
         goto(newFrame);
+
+        if (looped && _looped != null) {
+            _looped.emit();
+        }
     }
 
     private function goto (newFrame :Float)
@@ -151,10 +155,20 @@ class MovieSprite extends Sprite
         return paused;
     }
 
+    private function getLooped () :Signal0
+    {
+        if (_looped == null) {
+            _looped = new Signal0();
+        }
+        return _looped;
+    }
+
     private var _animators :Array<LayerAnimator>;
 
     private var _position :Float;
     private var _frame :Float;
+
+    private var _looped :Signal0 = null;
 }
 
 private class LayerAnimator

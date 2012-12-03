@@ -28,7 +28,7 @@ using Lambda;
  * }
  * </pre>
  */
-class Entity
+@:final class Entity
     implements Disposable
 {
     /** This entity's parent. */

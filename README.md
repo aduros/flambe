@@ -7,9 +7,8 @@ Written in Haxe, games are compiled to Flash and HTML5, with support for mobile
 devices. Server-side logic compiles to JS and runs on Node.js, for games that
 require multiplayer.
 
-Rendering in Flash uses Stage3D, falling back to copyPixels if hardware
-accelerated Stage3D isn't available. The HTML5 renderer uses canvas, with plans
-for WebGL support later on.
+Rendering in Flash uses Stage3D. The HTML5 renderer uses canvas, with
+plans for WebGL support later on.
 
 ## Demos
 

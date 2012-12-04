@@ -19,9 +19,9 @@ import flambe.display.Texture;
 class Stage3DTexture
     implements Texture
 {
-    public var width (getWidth, null) :Int;
-    public var height (getHeight, null) :Int;
-    public var graphics (getGraphics, null) :Graphics;
+    public var width (get_width, null) :Int;
+    public var height (get_height, null) :Int;
+    public var graphics (get_graphics, null) :Graphics;
 
     public var nativeTexture (default, null) :flash.display3D.textures.Texture;
 
@@ -112,17 +112,17 @@ class Stage3DTexture
         }
     }
 
-    inline private function getWidth () :Int
+    inline private function get_width () :Int
     {
         return _width;
     }
 
-    inline private function getHeight () :Int
+    inline private function get_height () :Int
     {
         return _height;
     }
 
-    private function getGraphics () :Stage3DGraphics
+    private function get_graphics () :Stage3DGraphics
     {
         if (_graphics == null) {
             _graphics = _renderer.createGraphics(this);

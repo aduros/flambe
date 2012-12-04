@@ -11,13 +11,13 @@ import flambe.web.WebView;
 class DummyWeb
     implements Web
 {
-    public var supported (isSupported, null) :Bool;
+    public var supported (get_supported, null) :Bool;
 
     public function new ()
     {
     }
 
-    public function isSupported ()
+    public function get_supported ()
     {
         return false;
     }

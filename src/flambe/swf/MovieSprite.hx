@@ -22,7 +22,7 @@ class MovieSprite extends Sprite
     public var symbol (default, null) :MovieSymbol;
 
     /** The current playback position in seconds. */
-    public var position (getPosition, setPosition) :Float;
+    public var position (get_position, set_position) :Float;
 
     /**
      * The playback speed multiplier of this movie, defaults to 1.0. Higher values will play faster.
@@ -30,10 +30,10 @@ class MovieSprite extends Sprite
     public var speed (default, null) :AnimatedFloat;
 
     /** Whether this movie is currently paused. */
-    public var paused (isPaused, setPaused) :Bool;
+    public var paused (get_paused, set_paused) :Bool;
 
     /** Emitted when this movie loops back to the beginning. */
-    public var looped (getLooped, null) :Signal0;
+    public var looped (get_looped, null) :Signal0;
 
     public function new (symbol :MovieSymbol)
     {
@@ -98,7 +98,7 @@ class MovieSprite extends Sprite
         speed.update(dt);
 
         var looped = false;
-        if (!isPaused()) {
+        if (!paused) {
             _position += speed._*dt;
             if (_position > symbol.duration) {
                 _position = _position % symbol.duration;
@@ -134,28 +134,28 @@ class MovieSprite extends Sprite
         _frame = newFrame;
     }
 
-    inline private function getPosition () :Float
+    inline private function get_position () :Float
     {
         return _position;
     }
 
-    private function setPosition (position :Float) :Float
+    private function set_position (position :Float) :Float
     {
         return _position = FMath.clamp(position, 0, symbol.duration);
     }
 
-    inline private function isPaused () :Bool
+    inline private function get_paused () :Bool
     {
         return _flags.contains(Sprite.MOVIESPRITE_PAUSED);
     }
 
-    private function setPaused (paused :Bool)
+    private function set_paused (paused :Bool)
     {
         _flags = _flags.set(Sprite.MOVIESPRITE_PAUSED, paused);
         return paused;
     }
 
-    private function getLooped () :Signal0
+    private function get_looped () :Signal0
     {
         if (_looped == null) {
             _looped = new Signal0();

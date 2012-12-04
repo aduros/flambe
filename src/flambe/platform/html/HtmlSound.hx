@@ -14,7 +14,7 @@ import flambe.sound.Sound;
 class HtmlSound
     implements Sound
 {
-    public var duration (getDuration, null) :Float;
+    public var duration (get_duration, null) :Float;
     public var audioElement :Dynamic; // TODO(bruno): Use typed audio element extern
 
     public function new (audioElement :Dynamic)
@@ -32,7 +32,7 @@ class HtmlSound
         return new HtmlPlayback(this, volume, true);
     }
 
-    public function getDuration () :Float
+    public function get_duration () :Float
     {
         return audioElement.duration;
     }
@@ -43,10 +43,10 @@ private class HtmlPlayback
     implements Tickable
 {
     public var volume (default, null) :AnimatedFloat;
-    public var paused (isPaused, setPaused) :Bool;
-    public var ended (isEnded, null) :Bool;
-    public var position (getPosition, null) :Float;
-    public var sound (getSound, null) :Sound;
+    public var paused (get_paused, set_paused) :Bool;
+    public var ended (get_ended, null) :Bool;
+    public var position (get_position, null) :Float;
+    public var sound (get_sound, null) :Sound;
 
     public function new (sound :HtmlSound, volume :Float, loop :Bool)
     {
@@ -65,17 +65,17 @@ private class HtmlPlayback
         playAudio();
     }
 
-    public function getSound () :Sound
+    public function get_sound () :Sound
     {
         return _sound;
     }
 
-    inline public function isPaused () :Bool
+    inline public function get_paused () :Bool
     {
         return _clonedElement.paused;
     }
 
-    public function setPaused (paused :Bool) :Bool
+    public function set_paused (paused :Bool) :Bool
     {
         if (_clonedElement.paused != paused) {
             if (paused) {
@@ -87,12 +87,12 @@ private class HtmlPlayback
         return paused;
     }
 
-    inline public function isEnded () :Bool
+    inline public function get_ended () :Bool
     {
         return _clonedElement.ended;
     }
 
-    public function getPosition () :Float
+    public function get_position () :Float
     {
         return _clonedElement.currentTime;
     }
@@ -101,7 +101,7 @@ private class HtmlPlayback
     {
         volume.update(dt);
 
-        if (isEnded() || isPaused()) {
+        if (ended || paused) {
             // Allow ended or paused sounds to be garbage collected
             _tickableAdded = false;
             return true;
@@ -111,7 +111,7 @@ private class HtmlPlayback
 
     public function dispose ()
     {
-        setPaused(true);
+        paused = true;
     }
 
     private function playAudio ()

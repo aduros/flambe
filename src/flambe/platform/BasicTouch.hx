@@ -11,9 +11,9 @@ import flambe.util.Signal1;
 class BasicTouch
     implements Touch
 {
-    public var supported (isSupported, null) :Bool;
-    public var maxPoints (getMaxPoints, null) :Int;
-    public var points (getPoints, null) :Array<TouchPoint>;
+    public var supported (get_supported, null) :Bool;
+    public var maxPoints (get_maxPoints, null) :Int;
+    public var points (get_points, null) :Array<TouchPoint>;
 
     public var down (default, null) :Signal1<TouchPoint>;
     public var move (default, null) :Signal1<TouchPoint>;
@@ -31,17 +31,17 @@ class BasicTouch
         up = new Signal1();
     }
 
-    public function isSupported () :Bool
+    public function get_supported () :Bool
     {
         return true;
     }
 
-    public function getMaxPoints () :Int
+    public function get_maxPoints () :Int
     {
         return _maxPoints;
     }
 
-    public function getPoints () :Array<TouchPoint>
+    public function get_points () :Array<TouchPoint>
     {
         return _points.copy();
     }

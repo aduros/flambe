@@ -22,11 +22,11 @@ import flambe.util.Value;
 class FlashStage
     implements Stage
 {
-    public var width (getWidth, null) :Int;
-    public var height (getHeight, null) :Int;
+    public var width (get_width, null) :Int;
+    public var height (get_height, null) :Int;
     public var orientation (default, null) :Value<Orientation>;
     public var fullscreen (default, null) :Value<Bool>;
-    public var fullscreenSupported (isFullscreenSupported, null) :Bool;
+    public var fullscreenSupported (get_fullscreenSupported, null) :Bool;
 
     public var resize (default, null) :Signal0;
 
@@ -53,17 +53,17 @@ class FlashStage
 #end
     }
 
-    public function getWidth () :Int
+    public function get_width () :Int
     {
         return nativeStage.stageWidth;
     }
 
-    public function getHeight () :Int
+    public function get_height () :Int
     {
         return nativeStage.stageHeight;
     }
 
-    public function isFullscreenSupported () :Bool
+    public function get_fullscreenSupported () :Bool
     {
         return nativeStage.allowsFullScreen;
     }

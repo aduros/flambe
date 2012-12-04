@@ -14,7 +14,7 @@ class HtmlMouse extends BasicMouse
         _canvas = canvas;
     }
 
-    override public function setCursor (cursor :MouseCursor) :MouseCursor
+    override public function set_cursor (cursor :MouseCursor) :MouseCursor
     {
         var name;
         switch (cursor) {
@@ -24,7 +24,7 @@ class HtmlMouse extends BasicMouse
         }
         _canvas.style.cursor = name;
 
-        return super.setCursor(cursor);
+        return super.set_cursor(cursor);
     }
 
     private var _canvas :Dynamic;

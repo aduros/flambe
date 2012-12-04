@@ -12,14 +12,14 @@ import flambe.sound.Sound;
 class WebAudioSound
     implements Sound
 {
-    public static var supported (isSupported, null) :Bool;
+    public static var supported (get_supported, null) :Bool;
 
     /**
      * The shared AudioContext.
      */
     public static var ctx :Dynamic;
 
-    public var duration (getDuration, null) :Float;
+    public var duration (get_duration, null) :Float;
 
     public var buffer :Dynamic;
 
@@ -38,12 +38,12 @@ class WebAudioSound
         return new WebAudioPlayback(this, volume, true);
     }
 
-    public function getDuration () :Float
+    public function get_duration () :Float
     {
         return buffer.duration;
     }
 
-    private static function isSupported () :Bool
+    private static function get_supported () :Bool
     {
         if (_detectSupport) {
             _detectSupport = false;
@@ -63,10 +63,10 @@ private class WebAudioPlayback
     implements Tickable
 {
     public var volume (default, null) :AnimatedFloat;
-    public var paused (isPaused, setPaused) :Bool;
-    public var ended (isEnded, null) :Bool;
-    public var position (getPosition, null) :Float;
-    public var sound (getSound, null) :Sound;
+    public var paused (get_paused, set_paused) :Bool;
+    public var ended (get_ended, null) :Bool;
+    public var position (get_position, null) :Float;
+    public var sound (get_sound, null) :Sound;
 
     public function new (sound :WebAudioSound, volume :Float, loop :Bool)
     {
@@ -87,22 +87,22 @@ private class WebAudioPlayback
         }
     }
 
-    public function getSound () :Sound
+    public function get_sound () :Sound
     {
         return _sound;
     }
 
-    inline public function isPaused () :Bool
+    inline public function get_paused () :Bool
     {
         return _pausedAt >= 0;
     }
 
-    public function setPaused (paused :Bool) :Bool
+    public function set_paused (paused :Bool) :Bool
     {
-        if (paused != isPaused()) {
+        if (paused != get_paused()) {
             if (paused) {
                 _sourceNode.disconnect();
-                _pausedAt = getPosition();
+                _pausedAt = position;
             } else {
                 playAudio();
             }
@@ -110,18 +110,18 @@ private class WebAudioPlayback
         return paused;
     }
 
-    inline public function isEnded () :Bool
+    inline public function get_ended () :Bool
     {
         return _sourceNode.playbackState == 3; // == FINISHED_STATE
     }
 
-    public function getPosition () :Float
+    public function get_position () :Float
     {
         // Web Audio sure doesn't make this simple...
-        if (isEnded()) {
+        if (ended) {
             return _sound.duration;
 
-        } else if (isPaused()) {
+        } else if (paused) {
             return _pausedAt;
 
         } else {
@@ -134,7 +134,7 @@ private class WebAudioPlayback
     {
         volume.update(dt);
 
-        if (isEnded() || isPaused()) {
+        if (ended || paused) {
             // Allow ended or paused sounds to be garbage collected
             _tickableAdded = false;
             return true;
@@ -144,7 +144,7 @@ private class WebAudioPlayback
 
     public function dispose ()
     {
-        setPaused(true);
+        paused = true;
     }
 
     private function setVolume (volume :Float)
@@ -158,7 +158,7 @@ private class WebAudioPlayback
 
     private function insertNode (head :Dynamic)
     {
-        if (!isPaused()) {
+        if (!paused) {
             _sourceNode.disconnect();
             _sourceNode.connect(head);
         }

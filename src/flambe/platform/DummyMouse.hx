@@ -13,33 +13,33 @@ import flambe.util.Signal1;
 class DummyMouse
     implements Mouse
 {
-    public var supported (isSupported, null) :Bool;
+    public var supported (get_supported, null) :Bool;
 
     public var down (default, null) :Signal1<MouseEvent>;
     public var move (default, null) :Signal1<MouseEvent>;
     public var up (default, null) :Signal1<MouseEvent>;
     public var scroll (default, null) :Signal1<Float>;
 
-    public var x (getX, null) :Float;
-    public var y (getY, null) :Float;
-    public var cursor (getCursor, setCursor) :MouseCursor;
+    public var x (get_x, null) :Float;
+    public var y (get_y, null) :Float;
+    public var cursor (get_cursor, set_cursor) :MouseCursor;
 
     public function new ()
     {
         _cursor = Default;
     }
 
-    public function isSupported () :Bool
+    public function get_supported () :Bool
     {
         return false;
     }
 
-    public function getX () :Float
+    public function get_x () :Float
     {
         return 0;
     }
 
-    public function getY () :Float
+    public function get_y () :Float
     {
         return 0;
     }
@@ -49,12 +49,12 @@ class DummyMouse
         return false;
     }
 
-    public function getCursor () :MouseCursor
+    public function get_cursor () :MouseCursor
     {
         return _cursor;
     }
 
-    public function setCursor (cursor :MouseCursor) :MouseCursor
+    public function set_cursor (cursor :MouseCursor) :MouseCursor
     {
         return _cursor = cursor;
     }

@@ -14,11 +14,11 @@ import flambe.util.Value;
 class HtmlStage
     implements Stage
 {
-    public var width (getWidth, null) :Int;
-    public var height (getHeight, null) :Int;
+    public var width (get_width, null) :Int;
+    public var height (get_height, null) :Int;
     public var orientation (default, null) :Value<Orientation>;
     public var fullscreen (default, null) :Value<Bool>;
-    public var fullscreenSupported (isFullscreenSupported, null) :Bool;
+    public var fullscreenSupported (get_fullscreenSupported, null) :Bool;
 
     public var resize (default, null) :Signal0;
 
@@ -71,17 +71,17 @@ class HtmlStage
         updateFullscreen();
     }
 
-    public function getWidth () :Int
+    public function get_width () :Int
     {
         return _canvas.width;
     }
 
-    public function getHeight () :Int
+    public function get_height () :Int
     {
         return _canvas.height;
     }
 
-    public function isFullscreenSupported () :Bool
+    public function get_fullscreenSupported () :Bool
     {
         return HtmlUtil.loadFirstExtension(
             ["fullscreenEnabled", "fullScreenEnabled"], Lib.document).value == true;

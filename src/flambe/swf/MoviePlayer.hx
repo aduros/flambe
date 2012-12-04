@@ -18,10 +18,10 @@ import flambe.util.Assert;
 class MoviePlayer extends Component
 {
     /** The movie currently being shown. */
-    public var movie (getMovie, null) :MovieSprite;
+    public var movie (get_movie, null) :MovieSprite;
 
     /** Whether the current movie is being looped. */
-    public var looping (isLooping, null) :Bool;
+    public var looping (get_looping, null) :Bool;
 
     public function new (lib :Library)
     {
@@ -138,12 +138,12 @@ class MoviePlayer extends Component
         return sprite;
     }
 
-    private function getMovie () :MovieSprite
+    private function get_movie () :MovieSprite
     {
         return (_oneshotSprite != null) ? _oneshotSprite : _loopingSprite;
     }
 
-    private function isLooping () :Bool
+    private function get_looping () :Bool
     {
         return _oneshotSprite == null && _loopingSprite != null;
     }

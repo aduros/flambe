@@ -15,7 +15,7 @@ using flambe.platform.KeyCodes;
 class BasicKeyboard
     implements Keyboard
 {
-    public var supported (isSupported, null) :Bool;
+    public var supported (get_supported, null) :Bool;
 
     public var down (default, null) :Signal1<KeyboardEvent>;
     public var up (default, null) :Signal1<KeyboardEvent>;
@@ -29,7 +29,7 @@ class BasicKeyboard
         _keyStates = new IntHash();
     }
 
-    public function isSupported () :Bool
+    public function get_supported () :Bool
     {
         return true;
     }

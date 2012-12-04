@@ -14,23 +14,23 @@ import flambe.util.Value;
  */
 class AnimatedFloat extends Value<Float>
 {
-    public var behavior (getBehavior, setBehavior) :Behavior;
+    public var behavior (get_behavior, set_behavior) :Behavior;
 
     public function new (value :Float, ?listener :Listener2<Float,Float>)
     {
         super(value, listener);
     }
 
-    override private function set (value :Float) :Float
+    override private function set__ (value :Float) :Float
     {
         _behavior = null;
-        return super.set(value);
+        return super.set__(value);
     }
 
     public function update (dt :Float)
     {
         if (_behavior != null) {
-            super.set(_behavior.update(dt));
+            super.set__(_behavior.update(dt));
             if (_behavior.isComplete()) {
                 _behavior = null;
             }
@@ -39,33 +39,33 @@ class AnimatedFloat extends Value<Float>
 
     public function animate (from :Float, to :Float, seconds :Float, ?easing :EaseFunction)
     {
-        set(from);
+        set__(from);
         animateTo(to, seconds, easing);
     }
 
     public function animateTo (to :Float, seconds :Float, ?easing :EaseFunction)
     {
-        setBehavior(new Tween(_value, to, seconds, easing));
+        behavior = new Tween(_value, to, seconds, easing);
     }
 
     public function animateBy (by :Float, seconds :Float, ?easing :EaseFunction)
     {
-        setBehavior(new Tween(_value, _value + by, seconds, easing));
+        behavior = new Tween(_value, _value + by, seconds, easing);
     }
 
     inline public function bindTo (to :Value<Float>, ?fn :BindingFunction)
     {
-        setBehavior(new Binding(to, fn));
+        behavior = new Binding(to, fn);
     }
 
-    private function setBehavior (behavior :Behavior) :Behavior
+    private function set_behavior (behavior :Behavior) :Behavior
     {
         _behavior = behavior;
         update(0);
         return behavior;
     }
 
-    inline private function getBehavior () :Behavior
+    inline private function get_behavior () :Behavior
     {
         return _behavior;
     }

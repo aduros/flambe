@@ -69,27 +69,27 @@ class Sprite extends Component
     /**
      * Whether this sprite should be drawn.
      */
-    public var visible (getVisible, setVisible) :Bool;
+    public var visible (get_visible, set_visible) :Bool;
 
     /**
      * Emitted when the pointer is pressed down over this sprite.
      */
-    public var pointerDown (getPointerDown, null) :Signal1<PointerEvent>;
+    public var pointerDown (get_pointerDown, null) :Signal1<PointerEvent>;
 
     /**
      * Emitted when the pointer is moved over this sprite.
      */
-    public var pointerMove (getPointerMove, null) :Signal1<PointerEvent>;
+    public var pointerMove (get_pointerMove, null) :Signal1<PointerEvent>;
 
     /**
      * Emitted when the pointer is raised over this sprite.
      */
-    public var pointerUp (getPointerUp, null) :Signal1<PointerEvent>;
+    public var pointerUp (get_pointerUp, null) :Signal1<PointerEvent>;
 
     /**
      * Whether this sprite or any children should receive pointer events. Defaults to true.
      */
-    public var pointerEnabled (isPointerEnabled, setPointerEnabled) :Bool;
+    public var pointerEnabled (get_pointerEnabled, set_pointerEnabled) :Bool;
 
     public function new ()
     {
@@ -393,7 +393,7 @@ class Sprite extends Component
         return null;
     }
 
-    private function getPointerDown () :Signal1<PointerEvent>
+    private function get_pointerDown () :Signal1<PointerEvent>
     {
         if (_internal_pointerDown == null) {
             _internal_pointerDown = new Signal1();
@@ -401,7 +401,7 @@ class Sprite extends Component
         return _internal_pointerDown;
     }
 
-    private function getPointerMove () :Signal1<PointerEvent>
+    private function get_pointerMove () :Signal1<PointerEvent>
     {
         if (_internal_pointerMove == null) {
             _internal_pointerMove = new Signal1();
@@ -409,7 +409,7 @@ class Sprite extends Component
         return _internal_pointerMove;
     }
 
-    private function getPointerUp () :Signal1<PointerEvent>
+    private function get_pointerUp () :Signal1<PointerEvent>
     {
         if (_internal_pointerUp == null) {
             _internal_pointerUp = new Signal1();
@@ -417,23 +417,23 @@ class Sprite extends Component
         return _internal_pointerUp;
     }
 
-    inline private function getVisible () :Bool
+    inline private function get_visible () :Bool
     {
         return _flags.contains(VISIBLE);
     }
 
-    private function setVisible (visible :Bool) :Bool
+    private function set_visible (visible :Bool) :Bool
     {
         _flags = _flags.set(VISIBLE, visible);
         return visible;
     }
 
-    inline private function isPointerEnabled () :Bool
+    inline private function get_pointerEnabled () :Bool
     {
         return _flags.contains(POINTER_ENABLED);
     }
 
-    private function setPointerEnabled (pointerEnabled :Bool) :Bool
+    private function set_pointerEnabled (pointerEnabled :Bool) :Bool
     {
         _flags = _flags.set(POINTER_ENABLED, pointerEnabled);
         return pointerEnabled;

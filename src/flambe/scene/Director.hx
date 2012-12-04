@@ -13,7 +13,7 @@ import flambe.Component;
 class Director extends Component
 {
     /** The front-most scene. */
-    public var topScene (getTopScene, null) :Entity;
+    public var topScene (get_topScene, null) :Entity;
 
     /** The complete list of scenes managed by this director, from back to front. */
     public var scenes (default, null) :Array<Entity>;
@@ -25,13 +25,13 @@ class Director extends Component
     public var occludedScenes (default, null) :Array<Entity>;
 
     /** Whether the director is currently transitioning between scenes. */
-    public var transitioning (isTransitioning, null) :Bool;
+    public var transitioning (get_transitioning, null) :Bool;
 
     /** The ideal width of the director's scenes. Used by some transitions. */
-    public var width (getWidth, null) :Float;
+    public var width (get_width, null) :Float;
 
     /** The ideal height of the director's scenes. Used by some transitions. */
-    public var height (getHeight, null) :Float;
+    public var height (get_height, null) :Float;
 
     public function new ()
     {
@@ -55,7 +55,7 @@ class Director extends Component
     {
         completeTransition();
 
-        var oldTop = getTopScene();
+        var oldTop = get_topScene();
         if (oldTop != null) {
             playTransition(oldTop, scene, transition, function () {
                 hide(oldTop);
@@ -70,10 +70,10 @@ class Director extends Component
     {
         completeTransition();
 
-        var oldTop = getTopScene();
+        var oldTop = get_topScene();
         if (oldTop != null) {
             scenes.pop(); // Pop oldTop
-            var newTop = getTopScene();
+            var newTop = get_topScene();
             if (newTop != null) {
                 playTransition(oldTop, newTop, transition, function () {
                     hideAndDispose(oldTop);
@@ -93,7 +93,7 @@ class Director extends Component
     {
         completeTransition();
 
-        var oldTop = getTopScene();
+        var oldTop = get_topScene();
         if (oldTop != null) {
             if (oldTop == scene) {
                 return; // We're already there
@@ -138,20 +138,20 @@ class Director extends Component
         }
     }
 
-    private function getTopScene () :Entity
+    private function get_topScene () :Entity
     {
         var ll = scenes.length;
         return (ll > 0) ? scenes[ll-1] : null;
     }
 
-    inline private function isTransitioning () :Bool
+    inline private function get_transitioning () :Bool
     {
         return _transitor != null;
     }
 
     private function add (scene :Entity)
     {
-        var oldTop = getTopScene();
+        var oldTop = get_topScene();
         if (oldTop != null) {
             _root.removeChild(oldTop);
         }
@@ -199,7 +199,7 @@ class Director extends Component
         occludedScenes = (scenes.length > 0) ? scenes.slice(ii, scenes.length-1) : [];
 
         // Notify the new top scene that it's being shown
-        var scene = getTopScene();
+        var scene = get_topScene();
         if (scene != null) {
             show(scene);
         }
@@ -234,12 +234,12 @@ class Director extends Component
         }
     }
 
-    private function getWidth () :Float
+    private function get_width () :Float
     {
         return (_width < 0) ? System.stage.width : _width;
     }
 
-    private function getHeight () :Float
+    private function get_height () :Float
     {
         return (_height < 0) ? System.stage.height : _height;
     }

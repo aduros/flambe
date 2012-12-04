@@ -16,7 +16,7 @@ interface Keyboard
      * True if the environment has a physical keyboard. Phones and tablets will generally return
      * false here.
      */
-    var supported (isSupported, null) :Bool;
+    var supported (get_supported, null) :Bool;
 
     /**
      * Emitted when a key is pressed down.

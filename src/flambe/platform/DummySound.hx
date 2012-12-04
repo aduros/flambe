@@ -14,7 +14,7 @@ import flambe.sound.Sound;
 class DummySound
     implements Sound
 {
-    public var duration (getDuration, null) :Float;
+    public var duration (get_duration, null) :Float;
 
     public function new ()
     {
@@ -31,7 +31,7 @@ class DummySound
         return _playback;
     }
 
-    public function getDuration () :Float
+    public function get_duration () :Float
     {
         return 0;
     }
@@ -54,10 +54,10 @@ class DummyPlayback
     implements Playback
 {
     public var volume (default, null) :AnimatedFloat;
-    public var paused (isPaused, setPaused) :Bool;
-    public var ended (isEnded, null) :Bool;
-    public var position (getPosition, null) :Float;
-    public var sound (getSound, null) :Sound;
+    public var paused (get_paused, set_paused) :Bool;
+    public var ended (get_ended, null) :Bool;
+    public var position (get_position, null) :Float;
+    public var sound (get_sound, null) :Sound;
 
     public function new (sound :Sound)
     {
@@ -65,27 +65,27 @@ class DummyPlayback
         this.volume = new AnimatedFloat(0); // A little quirky? All DummyPlaybacks share the same volume
     }
 
-    public function getSound () :Sound
+    public function get_sound () :Sound
     {
         return _sound;
     }
 
-    public function isPaused () :Bool
+    public function get_paused () :Bool
     {
         return true;
     }
 
-    public function setPaused (paused :Bool) :Bool
+    public function set_paused (paused :Bool) :Bool
     {
         return true;
     }
 
-    public function isEnded () :Bool
+    public function get_ended () :Bool
     {
         return true;
     }
 
-    public function getPosition () :Float
+    public function get_position () :Float
     {
         return 0;
     }

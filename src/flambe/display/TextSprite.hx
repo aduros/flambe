@@ -14,8 +14,8 @@ using flambe.util.BitSets;
  */
 class TextSprite extends Sprite
 {
-    public var text (getText, setText) :String;
-    public var font (getFont, setFont) :Font;
+    public var text (get_text, set_text) :String;
+    public var font (get_font, set_font) :Font;
 
     public function new (font :Font, ?text :String = "")
     {
@@ -51,24 +51,24 @@ class TextSprite extends Sprite
         return _height;
     }
 
-    inline private function getText () :String
+    inline private function get_text () :String
     {
         return _text;
     }
 
-    private function setText (text :String) :String
+    private function set_text (text :String) :String
     {
         _text = text;
         _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
         return text;
     }
 
-    inline private function getFont () :Font
+    inline private function get_font () :Font
     {
         return _font;
     }
 
-    private function setFont (font :Font) :Font
+    private function set_font (font :Font) :Font
     {
         _font = font;
         _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);

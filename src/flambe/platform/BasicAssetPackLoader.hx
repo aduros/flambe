@@ -182,7 +182,7 @@ class BasicAssetPackLoader
 private class BasicAssetPack
     implements AssetPack
 {
-    public var manifest (getManifest, null) :Manifest;
+    public var manifest (get_manifest, null) :Manifest;
 
     public var textures :Hash<Texture>;
     public var sounds :Hash<Sound>;
@@ -229,7 +229,7 @@ private class BasicAssetPack
         return file;
     }
 
-    public function getManifest () :Manifest
+    public function get_manifest () :Manifest
     {
         return _manifest;
     }

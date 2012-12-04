@@ -14,12 +14,12 @@ interface Texture
     /**
      * The width of this texture, in pixels.
      */
-    var width (getWidth, null) :Int;
+    var width (get_width, null) :Int;
 
     /**
      * The height of this texture, in pixels.
      */
-    var height (getHeight, null) :Int;
+    var height (get_height, null) :Int;
 
     /**
      * <p>The Graphics that draws to this texture.</p>
@@ -28,7 +28,7 @@ interface Texture
      * be cleared before first rendering, so this may cause the texture to be cleared. If you need
      * to support Stage3D, consider keeping a second cache texture and flipping between them.</p>
      */
-    var graphics (getGraphics, null) :Graphics;
+    var graphics (get_graphics, null) :Graphics;
 
     /**
      * Reads pixels out from the given region. This is potentially a very SLOW operation, avoid

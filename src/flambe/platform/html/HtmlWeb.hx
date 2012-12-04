@@ -15,14 +15,14 @@ import flambe.web.WebView;
 class HtmlWeb
     implements Web
 {
-    public var supported (isSupported, null) :Bool;
+    public var supported (get_supported, null) :Bool;
 
     public function new (container :Dynamic)
     {
         _container = container;
     }
 
-    public function isSupported () :Bool
+    public function get_supported () :Bool
     {
         return true;
     }

@@ -14,7 +14,7 @@ class Promise<A>
      * yet available. Read hasResult to check availability first, or use get(). When setting, throws
      * an error if the result was already previously assigned.
      */
-    public var result (getResult, setResult) :A;
+    public var result (get_result, set_result) :A;
 
     /**
      * Whether the result is available yet.
@@ -39,8 +39,8 @@ class Promise<A>
     /**
      * Context on how close this promise is to being fulfilled. For file IO, these are in bytes.
      */
-    public var progress (getProgress, setProgress) :Float;
-    public var total (getTotal, setTotal) :Float;
+    public var progress (get_progress, set_progress) :Float;
+    public var total (get_total, set_total) :Float;
 
     public function new ()
     {
@@ -52,7 +52,7 @@ class Promise<A>
         _total = 0;
     }
 
-    private function getResult () :A
+    private function get_result () :A
     {
         if (!hasResult) {
             throw "Promise result not yet available";
@@ -60,7 +60,7 @@ class Promise<A>
         return _result;
     }
 
-    private function setResult (result :A) :A
+    private function set_result (result :A) :A
     {
         if (hasResult) {
             throw "Promise result already assigned";
@@ -86,26 +86,26 @@ class Promise<A>
         return success.connect(fn).once();
     }
 
-    inline private function getProgress () :Float
+    inline private function get_progress () :Float
     {
         return _progress;
     }
 
-    private function setProgress (progress :Float) :Float
+    private function set_progress (progress :Float) :Float
     {
         _progress = progress;
         progressChanged.emit();
         return progress;
     }
 
-    private function setTotal (total :Float) :Float
+    private function set_total (total :Float) :Float
     {
         _total = total;
         progressChanged.emit();
         return total;
     }
 
-    inline private function getTotal () :Float
+    inline private function get_total () :Float
     {
         return _total;
     }

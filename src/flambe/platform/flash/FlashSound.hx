@@ -17,7 +17,7 @@ import flambe.sound.Sound;
 class FlashSound
     implements Sound
 {
-    public var duration (getDuration, null) :Float;
+    public var duration (get_duration, null) :Float;
     public var nativeSound :flash.media.Sound;
 
     public function new (nativeSound :flash.media.Sound)
@@ -35,7 +35,7 @@ class FlashSound
         return new FlashPlayback(this, volume, FMath.INT_MAX);
     }
 
-    public function getDuration () :Float
+    public function get_duration () :Float
     {
         return nativeSound.length*1000;
     }
@@ -46,10 +46,10 @@ private class FlashPlayback
     implements Tickable
 {
     public var volume (default, null) :AnimatedFloat;
-    public var paused (isPaused, setPaused) :Bool;
-    public var ended (isEnded, null) :Bool;
-    public var position (getPosition, null) :Float;
-    public var sound (getSound, null) :Sound;
+    public var paused (get_paused, set_paused) :Bool;
+    public var ended (get_ended, null) :Bool;
+    public var position (get_position, null) :Float;
+    public var sound (get_sound, null) :Sound;
 
     public function new (sound :FlashSound, volume :Float, loops :Int)
     {
@@ -67,19 +67,19 @@ private class FlashPlayback
         _channel.soundTransform = soundTransform; // Magic setter
     }
 
-    public function getSound () :Sound
+    public function get_sound () :Sound
     {
         return _sound;
     }
 
-    inline public function isPaused () :Bool
+    inline public function get_paused () :Bool
     {
         return _pausePosition >= 0;
     }
 
-    public function setPaused (paused :Bool) :Bool
+    public function set_paused (paused :Bool) :Bool
     {
-        if (paused != isPaused()) {
+        if (paused != get_paused()) {
             if (paused) {
                 _pausePosition = _channel.position;
                 _channel.stop();
@@ -95,12 +95,12 @@ private class FlashPlayback
         return paused;
     }
 
-    inline public function isEnded () :Bool
+    inline public function get_ended () :Bool
     {
         return _ended;
     }
 
-    public function getPosition () :Float
+    public function get_position () :Float
     {
         return _channel.position*1000;
     }
@@ -109,7 +109,7 @@ private class FlashPlayback
     {
         volume.update(dt);
 
-        if (isEnded() || isPaused()) {
+        if (ended || paused) {
             // Allow ended or paused sounds to be garbage collected
             _tickableAdded = false;
             return true;
@@ -119,7 +119,7 @@ private class FlashPlayback
 
     public function dispose ()
     {
-        setPaused(true);
+        paused = true;
         _ended = true;
     }
 

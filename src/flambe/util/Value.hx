@@ -17,13 +17,13 @@ class Value<A>
     /**
      * The wrapped value, setting this to a different value will fire the 'changed' signal.
      */
-    public var _ (get, set) :A;
+    public var _ (get__, set__) :A;
 
     /**
      * Emitted when the value has changed. The first listener parameter is the new current value,
      * the second parameter is the old previous value.
      */
-    public var changed (getChanged, null) :Signal2<A,A>;
+    public var changed (get_changed, null) :Signal2<A,A>;
 
     public function new (value :A, ?listener :Listener2<A,A>)
     {
@@ -43,12 +43,12 @@ class Value<A>
         return changed.connect(listener);
     }
 
-    inline private function get () :A
+    inline private function get__ () :A
     {
         return _value;
     }
 
-    private function set (newValue :A) :A
+    private function set__ (newValue :A) :A
     {
         var oldValue = _value;
         if (newValue != oldValue) {
@@ -60,7 +60,7 @@ class Value<A>
         return newValue;
     }
 
-    private function getChanged ()
+    private function get_changed ()
     {
         if (_changed == null) {
             _changed = new Signal2();

@@ -15,7 +15,7 @@ import flambe.swf.Format;
 class MovieSymbol
     implements Symbol
 {
-    public var name (getName, null) :String;
+    public var name (get_name, null) :String;
 
     public var layers (default, null) :Array<MovieLayer>;
 
@@ -49,7 +49,7 @@ class MovieSymbol
         duration = frames / frameRate;
     }
 
-    public function getName () :String
+    public function get_name () :String
     {
         return _name;
     }
@@ -66,7 +66,7 @@ class MovieLayer
 {
     public var name (default, null) :String;
     public var keyframes (default, null) :Array<MovieKeyframe>;
-    public var frames (getFrames, null) :Int;
+    public var frames (get_frames, null) :Int;
 
     /** The symbol in the last keyframe that has one, or null if there are no symbol keyframes. */
     public var lastSymbol :Symbol;
@@ -87,7 +87,7 @@ class MovieLayer
         }
     }
 
-    private function getFrames () :Int
+    private function get_frames () :Int
     {
         var lastKf = keyframes[keyframes.length - 1];
         return lastKf.index + Std.int(lastKf.duration);

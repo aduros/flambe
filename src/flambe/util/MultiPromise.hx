@@ -45,7 +45,7 @@ class MultiPromise extends Promise<Array<Dynamic>>
                 results.push(promise.result);
             }
             finalize();
-            setResult(cast results);
+            set_result(cast results);
         }
     }
 

@@ -33,11 +33,11 @@ class ComponentBuilder
             }
         });
 
-        // Only override getName if this component directly extends a @:componentBase and creates a
+        // Only override get_name if this component directly extends a @:componentBase and creates a
         // new namespace
         if (extendsComponentBase(cl)) {
             fields = fields.concat(Macros.buildFields(macro {
-                function override__private__getName () :String {
+                function override__private__get_name () :String {
                     return $name;
                 }
             }));

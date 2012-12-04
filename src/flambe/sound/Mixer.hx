@@ -56,7 +56,7 @@ private class MixerSound
     implements Sound,
     implements Disposable
 {
-    public var duration (getDuration, null) :Float;
+    public var duration (get_duration, null) :Float;
 
     public function new (source :Sound, channels :Int)
     {
@@ -99,7 +99,7 @@ private class MixerSound
         return -1;
     }
 
-    public function getDuration () :Float
+    public function get_duration () :Float
     {
         return _source.duration;
     }

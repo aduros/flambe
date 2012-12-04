@@ -15,7 +15,7 @@ interface Pointer
     /**
      * True if the environment has a pointing device.
      */
-    var supported (isSupported, null) :Bool;
+    var supported (get_supported, null) :Bool;
 
     /**
      * Emitted when the pointing device is pressed down (when the mouse button is held or a finger
@@ -37,12 +37,12 @@ interface Pointer
     /**
      * The last recorded X coordinate of the pointer.
      */
-    var x (getX, null) :Float;
+    var x (get_x, null) :Float;
 
     /**
      * The last recorded Y coordinate of the pointer.
      */
-    var y (getY, null) :Float;
+    var y (get_y, null) :Float;
 
     /**
      * True if the pointer is currently pressed down.

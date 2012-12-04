@@ -34,7 +34,7 @@ class FlashMouse extends BasicMouse
         return Mouse.supportsCursor;
     }
 
-    override public function setCursor (cursor :MouseCursor) :MouseCursor
+    override public function set_cursor (cursor :MouseCursor) :MouseCursor
     {
         Mouse.show();
         switch (cursor) {
@@ -42,7 +42,7 @@ class FlashMouse extends BasicMouse
             case Button: Mouse.cursor = "button";
             case None: Mouse.hide();
         }
-        return super.setCursor(cursor);
+        return super.set_cursor(cursor);
     }
 
     private function onMouseDown (event :MouseEvent)

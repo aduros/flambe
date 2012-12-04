@@ -1,0 +1,44 @@
+#!/usr/bin/env python
+#
+# Tries to convert a project to Haxe 3. Mostly covers property renaming, but hand tweaking will
+# still probably be necessary.
+
+import os
+import re
+import sys
+
+# Whether to generate accessors that remain compatible with Haxe 2.x
+haxe2_compat = True
+
+for root, dirs, files in os.walk("src"):
+    for path in files:
+        path = os.path.join(root, path)
+        replacements = {}
+
+        with open(path) as f:
+            def replacer (m):
+                prop = m.group(1)
+
+                getter = m.group(2)
+                if getter != "get" and not getter.startswith("get_") \
+                        and getter != "default" and getter != "never" and getter != "null":
+                    replacements[getter] = "get_"+prop
+                    getter = "get_"+prop if haxe2_compat else "get"
+
+                setter = m.group(3)
+                if setter != "set" and not setter.startswith("set_") \
+                        and setter != "default" and setter != "never" and setter != "null":
+                    replacements[setter] = "set_"+prop
+                    setter = "set_"+prop if haxe2_compat else "set"
+
+                return "var %s (%s, %s)" % (prop, getter, setter)
+
+            content = re.sub(r"var\s+(\w+)\s*\(\s*(\w+),\s*(\w+)\)", replacer, f.read())
+
+        with open(path, "w") as f:
+            def replacer (m):
+                if m.group(1) in replacements:
+                    return "function " + replacements[m.group(1)]
+                return m.group()
+            content = re.sub(r"function\s+(\w+)", replacer, content)
+            f.write(content)

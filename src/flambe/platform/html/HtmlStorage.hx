@@ -12,14 +12,14 @@ import flambe.storage.Storage;
 class HtmlStorage
     implements Storage
 {
-    public var supported (isSupported, null) :Bool;
+    public var supported (get_supported, null) :Bool;
 
     public function new (storage :Dynamic)
     {
         _storage = storage;
     }
 
-    public function isSupported () :Bool
+    public function get_supported () :Bool
     {
         return true;
     }

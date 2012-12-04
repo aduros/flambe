@@ -14,14 +14,14 @@ import flambe.storage.Storage;
 class FlashStorage
     implements Storage
 {
-    public var supported (isSupported, null) :Bool;
+    public var supported (get_supported, null) :Bool;
 
     public function new (so :SharedObject)
     {
         _so = so;
     }
 
-    public function isSupported () :Bool
+    public function get_supported () :Bool
     {
         return true;
     }

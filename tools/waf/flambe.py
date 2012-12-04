@@ -73,7 +73,7 @@ def apply_flambe(ctx):
     outputs = []
 
     if debug:
-        flags += "-debug --no-opt --no-inline -D fdb".split()
+        flags += "-debug --no-opt --no-inline -D fdb -D advanced-telemetry".split()
     else:
         flags += "--no-traces".split()
 

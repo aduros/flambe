@@ -29,7 +29,7 @@ class AirWeb extends FlashWeb
         return StageWebView.isSupported;
     }
 
-    override public function isSupported () :Bool
+    override public function get_supported () :Bool
     {
         return true;
     }

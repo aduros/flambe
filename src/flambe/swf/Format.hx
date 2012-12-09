@@ -83,11 +83,11 @@ typedef TextureFormat = {
     // The symbol name of this texture
     symbol: String,
 
-    // The top-left of the texture rectangle relative to the origin transformation point
+    // The bitmap's anchor point, relative to the top left of its rect
     offset: Array<Float>,
 
     // The rectangle bounding the texture in its atlas
-    rect: Array<Float>,
+    rect: Array<Int>,
 
     md5: String,
 }

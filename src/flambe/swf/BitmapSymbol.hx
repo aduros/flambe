@@ -16,10 +16,10 @@ class BitmapSymbol
 {
     public var name (get_name, null) :String;
     public var atlas (default, null) :Texture;
-    public var x (default, null) :Float;
-    public var y (default, null) :Float;
-    public var width (default, null) :Float;
-    public var height (default, null) :Float;
+    public var x (default, null) :Int;
+    public var y (default, null) :Int;
+    public var width (default, null) :Int;
+    public var height (default, null) :Int;
     public var anchorX (default, null) :Float;
     public var anchorY (default, null) :Float;
 

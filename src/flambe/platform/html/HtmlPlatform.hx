@@ -75,6 +75,10 @@ class HtmlPlatform
         _container.style.overflow = "hidden";
         _container.style.position = "relative";
 
+        // Prevent double tap zooming on IE10
+        // http://msdn.microsoft.com/en-us/library/windows/apps/Hh767313.aspx
+        _container.style.msTouchAction = "none";
+
         var lastTouchTime = 0;
         var onMouse = function (event) {
             if (event.timeStamp - lastTouchTime < 1000) {

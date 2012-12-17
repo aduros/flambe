@@ -44,7 +44,7 @@ class FlashStorage
         return true;
     }
 
-    public function get (key :String) :Dynamic
+    public function get<A> (key :String, defaultValue :A = null) :A
     {
         var encoded :String = _so.data[untyped key];
         if (encoded != null) {
@@ -54,7 +54,7 @@ class FlashStorage
                 Log.warn("Storage unserialization failed", ["message", error]);
             }
         }
-        return null;
+        return defaultValue;
     }
 
     public function remove (key :String)

@@ -27,9 +27,9 @@ class DummyStorage
         return true;
     }
 
-    public function get (key :String) :Dynamic
+    public function get<A> (key :String, defaultValue :A = null) :A
     {
-        return _hash.get(key);
+        return _hash.exists(key) ? _hash.get(key) : defaultValue;
     }
 
     public function remove (key :String)

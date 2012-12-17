@@ -49,15 +49,14 @@ class HtmlStorage
         return true;
     }
 
-    public function get (key :String) :Dynamic
+    public function get<A> (key :String, defaultValue :A = null) :A
     {
-        var encoded :String;
+        var encoded :String = null;
         try {
             encoded = _storage.getItem(PREFIX + key);
         } catch (error :Dynamic) {
             // This should never happen, but it sometimes does in Firefox and IE
             Log.warn("localStorage.getItem failed", ["message", error.message]);
-            return null;
         }
 
         if (encoded != null) {
@@ -67,7 +66,7 @@ class HtmlStorage
                 Log.warn("Storage unserialization failed", ["message", error]);
             }
         }
-        return null;
+        return defaultValue;
     }
 
     public function remove (key :String)

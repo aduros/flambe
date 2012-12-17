@@ -22,12 +22,15 @@ interface Storage
      */
     function set (key :String, value :Dynamic) :Bool;
 
-    /** Retrieve a value from storage for a given key. */
-    function get (key :String) :Dynamic;
+    /**
+     * Retrieve a value from storage for a given key.
+     * @param defaultValue If the key was not found, return this value.
+     */
+    function get<A> (key :String, defaultValue :A = null) :A;
 
     /** Deletes a key/value pair from storage. */
     function remove (key :String) :Void;
 
-    /** Deletes entire storage contents. */
+    /** Clears the entire storage contents. */
     function clear () :Void;
 }

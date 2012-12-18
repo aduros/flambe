@@ -16,6 +16,14 @@ typedef Format = {
 
     // All the movies and atlases in the library
     movies: Array<MovieFormat>,
+    textureGroups: Array<TextureGroupFormat>,
+}
+
+typedef TextureGroupFormat = {
+    // The additional scale factor (not supported in Flambe, use different base scales instead)
+    scaleFactor: Float,
+
+    // The atlases in this scale group
     atlases: Array<AtlasFormat>,
 }
 
@@ -25,8 +33,6 @@ typedef MovieFormat = {
     id: String,
 
     layers: Array<LayerFormat>,
-
-    md5: String,
 }
 
 typedef LayerFormat = {
@@ -88,6 +94,4 @@ typedef TextureFormat = {
 
     // The rectangle bounding the texture in its atlas
     rect: Array<Int>,
-
-    md5: String,
 }

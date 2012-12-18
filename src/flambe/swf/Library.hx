@@ -41,7 +41,19 @@ class Library
             _symbols.set(movie.name, movie);
         }
 
-        for (atlasObject in reader.atlases) {
+        var atlases;
+        if (reader.textureGroups != null) {
+            var groups = reader.textureGroups;
+            if (groups[0].scaleFactor != 1 || groups.length > 1) {
+                Log.warn("Flambe doesn't support Flump's Additional Scale Factors. " +
+                    "Use Base Scales and load from different asset packs instead.");
+            }
+            atlases = groups[0].atlases;
+        } else {
+            // Support older Flump versions that don't have textureGroups
+            atlases = (untyped reader).atlases;
+        }
+        for (atlasObject in atlases) {
             var atlas = pack.getTexture(baseDir + "/" + atlasObject.file.removeFileExtension());
             for (textureObject in atlasObject.textures) {
                 var bitmap = new BitmapSymbol(textureObject, atlas);

@@ -98,7 +98,7 @@ class System
      * worry about reclaiming GPU resources (HTML5 canvas) this is always true.</p>
      *
      * <p>When this becomes false, all Textures and Graphics objects are destroyed and become
-     * invalid.  When it returns to true, apps should reload its textures.</p>
+     * invalid. When it returns to true, apps should reload its textures.</p>
      */
     public static var hasGPU (default, null) :Value<Bool> = new Value<Bool>(false);
 

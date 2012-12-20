@@ -78,12 +78,8 @@ def apply_flambe(ctx):
     else:
         flags += "--no-traces".split()
 
-    # Inject a custom asset base URL if provided
     if ctx.asset_base != None:
-        flags += [
-            "--macro",
-            "addMetadata(\"@assetBase('%s')\", \"flambe.asset.Manifest\")" % ctx.asset_base,
-        ]
+        ctx.bld.fatal("asset_base has been removed, set Manifest.externalBasePath instead.");
 
     if build_flash:
         flash_flags = ["-swf-version", flash_version]

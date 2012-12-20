@@ -29,6 +29,17 @@ class Strings
         return (dot > 0) ? fileName.substr(0, dot) : fileName;
     }
 
+    /**
+     * Joins two strings with a path separator.
+     */
+    public static function joinPath (base :String, relative :String) :String
+    {
+        if (base.fastCodeAt(base.length-1) != "/".code) {
+            base += "/"; // Ensure it ends with a trailing slash
+        }
+        return base + relative;
+    }
+
     public static function hashCode (str :String) :Int
     {
         var code = 0;

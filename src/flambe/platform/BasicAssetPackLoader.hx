@@ -57,8 +57,9 @@ class BasicAssetPackLoader
 
                 } else {
                     bytesTotal += bestEntry.bytes;
+                    var url = manifest.getFullURL(bestEntry);
                     try {
-                        loadEntry(bestEntry);
+                        loadEntry(url, bestEntry);
                     } catch (error :Dynamic) {
                         handleError(bestEntry, "Unexpected error: " + error);
                     }
@@ -111,7 +112,7 @@ class BasicAssetPackLoader
         return null;
     }
 
-    private function loadEntry (entry :AssetEntry)
+    private function loadEntry (url :String, entry :AssetEntry)
     {
         // See subclasses
     }

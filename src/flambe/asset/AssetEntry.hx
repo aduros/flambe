@@ -24,7 +24,8 @@ class AssetEntry
     public var name (default, null) :String;
 
     /**
-     * The URL or file path this asset will be loaded from.
+     * The URL or file path this asset will be loaded from. May be appended to
+     * Manifest.relativeBasePath or externalBasePath to get the actual URL to load from.
      */
     public var url (default, null) :String;
 

@@ -29,9 +29,9 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
         super(platform, manifest);
     }
 
-    override private function loadEntry (entry :AssetEntry)
+    override private function loadEntry (url :String, entry :AssetEntry)
     {
-        var req = new URLRequest(entry.url);
+        var req = new URLRequest(url);
 
         // The dispatcher to listen for progress, completion and error events
         var dispatcher :IEventDispatcher;

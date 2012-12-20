@@ -8,6 +8,7 @@ import haxe.rtti.Meta;
 
 import flambe.asset.AssetEntry;
 import flambe.platform.ManifestBuilder;
+import flambe.util.Assert;
 
 using StringTools;
 using flambe.util.Strings;
@@ -15,10 +16,21 @@ using flambe.util.Strings;
 /**
  * An asset manifest contains all the information needed to load an asset pack. A manifest is
  * usually created with Manifest.build("directory"), but manifests can also be assembled
- * programmatically if you need to.
+ * programmatically.
  */
 class Manifest
 {
+    /**
+     * A relative path to load this manifest's assets from, or null.
+     */
+    public var relativeBasePath (get_relativeBasePath, set_relativeBasePath) :String;
+
+    /**
+     * A URL on another domain to load this manifest's assets from, or null. May be used to load
+     * assets from a CDN, in browsers that support cross-domain requests.
+     */
+    public var externalBasePath (get_externalBasePath, set_externalBasePath) :String;
+
     public function new ()
     {
         _entries = [];
@@ -110,8 +122,61 @@ class Manifest
     public function clone () :Manifest
     {
         var copy = new Manifest();
+        copy.relativeBasePath = relativeBasePath;
+        copy.externalBasePath = externalBasePath;
         copy._entries = _entries.copy();
         return copy;
+    }
+
+    /**
+     * Get the full URL to load an asset from. May prepend relativeBasePath or externalBasePath
+     * depending on cross-domain support and the asset type.
+     */
+    public function getFullURL (entry :AssetEntry) :String
+    {
+        var restricted = (externalBasePath != null && _supportsCrossOrigin) ?
+            externalBasePath : relativeBasePath;
+        var unrestricted = (externalBasePath != null) ? externalBasePath : relativeBasePath;
+
+        var base = unrestricted;
+#if html
+        if (entry.type == Data) {
+            // Without CORS, readable data must be loaded from the same origin
+            // TODO(bruno): Do this for Images too, required for readPixels.
+            base = restricted;
+        }
+#end
+        return (base != null) ? base.joinPath(entry.url) : entry.url;
+    }
+
+    private function get_relativeBasePath () :String
+    {
+        return _relativeBasePath;
+    }
+
+    private function set_relativeBasePath (basePath :String) :String
+    {
+        _relativeBasePath = basePath;
+        if (basePath != null) {
+            Assert.that(!basePath.startsWith("http://") && !basePath.startsWith("https://"),
+                "relativeBasePath must be a relative path on the same domain, NOT starting with http(s)://");
+        }
+        return basePath;
+    }
+
+    private function get_externalBasePath () :String
+    {
+        return _externalBasePath;
+    }
+
+    private function set_externalBasePath (basePath :String) :String
+    {
+        _externalBasePath = basePath;
+        if (basePath != null) {
+            Assert.that(basePath.startsWith("http://") || basePath.startsWith("https://"),
+                "externalBasePath must be on an external domain, starting with http(s)://");
+        }
+        return basePath;
     }
 
     private static function inferType (url :String) :AssetType
@@ -131,26 +196,11 @@ class Manifest
         var macroData = new Hash<Array<Dynamic>>();
         ManifestBuilder.populate(macroData);
 
-        // The path to our asset packs
-        var sameOriginBase = "assets/";
-        var crossOriginBase = sameOriginBase;
-
-        var meta = Meta.getType(Manifest);
-        if (meta.assetBase != null) {
-            crossOriginBase = meta.assetBase[0];
-            if (crossOriginBase.fastCodeAt(crossOriginBase.length - 1) != "/".code) {
-                // Ensure it ends with a trailing slash
-                crossOriginBase += "/";
-            }
-            if (supportsCrossOrigin()) {
-                // We can load ALL asset types from this URL
-                sameOriginBase = crossOriginBase;
-            }
-        }
-
         var manifests = new Hash();
         for (packName in macroData.keys()) {
             var manifest = new Manifest();
+            manifest.relativeBasePath = "assets";
+
             for (asset in macroData.get(packName)) {
                 var name = asset.name;
                 var path = packName + "/" + name + "?v=" + asset.md5;
@@ -162,33 +212,25 @@ class Manifest
                     name = name.removeFileExtension();
                 }
 
-                var base = crossOriginBase;
-#if html
-                if (type == Data) {
-                    // Without CORS, readable data must be loaded from the same origin
-                    // TODO(bruno): If Flambe ever gets an API to read pixels out of a texture,
-                    // sameOriginBase must be used for images too.
-                    base = sameOriginBase;
-                }
-#end
-
-                manifest.add(name, base + path, asset.bytes, type);
+                manifest.add(name, path, asset.bytes, type);
             }
             manifests.set(packName, manifest);
         }
         return manifests;
     }
 
-    /**
-     * Returns true if the environment fully supports loading assets on another domain.
-     */
-    private static function supportsCrossOrigin () :Bool
-    {
+    private static var _buildManifest :Hash<Manifest> = createBuildManifests();
+
+    // Whether the environment fully supports loading assets from another domain
+    private static var _supportsCrossOrigin :Bool = (function () {
 #if html
         // CORS in the stock Android browser is buggy. If your game is contained in an iframe, XHR
         // will work the first time. If the response had an Expires header, on subsequent page loads
         // instead of retrieving it from the cache, it will fail with error code 0.
         // http://stackoverflow.com/questions/6090816/android-cors-requests-work-only-once
+        //
+        // TODO(bruno): Better UA detection that only blacklists the stock browser, not Chrome or FF
+        // for Android
         var blacklist = ~/\b(Android)\b/;
         if (blacklist.match(js.Lib.window.navigator.userAgent)) {
             return false;
@@ -200,9 +242,10 @@ class Manifest
         // Assumes you have a valid crossdomain.xml
         return true;
 #end
-    }
-
-    private static var _buildManifest :Hash<Manifest> = createBuildManifests();
+    })();
 
     private var _entries :Array<AssetEntry>;
+
+    private var _relativeBasePath :String;
+    private var _externalBasePath :String;
 }

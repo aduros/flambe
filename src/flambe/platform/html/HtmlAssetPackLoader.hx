@@ -21,7 +21,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         super(platform, manifest);
     }
 
-    override private function loadEntry (entry :AssetEntry)
+    override private function loadEntry (url :String, entry :AssetEntry)
     {
         switch (entry.type) {
         case Image:
@@ -30,7 +30,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
 #if debug
                 if (image.width > 1024 || image.height > 1024) {
                     Log.warn("Images larger than 1024px on a side will prevent GPU acceleration" +
-                        " on some platforms (iOS)", ["url", entry.url,
+                        " on some platforms (iOS)", ["url", url,
                         "width", image.width, "height", image.height]);
                 }
 #end
@@ -44,13 +44,13 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
             image.onerror = function (_) {
                 handleError(entry, "Failed to load image");
             };
-            image.src = entry.url;
+            image.src = url;
 
         case Audio:
             // If we made it this far, we definitely support audio and can play this asset
             if (WebAudioSound.supported) {
                 var req = untyped __new__("XMLHttpRequest");
-                req.open("GET", entry.url, true);
+                req.open("GET", url, true);
                 req.responseType = "arraybuffer";
 
                 req.onload = function () {
@@ -62,7 +62,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                         // Since this happens unpredictably, continue with a DummySound rather than
                         // rejecting the entire asset pack.
                         Log.warn("Couldn't decode Web Audio, ignoring this asset." +
-                            " Is this a buggy browser?", ["url", entry.url]);
+                            " Is this a buggy browser?", ["url", url]);
                         handleLoad(entry, DummySound.getInstance());
                     });
                 };
@@ -96,12 +96,12 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
 
 
                 // TODO(bruno): Handle progress events
-                audio.src = entry.url;
+                audio.src = url;
                 audio.load();
             }
 
         case Data:
-            var http = new Http(entry.url);
+            var http = new Http(url);
             http.onData = function (data) {
                 handleLoad(entry, data);
             };

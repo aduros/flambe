@@ -29,4 +29,26 @@ class Arrays
 
         return insertedIdx;
     }
+
+    /** Allocate an array of a predetermined length. */
+    inline public static function create<A> (length :Int) :Array<A>
+    {
+#if (flash || js)
+        // This trick only works in Flash and JS
+        return untyped __new__(Array, length);
+#else
+        #error "Arrays.create unimplemented on this target"
+#end
+    }
+
+    /** Resizes an array in-place. */
+    inline public static function resize (arr :Array<Dynamic>, length :Int)
+    {
+#if (flash || js)
+        // This trick only works in Flash and JS
+        (untyped arr).length = length;
+#else
+        #error "Arrays.resize unimplemented on this target"
+#end
+    }
 }

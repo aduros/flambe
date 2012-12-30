@@ -8,7 +8,7 @@ import flambe.asset.AssetPack;
 
 using flambe.util.Strings;
 
-class EmitterConfig
+class EmitterMold
 {
     public var texture :Texture;
 

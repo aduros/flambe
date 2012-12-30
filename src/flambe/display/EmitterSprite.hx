@@ -71,45 +71,45 @@ class EmitterSprite extends Sprite
     public var tangentialAccel (default, null) :AnimatedFloat;
     public var tangentialAccelVariance (default, null) :AnimatedFloat;
 
-    public function new (config :EmitterConfig)
+    public function new (mold :EmitterMold)
     {
         super();
 
-        texture = config.texture;
-        blendMode = config.blendMode;
+        texture = mold.texture;
+        blendMode = mold.blendMode;
 
-        alphaEnd = new AnimatedFloat(config.alphaEnd);
-        alphaEndVariance = new AnimatedFloat(config.alphaEndVariance);
-        alphaStart = new AnimatedFloat(config.alphaStart);
-        alphaStartVariance = new AnimatedFloat(config.alphaStartVariance);
-        angle = new AnimatedFloat(config.angle);
-        angleVariance = new AnimatedFloat(config.angleVariance);
-        duration = new AnimatedFloat(config.duration);
-        emitXVariance = new AnimatedFloat(config.emitXVariance);
-        emitYVariance = new AnimatedFloat(config.emitYVariance);
-        gravityX = new AnimatedFloat(config.gravityX);
-        gravityY = new AnimatedFloat(config.gravityY);
-        lifespan = new AnimatedFloat(config.lifespan);
-        lifespanVariance = new AnimatedFloat(config.lifespanVariance);
-        radialAccel = new AnimatedFloat(config.radialAccel);
-        radialAccelVariance = new AnimatedFloat(config.radialAccelVariance);
-        rotationEnd = new AnimatedFloat(config.rotationEnd);
-        rotationEndVariance = new AnimatedFloat(config.rotationEndVariance);
-        rotationStart = new AnimatedFloat(config.rotationStart);
-        rotationStartVariance = new AnimatedFloat(config.rotationStartVariance);
-        sizeEnd = new AnimatedFloat(config.sizeEnd);
-        sizeEndVariance = new AnimatedFloat(config.sizeEndVariance);
-        sizeStart = new AnimatedFloat(config.sizeStart);
-        sizeStartVariance = new AnimatedFloat(config.sizeStartVariance);
-        speed = new AnimatedFloat(config.speed);
-        speedVariance = new AnimatedFloat(config.speedVariance);
-        tangentialAccel = new AnimatedFloat(config.tangentialAccel);
-        tangentialAccelVariance = new AnimatedFloat(config.tangentialAccelVariance);
+        alphaEnd = new AnimatedFloat(mold.alphaEnd);
+        alphaEndVariance = new AnimatedFloat(mold.alphaEndVariance);
+        alphaStart = new AnimatedFloat(mold.alphaStart);
+        alphaStartVariance = new AnimatedFloat(mold.alphaStartVariance);
+        angle = new AnimatedFloat(mold.angle);
+        angleVariance = new AnimatedFloat(mold.angleVariance);
+        duration = new AnimatedFloat(mold.duration);
+        emitXVariance = new AnimatedFloat(mold.emitXVariance);
+        emitYVariance = new AnimatedFloat(mold.emitYVariance);
+        gravityX = new AnimatedFloat(mold.gravityX);
+        gravityY = new AnimatedFloat(mold.gravityY);
+        lifespan = new AnimatedFloat(mold.lifespan);
+        lifespanVariance = new AnimatedFloat(mold.lifespanVariance);
+        radialAccel = new AnimatedFloat(mold.radialAccel);
+        radialAccelVariance = new AnimatedFloat(mold.radialAccelVariance);
+        rotationEnd = new AnimatedFloat(mold.rotationEnd);
+        rotationEndVariance = new AnimatedFloat(mold.rotationEndVariance);
+        rotationStart = new AnimatedFloat(mold.rotationStart);
+        rotationStartVariance = new AnimatedFloat(mold.rotationStartVariance);
+        sizeEnd = new AnimatedFloat(mold.sizeEnd);
+        sizeEndVariance = new AnimatedFloat(mold.sizeEndVariance);
+        sizeStart = new AnimatedFloat(mold.sizeStart);
+        sizeStartVariance = new AnimatedFloat(mold.sizeStartVariance);
+        speed = new AnimatedFloat(mold.speed);
+        speedVariance = new AnimatedFloat(mold.speedVariance);
+        tangentialAccel = new AnimatedFloat(mold.tangentialAccel);
+        tangentialAccelVariance = new AnimatedFloat(mold.tangentialAccelVariance);
 
         emitX = new AnimatedFloat(0);
         emitY = new AnimatedFloat(0);
 
-        _particles = Arrays.create(config.maxParticles);
+        _particles = Arrays.create(mold.maxParticles);
         var ii = 0, ll = _particles.length;
         while (ii < ll) {
             _particles[ii] = new Particle();

@@ -161,7 +161,7 @@ class EmitterMold
         }
     }
 
-    public function createSprite () :EmitterSprite
+    public function createEmitter () :EmitterSprite
     {
         return new EmitterSprite(this);
     }

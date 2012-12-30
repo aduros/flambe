@@ -65,11 +65,9 @@ class EmitterSprite extends Sprite
     public var speed (default, null) :AnimatedFloat;
     public var speedVariance (default, null) :AnimatedFloat;
 
-    // TODO(bruno): Implement!
     public var radialAccel (default, null) :AnimatedFloat;
     public var radialAccelVariance (default, null) :AnimatedFloat;
 
-    // TODO(bruno): Implement!
     public var tangentialAccel (default, null) :AnimatedFloat;
     public var tangentialAccelVariance (default, null) :AnimatedFloat;
 
@@ -163,8 +161,29 @@ class EmitterSprite extends Sprite
                 particle.x += particle.velX * dt;
                 particle.y += particle.velY * dt;
 
-                particle.velX += gravityX._ * dt;
-                particle.velY += gravityY._ * dt;
+                var accelX = gravityX._;
+                var accelY = gravityY._;
+
+                if (particle.radialAccel != 0 || particle.tangentialAccel != 0) {
+                    var dx = particle.x - particle.emitX;
+                    var dy = particle.y - particle.emitY;
+                    var distance = Math.sqrt(dx*dx + dy*dy);
+
+                    // Apply radial force
+                    var radialX = dx / distance;
+                    var radialY = dy / distance;
+                    accelX += radialX * particle.radialAccel;
+                    accelY += radialY * particle.radialAccel;
+
+                    // Apply tangential force
+                    var tangentialX = -radialY;
+                    var tangentialY = radialX;
+                    accelX += tangentialX * particle.tangentialAccel;
+                    accelY += tangentialY * particle.tangentialAccel;
+                }
+
+                particle.velX += accelX * dt;
+                particle.velY += accelY * dt;
 
                 particle.scale += particle.velScale * dt;
                 particle.rotation += particle.velRotation * dt;
@@ -224,12 +243,16 @@ class EmitterSprite extends Sprite
         }
     }
 
-    private function initParticle (particle :Particle)
+    private function initParticle (particle :Particle) :Bool
     {
         particle.life = random(lifespan._, lifespanVariance._);
         if (particle.life <= 0) {
             return false; // Dead on arrival
         }
+
+        // Don't include the variance here
+        particle.emitX = emitX._;
+        particle.emitY = emitY._;
 
         particle.x = random(emitX._, emitXVariance._);
         particle.y = random(emitY._, emitYVariance._);
@@ -238,6 +261,9 @@ class EmitterSprite extends Sprite
         var speed = random(speed._, speedVariance._);
         particle.velX = speed * Math.cos(angle);
         particle.velY = speed * Math.sin(angle);
+
+        particle.radialAccel = random(radialAccel._, radialAccelVariance._);
+        particle.tangentialAccel = random(tangentialAccel._, tangentialAccelVariance._);
 
         var width = texture.width;
         var scaleStart = random(sizeStart._, sizeStartVariance._) / width;
@@ -300,11 +326,18 @@ class EmitterSprite extends Sprite
 
 private class Particle
 {
+    // Where the emitter was when the particle was spawned
+    public var emitX :Float = 0;
+    public var emitY :Float = 0;
+
     public var x :Float = 0;
     public var velX :Float = 0;
 
     public var y :Float = 0;
     public var velY :Float = 0;
+
+    public var radialAccel :Float = 0;
+    public var tangentialAccel :Float = 0;
 
     public var scale :Float = 0;
     public var velScale :Float = 0;

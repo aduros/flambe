@@ -40,15 +40,15 @@ class EmitterSprite extends Sprite
     public var gravityY (default, null) :AnimatedFloat;
 
     // TODO(bruno): Implement!
-    public var maxRadius (default, null) :AnimatedFloat;
-    public var maxRadiusVariance (default, null) :AnimatedFloat;
+    // public var maxRadius (default, null) :AnimatedFloat;
+    // public var maxRadiusVariance (default, null) :AnimatedFloat;
 
     public var lifespanVariance (default, null) :AnimatedFloat;
     public var lifespan (default, null) :AnimatedFloat;
 
     // TODO(bruno): Implement!
-    public var rotatePerSecond (default, null) :AnimatedFloat;
-    public var rotatePerSecondVariance (default, null) :AnimatedFloat;
+    // public var rotatePerSecond (default, null) :AnimatedFloat;
+    // public var rotatePerSecondVariance (default, null) :AnimatedFloat;
 
     public var rotationStart (default, null) :AnimatedFloat;
     public var rotationStartVariance (default, null) :AnimatedFloat;
@@ -91,12 +91,8 @@ class EmitterSprite extends Sprite
         gravityY = new AnimatedFloat(config.gravityY);
         lifespan = new AnimatedFloat(config.lifespan);
         lifespanVariance = new AnimatedFloat(config.lifespanVariance);
-        maxRadius = new AnimatedFloat(config.maxRadius);
-        maxRadiusVariance = new AnimatedFloat(config.maxRadiusVariance);
         radialAccel = new AnimatedFloat(config.radialAccel);
         radialAccelVariance = new AnimatedFloat(config.radialAccelVariance);
-        rotatePerSecond = new AnimatedFloat(config.rotatePerSecond);
-        rotatePerSecondVariance = new AnimatedFloat(config.rotatePerSecondVariance);
         rotationEnd = new AnimatedFloat(config.rotationEnd);
         rotationEndVariance = new AnimatedFloat(config.rotationEndVariance);
         rotationStart = new AnimatedFloat(config.rotationStart);
@@ -136,12 +132,8 @@ class EmitterSprite extends Sprite
         gravityY.update(dt);
         lifespan.update(dt);
         lifespanVariance.update(dt);
-        maxRadius.update(dt);
-        maxRadiusVariance.update(dt);
         radialAccel.update(dt);
         radialAccelVariance.update(dt);
-        rotatePerSecond.update(dt);
-        rotatePerSecondVariance.update(dt);
         rotationEnd.update(dt);
         rotationEndVariance.update(dt);
         rotationStart.update(dt);

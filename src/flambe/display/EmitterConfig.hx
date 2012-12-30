@@ -87,7 +87,10 @@ class EmitterConfig
             case "duration":
                 duration = getValue(element);
             case "emittertype":
-            // TODO(bruno): Implement radial emitters
+                if (getValue(element) != 0) {
+                    // TODO(bruno): Implement radial emitters
+                    Log.warn("Radial emitters are not yet supported", ["emitter", name]);
+                }
             case "finishcolor":
                 alphaEnd = getFloat(element, "alpha");
             case "finishcolorvariance":
@@ -101,10 +104,10 @@ class EmitterConfig
                 gravityY = getY(element);
             case "maxparticles":
                 maxParticles = Std.int(getValue(element));
-            case "maxradius":
-                maxRadius = getValue(element);
-            case "maxradiusvariance":
-                maxRadiusVariance = getValue(element);
+            // case "maxradius":
+            //     maxRadius = getValue(element);
+            // case "maxradiusvariance":
+            //     maxRadiusVariance = getValue(element);
             // case "minradius":
             //     minRadius = getValue(element);
             case "particlelifespan":
@@ -154,7 +157,7 @@ class EmitterConfig
             // blendMode = Normal;
         } else if (blendFuncSource != 0 || blendFuncDestination != 0) {
             Log.warn("Unsupported particle blend functions", [
-                "source", blendFuncSource, "dest", blendFuncDestination ]);
+                "emitter", name, "source", blendFuncSource, "dest", blendFuncDestination ]);
         }
     }
 

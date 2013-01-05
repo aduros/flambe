@@ -67,6 +67,16 @@ class Sprite extends Component
     public var blendMode :BlendMode = null;
 
     /**
+     * <p>The scissor rectangle used for clipping/masking, in the local coordinate system. The
+     * scissor rectangle affects both rendering and hit testing, and applies to this sprite and all
+     * children.</p>
+     *
+     * <p><b>WARNING</b>: When using scissor testing, this sprite (and its parents) must not be
+     * rotated. The scissor rectangle must be axis-aligned when converted to screen coordinates.</p>
+     */
+    public var scissor :Rectangle = null;
+
+    /**
      * Whether this sprite should be drawn.
      */
     public var visible (get_visible, set_visible) :Bool;
@@ -180,6 +190,11 @@ class Sprite extends Component
             }
             var matrix = sprite.getLocalMatrix();
             g.transform(matrix.m00, matrix.m10, matrix.m01, matrix.m11, matrix.m02, matrix.m12);
+
+            var scissor = sprite.scissor;
+            if (scissor != null) {
+                g.applyScissor(scissor.x, scissor.y, scissor.width, scissor.height);
+            }
 
             sprite.draw(g);
         }

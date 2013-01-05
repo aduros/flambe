@@ -11,7 +11,7 @@ interface Graphics
 {
     /**
      * Saves the graphics state until the next restore(). The state contains the transformation
-     * matrix, alpha, and blend mode.
+     * matrix, alpha, blend mode, and scissor rectangle.
      */
     function save () :Void;
 
@@ -35,6 +35,12 @@ interface Graphics
 
     /** Sets the blend mode to use for drawing. */
     function setBlendMode (blendMode :BlendMode) :Void;
+
+    /**
+     * Sets the scissor rectangle to the intersection of the current scissor rectangle and the given
+     * rectangle, in local coordinates.
+     */
+    function applyScissor (x :Float, y :Float, width :Float, height :Float) :Void;
 
     /** Restores the graphics state back to the previous save(). */
     function restore () :Void;

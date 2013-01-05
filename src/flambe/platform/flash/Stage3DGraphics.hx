@@ -4,15 +4,17 @@
 
 package flambe.platform.flash;
 
-import flash.display3D.Context3D;
-import flash.geom.Matrix3D;
-import flash.geom.Vector3D;
 import flash.Lib;
 import flash.Vector;
+import flash.display3D.Context3D;
+import flash.geom.Matrix3D;
+import flash.geom.Rectangle;
+import flash.geom.Vector3D;
 
 import flambe.display.BlendMode;
 import flambe.display.Graphics;
 import flambe.display.Texture;
+import flambe.math.FMath;
 import flambe.platform.shader.DrawImage;
 import flambe.platform.shader.DrawPattern;
 import flambe.platform.shader.FillRect;
@@ -47,6 +49,10 @@ class Stage3DGraphics
         state.matrix.copyFrom(current.matrix);
         state.alpha = current.alpha;
         state.blendMode = current.blendMode;
+        state.scissorEnabled = current.scissorEnabled;
+        if (state.scissorEnabled) {
+            state.scissor.copyFrom(current.scissor);
+        }
         _stateList = state;
     }
 
@@ -99,8 +105,11 @@ class Stage3DGraphics
     public function drawSubImage (texture :Texture, destX :Float, destY :Float,
         sourceX :Float, sourceY :Float, sourceW :Float, sourceH :Float)
     {
-        var texture = Lib.as(texture, Stage3DTexture);
         var state = getTopState();
+        if (state.emptyScissor()) {
+            return;
+        }
+        var texture = Lib.as(texture, Stage3DTexture);
 
         var pos = transformQuad(destX, destY, sourceW, sourceH);
         var w = texture.width;
@@ -111,7 +120,7 @@ class Stage3DGraphics
         var v2 = texture.maxV*(sourceY + sourceH) / h;
         var alpha = state.alpha;
 
-        var offset = _batcher.prepareDrawImage(_renderTarget, state.blendMode, texture);
+        var offset = _batcher.prepareDrawImage(_renderTarget, state.blendMode, state.getScissor(), texture);
         var data = _batcher.data;
 
         data[  offset] = pos[0];
@@ -141,15 +150,18 @@ class Stage3DGraphics
 
     public function drawPattern (texture :Texture, x :Float, y :Float, width :Float, height :Float)
     {
-        var texture = Lib.as(texture, Stage3DTexture);
         var state = getTopState();
+        if (state.emptyScissor()) {
+            return;
+        }
+        var texture = Lib.as(texture, Stage3DTexture);
 
         var pos = transformQuad(x, y, width, height);
         var u2 = texture.maxU * (width / texture.width);
         var v2 = texture.maxV * (height / texture.height);
         var alpha = state.alpha;
 
-        var offset = _batcher.prepareDrawPattern(_renderTarget, state.blendMode, texture);
+        var offset = _batcher.prepareDrawPattern(_renderTarget, state.blendMode, state.getScissor(), texture);
         var data = _batcher.data;
 
         data[  offset] = pos[0];
@@ -180,6 +192,9 @@ class Stage3DGraphics
     public function fillRect (color :Int, x :Float, y :Float, width :Float, height :Float)
     {
         var state = getTopState();
+        if (state.emptyScissor()) {
+            return;
+        }
 
         var pos = transformQuad(x, y, width, height);
         var r = (color & 0xff0000) / 0xff0000;
@@ -187,7 +202,7 @@ class Stage3DGraphics
         var b = (color & 0x0000ff) / 0x0000ff;
         var a = state.alpha;
 
-        var offset = _batcher.prepareFillRect(_renderTarget, state.blendMode);
+        var offset = _batcher.prepareFillRect(_renderTarget, state.blendMode, state.getScissor());
         var data = _batcher.data;
 
         data[  offset] = pos[0];
@@ -234,16 +249,45 @@ class Stage3DGraphics
         getTopState().blendMode = blendMode;
     }
 
+    public function applyScissor (x :Float, y :Float, width :Float, height :Float)
+    {
+        var state = getTopState();
+        var rect = _scratchClipVector;
+
+        rect[0] = x;
+        rect[1] = y;
+        // rect[2] = 0;
+
+        rect[3] = x + width;
+        rect[4] = y + height;
+        // rect[5] = 0;
+
+        state.matrix.transformVectors(rect, rect);
+        _inverseProjection.transformVectors(rect, rect);
+
+        x = rect[0];
+        y = rect[1];
+        width = rect[3] - x;
+        height = rect[4] - y;
+        state.applyScissor(x, y, width, height);
+    }
+
     public function reset (width :Int, height :Int)
     {
-        // Reinitialize the stack from an orthographic projection matrix
-        _stateList = new DrawingState();
-        _stateList.matrix = new Matrix3D(Vector.ofArray([
+        var ortho = new Matrix3D(Vector.ofArray([
             2/width, 0, 0, 0,
             0, -2/height, 0, 0,
             0, 0, -1, 0,
             -1, 1, 0, 1,
         ]));
+
+        // Reinitialize the stack from an orthographic projection matrix
+        _stateList = new DrawingState();
+        _stateList.matrix = ortho;
+
+        // May be used to transform back into screen coordinates
+        _inverseProjection = ortho.clone();
+        _inverseProjection.invert();
     }
 
     inline private function getTopState () :DrawingState
@@ -278,7 +322,8 @@ class Stage3DGraphics
     }
 
     private static var _scratchMatrix3D = new Matrix3D();
-    private static var _scratchQuadVector = new Vector<Float>(12, true);
+    private static var _scratchClipVector = new Vector<Float>(2*3, true);
+    private static var _scratchQuadVector = new Vector<Float>(4*3, true);
     private static var _scratchTransformVector = (function () {
         var v = new Vector<Float>(16, true);
         new Matrix3D().copyRawDataTo(v);
@@ -289,6 +334,7 @@ class Stage3DGraphics
     private var _batcher :Stage3DBatcher;
     private var _renderTarget :Stage3DTexture;
 
+    private var _inverseProjection :Matrix3D;
     private var _stateList :DrawingState;
 }
 
@@ -298,6 +344,9 @@ private class DrawingState
     public var alpha :Float;
     public var blendMode :BlendMode;
 
+    public var scissor :Rectangle;
+    public var scissorEnabled :Bool;
+
     public var prev :DrawingState;
     public var next :DrawingState;
 
@@ -306,5 +355,38 @@ private class DrawingState
         matrix = new Matrix3D();
         alpha = 1;
         blendMode = Normal;
+        scissor = new Rectangle();
+    }
+
+    public function getScissor () :Rectangle
+    {
+        return scissorEnabled ? scissor : null;
+    }
+
+    public function applyScissor (x :Float, y :Float, width :Float, height :Float)
+    {
+        if (scissorEnabled) {
+            // Intersection with the previous scissor rectangle
+            var x1 = FMath.max(scissor.x, x);
+            var y1 = FMath.max(scissor.y, y);
+            var x2 = FMath.min(scissor.x + scissor.width, x + width);
+            var y2 = FMath.min(scissor.y + scissor.height, y + height);
+            x = x1;
+            y = y1;
+            width = x2 - x1;
+            height = y2 - y1;
+        }
+        scissor.setTo(x, y, width, height);
+        scissorEnabled = true;
+    }
+
+    /**
+     * Whether the scissor region is empty. Calling Context3D.setScissorRectangle with an empty
+     * rectangle actually disables scissor testing, so this needs to be queried before every draw
+     * method.
+     */
+    public function emptyScissor () :Bool
+    {
+        return scissorEnabled && (scissor.width < 0.5 || scissor.height < 0.5);
     }
 }

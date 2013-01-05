@@ -145,6 +145,13 @@ class CanvasGraphics
         _canvasCtx.globalCompositeOperation = op;
     }
 
+    public function applyScissor (x :Float, y :Float, width :Float, height :Float)
+    {
+        _canvasCtx.beginPath();
+        _canvasCtx.rect(Std.int(x), Std.int(y), Std.int(width), Std.int(height));
+        _canvasCtx.clip();
+    }
+
     public function willRender ()
     {
         // Disable blending for the first draw call. This squeezes a bit of performance out of games

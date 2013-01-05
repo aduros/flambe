@@ -109,6 +109,12 @@ class InspectorGraphics
         _graphics.setBlendMode(blendMode);
     }
 
+    public function applyScissor (x :Float, y :Float, width :Float, height :Float)
+    {
+        logMethod("applyScissor", [x, y, width, height]);
+        _graphics.applyScissor(x, y, width, height);
+    }
+
     public function show ()
     {
         var document = Lib.window.open("", "flambe-inspector").document;

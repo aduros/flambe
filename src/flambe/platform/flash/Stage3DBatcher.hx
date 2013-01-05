@@ -11,6 +11,7 @@ import flash.display3D.Context3D;
 import flash.display3D.IndexBuffer3D;
 import flash.display3D.VertexBuffer3D;
 import flash.geom.Matrix3D;
+import flash.geom.Rectangle;
 import flash.geom.Vector3D;
 
 import format.hxsl.Shader;
@@ -32,6 +33,8 @@ class Stage3DBatcher
         _drawPatternShader = new DrawPattern(context3D);
         _fillRectShader = new FillRect(context3D);
         resize(16);
+
+        _scratchScissor = new Rectangle();
     }
 
     public function willRender ()
@@ -112,7 +115,7 @@ class Stage3DBatcher
         ]));
         ortho.transformVectors(scratch, scratch);
 
-        var offset = prepareDrawImage(null, CopyExperimental, texture);
+        var offset = prepareDrawImage(null, CopyExperimental, null, texture);
         data[  offset] = scratch[0];
         data[++offset] = scratch[1];
         data[++offset] = 0;
@@ -157,35 +160,36 @@ class Stage3DBatcher
     }
 
     /** Adds a quad to the batch, using the DrawImage shader. */
-    public function prepareDrawImage (renderTarget :Stage3DTexture, blendMode :BlendMode,
-        texture :Stage3DTexture) :Int
+    public function prepareDrawImage (renderTarget :Stage3DTexture,
+        blendMode :BlendMode, scissor :Rectangle, texture :Stage3DTexture) :Int
     {
         if (texture != _lastTexture) {
             flush();
             _lastTexture = texture;
         }
-        return prepareQuad(5, renderTarget, blendMode, _drawImageShader);
+        return prepareQuad(5, renderTarget, blendMode, scissor, _drawImageShader);
     }
 
     /** Adds a quad to the batch, using the DrawPattern shader. */
-    public function prepareDrawPattern (renderTarget :Stage3DTexture, blendMode :BlendMode,
-        texture :Stage3DTexture) :Int
+    public function prepareDrawPattern (renderTarget :Stage3DTexture,
+        blendMode :BlendMode, scissor :Rectangle, texture :Stage3DTexture) :Int
     {
         if (texture != _lastTexture) {
             flush();
             _lastTexture = texture;
         }
-        return prepareQuad(5, renderTarget, blendMode, _drawPatternShader);
+        return prepareQuad(5, renderTarget, blendMode, scissor, _drawPatternShader);
     }
 
     /** Adds a quad to the batch, using the FillRect shader. */
-    public function prepareFillRect (renderTarget :Stage3DTexture, blendMode :BlendMode) :Int
+    public function prepareFillRect (renderTarget :Stage3DTexture,
+        blendMode :BlendMode, scissor :Rectangle) :Int
     {
-        return prepareQuad(6, renderTarget, blendMode, _fillRectShader);
+        return prepareQuad(6, renderTarget, blendMode, scissor, _fillRectShader);
     }
 
     private function prepareQuad (elementsPerVertex :Int, renderTarget :Stage3DTexture,
-        blendMode :BlendMode, shader :Shader) :Int
+        blendMode :BlendMode, scissor :Rectangle, shader :Shader) :Int
     {
         if (renderTarget != _lastRenderTarget) {
             flush();
@@ -198,6 +202,20 @@ class Stage3DBatcher
         if (shader != _lastShader) {
             flush();
             _lastShader = shader;
+        }
+
+        // Handle changes to the scissor rectangle
+        if (scissor != null || _lastScissor != null) {
+            if (scissor == null || _lastScissor == null || !_lastScissor.equals(scissor)) {
+                flush();
+                if (scissor != null) {
+                    _scratchScissor.copyFrom(scissor); // Copy by value
+                    _lastScissor = _scratchScissor;
+                } else {
+                    _lastScissor = null;
+                }
+                _pendingSetScissor = true;
+            }
         }
 
         var offset;
@@ -242,6 +260,11 @@ class Stage3DBatcher
                 case CopyExperimental: _context3D.setBlendFactors(ONE, ZERO);
             }
             _currentBlendMode = _lastBlendMode;
+        }
+
+        if (_pendingSetScissor) {
+            _context3D.setScissorRectangle(_lastScissor);
+            _pendingSetScissor = false;
         }
 
         var vertexBuffer = null;
@@ -322,10 +345,15 @@ class Stage3DBatcher
     private var _lastRenderTarget :Stage3DTexture;
     private var _lastShader :Shader;
     private var _lastTexture :Stage3DTexture;
+    private var _lastScissor :Rectangle;
 
     // Used to avoid redundant Context3D calls
     private var _currentBlendMode :BlendMode;
     private var _currentRenderTarget :Stage3DTexture;
+
+    // Extra stuff for scissor test tracking
+    private var _scratchScissor :Rectangle;
+    private var _pendingSetScissor :Bool;
 
     private var _drawImageShader :DrawImage;
     private var _drawPatternShader :DrawPattern;

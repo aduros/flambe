@@ -136,6 +136,11 @@ class Sprite extends Component
                 x = _scratchPoint.x;
                 y = _scratchPoint.y;
             }
+
+            var scissor = sprite.scissor;
+            if (scissor != null && !scissor.contains(x, y)) {
+                return null; // Prune if outside the scissor rectangle
+            }
         }
 
         // Hit test all children, front to back
@@ -471,12 +476,26 @@ class Sprite extends Component
                 ? Matrix.multiply(matrix, sprite.getLocalMatrix()) // Allocation!
                 : sprite.getLocalMatrix();
 
+            var x1 = 0.0, y1 = 0.0;
+            var x2 = sprite.getNaturalWidth(), y2 = sprite.getNaturalHeight();
+
+            // Intersecting scissor rectangles are too tricky for bounds calculation, ignore it for
+            // now...
+            // var scissor = sprite.scissor;
+            // if (scissor != null) {
+            //     x1 = FMath.max(x1, scissor.x);
+            //     y1 = FMath.max(y1, scissor.y);
+            //     x2 = FMath.min(x2, scissor.x + scissor.width);
+            //     y2 = FMath.min(y2, scissor.y + scissor.height);
+            // }
+
             // Extend the rectangle out to fit this sprite
-            var width = sprite.getNaturalWidth(), height = sprite.getNaturalHeight();
-            extendRect(matrix, 0, 0, result);
-            extendRect(matrix, width, 0, result);
-            extendRect(matrix, width, height, result);
-            extendRect(matrix, 0, height, result);
+            if (x2 > x1 && y2 > y1) {
+                extendRect(matrix, x1, y1, result);
+                extendRect(matrix, x2, y1, result);
+                extendRect(matrix, x2, y2, result);
+                extendRect(matrix, x1, y2, result);
+            }
         }
 
         // Recurse into partially occluded director scenes

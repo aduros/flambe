@@ -6,21 +6,22 @@ package flambe.platform.html;
 
 import js.Lib;
 
+import flambe.Entity;
+import flambe.System;
 import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
 import flambe.display.Stage;
 import flambe.display.Texture;
-import flambe.Entity;
+import flambe.external.External;
 import flambe.input.Keyboard;
 import flambe.input.Mouse;
 import flambe.input.Pointer;
 import flambe.input.Touch;
-import flambe.platform.Platform;
 import flambe.platform.BasicKeyboard;
 import flambe.platform.BasicPointer;
 import flambe.platform.MainLoop;
+import flambe.platform.Platform;
 import flambe.storage.Storage;
-import flambe.System;
 import flambe.util.Assert;
 import flambe.util.Logger;
 import flambe.util.Promise;
@@ -353,6 +354,14 @@ class HtmlPlatform
         return _web;
     }
 
+    public function getExternal () :External
+    {
+        if (_external == null) {
+            _external = new HtmlExternal();
+        }
+        return _external;
+    }
+
     public function getRenderer () :Renderer
     {
         return _renderer;
@@ -375,6 +384,7 @@ class HtmlPlatform
     private var _keyboard :BasicKeyboard;
     private var _storage :Storage;
     private var _web :Web;
+    private var _external :External;
     private var _renderer :CanvasRenderer;
 
     private var _container :Dynamic;

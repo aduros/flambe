@@ -5,6 +5,7 @@
 package flambe.platform.flash;
 
 #if flash11_2 import flash.events.ThrottleEvent; #end
+import flash.Lib;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.KeyboardEvent;
@@ -12,22 +13,22 @@ import flash.events.MouseEvent;
 import flash.events.TouchEvent;
 import flash.events.UncaughtErrorEvent;
 import flash.external.ExternalInterface;
-import flash.Lib;
 import flash.net.SharedObject;
 import flash.system.Capabilities;
 
+import flambe.Entity;
 import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
 import flambe.display.Stage;
-import flambe.Entity;
+import flambe.external.External;
 import flambe.input.Keyboard;
 import flambe.input.Mouse;
 import flambe.input.Pointer;
 import flambe.input.Touch;
-import flambe.platform.Platform;
 import flambe.platform.BasicKeyboard;
 import flambe.platform.BasicPointer;
 import flambe.platform.MainLoop;
+import flambe.platform.Platform;
 import flambe.storage.Storage;
 import flambe.util.Logger;
 import flambe.util.Promise;
@@ -149,6 +150,14 @@ class FlashPlatform
         return _web;
     }
 
+    public function getExternal () :External
+    {
+        if (_external == null) {
+            _external = FlashExternal.shouldUse() ? new FlashExternal() : new DummyExternal();
+        }
+        return _external;
+    }
+
     public function getRenderer () :Renderer
     {
         return _renderer;
@@ -157,15 +166,6 @@ class FlashPlatform
     public function getLocale () :String
     {
         return Capabilities.language;
-    }
-
-    public function callNative (funcName :String, params :Array<Dynamic>) :Dynamic
-    {
-        if (params == null) {
-            params = [];
-        }
-        var args = [ cast funcName ].concat(params);
-        return Reflect.callMethod(null, ExternalInterface.call, args);
     }
 
     public function createLogHandler (tag :String) :LogHandler
@@ -233,6 +233,7 @@ class FlashPlatform
     private var _keyboard :BasicKeyboard;
     private var _storage :Storage;
     private var _web :Web;
+    private var _external :External;
     private var _renderer :Renderer;
 
     private var _lastUpdate :Int;

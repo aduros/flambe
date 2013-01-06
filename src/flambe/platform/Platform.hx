@@ -4,11 +4,12 @@
 
 package flambe.platform;
 
+import flambe.Entity;
 import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
 import flambe.display.Stage;
 import flambe.display.Texture;
-import flambe.Entity;
+import flambe.external.External;
 import flambe.input.Keyboard;
 import flambe.input.Mouse;
 import flambe.input.Pointer;
@@ -29,10 +30,10 @@ interface Platform
     function getStorage () :Storage;
     function getTouch () :Touch;
     function getWeb () :Web;
+    function getExternal () :External;
 
     function getRenderer () :Renderer;
 
-    function callNative (funcName :String, params :Array<Dynamic>) :Dynamic;
     function createLogHandler (tag :String) :LogHandler;
     function loadAssetPack (manifest :Manifest) :Promise<AssetPack>;
 

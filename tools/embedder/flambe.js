@@ -54,6 +54,16 @@ flambe.embed = function (urls, elementId) {
                 swf.id = elementId + "-swf";
                 container.appendChild(swf);
 
+                // Setup the helper for binding global functions
+                if (typeof $flambe_expose == "undefined") {
+                    window.$flambe_expose = function (name, objectId) {
+                        window[name] = (objectId != null) ? function () {
+                            var swf = document.getElementById(objectId);
+                            swf[name].apply(swf, arguments);
+                        } : null;
+                    };
+                }
+
                 swfobject.embedSWF(url, swf.id, "100%", "100%", flambe.FLASH_VERSION, null, {}, {
                     allowScriptAccess: "always",
                     allowFullScreen: "true",

@@ -8,6 +8,7 @@ import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
 import flambe.display.Stage;
 import flambe.display.Texture;
+import flambe.external.External;
 import flambe.input.Keyboard;
 import flambe.input.Mouse;
 import flambe.input.Pointer;
@@ -66,6 +67,11 @@ class System
      */
     public static var web (get_web, null) :Web;
 
+    /**
+     * The External subsystem, for interaction with external code.
+     */
+    public static var external (get_external, null) :External;
+
     // TODO(bruno): Subsystems for accelerometer, gamepads, haptic, geolocation, video, textInput
 
     /**
@@ -120,17 +126,6 @@ class System
     {
         #if debug assertCalledInit(); #end
         return _platform.loadAssetPack(manifest);
-    }
-
-    /**
-     * Calls an external native function. When running in a browser, this calls a Javascript
-     * function defined elsewhere on the page. When running in AIR, this will (not yet implemented)
-     * call an AIR Native Extension.
-     */
-    inline public static function callNative (funcName :String, ?params :Array<Dynamic>) :Dynamic
-    {
-        #if debug assertCalledInit(); #end
-        return _platform.callNative(funcName, params);
     }
 
     /**
@@ -207,6 +202,12 @@ class System
     {
         #if debug assertCalledInit(); #end
         return _platform.getWeb();
+    }
+
+    inline private static function get_external () :External
+    {
+        #if debug assertCalledInit(); #end
+        return _platform.getExternal();
     }
 
     inline private static function get_locale () :String

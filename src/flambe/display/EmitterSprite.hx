@@ -249,7 +249,7 @@ class EmitterSprite extends Sprite
         particle.x = random(emitX._, emitXVariance._);
         particle.y = random(emitY._, emitYVariance._);
 
-        var angle = FMath.toRadians(random(angle._, angleVariance._));
+        var angle = -FMath.toRadians(random(angle._, angleVariance._));
         var speed = random(speed._, speedVariance._);
         particle.velX = speed * Math.cos(angle);
         particle.velY = speed * Math.sin(angle);

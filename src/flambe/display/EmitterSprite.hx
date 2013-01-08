@@ -14,6 +14,7 @@ using flambe.util.Arrays;
  */
 class EmitterSprite extends Sprite
 {
+    /** The particle texture, must be square. */
     public var texture :Texture;
 
     public var maxParticles (get_maxParticles, set_maxParticles) :Int;
@@ -33,6 +34,7 @@ class EmitterSprite extends Sprite
     public var angle (default, null) :AnimatedFloat;
     public var angleVariance (default, null) :AnimatedFloat;
 
+    /** How long the emitter should remain enabled, or <= 0 to never expire. */
     public var duration :Float;
 
     /** Whether new particles are being actively emitted. */

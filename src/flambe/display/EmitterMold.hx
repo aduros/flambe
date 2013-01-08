@@ -8,6 +8,10 @@ import flambe.asset.AssetPack;
 
 using flambe.util.Strings;
 
+/**
+ * A particle system configuration, that can be used to create emitter sprites. The configuration is
+ * loaded from a .pex file, authored in a tool such as Particle Designer.
+ */
 class EmitterMold
 {
     public var texture :Texture;
@@ -166,6 +170,7 @@ class EmitterMold
         }
     }
 
+    /** Creates a new EmitterSprite using this mold. */
     public function createEmitter () :EmitterSprite
     {
         return new EmitterSprite(this);

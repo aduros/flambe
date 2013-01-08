@@ -211,8 +211,8 @@ class EmitterSprite extends Sprite
 
     override public function draw (g :Graphics)
     {
-        var offsetX = -texture.width/2;
-        var offsetY = -texture.height/2;
+        // Assumes that the texture is always square
+        var offset = -texture.width/2;
 
         var ii = 0, ll = _numParticles;
         while (ii < ll) {
@@ -228,7 +228,7 @@ class EmitterSprite extends Sprite
             if (particle.scale != 1) {
                 g.scale(particle.scale, particle.scale);
             }
-            g.drawImage(texture, offsetX, offsetY);
+            g.drawImage(texture, offset, offset);
             g.restore();
 
             ++ii;
@@ -257,6 +257,7 @@ class EmitterSprite extends Sprite
         particle.radialAccel = random(radialAccel._, radialAccelVariance._);
         particle.tangentialAccel = random(tangentialAccel._, tangentialAccelVariance._);
 
+        // Assumes that the texture is always square
         var width = texture.width;
         var scaleStart = random(sizeStart._, sizeStartVariance._) / width;
         var scaleEnd = random(sizeEnd._, sizeEndVariance._) / width;

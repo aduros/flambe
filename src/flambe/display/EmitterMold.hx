@@ -151,6 +151,11 @@ class EmitterMold
             }
         }
 
+        // Handle weird Particle Designer output for emitters with a duration
+        if (lifespan <= 0) {
+            lifespan = duration;
+        }
+
         if (blendFuncSource == 1 && blendFuncDestination == 1) {
             blendMode = Add;
         } else if (blendFuncSource == 1 && blendFuncDestination == 771) {

@@ -33,8 +33,10 @@ class EmitterSprite extends Sprite
     public var angle (default, null) :AnimatedFloat;
     public var angleVariance (default, null) :AnimatedFloat;
 
-    // TODO(bruno): Implement!
-    public var duration (default, null) :AnimatedFloat;
+    public var duration :Float;
+
+    /** Whether new particles are being actively emitted. */
+    public var enabled :Bool = true;
 
     public var gravityX (default, null) :AnimatedFloat;
     public var gravityY (default, null) :AnimatedFloat;
@@ -84,7 +86,7 @@ class EmitterSprite extends Sprite
         alphaStartVariance = new AnimatedFloat(mold.alphaStartVariance);
         angle = new AnimatedFloat(mold.angle);
         angleVariance = new AnimatedFloat(mold.angleVariance);
-        duration = new AnimatedFloat(mold.duration);
+        duration = mold.duration;
         emitXVariance = new AnimatedFloat(mold.emitXVariance);
         emitYVariance = new AnimatedFloat(mold.emitYVariance);
         gravityX = new AnimatedFloat(mold.gravityX);
@@ -117,6 +119,12 @@ class EmitterSprite extends Sprite
         }
     }
 
+    public function restart ()
+    {
+        enabled = true;
+        _totalElapsed = 0;
+    }
+
     override public function onUpdate (dt :Float)
     {
         super.onUpdate(dt);
@@ -127,7 +135,6 @@ class EmitterSprite extends Sprite
         alphaStartVariance.update(dt);
         angle.update(dt);
         angleVariance.update(dt);
-        duration.update(dt);
         gravityX.update(dt);
         gravityY.update(dt);
         lifespan.update(dt);
@@ -192,6 +199,18 @@ class EmitterSprite extends Sprite
                     _particles[ii] = _particles[_numParticles];
                     _particles[_numParticles] = particle;
                 }
+            }
+        }
+
+        // Check whether we should continue to the emit step
+        if (!enabled) {
+            return;
+        }
+        if (duration > 0) {
+            _totalElapsed += dt;
+            if (_totalElapsed >= duration) {
+                enabled = false;
+                return;
             }
         }
 
@@ -315,6 +334,8 @@ class EmitterSprite extends Sprite
 
     // Time passed since the last emission
     private var _emitElapsed :Float = 0;
+
+    private var _totalElapsed :Float = 0;
 }
 
 private class Particle

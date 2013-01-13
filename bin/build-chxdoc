@@ -16,8 +16,8 @@ rm -rf "$CHXDOC_DIR"
 cd "$TMP_DIR"
 haxe -xml haxedoc.xml -debug \
     --macro 'include("flambe", true, ["flambe.platform"])' \
-    -lib format \
-    --no-output -cp "$FLAMBE_ROOT/src"
+    -lib format -cp "$FLAMBE_ROOT/src" \
+    -js none.js --no-output
 
 # Generate the actual chxdoc directory
 chxdoc -o "$CHXDOC_DIR" haxedoc.xml \

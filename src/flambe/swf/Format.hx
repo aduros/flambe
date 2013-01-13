@@ -90,7 +90,7 @@ typedef TextureFormat = {
     symbol: String,
 
     // The bitmap's anchor point, relative to the top left of its rect
-    offset: Array<Float>,
+    origin: Array<Float>,
 
     // The rectangle bounding the texture in its atlas
     rect: Array<Int>,

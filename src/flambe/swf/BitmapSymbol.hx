@@ -34,13 +34,20 @@ class BitmapSymbol
         width = rect[2];
         height = rect[3];
 
-        var offset = reader.offset;
-        if (offset != null) {
-            anchorX = -offset[0];
-            anchorY = -offset[1];
+        var origin = reader.origin;
+        if (origin != null) {
+            anchorX = origin[0];
+            anchorY = origin[1];
         } else {
-            anchorX = 0;
-            anchorY = 0;
+            // Old Flump versions used "offset", handle it
+            var offset = (untyped reader).offset;
+            if (offset != null) {
+                anchorX = -offset[0];
+                anchorY = -offset[1];
+            } else {
+                anchorX = 0;
+                anchorY = 0;
+            }
         }
     }
 

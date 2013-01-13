@@ -9,8 +9,21 @@ import flambe.asset.AssetPack;
 using flambe.util.Strings;
 
 /**
- * A particle system configuration, that can be used to create emitter sprites. The configuration is
- * loaded from a .pex file, authored in a tool such as Particle Designer.
+ * <p>A particle system configuration, that can be used to create emitter sprites. The configuration
+ * is loaded from a .pex file, authored in a tool such as Particle Designer.</p>
+ *
+ * <p><b>NOTE</b>: There are some restrictions to keep in mind when using Particle Designer with
+ * Flambe:
+ * <ul>
+ * <li>Particle coloring is not supported.</li>
+ * <li>Radial emitters are not (yet) supported.</li>
+ * <li>Only normal and additive blend modes are supported.</li>
+ * </ul>
+ * </p>
+ *
+ * <p>Also keep in mind that gratuitous particle systems are a great way to kill performance,
+ * especially on mobile. Try to keep maxParticles as low as possible to achieve the desired
+ * effect.</p>
  */
 class EmitterMold
 {
@@ -38,14 +51,14 @@ class EmitterMold
     public var gravityX :Float;
     public var gravityY :Float;
 
-    public var maxRadius :Float;
-    public var maxRadiusVariance :Float;
+    // public var maxRadius :Float;
+    // public var maxRadiusVariance :Float;
 
     public var lifespanVariance :Float;
     public var lifespan :Float;
 
-    public var rotatePerSecond :Float;
-    public var rotatePerSecondVariance :Float;
+    // public var rotatePerSecond :Float;
+    // public var rotatePerSecondVariance :Float;
 
     public var rotationStart :Float;
     public var rotationStartVariance :Float;

@@ -39,15 +39,8 @@ class BitmapSymbol
             anchorX = origin[0];
             anchorY = origin[1];
         } else {
-            // Old Flump versions used "offset", handle it
-            var offset = (untyped reader).offset;
-            if (offset != null) {
-                anchorX = -offset[0];
-                anchorY = -offset[1];
-            } else {
-                anchorX = 0;
-                anchorY = 0;
-            }
+            anchorX = 0;
+            anchorY = 0;
         }
     }
 

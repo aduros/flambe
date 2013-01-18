@@ -274,9 +274,7 @@ private class LayerAnimator
         matrix.set(cosY*scaleX, sinY*scaleX, -sinX*scaleY, cosX*scaleY, x, y);
 
         // Append the pivot
-        var pivotX = kf.pivotX + sprite.anchorX._;
-        var pivotY = kf.pivotY + sprite.anchorY._;
-        matrix.translate(-pivotX, -pivotY);
+        matrix.translate(-kf.pivotX, -kf.pivotY);
 
         sprite.alpha._ = alpha;
     }

@@ -34,30 +34,12 @@ class CanvasRenderer
     public function willRender () :Graphics
     {
         _drawCtx.willRender();
-#if debug
-        return (_inspector != null) ? _inspector : _drawCtx;
-#else
         return _drawCtx;
-#end
     }
 
     public function didRender ()
     {
-#if debug
-        if (_inspector != null) {
-            _inspector.show();
-            _inspector = null;
-        }
-#end
     }
-
-#if debug
-    public function inspectNextFrame ()
-    {
-        _inspector = new InspectorGraphics(_drawCtx);
-    }
-    private var _inspector :InspectorGraphics;
-#end
 
     /** If true, blit loaded images to a canvas and use that as the texture. */
     private static var CANVAS_TEXTURES :Bool = (function () {

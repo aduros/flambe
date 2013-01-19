@@ -173,13 +173,6 @@ class HtmlPlatform
         var onKey = function (event) {
             switch (event.type) {
             case "keydown":
-#if debug
-                if (event.ctrlKey && event.keyCode == KeyCodes.I) {
-                    event.preventDefault();
-                    _renderer.inspectNextFrame();
-                    return;
-                }
-#end
                 if (_keyboard.submitDown(event.keyCode)) {
                     event.preventDefault();
                 }

@@ -77,11 +77,11 @@ class Stage3DRenderer
 #if flambe_debug_renderer
         trace(">>> begin");
 #end
-        if (_drawCtx == null) {
+        if (_graphics == null) {
             return null;
         }
         batcher.willRender();
-        return _drawCtx;
+        return _graphics;
     }
 
     public function didRender ()
@@ -103,7 +103,7 @@ class Stage3DRenderer
 #end
 
         batcher = new Stage3DBatcher(_context3D);
-        _drawCtx = createGraphics(null);
+        _graphics = createGraphics(null);
         onResize(null);
 
         // Signal that the GPU context was (re)created
@@ -121,10 +121,10 @@ class Stage3DRenderer
         if (_context3D != null) {
             var stage = Lib.current.stage;
             _context3D.configureBackBuffer(stage.stageWidth, stage.stageHeight, 2, false);
-            _drawCtx.reset(stage.stageWidth, stage.stageHeight);
+            _graphics.reset(stage.stageWidth, stage.stageHeight);
         }
     }
 
     private var _context3D :Context3D;
-    private var _drawCtx :Stage3DGraphics;
+    private var _graphics :Stage3DGraphics;
 }

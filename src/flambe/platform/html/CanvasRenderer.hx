@@ -14,8 +14,8 @@ class CanvasRenderer
 {
     public function new (canvas :Dynamic)
     {
-        _drawCtx = new CanvasGraphics(canvas);
-        _drawCtx.clear();
+        _graphics = new CanvasGraphics(canvas);
+        _graphics.clear();
     }
 
     public function createTexture (image :Dynamic) :Texture
@@ -33,8 +33,8 @@ class CanvasRenderer
 
     public function willRender () :Graphics
     {
-        _drawCtx.willRender();
-        return _drawCtx;
+        _graphics.willRender();
+        return _graphics;
     }
 
     public function didRender ()
@@ -49,5 +49,5 @@ class CanvasRenderer
         return pattern.match(Lib.window.navigator.userAgent);
     })();
 
-    private var _drawCtx :CanvasGraphics;
+    private var _graphics :CanvasGraphics;
 }

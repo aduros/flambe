@@ -37,7 +37,7 @@ class FillRectGL extends ShaderGL
         a_alpha = getAttribLocation("a_alpha");
     }
 
-    override public function enableVertexArrays ()
+    override public function prepare ()
     {
         _gl.enableVertexAttribArray(a_pos);
         _gl.enableVertexAttribArray(a_rgb);
@@ -48,13 +48,6 @@ class FillRectGL extends ShaderGL
         _gl.vertexAttribPointer(a_pos, 2, _gl.FLOAT, false, stride, 0*bytesPerFloat);
         _gl.vertexAttribPointer(a_rgb, 3, _gl.FLOAT, false, stride, 2*bytesPerFloat);
         _gl.vertexAttribPointer(a_alpha, 1, _gl.FLOAT, false, stride, 5*bytesPerFloat);
-    }
-
-    override public function disableVertexArrays ()
-    {
-        _gl.disableVertexAttribArray(a_pos);
-        _gl.disableVertexAttribArray(a_rgb);
-        _gl.disableVertexAttribArray(a_alpha);
     }
 
     private var a_pos :Int;

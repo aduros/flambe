@@ -39,9 +39,13 @@ class WebGLBatcher
         flush();
     }
 
-    public function prepareDrawImage () :Int
+    public function prepareDrawImage (texture :WebGLTexture) :Int
     {
-        return prepareQuad(2, _drawImageShader);
+        if (texture != _lastTexture) {
+            flush();
+            _lastTexture = texture;
+        }
+        return prepareQuad(5, _drawImageShader);
     }
 
     public function prepareFillRect () :Int
@@ -72,24 +76,28 @@ class WebGLBatcher
             return;
         }
 
+        if (_lastTexture != _currentTexture) {
+            _gl.bindTexture(_gl.TEXTURE_2D, _lastTexture.nativeTexture);
+            _currentTexture = _lastTexture;
+        }
+
         if (_lastShader != _currentShader) {
             _lastShader.useProgram();
+            _lastShader.prepare();
             _currentShader = _lastShader;
         }
 
-        switch (_lastShader) {
-        case cast _drawImageShader:
-            _drawImageShader.setUniforms(0, 1, 0);
-        case cast _fillRectShader:
-            // Nothing
-        }
+        // switch (_lastShader) {
+        // case cast _drawImageShader:
+        //     _drawImageShader.setUniforms(_lastTexture);
+        // case cast _fillRectShader:
+        //     // Nothing
+        // }
 
-        trace(_dataOffset);
         _gl.bufferSubData(_gl.ARRAY_BUFFER, 0, data.subarray(0, _dataOffset));
 
-        _lastShader.enableVertexArrays();
         _gl.drawElements(_gl.TRIANGLES, 6*_quads, _gl.UNSIGNED_SHORT, 0);
-        _lastShader.disableVertexArrays();
+        // _lastShader.disableVertexArrays();
 
         _quads = 0;
         _dataOffset = 0;
@@ -127,10 +135,12 @@ class WebGLBatcher
     private var _gl :RenderingContext;
 
     // Used to keep track of context changes requiring a flush
-    private var _lastShader :ShaderGL;
+    private var _lastShader :ShaderGL = null;
+    private var _lastTexture :WebGLTexture = null;
 
     // Used to avoid redundant GL calls
-    private var _currentShader :ShaderGL;
+    private var _currentShader :ShaderGL = null;
+    private var _currentTexture :WebGLTexture = null;
 
     private var _vertexBuffer :Buffer;
     private var _quadIndexBuffer :Buffer;

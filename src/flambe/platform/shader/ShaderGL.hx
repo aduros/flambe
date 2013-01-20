@@ -26,6 +26,7 @@ class ShaderGL
         gl.attachShader(_program, createShader(gl, gl.VERTEX_SHADER, vertSource));
         gl.attachShader(_program, createShader(gl, gl.FRAGMENT_SHADER, fragSource));
         gl.linkProgram(_program);
+        gl.useProgram(_program);
 
 #if debug
         if (!gl.getProgramParameter(_program, gl.LINK_STATUS)) {
@@ -39,12 +40,7 @@ class ShaderGL
         _gl.useProgram(_program);
     }
 
-    public function enableVertexArrays ()
-    {
-        Assert.fail("abstract");
-    }
-
-    public function disableVertexArrays ()
+    public function prepare ()
     {
         Assert.fail("abstract");
     }

@@ -290,7 +290,7 @@ class Stage3DBatcher
         // vertexBuffer.uploadFromVector(data, 0, _quads*4);
         vertexBuffer.uploadFromVector(data, 0, _maxQuads*4);
         _lastShader.bind(vertexBuffer);
-        _context3D.drawTriangles(_quadIndices, 0, _quads*2);
+        _context3D.drawTriangles(_quadIndexBuffer, 0, _quads*2);
         _lastShader.unbind();
 
 #if flambe_debug_renderer
@@ -306,18 +306,18 @@ class Stage3DBatcher
 
         var indices = new Vector<UInt>(6*maxQuads, true);
         for (ii in 0...maxQuads) {
-            indices[ii*6] = ii*4;
+            indices[ii*6 + 0] = ii*4 + 0;
             indices[ii*6 + 1] = ii*4 + 1;
             indices[ii*6 + 2] = ii*4 + 2;
             indices[ii*6 + 3] = ii*4 + 2;
             indices[ii*6 + 4] = ii*4 + 3;
-            indices[ii*6 + 5] = ii*4;
+            indices[ii*6 + 5] = ii*4 + 0;
         }
-        if (_quadIndices != null) {
-            _quadIndices.dispose();
+        if (_quadIndexBuffer != null) {
+            _quadIndexBuffer.dispose();
         }
-        _quadIndices = _context3D.createIndexBuffer(indices.length);
-        _quadIndices.uploadFromVector(indices, 0, indices.length);
+        _quadIndexBuffer = _context3D.createIndexBuffer(indices.length);
+        _quadIndexBuffer.uploadFromVector(indices, 0, indices.length);
 
         var verts = 4*maxQuads;
         _vertexBuffer5 = createVertexBuffer(verts, 5, _vertexBuffer5);
@@ -359,7 +359,7 @@ class Stage3DBatcher
     private var _drawPatternShader :DrawPattern;
     private var _fillRectShader :FillRect;
 
-    private var _quadIndices :IndexBuffer3D;
+    private var _quadIndexBuffer :IndexBuffer3D;
     private var _vertexBuffer5 :VertexBuffer3D;
     private var _vertexBuffer6 :VertexBuffer3D;
 

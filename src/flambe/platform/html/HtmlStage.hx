@@ -31,7 +31,7 @@ class HtmlStage
 
         // If the DPI is being scaled by the browser, reverse it so that one canvas pixel equals
         // one screen pixel
-        scaleFactor = computeScaleFactor(canvas);
+        scaleFactor = computeScaleFactor();
         if (scaleFactor != 1) {
             Log.info("Reversing device DPI scaling", ["scaleFactor", scaleFactor]);
             HtmlUtil.setVendorStyle(_canvas, "transform-origin", "top left");
@@ -189,7 +189,7 @@ class HtmlStage
         fullscreen._ = (state == true); // state will be null if fullscreen not supported
     }
 
-    private static function computeScaleFactor (canvas :Dynamic) :Float
+    private static function computeScaleFactor () :Float
     {
         // Based on "Delivering Web Content on High Resolution Displays"
         // https://developer.apple.com/videos/wwdc/2012/?id=602
@@ -199,7 +199,8 @@ class HtmlStage
             devicePixelRatio = 1;
         }
 
-        // Take into account any behind-the-scenes scaling of the canvas element
+        // Take into account any behind-the-scenes scaling of canvas elements
+        var canvas :Dynamic = Lib.document.createElement("canvas");
         var ctx = canvas.getContext("2d");
         var backingStorePixelRatio = HtmlUtil.loadExtension("backingStorePixelRatio", ctx).value;
         if (backingStorePixelRatio == null) {

@@ -122,11 +122,17 @@ class HtmlUtil
         return (untyped Date).now();
     }
 
-    public static function createCanvas (source :Dynamic) :Dynamic
+    public static function createEmptyCanvas (width :Int, height :Int) :Dynamic
     {
         var canvas :Dynamic = Lib.document.createElement("canvas");
-        canvas.width = source.width;
-        canvas.height = source.height;
+        canvas.width = width;
+        canvas.height = height;
+        return canvas;
+    }
+
+    public static function createCanvas (source :Dynamic) :Dynamic
+    {
+        var canvas = createEmptyCanvas(source.width, source.height);
 
         var ctx = canvas.getContext("2d");
         ctx.save();

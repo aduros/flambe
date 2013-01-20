@@ -25,10 +25,7 @@ class CanvasRenderer
 
     public function createEmptyTexture (width :Int, height :Int) :Texture
     {
-        var canvas :Dynamic = Lib.document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-        return new CanvasTexture(canvas);
+        return new CanvasTexture(HtmlUtil.createEmptyCanvas(width, height));
     }
 
     public function willRender () :Graphics

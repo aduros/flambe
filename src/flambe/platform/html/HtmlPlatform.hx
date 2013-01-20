@@ -67,7 +67,7 @@ class HtmlPlatform
         _mouse = new HtmlMouse(_pointer, canvas);
         _keyboard = new BasicKeyboard();
 
-        _renderer = new CanvasRenderer(canvas);
+        _renderer = createRenderer(canvas);
         System.hasGPU._ = true;
 
         mainLoop = new MainLoop();
@@ -370,6 +370,20 @@ class HtmlPlatform
         return _stage.scaleFactor*(event.clientY - bounds.top);
     }
 
+    private static function createRenderer (canvas :Dynamic) :Renderer
+    {
+#if flambe_enable_webgl
+        for (name in ["webgl", "experimental-webgl"]) {
+            var gl = canvas.getContext(name, {alpha: false, depth: false});
+            if (gl != null) {
+                return new WebGLRenderer(gl);
+            }
+        }
+        Log.info("WebGL not available, falling back to canvas");
+#end
+        return new CanvasRenderer(canvas);
+    }
+
     private var _stage :HtmlStage;
     private var _pointer :BasicPointer;
     private var _mouse :HtmlMouse;
@@ -378,7 +392,7 @@ class HtmlPlatform
     private var _storage :Storage;
     private var _web :Web;
     private var _external :External;
-    private var _renderer :CanvasRenderer;
+    private var _renderer :Renderer;
 
     private var _container :Dynamic;
 

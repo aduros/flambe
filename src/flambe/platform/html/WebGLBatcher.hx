@@ -4,6 +4,7 @@
 
 package flambe.platform.html;
 
+import flambe.display.BlendMode;
 import flambe.platform.html.WebGLTypes;
 import flambe.platform.shader.DrawImageGL;
 import flambe.platform.shader.FillRectGL;
@@ -39,22 +40,27 @@ class WebGLBatcher
         flush();
     }
 
-    public function prepareDrawImage (texture :WebGLTexture) :Int
+    public function prepareDrawImage (blendMode :BlendMode, texture :WebGLTexture) :Int
     {
         if (texture != _lastTexture) {
             flush();
             _lastTexture = texture;
         }
-        return prepareQuad(5, _drawImageShader);
+        return prepareQuad(5, blendMode, _drawImageShader);
     }
 
-    public function prepareFillRect () :Int
+    public function prepareFillRect (blendMode :BlendMode) :Int
     {
-        return prepareQuad(6, _fillRectShader);
+        return prepareQuad(6, blendMode, _fillRectShader);
     }
 
-    private function prepareQuad (elementsPerVertex :Int, shader :ShaderGL) :Int
+    private function prepareQuad (elementsPerVertex :Int,
+        blendMode :BlendMode, shader :ShaderGL) :Int
     {
+        if (blendMode != _lastBlendMode) {
+            flush();
+            _lastBlendMode = blendMode;
+        }
         if (shader != _lastShader) {
             flush();
             _lastShader = shader;
@@ -76,6 +82,16 @@ class WebGLBatcher
             return;
         }
 
+        if (_lastBlendMode != _currentBlendMode) {
+            switch (_lastBlendMode) {
+                case Normal: _gl.blendFunc(_gl.ONE, _gl.ONE_MINUS_SRC_ALPHA);
+                case Add: _gl.blendFunc(_gl.ONE, _gl.ONE);
+                // TODO(bruno): Disable blending entirely?
+                case CopyExperimental: _gl.blendFunc(_gl.ONE, _gl.ZERO);
+            }
+            _currentBlendMode = _lastBlendMode;
+        }
+
         if (_lastTexture != _currentTexture) {
             _gl.bindTexture(_gl.TEXTURE_2D, _lastTexture.nativeTexture);
             _currentTexture = _lastTexture;
@@ -95,9 +111,7 @@ class WebGLBatcher
         // }
 
         _gl.bufferSubData(_gl.ARRAY_BUFFER, 0, data.subarray(0, _dataOffset));
-
         _gl.drawElements(_gl.TRIANGLES, 6*_quads, _gl.UNSIGNED_SHORT, 0);
-        // _lastShader.disableVertexArrays();
 
         _quads = 0;
         _dataOffset = 0;
@@ -135,10 +149,12 @@ class WebGLBatcher
     private var _gl :RenderingContext;
 
     // Used to keep track of context changes requiring a flush
+    private var _lastBlendMode :BlendMode = null;
     private var _lastShader :ShaderGL = null;
     private var _lastTexture :WebGLTexture = null;
 
     // Used to avoid redundant GL calls
+    private var _currentBlendMode :BlendMode = null;
     private var _currentShader :ShaderGL = null;
     private var _currentTexture :WebGLTexture = null;
 

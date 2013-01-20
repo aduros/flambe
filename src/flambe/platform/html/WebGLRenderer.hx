@@ -25,6 +25,7 @@ class WebGLRenderer
         _graphics = new WebGLGraphics(gl, batcher);
 
         gl.clearColor(1, 1, 1, 1);
+        gl.enable(gl.BLEND);
     }
 
     public function createTexture (image :Dynamic) :WebGLTexture

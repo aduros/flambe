@@ -92,7 +92,7 @@ class WebGLGraphics
         var v2 = texture.maxV*(sourceY + sourceH) / h;
         var alpha = state.alpha;
 
-        var offset = _batcher.prepareDrawImage(texture);
+        var offset = _batcher.prepareDrawImage(state.blendMode, texture);
         var data = _batcher.data;
 
         data[  offset] = pos[0];
@@ -136,7 +136,7 @@ class WebGLGraphics
         var b = (color & 0x0000ff) / 0x0000ff;
         var a = state.alpha;
 
-        var offset = _batcher.prepareFillRect();
+        var offset = _batcher.prepareFillRect(state.blendMode);
         var data = _batcher.data;
 
         data[  offset] = pos[0];

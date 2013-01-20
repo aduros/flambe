@@ -122,8 +122,40 @@ class WebGLGraphics
 
     public function drawPattern (texture :Texture, x :Float, y :Float, width :Float, height :Float)
     {
-        // TODO
-        fillRect(0x0000ff, x, y, width, height);
+        var state = getTopState();
+        var texture :WebGLTexture = cast texture;
+
+        var pos = transformQuad(x, y, width, height);
+        var u2 = texture.maxU * (width / texture.width);
+        var v2 = texture.maxV * (height / texture.height);
+        var alpha = state.alpha;
+
+        var offset = _batcher.prepareDrawPattern(state.blendMode, texture);
+        var data = _batcher.data;
+
+        data[  offset] = pos[0];
+        data[++offset] = pos[1];
+        data[++offset] = 0;
+        data[++offset] = 0;
+        data[++offset] = alpha;
+
+        data[++offset] = pos[2];
+        data[++offset] = pos[3];
+        data[++offset] = u2;
+        data[++offset] = 0;
+        data[++offset] = alpha;
+
+        data[++offset] = pos[4];
+        data[++offset] = pos[5];
+        data[++offset] = u2;
+        data[++offset] = v2;
+        data[++offset] = alpha;
+
+        data[++offset] = pos[6];
+        data[++offset] = pos[7];
+        data[++offset] = 0;
+        data[++offset] = v2;
+        data[++offset] = alpha;
     }
 
     public function fillRect (color :Int, x :Float, y :Float, width :Float, height :Float)

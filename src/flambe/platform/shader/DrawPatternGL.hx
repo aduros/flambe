@@ -7,7 +7,7 @@ package flambe.platform.shader;
 import flambe.platform.html.WebGLTexture;
 import flambe.platform.html.WebGLTypes;
 
-class DrawImageGL extends ShaderGL
+class DrawPatternGL extends ShaderGL
 {
     public function new (gl :RenderingContext)
     {
@@ -32,9 +32,10 @@ class DrawImageGL extends ShaderGL
             "varying float v_alpha;",
 
             "uniform sampler2D u_texture;",
+            "uniform vec2 u_maxUV;",
 
             "void main (void) {",
-                "gl_FragColor = texture2D(u_texture, v_uv) * v_alpha;",
+                "gl_FragColor = texture2D(u_texture, mod(v_uv, u_maxUV)) * v_alpha;",
             "}",
         ].join("\n"));
 
@@ -43,12 +44,18 @@ class DrawImageGL extends ShaderGL
         a_alpha = getAttribLocation("a_alpha");
 
         u_texture = getUniformLocation("u_texture");
+        u_maxUV = getUniformLocation("u_maxUV");
         setTexture(0);
     }
 
     public function setTexture (unit :Int)
     {
         _gl.uniform1i(u_texture, unit);
+    }
+
+    public function setMaxUV (maxU :Float, maxV :Float)
+    {
+        _gl.uniform2f(u_maxUV, maxU, maxV);
     }
 
     override public function prepare ()
@@ -69,4 +76,5 @@ class DrawImageGL extends ShaderGL
     private var a_alpha :Int;
 
     private var u_texture :UniformLocation;
+    private var u_maxUV :UniformLocation;
 }

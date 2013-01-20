@@ -7,6 +7,7 @@ package flambe.platform.html;
 import flambe.display.BlendMode;
 import flambe.platform.html.WebGLTypes;
 import flambe.platform.shader.DrawImageGL;
+import flambe.platform.shader.DrawPatternGL;
 import flambe.platform.shader.FillRectGL;
 import flambe.platform.shader.ShaderGL;
 
@@ -25,6 +26,7 @@ class WebGLBatcher
         _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, _quadIndexBuffer);
 
         _drawImageShader = new DrawImageGL(gl);
+        _drawPatternShader = new DrawPatternGL(gl);
         _fillRectShader = new FillRectGL(gl);
 
         resize(16);
@@ -47,6 +49,15 @@ class WebGLBatcher
             _lastTexture = texture;
         }
         return prepareQuad(5, blendMode, _drawImageShader);
+    }
+
+    public function prepareDrawPattern (blendMode :BlendMode, texture :WebGLTexture) :Int
+    {
+        if (texture != _lastTexture) {
+            flush();
+            _lastTexture = texture;
+        }
+        return prepareQuad(5, blendMode, _drawPatternShader);
     }
 
     public function prepareFillRect (blendMode :BlendMode) :Int
@@ -103,12 +114,10 @@ class WebGLBatcher
             _currentShader = _lastShader;
         }
 
-        // switch (_lastShader) {
-        // case cast _drawImageShader:
-        //     _drawImageShader.setUniforms(_lastTexture);
-        // case cast _fillRectShader:
-        //     // Nothing
-        // }
+        switch (_lastShader) {
+        case cast _drawPatternShader:
+            _drawPatternShader.setMaxUV(_lastTexture.maxU, _lastTexture.maxV);
+        }
 
         _gl.bufferSubData(_gl.ARRAY_BUFFER, 0, data.subarray(0, _dataOffset));
         _gl.drawElements(_gl.TRIANGLES, 6*_quads, _gl.UNSIGNED_SHORT, 0);
@@ -162,6 +171,7 @@ class WebGLBatcher
     private var _quadIndexBuffer :Buffer;
 
     private var _drawImageShader :DrawImageGL;
+    private var _drawPatternShader :DrawPatternGL;
     private var _fillRectShader :FillRectGL;
 
     private var _quads :Int = 0;

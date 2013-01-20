@@ -23,7 +23,6 @@ class WebGLGraphics
 
         _gl = gl;
         _batcher = batcher;
-        reset(gl.canvas.width, gl.canvas.height);
     }
 
     public function save ()

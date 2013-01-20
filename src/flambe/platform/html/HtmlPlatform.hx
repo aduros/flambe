@@ -370,13 +370,13 @@ class HtmlPlatform
         return _stage.scaleFactor*(event.clientY - bounds.top);
     }
 
-    private static function createRenderer (canvas :Dynamic) :Renderer
+    private function createRenderer (canvas :Dynamic) :Renderer
     {
 #if flambe_enable_webgl
         for (name in ["webgl", "experimental-webgl"]) {
             var gl = canvas.getContext(name, {alpha: false, depth: false});
             if (gl != null) {
-                return new WebGLRenderer(gl);
+                return new WebGLRenderer(_stage, gl);
             }
         }
         Log.info("WebGL not available, falling back to canvas");

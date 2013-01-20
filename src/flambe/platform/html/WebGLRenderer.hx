@@ -21,8 +21,8 @@ class WebGLRenderer
     public function new (gl :RenderingContext)
     {
         this.gl = gl;
-        _graphics = new WebGLGraphics(gl);
         batcher = new WebGLBatcher(gl);
+        _graphics = new WebGLGraphics(gl, batcher);
 
         gl.clearColor(1, 1, 1, 1);
     }

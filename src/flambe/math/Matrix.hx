@@ -91,6 +91,17 @@ class Matrix
         return result;
     }
 
+    public function transformArray (points :ArrayAccess<Float>, length :Int,
+        result :ArrayAccess<Float>)
+    {
+        var ii = 0;
+        while (ii < length) {
+            var x = points[ii], y = points[ii+1];
+            result[ii++] = x*m00 + y*m01 + m02;
+            result[ii++] = x*m10 + y*m11 + m12;
+        }
+    }
+
     /**
      * Calculate the determinant of this matrix.
      */

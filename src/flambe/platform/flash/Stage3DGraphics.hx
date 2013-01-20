@@ -15,9 +15,6 @@ import flambe.display.BlendMode;
 import flambe.display.Graphics;
 import flambe.display.Texture;
 import flambe.math.FMath;
-import flambe.platform.shader.DrawImage;
-import flambe.platform.shader.DrawPattern;
-import flambe.platform.shader.FillRect;
 import flambe.util.Assert;
 
 class Stage3DGraphics

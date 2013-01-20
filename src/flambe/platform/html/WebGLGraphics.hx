@@ -8,72 +8,205 @@ import flambe.display.BlendMode;
 import flambe.display.Graphics;
 import flambe.display.Texture;
 import flambe.math.FMath;
+import flambe.math.Matrix;
 import flambe.platform.html.WebGLTypes;
+import flambe.util.Assert;
 
 class WebGLGraphics
     implements Graphics
 {
-    public function new (gl :RenderingContext)
+    public function new (gl :RenderingContext, batcher :WebGLBatcher)
     {
+        // Initialize this here in case to prevent blowing up during static init on browsers without
+        // typed array support
+        _scratchQuadArray = new Float32Array(8);
+
         _gl = gl;
+        _batcher = batcher;
+        reset(gl.canvas.width, gl.canvas.height);
     }
 
     public function save ()
     {
+        var current = _stateList;
+        var state = _stateList.next;
+
+        if (state == null) {
+            // Grow the list
+            state = new DrawingState();
+            state.prev = current;
+            current.next = state;
+        }
+
+        current.matrix.clone(state.matrix);
+        state.alpha = current.alpha;
+        state.blendMode = current.blendMode;
+        _stateList = state;
     }
 
     public function translate (x :Float, y :Float)
     {
+        throw "TODO";
     }
 
     public function scale (x :Float, y :Float)
     {
+        throw "TODO";
     }
 
     public function rotate (rotation :Float)
     {
+        throw "TODO";
     }
 
     public function transform (m00 :Float, m10 :Float, m01 :Float, m11 :Float, m02 :Float, m12 :Float)
     {
+        var state = getTopState();
+        _scratchMatrix.set(m00, m10, m01, m11, m02, m12);
+        Matrix.multiply(state.matrix, _scratchMatrix, state.matrix);
     }
 
     public function restore ()
     {
+        Assert.that(_stateList.prev != null, "Can't restore without a previous save");
+        _stateList = _stateList.prev;
     }
 
     public function drawImage (texture :Texture, x :Float, y :Float)
     {
+        drawSubImage(texture, x, y, 0, 0, texture.width, texture.height);
     }
 
     public function drawSubImage (texture :Texture, destX :Float, destY :Float,
         sourceX :Float, sourceY :Float, sourceW :Float, sourceH :Float)
     {
+        // TODO
+        fillRect(0xff0000, destX, destY, sourceW, sourceW);
     }
 
     public function drawPattern (texture :Texture, x :Float, y :Float, width :Float, height :Float)
     {
+        // TODO
+        fillRect(0x0000ff, x, y, width, height);
     }
 
     public function fillRect (color :Int, x :Float, y :Float, width :Float, height :Float)
     {
+        var state = getTopState();
+
+        var pos = transformQuad(x, y, width, height);
+        var r = (color & 0xff0000) / 0xff0000;
+        var g = (color & 0x00ff00) / 0x00ff00;
+        var b = (color & 0x0000ff) / 0x0000ff;
+        var a = state.alpha;
+
+        var offset = _batcher.prepareFillRect();
+        var data = _batcher.data;
+
+        data[  offset] = pos[0];
+        data[++offset] = pos[1];
+        data[++offset] = r;
+        data[++offset] = g;
+        data[++offset] = b;
+        data[++offset] = a;
+
+        data[++offset] = pos[2];
+        data[++offset] = pos[3];
+        data[++offset] = r;
+        data[++offset] = g;
+        data[++offset] = b;
+        data[++offset] = a;
+
+        data[++offset] = pos[4];
+        data[++offset] = pos[5];
+        data[++offset] = r;
+        data[++offset] = g;
+        data[++offset] = b;
+        data[++offset] = a;
+
+        data[++offset] = pos[6];
+        data[++offset] = pos[7];
+        data[++offset] = r;
+        data[++offset] = g;
+        data[++offset] = b;
+        data[++offset] = a;
     }
 
     public function multiplyAlpha (factor :Float)
     {
+        getTopState().alpha *= factor;
     }
 
     public function setAlpha (alpha :Float)
     {
+        getTopState().alpha = alpha;
     }
 
     public function setBlendMode (blendMode :BlendMode)
     {
+        getTopState().blendMode = blendMode;
     }
 
     public function applyScissor (x :Float, y :Float, width :Float, height :Float)
     {
+        throw "TODO";
     }
 
+    public function reset (width :Int, height :Int)
+    {
+        _stateList = new DrawingState();
+        _stateList.matrix.set(2/width, 0, 0, -2/height, -1, 1);
+    }
+
+    inline private function getTopState () :DrawingState
+    {
+        return _stateList;
+    }
+
+    private function transformQuad (x :Float, y :Float, width :Float, height :Float) :Float32Array
+    {
+        var x2 = x + width;
+        var y2 = y + height;
+        var pos = _scratchQuadArray;
+
+        pos[0] = x;
+        pos[1] = y;
+
+        pos[2] = x2;
+        pos[3] = y;
+
+        pos[4] = x2;
+        pos[5] = y2;
+
+        pos[6] = x;
+        pos[7] = y2;
+
+        getTopState().matrix.transformArray(cast pos, 8, cast pos);
+        return pos;
+    }
+
+    private static var _scratchMatrix = new Matrix();
+    private static var _scratchQuadArray :Float32Array;
+
     private var _gl :RenderingContext;
+    private var _batcher :WebGLBatcher;
+
+    private var _stateList :DrawingState;
+}
+
+private class DrawingState
+{
+    public var matrix :Matrix;
+    public var alpha :Float;
+    public var blendMode :BlendMode;
+
+    public var prev :DrawingState = null;
+    public var next :DrawingState = null;
+
+    public function new ()
+    {
+        matrix = new Matrix();
+        alpha = 1;
+        blendMode = Normal;
+    }
 }

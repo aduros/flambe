@@ -6,6 +6,7 @@ package flambe.platform.html;
 
 import flambe.platform.html.WebGLTypes;
 import flambe.platform.shader.DrawImageGL;
+import flambe.platform.shader.FillRectGL;
 import flambe.platform.shader.ShaderGL;
 
 class WebGLBatcher
@@ -23,33 +24,29 @@ class WebGLBatcher
         _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, _quadIndexBuffer);
 
         _drawImageShader = new DrawImageGL(gl);
+        _fillRectShader = new FillRectGL(gl);
 
         resize(16);
     }
 
     public function willRender ()
     {
-        _gl.clear(_gl.COLOR_BUFFER_BIT);
+        // _gl.clear(_gl.COLOR_BUFFER_BIT);
     }
 
     public function didRender ()
     {
-        var offset = prepareDrawImage();
-        data[  offset] = -0.5;
-        data[++offset] = 0.5;
-        data[++offset] = 0.5;
-        data[++offset] = 0.5;
-        data[++offset] = 0.5;
-        data[++offset] = -0.5;
-        data[++offset] = -0.5;
-        data[++offset] = -0.5;
-
         flush();
     }
 
     public function prepareDrawImage () :Int
     {
         return prepareQuad(2, _drawImageShader);
+    }
+
+    public function prepareFillRect () :Int
+    {
+        return prepareQuad(6, _fillRectShader);
     }
 
     private function prepareQuad (elementsPerVertex :Int, shader :ShaderGL) :Int
@@ -75,12 +72,19 @@ class WebGLBatcher
             return;
         }
 
-        _lastShader.useProgram();
+        if (_lastShader != _currentShader) {
+            _lastShader.useProgram();
+            _currentShader = _lastShader;
+        }
+
         switch (_lastShader) {
         case cast _drawImageShader:
             _drawImageShader.setUniforms(0, 1, 0);
+        case cast _fillRectShader:
+            // Nothing
         }
 
+        trace(_dataOffset);
         _gl.bufferSubData(_gl.ARRAY_BUFFER, 0, data.subarray(0, _dataOffset));
 
         _lastShader.enableVertexArrays();
@@ -102,7 +106,8 @@ class WebGLBatcher
 
         // Set the new vertex buffer size
         data = new Float32Array(maxQuads*4*MAX_ELEMENTS_PER_VERTEX);
-        _gl.bufferData(_gl.ARRAY_BUFFER, data.length, _gl.STREAM_DRAW);
+        _gl.bufferData(_gl.ARRAY_BUFFER,
+            data.length*Float32Array.BYTES_PER_ELEMENT, _gl.STREAM_DRAW);
 
         var indices = new Uint16Array(6*maxQuads);
         for (ii in 0...maxQuads) {
@@ -124,10 +129,14 @@ class WebGLBatcher
     // Used to keep track of context changes requiring a flush
     private var _lastShader :ShaderGL;
 
+    // Used to avoid redundant GL calls
+    private var _currentShader :ShaderGL;
+
     private var _vertexBuffer :Buffer;
     private var _quadIndexBuffer :Buffer;
 
     private var _drawImageShader :DrawImageGL;
+    private var _fillRectShader :FillRectGL;
 
     private var _quads :Int = 0;
     private var _maxQuads :Int = 0;

@@ -26,6 +26,7 @@ class WebGLRenderer
 
         gl.clearColor(1, 1, 1, 1);
         gl.enable(gl.BLEND);
+        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
     }
 
     public function createTexture (image :Dynamic) :WebGLTexture

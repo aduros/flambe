@@ -17,9 +17,11 @@ class WebGLGraphics
 {
     public function new (gl :RenderingContext, batcher :WebGLBatcher)
     {
-        // Initialize this here in case to prevent blowing up during static init on browsers without
-        // typed array support
-        _scratchQuadArray = new Float32Array(8);
+        // Initialize this here to prevent blowing up during static init on browsers without typed
+        // array support
+        if (_scratchQuadArray == null) {
+            _scratchQuadArray = new Float32Array(8);
+        }
 
         _gl = gl;
         _batcher = batcher;
@@ -253,12 +255,12 @@ class WebGLGraphics
     }
 
     private static var _scratchMatrix = new Matrix();
-    private static var _scratchQuadArray :Float32Array;
+    private static var _scratchQuadArray :Float32Array = null;
 
     private var _gl :RenderingContext;
     private var _batcher :WebGLBatcher;
 
-    private var _stateList :DrawingState;
+    private var _stateList :DrawingState = null;
 }
 
 private class DrawingState

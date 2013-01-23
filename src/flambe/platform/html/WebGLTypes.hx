@@ -40,7 +40,7 @@ extern class Float32Array implements ArrayAccess<Float> {
 }
 
 @:native("Uint16Array")
-extern class Uint16Array implements ArrayAccess<Float> {
+extern class Uint16Array implements ArrayAccess<Int> {
     public static var BYTES_PER_ELEMENT;
     public var length :Int;
     function new (length :Int) :Void;

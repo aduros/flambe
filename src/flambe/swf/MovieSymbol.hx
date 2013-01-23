@@ -120,6 +120,10 @@ class MovieKeyframe
 
     public var visible (default, null) :Bool;
 
+    /** Whether this keyframe should be tweened to the next. */
+    public var tweened (default, null) :Bool;
+
+    /** Easing amount, if tweened is true. */
     public var ease (default, null) :Float;
 
     public function new (reader :KeyframeFormat, prevKf :MovieKeyframe)
@@ -140,6 +144,7 @@ class MovieKeyframe
         pivotY = 0;
         alpha = 1;
         visible = true;
+        tweened = true;
         ease = 0;
 
         // if (flipbook) {
@@ -180,6 +185,10 @@ class MovieKeyframe
 
         if (reader.visible != null) {
             visible = reader.visible;
+        }
+
+        if (reader.tweened != null) {
+            tweened = reader.tweened;
         }
 
         if (reader.ease != null) {

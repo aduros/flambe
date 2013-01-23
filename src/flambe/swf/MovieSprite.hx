@@ -240,7 +240,7 @@ private class LayerAnimator
         var skewY = kf.skewY;
         var alpha = kf.alpha;
 
-        if (keyframeIdx < finalFrame) {
+        if (kf.tweened && keyframeIdx < finalFrame) {
             var interp = (frame-kf.index) / kf.duration;
             var ease = kf.ease;
             if (ease != 0) {

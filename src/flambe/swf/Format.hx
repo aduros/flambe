@@ -73,6 +73,9 @@ typedef KeyframeFormat = {
     // Optional: Whether this keyframe should be displayed. Defaults to true
     visible: Null<Bool>,
 
+    // Optional: Whether this keyframe is tweened into the next. Defaults to true
+    tweened: Null<Bool>,
+
     // Optional: Easing factor to tween this keyframe's properties, from -1.0 to 1.0. Defaults to 0
     ease: Null<Float>,
 }

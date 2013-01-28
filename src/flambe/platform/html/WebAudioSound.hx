@@ -19,6 +19,11 @@ class WebAudioSound
      */
     public static var ctx :Dynamic;
 
+    /**
+     * The shared gain node for global system volume.
+     */
+    public static var gain :Dynamic;
+
     public var duration (get_duration, null) :Float;
 
     public var buffer :Dynamic;
@@ -50,6 +55,16 @@ class WebAudioSound
 
             var AudioContext = HtmlUtil.loadExtension("AudioContext").value;
             ctx = (AudioContext != null) ?  untyped __new__(AudioContext) : null;
+
+            if( ctx != null )
+            {
+                gain = ctx.createGainNode();
+                gain.connect(ctx.destination);
+                System.volume.watch(function(v,_) {
+                    gain.gain.value = v;
+                });
+            }
+
         }
 
         return ctx != null;
@@ -71,7 +86,7 @@ private class WebAudioPlayback
     public function new (sound :WebAudioSound, volume :Float, loop :Bool)
     {
         _sound = sound;
-        _head = WebAudioSound.ctx.destination;
+        _head = WebAudioSound.gain;
 
         _sourceNode = WebAudioSound.ctx.createBufferSource();
         _sourceNode.buffer = sound.buffer;

@@ -4,6 +4,7 @@
 
 package flambe;
 
+import flambe.animation.AnimatedFloat;
 import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
 import flambe.display.Stage;
@@ -61,6 +62,11 @@ class System
      * The Keyboard subsystem, for keyboard events.
      */
     public static var keyboard (get_keyboard, null) :Keyboard;
+
+    /**
+     * The system volume.
+     */
+    public static var volume (get_volume, null) :AnimatedFloat;
 
     /**
      * The Web subsystem, for using the device's web browser.
@@ -196,6 +202,12 @@ class System
     {
         #if debug assertCalledInit(); #end
         return _platform.getKeyboard();
+    }
+
+    inline private static function get_volume () :AnimatedFloat
+    {
+        #if debug assertCalledInit(); #end
+        return _platform.getVolume();
     }
 
     inline private static function get_web () :Web

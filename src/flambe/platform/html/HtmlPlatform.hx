@@ -6,6 +6,7 @@ package flambe.platform.html;
 
 import js.Lib;
 
+import flambe.animation.AnimatedFloat;
 import flambe.Entity;
 import flambe.System;
 import flambe.asset.AssetPack;
@@ -347,6 +348,14 @@ class HtmlPlatform
         return _web;
     }
 
+    public function getVolume () :AnimatedFloat
+    {
+        if (_volume == null) {
+            _volume = new AnimatedFloat(1);
+        }
+        return _volume;
+    }
+
     public function getExternal () :External
     {
         if (_external == null) {
@@ -391,6 +400,7 @@ class HtmlPlatform
     private var _keyboard :BasicKeyboard;
     private var _storage :Storage;
     private var _web :Web;
+    private var _volume:AnimatedFloat;
     private var _external :External;
     private var _renderer :Renderer;
 

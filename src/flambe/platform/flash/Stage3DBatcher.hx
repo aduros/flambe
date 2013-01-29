@@ -32,9 +32,10 @@ class Stage3DBatcher
         _drawImageShader = new DrawImage(context3D);
         _drawPatternShader = new DrawPattern(context3D);
         _fillRectShader = new FillRect(context3D);
-        resize(16);
 
         _scratchScissor = new Rectangle();
+
+        resize(16);
     }
 
     public function willRender ()
@@ -218,18 +219,13 @@ class Stage3DBatcher
             }
         }
 
-        var offset;
-        if (_quads >= MAX_BATCH_QUADS) {
-            flush();
-            offset = 0;
-        } else {
-            if (_quads >= _maxQuads) {
-                // Expand the index and vertex buffers
-                resize(2*_maxQuads);
-            }
-            offset = _quads*4*elementsPerVertex;
+        if (_quads >= _maxQuads) {
+            resize(2*_maxQuads);
         }
         ++_quads;
+
+        var offset = _dataOffset;
+        _dataOffset += 4*elementsPerVertex;
         return offset;
     }
 
@@ -297,10 +293,16 @@ class Stage3DBatcher
         trace("Flushed " + _quads + " / " + _maxQuads + " quads");
 #end
         _quads = 0;
+        _dataOffset = 0;
     }
 
     private function resize (maxQuads :Int)
     {
+        flush();
+        if (maxQuads > MAX_BATCH_QUADS) {
+            return; // That's big enough, return right after the flush
+        }
+
         _maxQuads = maxQuads;
         data = new Vector<Float>(maxQuads*4*MAX_ELEMENTS_PER_VERTEX, true);
 
@@ -365,4 +367,5 @@ class Stage3DBatcher
 
     private var _quads :Int;
     private var _maxQuads :Int;
+    private var _dataOffset :Int;
 }

@@ -10,6 +10,7 @@ import flambe.animation.AnimatedFloat;
 import flambe.platform.Tickable;
 import flambe.sound.Playback;
 import flambe.sound.Sound;
+import flambe.util.Disposable;
 
 class HtmlSound
     implements Sound
@@ -53,14 +54,18 @@ private class HtmlPlayback
         _sound = sound;
         _tickableAdded = false;
         this.volume = new AnimatedFloat(volume, function (v, _) {
-            _clonedElement.volume = v;
+            _clonedElement.volume = v * System.volume._;
         });
 
         // Create a copy of the original sound's element. Note that cloneNode() doesn't work in IE
         _clonedElement = Lib.document.createElement("audio");
-        _clonedElement.volume = volume;
+        _clonedElement.volume = volume * System.volume._;
         _clonedElement.loop = loop;
         _clonedElement.src = sound.audioElement.src;
+
+        _binding = System.volume.watch(function(v,_) {
+           _clonedElement.volume = v * this.volume._; 
+        });
 
         playAudio();
     }
@@ -112,6 +117,7 @@ private class HtmlPlayback
     public function dispose ()
     {
         paused = true;
+        _binding.dispose();
     }
 
     private function playAudio ()
@@ -126,6 +132,6 @@ private class HtmlPlayback
 
     private var _sound :HtmlSound;
     private var _clonedElement :Dynamic;
-
+    private var _binding:Disposable;
     private var _tickableAdded :Bool;
 }

@@ -60,7 +60,6 @@ private class HtmlPlayback
         _clonedElement.src = sound.audioElement.src;
 
         this.volume = new AnimatedFloat(volume, function (_,_) updateVolume());
-        _binding = System.volume.changed.connect(function(_,_) updateVolume());
         updateVolume();
 
         playAudio();
@@ -105,6 +104,9 @@ private class HtmlPlayback
         if (ended || paused) {
             // Allow ended or paused sounds to be garbage collected
             _tickableAdded = false;
+
+            // Release System references
+            _volumeBinding.dispose();
             return true;
         }
         return false;
@@ -113,7 +115,6 @@ private class HtmlPlayback
     public function dispose ()
     {
         paused = true;
-        _binding.dispose();
     }
 
     private function playAudio ()
@@ -123,6 +124,9 @@ private class HtmlPlayback
         if (!_tickableAdded) {
             HtmlPlatform.instance.mainLoop.addTickable(this);
             _tickableAdded = true;
+
+            // Claim System references
+            _volumeBinding = System.volume.changed.connect(function(_,_) updateVolume());
         }
     }
 
@@ -133,6 +137,6 @@ private class HtmlPlayback
 
     private var _sound :HtmlSound;
     private var _clonedElement :Dynamic;
-    private var _binding :Disposable;
+    private var _volumeBinding :Disposable;
     private var _tickableAdded :Bool;
 }

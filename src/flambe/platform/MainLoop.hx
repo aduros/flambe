@@ -48,8 +48,9 @@ class MainLoop
                 ++ii;
             }
         }
-        
+
         System.volume.update(dt);
+
         updateEntity(System.root, dt);
     }
 

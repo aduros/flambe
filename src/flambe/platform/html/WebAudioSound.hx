@@ -17,7 +17,7 @@ class WebAudioSound
     /**
      * The shared AudioContext.
      */
-    public static var ctx :Dynamic;
+    public static var ctx :Dynamic = null;
 
     /**
      * The shared gain node for global system volume.
@@ -54,17 +54,16 @@ class WebAudioSound
             _detectSupport = false;
 
             var AudioContext = HtmlUtil.loadExtension("AudioContext").value;
-            ctx = (AudioContext != null) ?  untyped __new__(AudioContext) : null;
 
-            if( ctx != null )
-            {
+            if (AudioContext != null) {
+                ctx = untyped __new__(AudioContext);
                 gain = ctx.createGainNode();
                 gain.connect(ctx.destination);
-                System.volume.watch(function(v,_) {
-                    gain.gain.value = v;
+
+                System.volume.watch(function(volume, _) {
+                    gain.gain.value = volume;
                 });
             }
-
         }
 
         return ctx != null;

@@ -64,11 +64,6 @@ class System
     public static var keyboard (get_keyboard, null) :Keyboard;
 
     /**
-     * The system volume.
-     */
-    public static var volume (get_volume, null) :AnimatedFloat;
-
-    /**
      * The Web subsystem, for using the device's web browser.
      */
     public static var web (get_web, null) :Web;
@@ -113,6 +108,11 @@ class System
      * invalid. When it returns to true, apps should reload its textures.</p>
      */
     public static var hasGPU (default, null) :Value<Bool> = new Value<Bool>(false);
+
+    /**
+     * The global volume applied to all sounds, defaults to 1.
+     */
+    public static var volume (default, null) :AnimatedFloat = new AnimatedFloat(1);
 
     /**
      * Starts up Flambe, this should usually be the first thing a game does.
@@ -202,12 +202,6 @@ class System
     {
         #if debug assertCalledInit(); #end
         return _platform.getKeyboard();
-    }
-
-    inline private static function get_volume () :AnimatedFloat
-    {
-        #if debug assertCalledInit(); #end
-        return _platform.getVolume();
     }
 
     inline private static function get_web () :Web

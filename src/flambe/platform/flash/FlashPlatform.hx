@@ -18,7 +18,6 @@ import flash.system.Capabilities;
 import flash.media.SoundTransform;
 import flash.media.SoundMixer;
 
-import flambe.animation.AnimatedFloat;
 import flambe.Entity;
 import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
@@ -87,6 +86,12 @@ class FlashPlatform
         });
 #end
 
+        System.volume.watch(function (volume, _) {
+            var s = SoundMixer.soundTransform;
+            s.volume = volume;
+            SoundMixer.soundTransform = s;
+        });
+
         _lastUpdate = Lib.getTimer();
         _skipFrame = false;
         _timeOffset = Date.now().getTime() - Lib.getTimer();
@@ -151,18 +156,6 @@ class FlashPlatform
 #end
         }
         return _web;
-    }
-
-    public function getVolume () :AnimatedFloat
-    {
-        if (_volume == null) {
-            _volume = new AnimatedFloat(1, function(v,_) {
-                var s:SoundTransform = SoundMixer.soundTransform;
-                s.volume = v;
-                SoundMixer.soundTransform = s;
-            });
-        }
-        return _volume;
     }
 
     public function getExternal () :External
@@ -248,7 +241,6 @@ class FlashPlatform
     private var _keyboard :BasicKeyboard;
     private var _storage :Storage;
     private var _web :Web;
-    private var _volume:AnimatedFloat;
     private var _external :External;
     private var _renderer :Renderer;
 

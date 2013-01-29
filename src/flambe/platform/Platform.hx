@@ -18,7 +18,6 @@ import flambe.storage.Storage;
 import flambe.util.Logger;
 import flambe.util.Promise;
 import flambe.web.Web;
-import flambe.animation.AnimatedFloat;
 
 interface Platform
 {
@@ -31,7 +30,6 @@ interface Platform
     function getStorage () :Storage;
     function getTouch () :Touch;
     function getWeb () :Web;
-    function getVolume () :AnimatedFloat;
     function getExternal () :External;
 
     function getRenderer () :Renderer;

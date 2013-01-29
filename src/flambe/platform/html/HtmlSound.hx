@@ -53,19 +53,15 @@ private class HtmlPlayback
     {
         _sound = sound;
         _tickableAdded = false;
-        this.volume = new AnimatedFloat(volume, function (v, _) {
-            _clonedElement.volume = v * System.volume._;
-        });
 
         // Create a copy of the original sound's element. Note that cloneNode() doesn't work in IE
         _clonedElement = Lib.document.createElement("audio");
-        _clonedElement.volume = volume * System.volume._;
         _clonedElement.loop = loop;
         _clonedElement.src = sound.audioElement.src;
 
-        _binding = System.volume.watch(function(v,_) {
-           _clonedElement.volume = v * this.volume._; 
-        });
+        this.volume = new AnimatedFloat(volume, function (_,_) updateVolume());
+        _binding = System.volume.changed.connect(function(_,_) updateVolume());
+        updateVolume();
 
         playAudio();
     }
@@ -130,8 +126,13 @@ private class HtmlPlayback
         }
     }
 
+    private function updateVolume ()
+    {
+        _clonedElement.volume = System.volume._ * volume._;
+    }
+
     private var _sound :HtmlSound;
     private var _clonedElement :Dynamic;
-    private var _binding:Disposable;
+    private var _binding :Disposable;
     private var _tickableAdded :Bool;
 }

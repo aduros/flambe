@@ -74,10 +74,21 @@ class Disposer extends Component
 
     override public function onRemoved ()
     {
-        var disposables = _disposables;
+        freeDisposables();
+    }
+
+    override public function dispose ()
+    {
+        super.dispose();
+        freeDisposables(); // Cleanup even if this component had no owner
+    }
+
+    private function freeDisposables ()
+    {
+        var snapshot = _disposables;
         _disposables = [];
-        for (d in disposables) {
-            d.dispose();
+        for (disposable in snapshot) {
+            disposable.dispose();
         }
     }
 

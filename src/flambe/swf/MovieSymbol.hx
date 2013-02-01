@@ -69,15 +69,14 @@ class MovieLayer
     public var frames (get_frames, null) :Int;
 
     /** The symbol in the last keyframe that has one, or null if there are no symbol keyframes. */
-    public var lastSymbol :Symbol;
+    public var lastSymbol :Symbol = null;
 
     /** True if this layer contains keyframes with at least two different symbols. */
-    public var multipleSymbols :Bool;
+    public var multipleSymbols :Bool = false;
 
     public function new (reader :LayerFormat)
     {
         name = reader.name;
-        multipleSymbols = false;
 
         keyframes = [];
         var prevKf = null;
@@ -102,29 +101,29 @@ class MovieKeyframe
     public var duration (default, null) :Int;
 
     public var symbolName (default, null) :String;
-    public var symbol :Symbol;
+    public var symbol :Symbol = null;
 
     public var label (default, null) :String;
 
-    public var x (default, null) :Float;
-    public var y (default, null) :Float;
-    public var scaleX (default, null) :Float;
-    public var scaleY (default, null) :Float;
-    public var skewX (default, null) :Float;
-    public var skewY (default, null) :Float;
+    public var x (default, null) :Float = 0;
+    public var y (default, null) :Float = 0;
+    public var scaleX (default, null) :Float = 1;
+    public var scaleY (default, null) :Float = 1;
+    public var skewX (default, null) :Float = 0;
+    public var skewY (default, null) :Float = 0;
 
-    public var pivotX (default, null) :Float;
-    public var pivotY (default, null) :Float;
+    public var pivotX (default, null) :Float = 0;
+    public var pivotY (default, null) :Float = 0;
 
-    public var alpha (default, null) :Float;
+    public var alpha (default, null) :Float = 1;
 
-    public var visible (default, null) :Bool;
+    public var visible (default, null) :Bool = true;
 
     /** Whether this keyframe should be tweened to the next. */
-    public var tweened (default, null) :Bool;
+    public var tweened (default, null) :Bool = true;
 
     /** Easing amount, if tweened is true. */
-    public var ease (default, null) :Float;
+    public var ease (default, null) :Float = 0;
 
     public function new (reader :KeyframeFormat, prevKf :MovieKeyframe)
     {
@@ -133,27 +132,6 @@ class MovieKeyframe
         duration = reader.duration;
         label = reader.label;
         symbolName = reader.ref;
-
-        x = 0;
-        y = 0;
-        scaleX = 1;
-        scaleY = 1;
-        skewX = 0;
-        skewY = 0;
-        pivotX = 0;
-        pivotY = 0;
-        alpha = 1;
-        visible = true;
-        tweened = true;
-        ease = 0;
-
-        // if (flipbook) {
-        //     return; // Purely labelled frame
-        // }
-
-        if (symbolName == null) {
-            return;
-        }
 
         var loc = reader.loc;
         if (loc != null) {

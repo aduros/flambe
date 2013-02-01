@@ -191,7 +191,7 @@ private class LayerAnimator
         if (layer.multipleSymbols) {
             _sprites = [];
             for (kf in layer.keyframes) {
-                var sprite = kf.symbol.createSprite();
+                var sprite = (kf.symbol != null) ? kf.symbol.createSprite() : new Sprite();
                 _sprites.push(sprite);
             }
             sprite = _sprites[0];
@@ -218,12 +218,12 @@ private class LayerAnimator
         var sprite;
         if (changedKeyframe && _sprites != null) {
             // Switch to the next instance if this is a multi-layer symbol
-            changedKeyframe = false;
             sprite = _sprites[keyframeIdx];
-            content.add(sprite);
+            content.add(sprite); // TODO(bruno): Optimize away redundant adds
         } else {
             sprite = content.get(Sprite);
         }
+        changedKeyframe = false;
 
         var kf = keyframes[keyframeIdx];
         var visible = kf.visible;

@@ -12,11 +12,11 @@ class FillRectGL extends ShaderGL
     {
         super(gl,
         [ // Vertex shader
-            "attribute vec2 a_pos;",
-            "attribute vec3 a_rgb;",
-            "attribute float a_alpha;",
+            "attribute highp vec2 a_pos;",
+            "attribute lowp vec3 a_rgb;",
+            "attribute lowp float a_alpha;",
 
-            "varying vec4 v_color;",
+            "varying lowp vec4 v_color;",
 
             "void main (void) {",
                 "v_color = vec4(a_rgb*a_alpha, a_alpha);",
@@ -25,7 +25,7 @@ class FillRectGL extends ShaderGL
         ].join("\n"),
 
         [ // Fragment shader
-            "varying vec4 v_color;",
+            "varying lowp vec4 v_color;",
 
             "void main (void) {",
                 "gl_FragColor = v_color;",

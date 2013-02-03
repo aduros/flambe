@@ -13,12 +13,12 @@ class DrawPatternGL extends ShaderGL
     {
         super(gl,
         [ // Vertex shader
-            "attribute vec2 a_pos;",
-            "attribute vec2 a_uv;",
-            "attribute float a_alpha;",
+            "attribute highp vec2 a_pos;",
+            "attribute mediump vec2 a_uv;",
+            "attribute lowp float a_alpha;",
 
-            "varying vec2 v_uv;",
-            "varying float v_alpha;",
+            "varying mediump vec2 v_uv;",
+            "varying lowp float v_alpha;",
 
             "void main (void) {",
                 "v_uv = a_uv;",
@@ -28,11 +28,11 @@ class DrawPatternGL extends ShaderGL
         ].join("\n"),
 
         [ // Fragment shader
-            "varying vec2 v_uv;",
-            "varying float v_alpha;",
+            "varying mediump vec2 v_uv;",
+            "varying lowp float v_alpha;",
 
-            "uniform sampler2D u_texture;",
-            "uniform vec2 u_maxUV;",
+            "uniform lowp sampler2D u_texture;",
+            "uniform mediump vec2 u_maxUV;",
 
             "void main (void) {",
                 "gl_FragColor = texture2D(u_texture, mod(v_uv, u_maxUV)) * v_alpha;",

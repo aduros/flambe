@@ -17,7 +17,7 @@ class ShaderGL
         // Prepend the required precision rigamarole
         fragSource = [
             "#ifdef GL_ES",
-                "precision highp float;",
+                "precision mediump float;",
             "#endif",
         ].join("\n") + "\n" + fragSource;
 

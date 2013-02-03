@@ -13,12 +13,12 @@ class DrawImageGL extends ShaderGL
     {
         super(gl,
         [ // Vertex shader
-            "attribute vec2 a_pos;",
-            "attribute vec2 a_uv;",
-            "attribute float a_alpha;",
+            "attribute highp vec2 a_pos;",
+            "attribute mediump vec2 a_uv;",
+            "attribute lowp float a_alpha;",
 
-            "varying vec2 v_uv;",
-            "varying float v_alpha;",
+            "varying mediump vec2 v_uv;",
+            "varying lowp float v_alpha;",
 
             "void main (void) {",
                 "v_uv = a_uv;",
@@ -28,10 +28,10 @@ class DrawImageGL extends ShaderGL
         ].join("\n"),
 
         [ // Fragment shader
-            "varying vec2 v_uv;",
-            "varying float v_alpha;",
+            "varying mediump vec2 v_uv;",
+            "varying lowp float v_alpha;",
 
-            "uniform sampler2D u_texture;",
+            "uniform lowp sampler2D u_texture;",
 
             "void main (void) {",
                 "gl_FragColor = texture2D(u_texture, v_uv) * v_alpha;",

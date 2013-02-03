@@ -9,6 +9,8 @@ import flambe.math.FMath;
 import flambe.math.Matrix;
 import flambe.swf.Format;
 
+using flambe.util.Arrays;
+
 /**
  * Defines a Flump movie.
  */
@@ -34,17 +36,17 @@ class MovieSymbol
      */
     public var duration (default, null) :Float;
 
-    public function new (lib :Library, reader :MovieFormat)
+    public function new (lib :Library, json :MovieFormat)
     {
-        _name = reader.id;
+        _name = json.id;
         frameRate = lib.frameRate;
 
         frames = 0;
-        layers = [];
-        for (layerObject in reader.layers) {
-            var layer = new MovieLayer(layerObject);
+        layers = Arrays.create(json.layers.length);
+        for (ii in 0...layers.length) {
+            var layer = new MovieLayer(json.layers[ii]);
             frames = cast Math.max(layer.frames, frames);
-            layers.push(layer);
+            layers[ii] = layer;
         }
         duration = frames / frameRate;
     }
@@ -74,15 +76,15 @@ class MovieLayer
     /** True if this layer contains keyframes with at least two different symbols. */
     public var multipleSymbols :Bool = false;
 
-    public function new (reader :LayerFormat)
+    public function new (json :LayerFormat)
     {
-        name = reader.name;
+        name = json.name;
 
-        keyframes = [];
         var prevKf = null;
-        for (keyframeObject in reader.keyframes) {
-            prevKf = new MovieKeyframe(keyframeObject, prevKf);
-            keyframes.push(prevKf);
+        keyframes = Arrays.create(json.keyframes.length);
+        for (ii in 0...keyframes.length) {
+            prevKf = new MovieKeyframe(json.keyframes[ii], prevKf);
+            keyframes[ii] = prevKf;
         }
     }
 
@@ -125,52 +127,52 @@ class MovieKeyframe
     /** Easing amount, if tweened is true. */
     public var ease (default, null) :Float = 0;
 
-    public function new (reader :KeyframeFormat, prevKf :MovieKeyframe)
+    public function new (json :KeyframeFormat, prevKf :MovieKeyframe)
     {
         index = (prevKf != null) ? prevKf.index + prevKf.duration : 0;
 
-        duration = reader.duration;
-        label = reader.label;
-        symbolName = reader.ref;
+        duration = json.duration;
+        label = json.label;
+        symbolName = json.ref;
 
-        var loc = reader.loc;
+        var loc = json.loc;
         if (loc != null) {
             x = loc[0];
             y = loc[1];
         }
 
-        var scale = reader.scale;
+        var scale = json.scale;
         if (scale != null) {
             scaleX = scale[0];
             scaleY = scale[1];
         }
 
-        var skew = reader.skew;
+        var skew = json.skew;
         if (skew != null) {
             skewX = skew[0];
             skewY = skew[1];
         }
 
-        var pivot = reader.pivot;
+        var pivot = json.pivot;
         if (pivot != null) {
             pivotX = pivot[0];
             pivotY = pivot[1];
         }
 
-        if (reader.alpha != null) {
-            alpha = reader.alpha;
+        if (json.alpha != null) {
+            alpha = json.alpha;
         }
 
-        if (reader.visible != null) {
-            visible = reader.visible;
+        if (json.visible != null) {
+            visible = json.visible;
         }
 
-        if (reader.tweened != null) {
-            tweened = reader.tweened;
+        if (json.tweened != null) {
+            tweened = json.tweened;
         }
 
-        if (reader.ease != null) {
-            ease = reader.ease;
+        if (json.ease != null) {
+            ease = json.ease;
         }
     }
 }

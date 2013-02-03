@@ -23,18 +23,18 @@ class BitmapSymbol
     public var anchorX (default, null) :Float;
     public var anchorY (default, null) :Float;
 
-    public function new (reader :TextureFormat, atlas :Texture)
+    public function new (json :TextureFormat, atlas :Texture)
     {
-        _name = reader.symbol;
+        _name = json.symbol;
         this.atlas = atlas;
 
-        var rect = reader.rect;
+        var rect = json.rect;
         x = rect[0];
         y = rect[1];
         width = rect[2];
         height = rect[3];
 
-        var origin = reader.origin;
+        var origin = json.origin;
         if (origin != null) {
             anchorX = origin[0];
             anchorY = origin[1];

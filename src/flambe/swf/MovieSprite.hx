@@ -10,6 +10,7 @@ import flambe.math.FMath;
 import flambe.swf.MovieSymbol;
 import flambe.util.Signal0;
 
+using flambe.util.Arrays;
 using flambe.util.BitSets;
 using flambe.util.Strings;
 
@@ -42,9 +43,10 @@ class MovieSprite extends Sprite
 
         speed = new AnimatedFloat(1);
 
-        _animators = [];
-        for (animator in symbol.layers) {
-            _animators.push(new LayerAnimator(animator));
+        _animators = Arrays.create(symbol.layers.length);
+        for (ii in 0..._animators.length) {
+            var layer = symbol.layers[ii];
+            _animators[ii] = new LayerAnimator(layer);
         }
 
         _frame = 0;
@@ -186,13 +188,12 @@ private class LayerAnimator
         keyframeIdx = 0;
         this.layer = layer;
 
-        content = new Entity();
         var sprite;
         if (layer.multipleSymbols) {
-            _sprites = [];
-            for (kf in layer.keyframes) {
-                var sprite = (kf.symbol != null) ? kf.symbol.createSprite() : new Sprite();
-                _sprites.push(sprite);
+            _sprites = Arrays.create(layer.keyframes.length);
+            for (ii in 0..._sprites.length) {
+                var kf = layer.keyframes[ii];
+                _sprites[ii] = (kf.symbol != null) ? kf.symbol.createSprite() : new Sprite();
             }
             sprite = _sprites[0];
 
@@ -200,9 +201,10 @@ private class LayerAnimator
             sprite = layer.lastSymbol.createSprite();
 
         } else {
-            sprite = new Sprite();
+            sprite = new Sprite(); // Empty container layer
         }
-        content.add(sprite);
+
+        content = new Entity().add(sprite);
     }
 
     public function composeFrame (frame :Float)

@@ -9,6 +9,7 @@ import haxe.Json;
 import flambe.asset.AssetPack;
 import flambe.display.Sprite;
 import flambe.swf.Format;
+import flambe.util.Assert;
 
 using flambe.util.Strings;
 
@@ -30,18 +31,18 @@ class Library
     {
         _symbols = new Hash();
 
-        var reader :Format = Json.parse(pack.getFile(baseDir + "/library.json"));
+        var json :Format = Json.parse(pack.getFile(baseDir + "/library.json"));
 
-        frameRate = reader.frameRate;
+        frameRate = json.frameRate;
 
         var movies = [];
-        for (movieObject in reader.movies) {
+        for (movieObject in json.movies) {
             var movie = new MovieSymbol(this, movieObject);
             movies.push(movie);
             _symbols.set(movie.name, movie);
         }
 
-        var groups = reader.textureGroups;
+        var groups = json.textureGroups;
         if (groups[0].scaleFactor != 1 || groups.length > 1) {
             Log.warn("Flambe doesn't support Flump's Additional Scale Factors. " +
                 "Use Base Scales and load from different asset packs instead.");
@@ -59,8 +60,10 @@ class Library
         for (movie in movies) {
             for (layer in movie.layers) {
                 for (kf in layer.keyframes) {
-                    var symbol = _symbols.get(kf.symbolName);
-                    if (symbol != null) {
+                    if (kf.symbolName != null) {
+                        var symbol = _symbols.get(kf.symbolName);
+                        Assert.that(symbol != null);
+
                         if (layer.lastSymbol == null) {
                             layer.lastSymbol = symbol;
                         } else if (layer.lastSymbol != symbol) {

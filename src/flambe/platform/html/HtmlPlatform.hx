@@ -277,20 +277,6 @@ class HtmlPlatform
         return untyped Lib.window.navigator.language;
     }
 
-    public function callNative (funcName :String, params :Array<Dynamic>) :Dynamic
-    {
-        if (params == null) {
-            params = [];
-        }
-        var func = Reflect.field(Lib.window, funcName);
-        try {
-            return Reflect.callMethod(null, func, params);
-        } catch (e :Dynamic) {
-            Log.warn("Error calling native method", ["error", e]);
-            return null;
-        }
-    }
-
     public function createLogHandler (tag :String) :LogHandler
     {
 #if (debug || flambe_keep_logs)

@@ -13,10 +13,10 @@ import flash.events.MouseEvent;
 import flash.events.TouchEvent;
 import flash.events.UncaughtErrorEvent;
 import flash.external.ExternalInterface;
+import flash.media.SoundMixer;
+import flash.media.SoundTransform;
 import flash.net.SharedObject;
 import flash.system.Capabilities;
-import flash.media.SoundTransform;
-import flash.media.SoundMixer;
 
 import flambe.Entity;
 import flambe.asset.AssetPack;
@@ -84,6 +84,11 @@ class FlashPlatform
                 _skipFrame = true;
             }
         });
+#end
+
+#if flambe_air
+        // Ensure sound stops when the app is backgrounded or hardware muted on iOS
+        SoundMixer.audioPlaybackMode = "ambient";
 #end
 
         System.volume.watch(function (volume, _) {

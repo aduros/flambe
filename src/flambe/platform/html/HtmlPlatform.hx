@@ -125,17 +125,23 @@ class HtmlPlatform
 
         // Detect touch support. See http://modernizr.github.com/Modernizr/touch.html for more
         // sophisticated detection methods, but this seems to cover all important browsers
-        if (untyped __js__("'ontouchstart' in window")) {
-            var basicTouch = new BasicTouch(_pointer);
+        var standardTouch:Bool = untyped __js__("'ontouchstart' in window");
+        
+        // The pointer event handles mouse movement, touch events, and stylus events.
+        // We check to see if multiple points are supported indicating true touch support.
+        var msTouch:Bool = untyped __js__("'msMaxTouchPoints' in window.navigator && (window.navigator.msMaxTouchPoints > 1)");
+
+        if (standardTouch || msTouch) {
+            var basicTouch = new BasicTouch(_pointer, msTouch ? untyped __js__("window.navigator.msMaxTouchPoints") : 4);
             _touch = basicTouch;
 
             var onTouch = function (event) {
-                var changedTouches :Array<Dynamic> = event.changedTouches;
+                var changedTouches:Array<Dynamic> = standardTouch ? event.changedTouches : [ untyped event ];
                 var bounds = event.target.getBoundingClientRect();
                 lastTouchTime = event.timeStamp;
 
                 switch (event.type) {
-                case "touchstart":
+                case "touchstart", "MSPointerDown":
                     event.preventDefault();
                     if (HtmlUtil.SHOULD_HIDE_MOBILE_BROWSER) {
                         HtmlUtil.hideMobileBrowser();
@@ -143,29 +149,39 @@ class HtmlPlatform
                     for (touch in changedTouches) {
                         var x = getX(touch, bounds);
                         var y = getY(touch, bounds);
-                        basicTouch.submitDown(Std.int(touch.identifier), x, y);
+                        var id = Std.int( standardTouch ? touch.identifier : touch.pointerId );
+                        basicTouch.submitDown(id, x, y);
                     }
 
-                case "touchmove":
+                case "touchmove", "MSPointerMove":
                     event.preventDefault();
                     for (touch in changedTouches) {
                         var x = getX(touch, bounds);
                         var y = getY(touch, bounds);
-                        basicTouch.submitMove(Std.int(touch.identifier), x, y);
+                        var id = Std.int( standardTouch ? touch.identifier : touch.pointerId );
+                        basicTouch.submitMove(id, x, y);
                     }
 
-                case "touchend", "touchcancel":
+                case "touchend", "touchcancel", "MSPointerUp":
                     for (touch in changedTouches) {
                         var x = getX(touch, bounds);
                         var y = getY(touch, bounds);
-                        basicTouch.submitUp(Std.int(touch.identifier), x, y);
+                        var id = Std.int( standardTouch ? touch.identifier : touch.pointerId );
+                        basicTouch.submitUp(id, x, y);
                     }
                 }
             };
-            canvas.addEventListener("touchstart", onTouch, false);
-            canvas.addEventListener("touchmove", onTouch, false);
-            canvas.addEventListener("touchend", onTouch, false);
-            canvas.addEventListener("touchcancel", onTouch, false);
+
+            if(standardTouch) {
+                canvas.addEventListener("touchstart", onTouch, false);
+                canvas.addEventListener("touchmove", onTouch, false);
+                canvas.addEventListener("touchend", onTouch, false);
+                canvas.addEventListener("touchcancel", onTouch, false);
+            } else {
+                canvas.addEventListener("MSPointerDown", onTouch, false);
+                canvas.addEventListener("MSPointerMove", onTouch, false);
+                canvas.addEventListener("MSPointerUp", onTouch, false);
+            }
 
         } else {
             _touch = new DummyTouch();

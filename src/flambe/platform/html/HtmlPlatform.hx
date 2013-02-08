@@ -136,7 +136,7 @@ class HtmlPlatform
             _touch = basicTouch;
 
             var onTouch = function (event) {
-                var changedTouches :Array<Dynamic> = standardTouch ? event.changedTouches : [ event ];
+                var changedTouches:Array<Dynamic> = standardTouch ? event.changedTouches : [ untyped event ];
                 var bounds = event.target.getBoundingClientRect();
                 lastTouchTime = event.timeStamp;
 
@@ -149,7 +149,7 @@ class HtmlPlatform
                     for (touch in changedTouches) {
                         var x = getX(touch, bounds);
                         var y = getY(touch, bounds);
-                        var id = Std.int(standardTouch ? touch.identifier : touch.pointerId);
+                        var id = Std.int( standardTouch ? touch.identifier : touch.pointerId );
                         basicTouch.submitDown(id, x, y);
                     }
 
@@ -158,7 +158,7 @@ class HtmlPlatform
                     for (touch in changedTouches) {
                         var x = getX(touch, bounds);
                         var y = getY(touch, bounds);
-                        var id = Std.int(standardTouch ? touch.identifier : touch.pointerId);
+                        var id = Std.int( standardTouch ? touch.identifier : touch.pointerId );
                         basicTouch.submitMove(id, x, y);
                     }
 
@@ -166,7 +166,7 @@ class HtmlPlatform
                     for (touch in changedTouches) {
                         var x = getX(touch, bounds);
                         var y = getY(touch, bounds);
-                        var id = Std.int(standardTouch ? touch.identifier : touch.pointerId);
+                        var id = Std.int( standardTouch ? touch.identifier : touch.pointerId );
                         basicTouch.submitUp(id, x, y);
                     }
                 }

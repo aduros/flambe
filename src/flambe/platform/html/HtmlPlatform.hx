@@ -77,7 +77,8 @@ class HtmlPlatform
         _container.style.overflow = "hidden";
         _container.style.position = "relative";
 
-        // Prevent double tap zooming on IE10
+        // Prevent double tap zooming on IE10. Maybe this should be in the MSPointer block below,
+        // but I have no idea without testing, so apply it always
         // http://msdn.microsoft.com/en-us/library/windows/apps/Hh767313.aspx
         _container.style.msTouchAction = "none";
 
@@ -125,18 +126,20 @@ class HtmlPlatform
 
         // Detect touch support. See http://modernizr.github.com/Modernizr/touch.html for more
         // sophisticated detection methods, but this seems to cover all important browsers
-        var standardTouch:Bool = untyped __js__("'ontouchstart' in window");
-        
+        var standardTouch :Bool = untyped __js__("'ontouchstart' in window");
+
         // The pointer event handles mouse movement, touch events, and stylus events.
         // We check to see if multiple points are supported indicating true touch support.
-        var msTouch:Bool = untyped __js__("'msMaxTouchPoints' in window.navigator && (window.navigator.msMaxTouchPoints > 1)");
+        // http://blogs.msdn.com/b/ie/archive/2011/10/19/handling-multi-touch-and-mouse-input-in-all-browsers.aspx
+        var msTouch :Bool = untyped __js__("'msMaxTouchPoints' in window.navigator && (window.navigator.msMaxTouchPoints > 1)");
 
         if (standardTouch || msTouch) {
-            var basicTouch = new BasicTouch(_pointer, msTouch ? untyped __js__("window.navigator.msMaxTouchPoints") : 4);
+            var basicTouch = new BasicTouch(_pointer, msTouch ?
+                untyped __js__("window.navigator.msMaxTouchPoints") : 4);
             _touch = basicTouch;
 
-            var onTouch = function (event) {
-                var changedTouches:Array<Dynamic> = standardTouch ? event.changedTouches : [ untyped event ];
+            var onTouch = function (event :Dynamic) {
+                var changedTouches :Array<Dynamic> = standardTouch ?  event.changedTouches : [ event ];
                 var bounds = event.target.getBoundingClientRect();
                 lastTouchTime = event.timeStamp;
 
@@ -149,7 +152,7 @@ class HtmlPlatform
                     for (touch in changedTouches) {
                         var x = getX(touch, bounds);
                         var y = getY(touch, bounds);
-                        var id = Std.int( standardTouch ? touch.identifier : touch.pointerId );
+                        var id = Std.int(standardTouch ? touch.identifier : touch.pointerId);
                         basicTouch.submitDown(id, x, y);
                     }
 
@@ -158,7 +161,7 @@ class HtmlPlatform
                     for (touch in changedTouches) {
                         var x = getX(touch, bounds);
                         var y = getY(touch, bounds);
-                        var id = Std.int( standardTouch ? touch.identifier : touch.pointerId );
+                        var id = Std.int(standardTouch ? touch.identifier : touch.pointerId);
                         basicTouch.submitMove(id, x, y);
                     }
 
@@ -166,13 +169,13 @@ class HtmlPlatform
                     for (touch in changedTouches) {
                         var x = getX(touch, bounds);
                         var y = getY(touch, bounds);
-                        var id = Std.int( standardTouch ? touch.identifier : touch.pointerId );
+                        var id = Std.int(standardTouch ? touch.identifier : touch.pointerId);
                         basicTouch.submitUp(id, x, y);
                     }
                 }
             };
 
-            if(standardTouch) {
+            if (standardTouch) {
                 canvas.addEventListener("touchstart", onTouch, false);
                 canvas.addEventListener("touchmove", onTouch, false);
                 canvas.addEventListener("touchend", onTouch, false);

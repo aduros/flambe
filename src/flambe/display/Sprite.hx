@@ -229,7 +229,7 @@ class Sprite extends Component
 
     /**
      * The "natural" width of this sprite, without any transformations being applied. Used for hit
-     * testing.
+     * testing. This does not consider child sprites, use Sprite.getBounds for that.
      */
     public function getNaturalWidth () :Float
     {
@@ -238,7 +238,7 @@ class Sprite extends Component
 
     /**
      * The "natural" height of this sprite, without any transformations being applied. Used for hit
-     * testing.
+     * testing. This does not consider child sprites, use Sprite.getBounds for that.
      */
     public function getNaturalHeight () :Float
     {
@@ -311,7 +311,7 @@ class Sprite extends Component
     }
 
     /**
-     * Convenience method to center the anchor.
+     * Convenience method to center the anchor using the natural width and height.
      * @returns This instance, for chaining.
      */
     public function centerAnchor () :Sprite

@@ -51,6 +51,7 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
             var ctx = new LoaderContext();
             ctx.checkPolicyFile = true;
             ctx.allowCodeImport = false;
+            ctx.imageDecodingPolicy = ON_LOAD;
             loader.load(req, ctx);
 
         case Audio:

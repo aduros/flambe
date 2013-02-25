@@ -86,10 +86,10 @@ class FlashPlatform
         });
 #end
 
-#if flambe_air
-        // Ensure sound stops when the app is backgrounded or hardware muted on iOS
-        SoundMixer.audioPlaybackMode = "ambient";
-#end
+// #if flambe_air
+//         // Ensure sound stops when the app is backgrounded or hardware muted on iOS
+//         SoundMixer.audioPlaybackMode = "ambient";
+// #end
 
         System.volume.watch(function (volume, _) {
             var s = SoundMixer.soundTransform;

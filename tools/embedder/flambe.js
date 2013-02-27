@@ -69,7 +69,7 @@ flambe.embed = function (urls, elementId) {
                     allowFullScreen: "true",
                     fullscreenOnSelection: "true",
                     wmode: "direct"
-                });
+                }, {id: swf.id, name: swf.id});
                 return true;
             }
             break;

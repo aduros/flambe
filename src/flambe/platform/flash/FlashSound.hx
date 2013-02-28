@@ -37,7 +37,7 @@ class FlashSound
 
     public function get_duration () :Float
     {
-        return nativeSound.length*1000;
+        return nativeSound.length/1000;
     }
 }
 

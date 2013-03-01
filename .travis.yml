@@ -14,7 +14,8 @@ before_script:
     - sudo add-apt-repository ppa:eyecreate/haxe -y
     - sudo apt-get update -y
     - sudo apt-get install haxe -y
-    - echo | haxelib setup
+    - sudo mkdir -p ~/.haxe/lib
+    - echo ~/.haxe/lib | haxelib setup
     - haxelib install format || true
     - haxelib install nape || true
 

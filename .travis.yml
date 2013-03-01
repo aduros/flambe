@@ -11,9 +11,9 @@ python:
 
 # Install Haxe
 before_script:
-    - sudo add-apt-repository ppa:eyecreate/haxe
-    - sudo apt-get update
-    - sudo apt-get install haxe
+    - sudo add-apt-repository ppa:eyecreate/haxe -y
+    - sudo apt-get update -y
+    - sudo apt-get install haxe -y
     - echo | haxelib setup
     - haxelib install format || true
     - haxelib install nape || true

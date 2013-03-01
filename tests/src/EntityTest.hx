@@ -15,9 +15,11 @@ class EntityTest extends TestCase
         var comp = new TestComponent();
 
         assertEquals(parent.add(comp), parent);
-
+        assertEquals(comp.owner, parent);
+        assertEquals(comp.next, null);
         assertTrue(parent.has(TestComponent));
         assertEquals(parent.get(TestComponent), comp);
+        assertEquals(parent.firstComponent, comp);
 
         comp.dispose();
         assertFalse(parent.has(TestComponent));
@@ -29,10 +31,18 @@ class EntityTest extends TestCase
         parent.addChild(child);
         assertEquals(child.parent, parent);
 
-        parent.dispose();
+        // Transfer component to another entity
+        parent.add(comp);
+        assertEquals(comp.owner, parent);
+        assertFalse(child.has(TestComponent));
+        assertEquals(child.firstComponent, null);
+        assertTrue(parent.has(TestComponent));
+        assertEquals(parent.firstComponent, comp);
+
+        child.dispose();
         assertEquals(child.parent, null);
 
-        child.remove(comp);
+        parent.remove(comp);
         assertFalse(child.has(TestComponent));
     }
 }

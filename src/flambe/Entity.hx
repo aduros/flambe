@@ -58,6 +58,9 @@ using Lambda;
      */
     public function add (component :Component) :Entity
     {
+        // Remove the component from any previous owner
+        component.dispose();
+
         var name = component.name;
         var prev = getComponent(name);
         if (prev != null) {

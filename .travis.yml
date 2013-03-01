@@ -11,9 +11,9 @@ python:
 
 # Install Haxe
 before_script:
-    - sudo apt-get install libgc1c2
-    - curl http://haxe.org/file/hxinst-linux.tgz | tar zxf -
-    - echo y | sudo ./hxinst-linux > /dev/null
+    - sudo add-apt-repository ppa:eyecreate/haxe
+    - sudo apt-get update
+    - sudo apt-get install haxe
     - echo | haxelib setup
     - haxelib install format || true
     - haxelib install nape || true

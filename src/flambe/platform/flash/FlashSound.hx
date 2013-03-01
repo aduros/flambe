@@ -102,7 +102,7 @@ private class FlashPlayback
 
     public function get_position () :Float
     {
-        return _channel.position*1000;
+        return _channel.position/1000;
     }
 
     public function update (dt :Float) :Bool

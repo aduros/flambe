@@ -9,6 +9,7 @@ import flambe.Entity;
 import flambe.swf.Library;
 import flambe.swf.MovieSprite;
 import flambe.util.Assert;
+import flambe.util.Value;
 
 /**
  * A convenient controller to play though multiple different movies. Designed for characters and
@@ -18,7 +19,7 @@ import flambe.util.Assert;
 class MoviePlayer extends Component
 {
     /** The movie currently being shown. */
-    public var movie (get_movie, null) :MovieSprite;
+    public var movie (default, null) :Value<MovieSprite>;
 
     /** Whether the current movie is being looped. */
     public var looping (get_looping, null) :Bool;
@@ -27,6 +28,7 @@ class MoviePlayer extends Component
     {
         _lib = lib;
         _root = new Entity();
+        movie = new Value<MovieSprite>(null);
         setCache(true);
     }
 
@@ -97,6 +99,7 @@ class MoviePlayer extends Component
     {
         _root.dispose();
         _oneshotSprite = _loopingSprite = null;
+        movie._ = null;
     }
 
     override public function onUpdate (dt :Float)
@@ -104,7 +107,7 @@ class MoviePlayer extends Component
         // If this update would end the oneshot movie, replace it with the looping movie
         if (_oneshotSprite != null && _oneshotSprite.position+dt > _oneshotSprite.symbol.duration) {
             _oneshotSprite = null;
-            _root.add(_loopingSprite);
+            setCurrent(_loopingSprite);
         }
     }
 
@@ -125,8 +128,7 @@ class MoviePlayer extends Component
             // Caching disabled, create a new movie each time
             sprite = createMovie(name);
         }
-        _root.add(sprite);
-        return sprite;
+        return setCurrent(sprite);
     }
 
     private function createMovie (name :String) :MovieSprite
@@ -138,14 +140,15 @@ class MoviePlayer extends Component
         return sprite;
     }
 
-    private function get_movie () :MovieSprite
-    {
-        return (_oneshotSprite != null) ? _oneshotSprite : _loopingSprite;
-    }
-
     private function get_looping () :Bool
     {
         return _oneshotSprite == null && _loopingSprite != null;
+    }
+
+    private function setCurrent (current :MovieSprite) :MovieSprite
+    {
+        _root.add(current);
+        return movie._ = current;
     }
 
     private var _lib :Library;

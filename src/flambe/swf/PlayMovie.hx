@@ -28,9 +28,9 @@ class PlayMovie
         var player = actor.get(MoviePlayer);
         if (_movie == null) {
             player.play(_name);
-            _movie = player.movie;
+            _movie = player.movie._;
 
-        } else if (_movie != player.movie) {
+        } else if (_movie != player.movie._) {
             _movie = null;
             return 0;
         }

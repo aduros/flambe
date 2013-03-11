@@ -40,7 +40,7 @@ class Node
         throw untyped __js__("new Error")(message);
     }
 
-    inline private static function get_require () return untyped __js__("require")
-    inline private static function get_console () return untyped __js__("console")
-    inline private static function get_process () return untyped __js__("process")
+    inline private static function get_require () return untyped __js__("require");
+    inline private static function get_console () return untyped __js__("console");
+    inline private static function get_process () return untyped __js__("process");
 }

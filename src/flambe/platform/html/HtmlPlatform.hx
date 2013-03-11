@@ -4,7 +4,7 @@
 
 package flambe.platform.html;
 
-import js.Lib;
+import js.Browser;
 
 import flambe.animation.AnimatedFloat;
 import flambe.Entity;
@@ -47,7 +47,7 @@ class HtmlPlatform
         var canvas :Dynamic = null;
         try {
             // Use the canvas assigned to us by the flambe.js embedder
-            canvas = (untyped Lib.window).flambe.canvas;
+            canvas = (untyped Browser.window).flambe.canvas;
         } catch (error :Dynamic) {
         }
         Assert.that(canvas != null,
@@ -204,21 +204,21 @@ class HtmlPlatform
         canvas.addEventListener("keyup", onKey, false);
 
         // Handle uncaught errors
-        var oldErrorHandler = (untyped Lib.window).onerror;
-        (untyped Lib.window).onerror = function (message, url, line) {
+        var oldErrorHandler = (untyped Browser.window).onerror;
+        (untyped Browser.window).onerror = function (message, url, line) {
             System.uncaughtError.emit(message);
             return (oldErrorHandler != null) ? oldErrorHandler(message, url, line) : false;
         };
 
         // Handle visibility changes if the browser supports them
         // http://www.w3.org/TR/page-visibility/
-        var hiddenApi = HtmlUtil.loadExtension("hidden", Lib.document);
+        var hiddenApi = HtmlUtil.loadExtension("hidden", Browser.document);
         if (hiddenApi.value != null) {
             var onVisibilityChanged = function () {
-                System.hidden._ = Reflect.field(Lib.document, hiddenApi.field);
+                System.hidden._ = Reflect.field(Browser.document, hiddenApi.field);
             };
             onVisibilityChanged(); // Update now
-            (untyped Lib.document).addEventListener(hiddenApi.prefix + "visibilitychange",
+            (untyped Browser.document).addEventListener(hiddenApi.prefix + "visibilitychange",
                 onVisibilityChanged, false);
             System.hidden.changed.connect(function (hidden,_) {
                 if (!hidden) {
@@ -236,7 +236,7 @@ class HtmlPlatform
         if (requestAnimationFrame != null) {
             // Use the high resolution, monotonic timer if available
             // http://www.w3.org/TR/hr-time/
-            var performance :{ now :Void -> Float } = untyped Lib.window.performance;
+            var performance :{ now :Void -> Float } = untyped Browser.window.performance;
             var hasPerfNow = (performance != null) && HtmlUtil.polyfill("now", performance);
 
             if (hasPerfNow) {
@@ -255,7 +255,7 @@ class HtmlPlatform
 
         } else {
             Log.warn("No requestAnimationFrame support, falling back to setInterval");
-            (untyped Lib.window).setInterval(function () {
+            (untyped Browser.window).setInterval(function () {
                 update(HtmlUtil.now());
             }, 1000/60);
         }
@@ -276,7 +276,7 @@ class HtmlPlatform
         if (_storage == null) {
             var localStorage = null;
             try {
-                localStorage = (untyped Lib.window).localStorage;
+                localStorage = (untyped Browser.window).localStorage;
             } catch (error :Dynamic) {
                 // Browsers may throw an error on accessing localStorage:
                 // http://dev.w3.org/html5/webstorage/#dom-localstorage
@@ -293,7 +293,7 @@ class HtmlPlatform
 
     public function getLocale () :String
     {
-        return untyped Lib.window.navigator.language;
+        return untyped Browser.window.navigator.language;
     }
 
     public function createLogHandler (tag :String) :LogHandler

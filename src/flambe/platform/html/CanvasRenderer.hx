@@ -4,7 +4,7 @@
 
 package flambe.platform.html;
 
-import js.Lib;
+import js.Browser;
 
 import flambe.display.Graphics;
 import flambe.display.Texture;
@@ -43,7 +43,7 @@ class CanvasRenderer
         // On iOS, canvas textures are way faster
         // http://jsperf.com/drawimage-vs-canvaspattern/8
         var pattern = ~/(iPhone|iPod|iPad)/;
-        return pattern.match(Lib.window.navigator.userAgent);
+        return pattern.match(Browser.window.navigator.userAgent);
     })();
 
     private var _graphics :CanvasGraphics;

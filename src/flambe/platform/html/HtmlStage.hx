@@ -4,7 +4,7 @@
 
 package flambe.platform.html;
 
-import js.Lib;
+import js.Browser;
 
 import flambe.display.Orientation;
 import flambe.display.Stage;
@@ -58,11 +58,11 @@ class HtmlStage
         }
 
         fullscreen = new Value<Bool>(false);
-        HtmlUtil.addVendorListener(Lib.document, "fullscreenchange", function (_) {
+        HtmlUtil.addVendorListener(Browser.document, "fullscreenchange", function (_) {
             updateFullscreen();
         }, false);
 #if debug
-        HtmlUtil.addVendorListener(Lib.document, "fullscreenerror", function (_) {
+        HtmlUtil.addVendorListener(Browser.document, "fullscreenerror", function (_) {
             // No useful error message since the event provides no reason. See the error conditions
             // at http://dvcs.w3.org/hg/fullscreen/raw-file/tip/Overview.html#dom-element-requestfullscreen
             Log.warn("Error when requesting fullscreen");
@@ -84,7 +84,7 @@ class HtmlStage
     public function get_fullscreenSupported () :Bool
     {
         return HtmlUtil.loadFirstExtension(
-            ["fullscreenEnabled", "fullScreenEnabled"], Lib.document).value == true;
+            ["fullscreenEnabled", "fullScreenEnabled"], Browser.document).value == true;
     }
 
     public function lockOrientation (orient :Orientation)
@@ -110,7 +110,7 @@ class HtmlStage
     public function requestFullscreen (enable :Bool = true)
     {
         if (enable) {
-            var documentElement = untyped Lib.document.documentElement;
+            var documentElement = untyped Browser.document.documentElement;
             var requestFullscreen = HtmlUtil.loadFirstExtension(
                ["requestFullscreen", "requestFullScreen"], documentElement).value;
             if (requestFullscreen != null) {
@@ -119,9 +119,9 @@ class HtmlStage
 
         } else {
             var cancelFullscreen = HtmlUtil.loadFirstExtension(
-                ["cancelFullscreen", "cancelFullScreen"], Lib.document).value;
+                ["cancelFullscreen", "cancelFullScreen"], Browser.document).value;
             if (cancelFullscreen != null) {
-                Reflect.callMethod(Lib.document, cancelFullscreen, []);
+                Reflect.callMethod(Browser.document, cancelFullscreen, []);
             }
         }
     }
@@ -156,11 +156,11 @@ class HtmlStage
         // The maximum size of the part of the browser that can be scrolled away
         var mobileAddressBar = 100;
 
-        var htmlStyle = (untyped Lib.document).documentElement.style;
+        var htmlStyle = (untyped Browser.document).documentElement.style;
 
         // Force the page to be tall enough to scroll
-        htmlStyle.height = (Lib.window.innerHeight + mobileAddressBar) + "px";
-        htmlStyle.width = Lib.window.innerWidth + "px";
+        htmlStyle.height = (Browser.window.innerHeight + mobileAddressBar) + "px";
+        htmlStyle.width = Browser.window.innerWidth + "px";
         htmlStyle.overflow = "visible"; // Need to have overflow to scroll...
 
         HtmlUtil.callLater(function () {
@@ -169,7 +169,7 @@ class HtmlStage
 
             HtmlUtil.callLater(function () {
                 // Fit the page to the new screen size
-                htmlStyle.height = Lib.window.innerHeight + "px";
+                htmlStyle.height = Browser.window.innerHeight + "px";
 
                 onWindowResize();
             }, 100);
@@ -185,7 +185,7 @@ class HtmlStage
     private function updateFullscreen ()
     {
         var state :Dynamic = HtmlUtil.loadFirstExtension(
-            ["fullscreen", "fullScreen", "isFullScreen"], Lib.document).value;
+            ["fullscreen", "fullScreen", "isFullScreen"], Browser.document).value;
         fullscreen._ = (state == true); // state will be null if fullscreen not supported
     }
 
@@ -200,7 +200,7 @@ class HtmlStage
         }
 
         // Take into account any behind-the-scenes scaling of canvas elements
-        var canvas :Dynamic = Lib.document.createElement("canvas");
+        var canvas :Dynamic = Browser.document.createElement("canvas");
         var ctx = canvas.getContext("2d");
         var backingStorePixelRatio = HtmlUtil.loadExtension("backingStorePixelRatio", ctx).value;
         if (backingStorePixelRatio == null) {

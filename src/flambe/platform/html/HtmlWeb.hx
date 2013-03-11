@@ -4,7 +4,7 @@
 
 package flambe.platform.html;
 
-import js.Lib;
+import js.Browser;
 
 import flambe.animation.AnimatedFloat;
 import flambe.util.Signal1;
@@ -29,7 +29,7 @@ class HtmlWeb
 
     public function createView (x :Float, y :Float, width :Float, height :Float) :WebView
     {
-        var iframe = Lib.document.createElement("iframe");
+        var iframe = Browser.document.createElement("iframe");
         iframe.style.position = "absolute";
         iframe.style.border = "0";
         (untyped iframe).scrolling = "no";
@@ -42,7 +42,7 @@ class HtmlWeb
 
     public function openBrowser (url :String)
     {
-        Lib.window.open(url, "_blank");
+        Browser.window.open(url, "_blank");
     }
 
     private var _container :Dynamic;

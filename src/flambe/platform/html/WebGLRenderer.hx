@@ -4,7 +4,7 @@
 
 package flambe.platform.html;
 
-import js.Lib;
+import js.Browser;
 
 import flambe.display.Graphics;
 import flambe.display.Texture;

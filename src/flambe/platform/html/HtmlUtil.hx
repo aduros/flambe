@@ -4,7 +4,7 @@
 
 package flambe.platform.html;
 
-import js.Lib;
+import js.Browser;
 
 import flambe.display.Orientation;
 
@@ -16,17 +16,17 @@ class HtmlUtil
      * Whether the annoying scrolling address bar in some iOS and Android browsers may be hidden.
      */
     public static var SHOULD_HIDE_MOBILE_BROWSER =
-        Lib.window.top == Lib.window &&
-        ~/Mobile(\/.*)? Safari/.match(Lib.window.navigator.userAgent);
+        Browser.window.top == Browser.window &&
+        ~/Mobile(\/.*)? Safari/.match(Browser.window.navigator.userAgent);
 
     public static function callLater (func :Void -> Void, delay :Int = 0)
     {
-        (untyped Lib.window).setTimeout(func, delay);
+        (untyped Browser.window).setTimeout(func, delay);
     }
 
     public static function hideMobileBrowser ()
     {
-        Lib.window.scrollTo(1, 0);
+        Browser.window.scrollTo(1, 0);
     }
 
     // Load a prefixed vendor extension
@@ -34,7 +34,7 @@ class HtmlUtil
         name :String, ?obj :Dynamic) :{ prefix :String, field :String, value :Dynamic }
     {
         if (obj == null) {
-            obj = Lib.window;
+            obj = Browser.window;
         }
 
         // Try to load it as is
@@ -75,7 +75,7 @@ class HtmlUtil
     public static function polyfill (name :String, ?obj :Dynamic) :Bool
     {
         if (obj == null) {
-            obj = Lib.window;
+            obj = Browser.window;
         }
 
         var value = loadExtension(name, obj).value;
@@ -124,7 +124,7 @@ class HtmlUtil
 
     public static function createEmptyCanvas (width :Int, height :Int) :Dynamic
     {
-        var canvas :Dynamic = Lib.document.createElement("canvas");
+        var canvas :Dynamic = Browser.document.createElement("canvas");
         canvas.width = width;
         canvas.height = height;
         return canvas;

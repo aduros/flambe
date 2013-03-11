@@ -4,8 +4,7 @@
 
 package flambe.platform.html;
 
-import js.Dom;
-import js.Lib;
+import js.Browser;
 
 import haxe.Http;
 
@@ -73,7 +72,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                 req.send();
 
             } else {
-                var audio :Dynamic = Lib.document.createElement("audio");
+                var audio :Dynamic = Browser.document.createElement("audio");
                 audio.preload = "auto"; // Hint that we want to preload the entire file
 
                 // Maintain a hard reference to the audio during loading to prevent GC on some
@@ -123,14 +122,14 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
     private static function detectAudioFormats () :Array<String>
     {
         // Detect basic support for HTML5 audio
-        var element :Dynamic = Lib.document.createElement("audio");
+        var element :Dynamic = Browser.document.createElement("audio");
         if (element == null || element.canPlayType == null) {
             return [];
         }
 
         // Reject browsers that claim to support audio, but are too buggy or incomplete
         var blacklist = ~/\b(iPhone|iPod|iPad|Android)\b/;
-        if (!WebAudioSound.supported && blacklist.match(Lib.window.navigator.userAgent)) {
+        if (!WebAudioSound.supported && blacklist.match(Browser.window.navigator.userAgent)) {
             return [];
         }
 

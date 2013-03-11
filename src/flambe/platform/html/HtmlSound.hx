@@ -4,7 +4,7 @@
 
 package flambe.platform.html;
 
-import js.Lib;
+import js.Browser;
 
 import flambe.animation.AnimatedFloat;
 import flambe.platform.Tickable;
@@ -55,7 +55,7 @@ private class HtmlPlayback
         _tickableAdded = false;
 
         // Create a copy of the original sound's element. Note that cloneNode() doesn't work in IE
-        _clonedElement = Lib.document.createElement("audio");
+        _clonedElement = Browser.document.createElement("audio");
         _clonedElement.loop = loop;
         _clonedElement.src = sound.audioElement.src;
 

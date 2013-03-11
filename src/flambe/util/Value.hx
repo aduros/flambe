@@ -9,10 +9,8 @@ import flambe.util.Signal2;
 /**
  * Wraps a single value, notifying listeners when the value changes.
  */
+@:generic // Generate typed templates on static targets
 class Value<A>
-#if (flash || cpp || cs || java)
-    implements haxe.rtti.Generic // Generate typed templates on static targets
-#end
 {
     /**
      * The wrapped value, setting this to a different value will fire the 'changed' signal.

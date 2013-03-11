@@ -24,7 +24,7 @@ using Type;
  */
 class ManifestBuilder
 {
-    @:macro public static function populate (hash :Expr) :Expr
+    macro public static function populate (hash :Expr) :Expr
     {
         if (Context.defined("display")) {
             // When running in code completion, skip out early

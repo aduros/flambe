@@ -13,6 +13,7 @@
 #     * Hash<Foo> --> Map<String,Foo>
 #     * IntHash<Foo> --> Map<Int,Foo>
 #     * class Foo extends Bar, implements Baz --> class Foo extends Bar implements Baz
+#     * @:macro --> macro
 #     * Handles moved types in import statements
 
 import os
@@ -87,6 +88,8 @@ for root, dirs, files in os.walk("src"):
                 return m.group(0)[1:] # Trim the leading comma
 
             content = re.sub(r",\s*(extends|implements)(.*)", replace_inheritance, content)
+
+            content = re.sub(r"@:macro(\s+)?", "macro ", content)
 
         with open(path, "w") as f:
             def replace_methods (m):

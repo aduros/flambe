@@ -1,8 +1,13 @@
 #!/usr/bin/env python
 #
-# Tries to convert a project to Haxe 3.
+# Tries to convert a project to Haxe 3. It will do most of the heavy lifting, but some manual
+# editing will still be necessary.
 #
-# Will perform these replacements:
+# **** WARNING WARNING WARNING ****
+# Create a backup of your project before running this script!
+# **** WARNING WARNING WARNING ****
+#
+# Performs these replacements:
 #     * var foo (getFoo, setFoo) --> var foo (get, set)
 #     * callback(foo, bar) --> foo.bind(bar)
 #     * Hash<Foo> --> Map<String,Foo>
@@ -16,8 +21,19 @@ import sys
 
 property_keywords = ["get", "default", "never", "null"]
 
+# Note: Only import/using statements are replaced, so you may have to go in and manually fix
+# whatever was renamed
 renamed_types = {
     "flambe.util.Hashes": "flambe.util.Maps",
+
+    "haxe.BaseCode": "haxe.crypto.BaseCode",
+    "haxe.Md5": "haxe.crypto.Md5",
+    "haxe.SHA1": "haxe.crypto.Sha1",
+    "haxe.Stack": "haxe.CallStack",
+    "haxe.FastList": "haxe.ds.GenericStack",
+
+    "neko.zip.Reader": "haxe.zip.Reader",
+    "neko.zip.Writer": "haxe.zip.Writer",
 }
 
 for root, dirs, files in os.walk("src"):

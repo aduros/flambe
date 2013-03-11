@@ -26,7 +26,7 @@ class Component
      * The component's name, generated based on its class. Components with the same name replace
      * eachother when added to an entity.
      */
-    public var name (get_name, null) :String;
+    public var name (get, null) :String;
 
     /**
      * Called after this component has been added to an entity.

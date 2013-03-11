@@ -13,7 +13,7 @@ import flambe.Component;
 class Director extends Component
 {
     /** The front-most scene. */
-    public var topScene (get_topScene, null) :Entity;
+    public var topScene (get, null) :Entity;
 
     /** The complete list of scenes managed by this director, from back to front. */
     public var scenes (default, null) :Array<Entity>;
@@ -25,13 +25,13 @@ class Director extends Component
     public var occludedScenes (default, null) :Array<Entity>;
 
     /** Whether the director is currently transitioning between scenes. */
-    public var transitioning (get_transitioning, null) :Bool;
+    public var transitioning (get, null) :Bool;
 
     /** The ideal width of the director's scenes. Used by some transitions. */
-    public var width (get_width, null) :Float;
+    public var width (get, null) :Float;
 
     /** The ideal height of the director's scenes. Used by some transitions. */
-    public var height (get_height, null) :Float;
+    public var height (get, null) :Float;
 
     public function new ()
     {

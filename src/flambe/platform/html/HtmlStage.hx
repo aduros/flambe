@@ -14,11 +14,11 @@ import flambe.util.Value;
 class HtmlStage
     implements Stage
 {
-    public var width (get_width, null) :Int;
-    public var height (get_height, null) :Int;
+    public var width (get, null) :Int;
+    public var height (get, null) :Int;
     public var orientation (default, null) :Value<Orientation>;
     public var fullscreen (default, null) :Value<Bool>;
-    public var fullscreenSupported (get_fullscreenSupported, null) :Bool;
+    public var fullscreenSupported (get, null) :Bool;
 
     public var resize (default, null) :Signal0;
 

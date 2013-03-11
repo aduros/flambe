@@ -15,7 +15,7 @@ import flambe.web.WebView;
 class HtmlWeb
     implements Web
 {
-    public var supported (get_supported, null) :Bool;
+    public var supported (get, null) :Bool;
 
     public function new (container :Dynamic)
     {

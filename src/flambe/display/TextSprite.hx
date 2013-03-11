@@ -14,8 +14,8 @@ using flambe.util.BitSets;
  */
 class TextSprite extends Sprite
 {
-    public var text (get_text, set_text) :String;
-    public var font (get_font, set_font) :Font;
+    public var text (get, set) :String;
+    public var font (get, set) :Font;
 
     public function new (font :Font, ?text :String = "")
     {

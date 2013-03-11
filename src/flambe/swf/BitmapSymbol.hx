@@ -14,7 +14,7 @@ import flambe.swf.Format;
 class BitmapSymbol
     implements Symbol
 {
-    public var name (get_name, null) :String;
+    public var name (get, null) :String;
     public var atlas (default, null) :Texture;
     public var x (default, null) :Int;
     public var y (default, null) :Int;

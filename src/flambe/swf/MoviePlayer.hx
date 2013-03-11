@@ -22,7 +22,7 @@ class MoviePlayer extends Component
     public var movie (default, null) :Value<MovieSprite>;
 
     /** Whether the current movie is being looped. */
-    public var looping (get_looping, null) :Bool;
+    public var looping (get, null) :Bool;
 
     public function new (lib :Library)
     {

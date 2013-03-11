@@ -183,7 +183,7 @@ class BasicAssetPackLoader
 private class BasicAssetPack
     implements AssetPack
 {
-    public var manifest (get_manifest, null) :Manifest;
+    public var manifest (get, null) :Manifest;
 
     public var textures :Hash<Texture>;
     public var sounds :Hash<Sound>;

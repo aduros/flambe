@@ -12,7 +12,7 @@ interface Sound
     /**
      * The length of the sound in seconds.
      */
-    var duration (get_duration, null) :Float;
+    var duration (get, null) :Float;
 
     /**
      * Plays the sound once, suitable for one-shot sound effects.

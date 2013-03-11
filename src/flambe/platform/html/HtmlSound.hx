@@ -15,7 +15,7 @@ import flambe.util.Disposable;
 class HtmlSound
     implements Sound
 {
-    public var duration (get_duration, null) :Float;
+    public var duration (get, null) :Float;
     public var audioElement :Dynamic; // TODO(bruno): Use typed audio element extern
 
     public function new (audioElement :Dynamic)
@@ -44,10 +44,10 @@ private class HtmlPlayback
     implements Tickable
 {
     public var volume (default, null) :AnimatedFloat;
-    public var paused (get_paused, set_paused) :Bool;
-    public var ended (get_ended, null) :Bool;
-    public var position (get_position, null) :Float;
-    public var sound (get_sound, null) :Sound;
+    public var paused (get, set) :Bool;
+    public var ended (get, null) :Bool;
+    public var position (get, null) :Float;
+    public var sound (get, null) :Sound;
 
     public function new (sound :HtmlSound, volume :Float, loop :Bool)
     {

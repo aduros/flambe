@@ -17,14 +17,14 @@ using Lambda;
 class BasicPointer
     implements Pointer
 {
-    public var supported (get_supported, null) :Bool;
+    public var supported (get, null) :Bool;
 
     public var down (default, null) :Signal1<PointerEvent>;
     public var move (default, null) :Signal1<PointerEvent>;
     public var up (default, null) :Signal1<PointerEvent>;
 
-    public var x (get_x, null) :Float;
-    public var y (get_y, null) :Float;
+    public var x (get, null) :Float;
+    public var y (get, null) :Float;
 
     public function new (x :Float = 0, y :Float = 0, isDown :Bool = false)
     {

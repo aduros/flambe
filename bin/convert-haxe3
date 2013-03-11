@@ -7,38 +7,36 @@ import os
 import re
 import sys
 
-# Whether to generate accessors that remain compatible with Haxe 2.x
-haxe2_compat = True
+property_keywords = ["get", "default", "never", "null"]
 
 for root, dirs, files in os.walk("src"):
     for path in files:
         path = os.path.join(root, path)
-        replacements = {}
+        renamed_methods = {}
 
         with open(path) as f:
-            def replacer (m):
+            def replace_properties (m):
                 prop = m.group(1)
 
                 getter = m.group(2)
-                if getter != "get" and not getter.startswith("get_") \
-                        and getter != "default" and getter != "never" and getter != "null":
-                    replacements[getter] = "get_"+prop
-                    getter = "get_"+prop if haxe2_compat else "get"
+                if getter not in property_keywords:
+                    renamed_methods[getter] = "get_"+prop
+                    getter = "get"
 
                 setter = m.group(3)
-                if setter != "set" and not setter.startswith("set_") \
-                        and setter != "default" and setter != "never" and setter != "null":
-                    replacements[setter] = "set_"+prop
-                    setter = "set_"+prop if haxe2_compat else "set"
+                if setter not in property_keywords:
+                    renamed_methods[setter] = "set_"+prop
+                    setter = "set"
 
                 return "var %s (%s, %s)" % (prop, getter, setter)
 
-            content = re.sub(r"var\s+(\w+)\s*\(\s*(\w+),\s*(\w+)\)", replacer, f.read())
+            content = f.read()
+            content = re.sub(r"var\s+(\w+)\s*\(\s*(\w+),\s*(\w+)\)", replace_properties, content)
 
         with open(path, "w") as f:
-            def replacer (m):
-                if m.group(1) in replacements:
-                    return "function " + replacements[m.group(1)]
+            def replace_methods (m):
+                if m.group(1) in renamed_methods:
+                    return "function " + renamed_methods[m.group(1)]
                 return m.group()
-            content = re.sub(r"function\s+(\w+)", replacer, content)
+            content = re.sub(r"function\s+(\w+)", replace_methods, content)
             f.write(content)

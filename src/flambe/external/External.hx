@@ -15,7 +15,7 @@ interface External
     /**
      * Whether the environment supports interaction with external code.
      */
-    var supported (get_supported, null) :Bool;
+    var supported (get, null) :Bool;
 
     /**
      * Call an external function with the given parameters, and returns the result. Errors thrown by

@@ -14,12 +14,12 @@ interface Touch
     /**
      * True if the environment has a touch screen.
      */
-    var supported (get_supported, null) :Bool;
+    var supported (get, null) :Bool;
 
     /**
      * The maximum number of touch points that can be detected at once.
      */
-    var maxPoints (get_maxPoints, null) :Int;
+    var maxPoints (get, null) :Int;
 
     /**
      * Emits a new TouchPoint when a finger presses down on the screen.
@@ -39,5 +39,5 @@ interface Touch
     /**
      * The touch points currently pressed to the screen.
      */
-    var points (get_points, null) :Array<TouchPoint>;
+    var points (get, null) :Array<TouchPoint>;
 }

@@ -9,7 +9,7 @@ import flambe.storage.Storage;
 class DummyStorage
     implements Storage
 {
-    public var supported (get_supported, null) :Bool;
+    public var supported (get, null) :Bool;
 
     public function new ()
     {

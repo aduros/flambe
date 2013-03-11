@@ -11,7 +11,7 @@ import flambe.external.External;
 class FlashExternal
     implements External
 {
-    public var supported (get_supported, null) :Bool;
+    public var supported (get, null) :Bool;
 
     public function new ()
     {

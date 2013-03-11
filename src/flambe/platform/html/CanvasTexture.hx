@@ -12,9 +12,9 @@ import flambe.display.Texture;
 class CanvasTexture
     implements Texture
 {
-    public var width (get_width, null) :Int;
-    public var height (get_height, null) :Int;
-    public var graphics (get_graphics, null) :Graphics;
+    public var width (get, null) :Int;
+    public var height (get, null) :Int;
+    public var graphics (get, null) :Graphics;
 
     // The Image (or sometimes Canvas) used for most draw calls
     public var image (default, null) :Dynamic;

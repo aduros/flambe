@@ -15,7 +15,7 @@ using flambe.platform.KeyCodes;
 class BasicKeyboard
     implements Keyboard
 {
-    public var supported (get_supported, null) :Bool;
+    public var supported (get, null) :Bool;
 
     public var down (default, null) :Signal1<KeyboardEvent>;
     public var up (default, null) :Signal1<KeyboardEvent>;

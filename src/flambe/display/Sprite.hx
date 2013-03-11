@@ -79,27 +79,27 @@ class Sprite extends Component
     /**
      * Whether this sprite should be drawn.
      */
-    public var visible (get_visible, set_visible) :Bool;
+    public var visible (get, set) :Bool;
 
     /**
      * Emitted when the pointer is pressed down over this sprite.
      */
-    public var pointerDown (get_pointerDown, null) :Signal1<PointerEvent>;
+    public var pointerDown (get, null) :Signal1<PointerEvent>;
 
     /**
      * Emitted when the pointer is moved over this sprite.
      */
-    public var pointerMove (get_pointerMove, null) :Signal1<PointerEvent>;
+    public var pointerMove (get, null) :Signal1<PointerEvent>;
 
     /**
      * Emitted when the pointer is raised over this sprite.
      */
-    public var pointerUp (get_pointerUp, null) :Signal1<PointerEvent>;
+    public var pointerUp (get, null) :Signal1<PointerEvent>;
 
     /**
      * Whether this sprite or any children should receive pointer events. Defaults to true.
      */
-    public var pointerEnabled (get_pointerEnabled, set_pointerEnabled) :Bool;
+    public var pointerEnabled (get, set) :Bool;
 
     public function new ()
     {

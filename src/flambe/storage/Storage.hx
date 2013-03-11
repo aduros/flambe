@@ -13,7 +13,7 @@ interface Storage
      * True if the environment supports persisted storage. Otherwise, the storage is backed by a
      * Hash and not actually persisted between sessions.
      */
-    var supported (get_supported, null) :Bool;
+    var supported (get, null) :Bool;
 
     /**
      * Add a key to the storage, replacing any existing value.

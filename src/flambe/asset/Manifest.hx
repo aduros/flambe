@@ -23,13 +23,13 @@ class Manifest
     /**
      * A relative path to load this manifest's assets from, or null.
      */
-    public var relativeBasePath (get_relativeBasePath, set_relativeBasePath) :String;
+    public var relativeBasePath (get, set) :String;
 
     /**
      * A URL on another domain to load this manifest's assets from, or null. May be used to load
      * assets from a CDN, in browsers that support cross-domain requests.
      */
-    public var externalBasePath (get_externalBasePath, set_externalBasePath) :String;
+    public var externalBasePath (get, set) :String;
 
     public function new ()
     {

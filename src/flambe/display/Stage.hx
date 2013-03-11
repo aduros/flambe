@@ -15,12 +15,12 @@ interface Stage
     /**
      * The width of the stage viewport, in pixels.
      */
-    var width (get_width, null) :Int;
+    var width (get, null) :Int;
 
     /**
      * The height of the stage viewport, in pixels.
      */
-    var height (get_height, null) :Int;
+    var height (get, null) :Int;
 
     /**
      * The current screen orientation, or a wrapped null value if the environment doesn't support
@@ -37,7 +37,7 @@ interface Stage
      * Whether the stage may change its fullscreen state. False if the stage is fullscreen and can't
      * go into windowed mode, or vise versa.
      */
-    var fullscreenSupported (get_fullscreenSupported, null) :Bool;
+    var fullscreenSupported (get, null) :Bool;
 
     /**
      * Emitted after the stage size changes, such as when the window is resized or the device is

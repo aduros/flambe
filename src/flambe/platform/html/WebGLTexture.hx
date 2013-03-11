@@ -13,9 +13,9 @@ import flambe.platform.html.WebGLTypes;
 class WebGLTexture
     implements Texture
 {
-    public var width (get_width, null) :Int;
-    public var height (get_height, null) :Int;
-    public var graphics (get_graphics, null) :Graphics;
+    public var width (get, null) :Int;
+    public var height (get, null) :Int;
+    public var graphics (get, null) :Graphics;
 
     public var nativeTexture (default, null) :WebGLTypes.Texture;
     public var framebuffer (default, null) :Framebuffer;

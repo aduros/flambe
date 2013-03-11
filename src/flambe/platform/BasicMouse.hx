@@ -16,16 +16,16 @@ using flambe.platform.MouseCodes;
 class BasicMouse
     implements Mouse
 {
-    public var supported (get_supported, null) :Bool;
+    public var supported (get, null) :Bool;
 
     public var down (default, null) :Signal1<MouseEvent>;
     public var move (default, null) :Signal1<MouseEvent>;
     public var up (default, null) :Signal1<MouseEvent>;
     public var scroll (default, null) :Signal1<Float>;
 
-    public var x (get_x, null) :Float;
-    public var y (get_y, null) :Float;
-    public var cursor (get_cursor, set_cursor) :MouseCursor;
+    public var x (get, null) :Float;
+    public var y (get, null) :Float;
+    public var cursor (get, set) :MouseCursor;
 
     public function new (pointer :BasicPointer)
     {

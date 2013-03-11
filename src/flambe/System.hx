@@ -36,42 +36,42 @@ class System
     /**
      * The Stage subsystem, for controlling the display viewport.
      */
-    public static var stage (get_stage, null) :Stage;
+    public static var stage (get, null) :Stage;
 
     /**
      * The Storage subsystem, for persisting values.
      */
-    public static var storage (get_storage, null) :Storage;
+    public static var storage (get, null) :Storage;
 
     /**
      * The Pointer subsystem, for unified mouse/touch events.
      */
-    public static var pointer (get_pointer, null) :Pointer;
+    public static var pointer (get, null) :Pointer;
 
     /**
      * The Mouse subsystem, for direct access to the mouse.
      */
-    public static var mouse (get_mouse, null) :Mouse;
+    public static var mouse (get, null) :Mouse;
 
     /**
      * The Touch subsystem, for direct access to the multi-touch.
      */
-    public static var touch (get_touch, null) :Touch;
+    public static var touch (get, null) :Touch;
 
     /**
      * The Keyboard subsystem, for keyboard events.
      */
-    public static var keyboard (get_keyboard, null) :Keyboard;
+    public static var keyboard (get, null) :Keyboard;
 
     /**
      * The Web subsystem, for using the device's web browser.
      */
-    public static var web (get_web, null) :Web;
+    public static var web (get, null) :Web;
 
     /**
      * The External subsystem, for interaction with external code.
      */
-    public static var external (get_external, null) :External;
+    public static var external (get, null) :External;
 
     // TODO(bruno): Subsystems for accelerometer, gamepads, haptic, geolocation, video, textInput
 
@@ -79,7 +79,7 @@ class System
      * Gets the RFC 4646 language tag of the environment. For example, "en-US", "pt", or null if the
      * locale is unknown.
      */
-    public static var locale (get_locale, null) :String;
+    public static var locale (get, null) :String;
 
     /**
      * Emitted when an uncaught exception occurs, if the platform supports it. You can wire this up
@@ -97,7 +97,7 @@ class System
      * Gets the current clock time, in <b>seconds</b> since January 1, 1970. Depending on the
      * platform, this may be slightly more efficient than Date.now().getTime().
      */
-    public static var time (get_time, null) :Float;
+    public static var time (get, null) :Float;
 
     /**
      * <p>Whether the app currently has a GPU context. In some renderers (Stage3D) the GPU and all

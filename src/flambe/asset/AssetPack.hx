@@ -16,7 +16,7 @@ interface AssetPack
     /**
      * The manifest that was used to load this asset pack.
      */
-    var manifest (get_manifest, null) :Manifest;
+    var manifest (get, null) :Manifest;
 
     /**
      * Gets a texture by name from the asset pack. The name must NOT contain a filename extension.

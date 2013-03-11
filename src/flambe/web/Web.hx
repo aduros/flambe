@@ -13,7 +13,7 @@ interface Web
      * True if the environment supports WebViews. Note that this will always be false on the browser
      * Flash target.
      */
-    var supported (get_supported, null) :Bool;
+    var supported (get, null) :Bool;
 
     /**
      * Creates a blank WebView with the given viewport bounds, in pixels. Fails with an assertion if

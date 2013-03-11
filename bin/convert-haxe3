@@ -14,7 +14,8 @@
 #     * IntHash<Foo> --> Map<Int,Foo>
 #     * class Foo extends Bar, implements Baz --> class Foo extends Bar implements Baz
 #     * @:macro --> macro
-#     * Handles moved types in import statements
+#     * ExprRequire --> ExprOf
+#     * Handles a few moved types in import statements
 
 import os
 import re
@@ -90,6 +91,7 @@ for root, dirs, files in os.walk("src"):
             content = re.sub(r",\s*(extends|implements)(.*)", replace_inheritance, content)
 
             content = re.sub(r"@:macro(\s+)?", "macro ", content)
+            content = re.sub(r"ExprRequire<", "ExprOf<", content)
 
         with open(path, "w") as f:
             def replace_methods (m):

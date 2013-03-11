@@ -124,7 +124,7 @@ using Lambda;
     /**
      * Gets a component of a given class from this entity.
      */
-    macro public function get<A> (self :Expr, componentClass :ExprRequire<Class<A>>) :ExprRequire<A>
+    macro public function get<A> (self :Expr, componentClass :ExprOf<Class<A>>) :ExprOf<A>
     {
         // Rewrites self.get(ComponentClass) to ComponentClass.getFrom(self)
         return {
@@ -139,7 +139,7 @@ using Lambda;
     /**
      * Checks if this entity has a component of the given class.
      */
-    macro public function has<A> (self :Expr, componentClass :ExprRequire<Class<A>>) :ExprRequire<Bool>
+    macro public function has<A> (self :Expr, componentClass :ExprOf<Class<A>>) :ExprOf<Bool>
     {
         // Rewrites self.has(ComponentClass) to ComponentClass.hasIn(self)
         return {

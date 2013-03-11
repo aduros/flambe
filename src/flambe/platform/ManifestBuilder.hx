@@ -5,9 +5,8 @@
 package flambe.platform;
 
 #if macro
-import neko.FileSystem;
-import neko.io.File;
-import neko.Lib;
+import sys.FileSystem;
+import sys.io.File;
 
 import haxe.macro.Expr;
 import haxe.macro.Context;

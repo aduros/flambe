@@ -34,8 +34,11 @@ renamed_types = {
     "haxe.Stack": "haxe.CallStack",
     "haxe.FastList": "haxe.ds.GenericStack",
 
+    # This list is not complete
     "neko.zip.Reader": "haxe.zip.Reader",
     "neko.zip.Writer": "haxe.zip.Writer",
+    "neko.FileSystem": "sys.FileSystem",
+    "neko.io.File": "sys.io.File",
 }
 
 for root, dirs, files in os.walk("src"):

@@ -49,8 +49,7 @@ def apply_flambe(ctx):
 
     flags = ["-main", main]
     if ctx.dead_code_elimination:
-        flags += ["--dead-code-elimination"]
-        # flags += ["--dce", "full"]
+        flags += ["-dce", "full"]
     flags += Utils.to_list(ctx.flags)
 
     libs = ["format"] + Utils.to_list(ctx.libs)

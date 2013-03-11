@@ -10,8 +10,7 @@ import flambe.util.Disposable;
 /**
  * Represents a currently playing sound.
  */
-interface Playback
-    implements Disposable
+interface Playback extends Disposable
 {
     /**
      * The volume of the sound being played, between 0 and 1 (inclusive).

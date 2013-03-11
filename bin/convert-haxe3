@@ -7,12 +7,17 @@
 #     * callback(foo, bar) --> foo.bind(bar)
 #     * Hash<Foo> --> Map<String,Foo>
 #     * IntHash<Foo> --> Map<Int,Foo>
+#     * Handles moved types in import statements
 
 import os
 import re
 import sys
 
 property_keywords = ["get", "default", "never", "null"]
+
+renamed_types = {
+    "flambe.util.Hashes": "flambe.util.Maps",
+}
 
 for root, dirs, files in os.walk("src"):
     for path in files:
@@ -21,6 +26,14 @@ for root, dirs, files in os.walk("src"):
 
         with open(path) as f:
             content = f.read()
+
+            def replace_imports (m):
+                import_statement = m.group(1)
+                type = m.group(2)
+                renamed_type = renamed_types.get(type, type)
+                return "%s %s;" % (import_statement, renamed_type)
+
+            content = re.sub(r"\b(import|using)\s+(.+?);", replace_imports, content)
 
             def replace_properties (m):
                 prop = m.group(1)

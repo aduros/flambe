@@ -5,9 +5,9 @@
 package flambe.util;
 
 /**
- * Utility mixins for Mapes. Designed to be imported with 'using'.
+ * Utility mixins for Maps. Designed to be imported with 'using'.
  */
-class Mapes
+class Maps
 {
     /**
      * Fetch a string from a hash, converting it from another type if necessary.

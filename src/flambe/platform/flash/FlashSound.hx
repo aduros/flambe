@@ -42,7 +42,7 @@ class FlashSound
 }
 
 private class FlashPlayback
-    implements Playback,
+    implements Playback
     implements Tickable
 {
     public var volume (default, null) :AnimatedFloat;

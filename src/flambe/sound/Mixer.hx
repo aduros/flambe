@@ -53,7 +53,7 @@ class Mixer
 }
 
 private class MixerSound
-    implements Sound,
+    implements Sound
     implements Disposable
 {
     public var duration (get, null) :Float;

@@ -48,7 +48,7 @@ class AirWeb extends FlashWeb
 }
 
 class AirWebView
-    implements WebView,
+    implements WebView
     implements Tickable
 {
     public var url (default, null) :Value<String>;

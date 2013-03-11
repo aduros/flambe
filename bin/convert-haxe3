@@ -7,6 +7,7 @@
 #     * callback(foo, bar) --> foo.bind(bar)
 #     * Hash<Foo> --> Map<String,Foo>
 #     * IntHash<Foo> --> Map<Int,Foo>
+#     * class Foo extends Bar, implements Baz --> class Foo extends Bar implements Baz
 #     * Handles moved types in import statements
 
 import os
@@ -65,6 +66,11 @@ for root, dirs, files in os.walk("src"):
                 return "Map" if value_type is None else "Map<%s,%s>" % (key_type, value_type)
 
             content = re.sub(r"\b(Int)?Hash(<(.*?)>)?", replace_hashes, content)
+
+            def replace_inheritance (m):
+                return m.group(0)[1:] # Trim the leading comma
+
+            content = re.sub(r",\s*(extends|implements)(.*)", replace_inheritance, content)
 
         with open(path, "w") as f:
             def replace_methods (m):

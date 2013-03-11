@@ -73,7 +73,7 @@ class WebAudioSound
 }
 
 private class WebAudioPlayback
-    implements Playback,
+    implements Playback
     implements Tickable
 {
     public var volume (default, null) :AnimatedFloat;

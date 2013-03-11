@@ -40,7 +40,7 @@ class HtmlSound
 }
 
 private class HtmlPlayback
-    implements Playback,
+    implements Playback
     implements Tickable
 {
     public var volume (default, null) :AnimatedFloat;

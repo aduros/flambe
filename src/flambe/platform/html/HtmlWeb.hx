@@ -49,7 +49,7 @@ class HtmlWeb
 }
 
 class HtmlWebView
-    implements WebView,
+    implements WebView
     implements Tickable
 {
     public var url (default, null) :Value<String>;

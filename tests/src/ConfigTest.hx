@@ -7,7 +7,7 @@ import haxe.unit.TestCase;
 import flambe.util.Config;
 import flambe.util.MessageBundle;
 
-using flambe.util.Hashes;
+using flambe.util.Maps;
 
 class ConfigTest extends TestCase
 {

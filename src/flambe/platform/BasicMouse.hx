@@ -39,7 +39,7 @@ class BasicMouse
         _x = 0;
         _y = 0;
         _cursor = Default;
-        _buttonStates = new IntHash();
+        _buttonStates = new Map();
     }
 
     public function get_supported () :Bool
@@ -135,5 +135,5 @@ class BasicMouse
     private var _x :Float;
     private var _y :Float;
     private var _cursor :MouseCursor;
-    private var _buttonStates :IntHash<Bool>;
+    private var _buttonStates :Map<Int,Bool>;
 }

@@ -74,6 +74,6 @@ class ComponentBuilder
         return superClass.meta.has(":componentBase");
     }
 
-    private static var _nameCache = new Hash<String>();
+    private static var _nameCache = new Map<String,String>();
     private static var _nextId = 0;
 }

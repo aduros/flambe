@@ -277,7 +277,7 @@ using Lambda;
     }
 
     /**
-     * Maps String -> Component. Usually you would use a Haxe Hash here, but I'm dropping down to plain
+     * Maps String -> Component. Usually you would use a Haxe Map here, but I'm dropping down to plain
      * Object/Dictionary for the quickest possible lookups in this critical part of Flambe.
      */
     private var _compMap :Dynamic<Component>;

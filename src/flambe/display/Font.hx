@@ -32,10 +32,10 @@ class Font
     public function new (pack :AssetPack, name :String)
     {
         this.name = name;
-        _glyphs = new IntHash();
+        _glyphs = new Map();
 
         var parser = new ConfigParser(pack.getFile(name + ".fnt"));
-        var pages = new IntHash<Texture>();
+        var pages = new Map<Int,Texture>();
 
         // The basename of the font's path, where we'll find the textures
         var idx = name.lastIndexOf("/");
@@ -181,7 +181,7 @@ class Font
         return _glyphs.get(charCode);
     }
 
-    private var _glyphs :IntHash<Glyph>;
+    private var _glyphs :Map<Int,Glyph>;
 }
 
 /**
@@ -234,12 +234,12 @@ class Glyph
     /** @private */ public function _internal_setKerning (nextCharCode :Int, amount :Int)
     {
         if (_kernings == null) {
-            _kernings = new IntHash();
+            _kernings = new Map();
         }
         _kernings.set(nextCharCode, amount);
     }
 
-    private var _kernings :IntHash<Int>;
+    private var _kernings :Map<Int,Int>;
 }
 
 private class ConfigParser

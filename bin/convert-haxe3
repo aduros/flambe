@@ -5,6 +5,8 @@
 # Will perform these replacements:
 #     * var foo (getFoo, setFoo) --> var foo (get, set)
 #     * callback(foo, bar) --> foo.bind(bar)
+#     * Hash<Foo> --> Map<String,Foo>
+#     * IntHash<Foo> --> Map<Int,Foo>
 
 import os
 import re
@@ -42,7 +44,14 @@ for root, dirs, files in os.walk("src"):
                 params = m.group(2)
                 return "%s.bind(%s)" % (function, params)
 
-            content = re.sub(r"callback\((.*?)\s*,\s*(.*)\)", replace_callbacks, content)
+            content = re.sub(r"\bcallback\((.*?)\s*,\s*(.*)\)", replace_callbacks, content)
+
+            def replace_hashes (m):
+                key_type = "Int" if m.group(1) == "Int" else "String"
+                value_type = m.group(3)
+                return "Map" if value_type is None else "Map<%s,%s>" % (key_type, value_type)
+
+            content = re.sub(r"\b(Int)?Hash(<(.*?)>)?", replace_hashes, content)
 
         with open(path, "w") as f:
             def replace_methods (m):

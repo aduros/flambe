@@ -26,7 +26,7 @@ class BasicKeyboard
         down = new Signal1();
         up = new Signal1();
         backButton = new Signal0();
-        _keyStates = new IntHash();
+        _keyStates = new Map();
     }
 
     public function get_supported () :Bool
@@ -80,5 +80,5 @@ class BasicKeyboard
 
     private static var _sharedEvent = new KeyboardEvent();
 
-    private var _keyStates :IntHash<Bool>;
+    private var _keyStates :Map<Int,Bool>;
 }

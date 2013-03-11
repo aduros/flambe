@@ -80,7 +80,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                 // browsers
                 var ref = ++_mediaRefCount;
                 if (_mediaElements == null) {
-                    _mediaElements = new IntHash();
+                    _mediaElements = new Map();
                 }
                 _mediaElements.set(ref, audio);
 
@@ -165,6 +165,6 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
      * shouldn't be GCed while playing, but vague about about GCing while loading. So, maintain a
      * hard reference to all media elements being loaded to prevent GC.
      */
-    private static var _mediaElements :IntHash<Dynamic>;
+    private static var _mediaElements :Map<Int,Dynamic>;
     private static var _mediaRefCount = 0;
 }

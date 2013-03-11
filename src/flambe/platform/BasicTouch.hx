@@ -23,7 +23,7 @@ class BasicTouch
     {
         _pointer = pointer;
         _maxPoints = maxPoints;
-        _pointMap = new IntHash();
+        _pointMap = new Map();
         _points = [];
 
         down = new Signal1();
@@ -96,6 +96,6 @@ class BasicTouch
     private var _pointerTouch :TouchPoint;
 
     private var _maxPoints :Int;
-    private var _pointMap :IntHash<TouchPoint>;
+    private var _pointMap :Map<Int,TouchPoint>;
     private var _points :Array<TouchPoint>;
 }

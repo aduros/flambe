@@ -39,7 +39,7 @@ class DummyStorage
 
     public function clear ()
     {
-        _hash = new Map();
+        _hash = new Map<String,Dynamic>();
     }
 
     private var _hash :Map<String,Dynamic>;

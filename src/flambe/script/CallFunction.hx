@@ -15,7 +15,7 @@ class CallFunction
     /**
      * @param fn The function to call when this action is run.
      */
-    public function new (fn :Void -> Dynamic)
+    public function new (fn :Void -> Void)
     {
         _fn = fn;
     }
@@ -26,5 +26,5 @@ class CallFunction
         return 0;
     }
 
-    private var _fn :Void -> Dynamic;
+    private var _fn :Void -> Void;
 }

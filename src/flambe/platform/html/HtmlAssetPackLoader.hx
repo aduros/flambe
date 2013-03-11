@@ -24,7 +24,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
     {
         switch (entry.type) {
         case Image:
-            var image :Image = untyped __new__("Image");
+            var image = Browser.document.createImageElement();
             image.onload = function (_) {
 #if debug
                 if (image.width > 1024 || image.height > 1024) {
@@ -79,7 +79,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                 // browsers
                 var ref = ++_mediaRefCount;
                 if (_mediaElements == null) {
-                    _mediaElements = new Map();
+                    _mediaElements = new Map<Int,Dynamic>();
                 }
                 _mediaElements.set(ref, audio);
 

@@ -232,7 +232,7 @@ class Manifest
         // TODO(bruno): Better UA detection that only blacklists the stock browser, not Chrome or FF
         // for Android
         var blacklist = ~/\b(Android)\b/;
-        if (blacklist.match(js.Lib.window.navigator.userAgent)) {
+        if (blacklist.match(js.Browser.window.navigator.userAgent)) {
             return false;
         }
 

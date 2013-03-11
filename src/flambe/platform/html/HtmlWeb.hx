@@ -74,7 +74,7 @@ class HtmlWebView
         this.height = new AnimatedFloat(height, onBoundsChanged);
         updateBounds();
 
-        url = new Value(null, function (url, _) loadUrl(url));
+        url = new Value<String>(null, function (url, _) loadUrl(url));
         error = new Signal1();
     }
 

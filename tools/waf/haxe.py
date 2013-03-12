@@ -73,7 +73,7 @@ def apply_haxe(self):
     elif target.endswith(".js"):
         if "-debug" in flags:
             outputs += [self.path.get_bld().make_node(target + ".map")]
-        flags += ["-js", target, "--js-modern"]
+        flags += ["-js", target]
     elif target.endswith(".n"):
         flags += ["-neko", target]
     else:

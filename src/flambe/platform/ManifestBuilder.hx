@@ -89,7 +89,7 @@ class ManifestBuilder
         }
         return FileSystem.exists(dir) && FileSystem.isDirectory(dir) ?
             FileSystem.readDirectory(dir).filter(
-                function (file) return file.fastCodeAt(0) != ".".code) :
+                function (file) return (file.fastCodeAt(0) != ".".code && file.endsWith(".cache"))) :
             cast [];
     }
 

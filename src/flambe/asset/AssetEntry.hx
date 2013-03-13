@@ -51,4 +51,22 @@ class AssetEntry
     {
         return url.split("?")[0].getFileExtension().toLowerCase();
     }
+    
+    @:keep
+    function hxSerialize (s :haxe.Serializer) 
+    {
+        s.serialize(name);
+        s.serialize(url);
+        s.serialize(type);
+        s.serialize(bytes);
+    }
+    
+    @:keep
+    public function hxUnserialize (s :haxe.Unserializer) 
+    {
+        this.name = s.unserialize();
+        this.url = s.unserialize();
+        this.type = s.unserialize();
+        this.bytes = s.unserialize();
+    }
 }

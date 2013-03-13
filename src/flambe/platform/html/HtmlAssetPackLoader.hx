@@ -18,6 +18,9 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
     public function new (platform :HtmlPlatform, manifest :Manifest)
     {
         super(platform, manifest);
+        #if enable_flambe_reloading
+        flambe.asset.AssetReloader.setupAssetReloading(loadEntry, _pack.manifest);
+        #end
     }
 
     override private function loadEntry (url :String, entry :AssetEntry)

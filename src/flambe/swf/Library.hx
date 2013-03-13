@@ -31,7 +31,7 @@ class Library
     {
         _symbols = new Map();
 
-        var json :Format = Json.parse(pack.getFile(baseDir + "/library.json"));
+        var json :Format = Json.parse(pack.getFile(baseDir + "/library.json")._);
 
         frameRate = json.frameRate;
 

@@ -5,6 +5,7 @@
 package flambe.platform.flash;
 
 import flash.Lib;
+import flash.external.ExternalInterface;
 import flash.net.URLRequest;
 
 class FlashWeb extends DummyWeb
@@ -16,6 +17,11 @@ class FlashWeb extends DummyWeb
 
     override public function openBrowser (url :String)
     {
-        Lib.getURL(new URLRequest(url), "_blank");
+        if (ExternalInterface.available) {
+            // Circumvent some browsers that block Flash popups even from a user input event
+            ExternalInterface.call("window.open", url, "_blank");
+        } else {
+            Lib.getURL(new URLRequest(url), "_blank");
+        }
     }
 }

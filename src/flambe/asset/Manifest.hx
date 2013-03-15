@@ -21,6 +21,11 @@ using flambe.util.Strings;
 class Manifest
 {
     /**
+     * Reloaded assets reference the manifest name
+     */
+    public var name (default, null) :String;
+    
+    /**
      * A relative path to load this manifest's assets from, or null.
      */
     public var relativeBasePath (get, set) :String;
@@ -31,9 +36,11 @@ class Manifest
      */
     public var externalBasePath (get, set) :String;
 
-    public function new ()
+    /** Reloaded assets reference the manifest name */
+    public function new (?name :String)
     {
         _entries = [];
+        this.name = name;
     }
 
     /**
@@ -121,7 +128,7 @@ class Manifest
      */
     public function clone () :Manifest
     {
-        var copy = new Manifest();
+        var copy = new Manifest(name);
         copy.relativeBasePath = relativeBasePath;
         copy.externalBasePath = externalBasePath;
         copy._entries = _entries.copy();
@@ -219,7 +226,12 @@ class Manifest
         return manifests;
     }
 
+    //The server doesn't build manifests this way
+    #if !(server || nodejs)
     private static var _buildManifest :Map<String,Manifest> = createBuildManifests();
+    #else
+    private static var _buildManifest :Map<String,Manifest> = new Map();
+    #end
 
     // Whether the environment fully supports loading assets from another domain
     private static var _supportsCrossOrigin :Bool = (function () {

@@ -4,14 +4,16 @@
 
 package flambe.display;
 
+import flambe.util.Value;
+
 /**
  * A fixed-size sprite that displays a single texture.
  */
 class ImageSprite extends Sprite
 {
-    public var texture :Texture;
+    public var texture :Value<Texture>;
 
-    public function new (texture :Texture)
+    public function new (texture :Value<Texture>)
     {
         super();
         this.texture = texture;
@@ -19,16 +21,16 @@ class ImageSprite extends Sprite
 
     override public function draw (g :Graphics)
     {
-        g.drawImage(texture, 0, 0);
+        g.drawImage(texture._, 0, 0);
     }
 
     override public function getNaturalWidth () :Float
     {
-        return texture.width;
+        return texture._.width;
     }
 
     override public function getNaturalHeight () :Float
     {
-        return texture.height;
+        return texture._.height;
     }
 }

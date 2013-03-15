@@ -7,6 +7,7 @@ package flambe.asset;
 import flambe.asset.Manifest;
 import flambe.display.Texture;
 import flambe.sound.Sound;
+import flambe.util.Value;
 
 /**
  * Represents a collection of fully loaded assets.
@@ -23,19 +24,19 @@ interface AssetPack
      * Textures are cached, so it's safe to get the same texture multiple times.
      * @param required If true and the asset was not found, an error is thrown.
      */
-    function getTexture (name :String, required :Bool = true) :Texture;
+    function getTexture (name :String, required :Bool = true) :Value<Texture>;
 
     /**
      * Gets a sound by name from the asset pack. The name must NOT contain a filename extension.
      * Sounds are cached, so it's safe to get the same sound multiple times.
      * @param required If true and the asset was not found, an error is thrown.
      */
-    function getSound (name :String, required :Bool = true) :Sound;
+    function getSound (name :String, required :Bool = true) :Value<Sound>;
 
     /**
      * Gets a file by name from the asset pack, returning its contents as a string. Files are
      * cached, so it's safe to get the same file multiple times.
      * @param required If true and the asset was not found, an error is thrown.
      */
-    function getFile (name :String, required :Bool = true) :String;
+    function getFile (name :String, required :Bool = true) :Value<String>;
 }

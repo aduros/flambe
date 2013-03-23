@@ -26,7 +26,9 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         switch (entry.type) {
         case Image:
             var image :Dynamic = untyped __new__("Image");
-            image.onload = function (_) {
+            var events = new EventGroup();
+
+            events.addDisposingListener(image, "load", function (_) {
 #if debug
                 if (image.width > 1024 || image.height > 1024) {
                     Log.warn("Images larger than 1024px on a side will prevent GPU acceleration" +
@@ -34,24 +36,26 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                         "width", image.width, "height", image.height]);
                 }
 #end
+                if (supportsBlob()) {
+                    // Reclaim memory previously allocated by createObjectURL
+                    _URL.revokeObjectURL(image.src);
+                }
+
                 var texture = _platform.getRenderer().createTexture(image);
                 if (texture != null) {
                     handleLoad(entry, texture);
                 } else {
                     handleTextureError(entry);
                 }
-            };
-            image.onerror = function (_) {
+            });
+            events.addDisposingListener(image, "error", function (_) {
                 handleError(entry, "Failed to load image");
-            };
+            });
 
             // If this browser supports Blob, load the image data over XHR to benefit from progress
             // events, otherwise just set the src directly
             if (supportsBlob()) {
                 sendRequest(url, entry, "blob", function (blob) {
-                    image.addEventListener("load", function (_) {
-                        _URL.revokeObjectURL(image.src);
-                    }, false);
                     image.src = _URL.createObjectURL(blob);
                 });
             } else {
@@ -96,7 +100,6 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                     _mediaElements.remove(ref);
                     handleError(entry, "Failed to load audio: " + audio.error.code);
                 });
-
 
                 // TODO(bruno): Handle progress events
                 audio.src = url;

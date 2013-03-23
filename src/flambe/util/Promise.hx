@@ -93,15 +93,19 @@ class Promise<A>
 
     private function set_progress (progress :Float) :Float
     {
-        _progress = progress;
-        progressChanged.emit();
+        if (_progress != progress) {
+            _progress = progress;
+            progressChanged.emit();
+        }
         return progress;
     }
 
     private function set_total (total :Float) :Float
     {
-        _total = total;
-        progressChanged.emit();
+        if (_total != total) {
+            _total = total;
+            progressChanged.emit();
+        }
         return total;
     }
 

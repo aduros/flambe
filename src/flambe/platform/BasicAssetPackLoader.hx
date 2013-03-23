@@ -128,6 +128,9 @@ class BasicAssetPackLoader
 
     private function handleLoad (entry :AssetEntry, asset :Dynamic)
     {
+        // Ensure this asset has been fully progressed
+        handleProgress(entry, entry.bytes);
+
         var name = entry.name;
         switch (entry.type) {
             case Image: _pack.textures.set(name, asset);

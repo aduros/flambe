@@ -25,7 +25,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
     {
         switch (entry.type) {
         case Image:
-            var image :Image = untyped __new__("Image");
+            var image :Dynamic = untyped __new__("Image");
             image.onload = function (_) {
 #if debug
                 if (image.width > 1024 || image.height > 1024) {
@@ -44,18 +44,26 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
             image.onerror = function (_) {
                 handleError(entry, "Failed to load image");
             };
-            image.src = url;
+
+            // If this browser supports Blob, load the image data over XHR to benefit from progress
+            // events, otherwise just set the src directly
+            if (supportsBlob()) {
+                sendRequest(url, entry, "blob", function (blob) {
+                    image.addEventListener("load", function (_) {
+                        _URL.revokeObjectURL(image.src);
+                    }, false);
+                    image.src = _URL.createObjectURL(blob);
+                });
+            } else {
+                image.src = url;
+            }
 
         case Audio:
             // If we made it this far, we definitely support audio and can play this asset
             if (WebAudioSound.supported) {
-                var req = untyped __new__("XMLHttpRequest");
-                req.open("GET", url, true);
-                req.responseType = "arraybuffer";
-
-                req.onload = function () {
-                    WebAudioSound.ctx.decodeAudioData(req.response, function (buffer) {
-                        handleLoad(entry, new WebAudioSound(buffer));
+                sendRequest(url, entry, "arraybuffer", function (buffer) {
+                    WebAudioSound.ctx.decodeAudioData(buffer, function (decoded) {
+                        handleLoad(entry, new WebAudioSound(decoded));
                     }, function () {
                         // Happens in iOS 6 beta for some sounds that should be able to play. It
                         // seems that monochannel audio will always fail, try converting to stereo.
@@ -65,12 +73,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                             " Is this a buggy browser?", ["url", url]);
                         handleLoad(entry, DummySound.getInstance());
                     });
-                };
-                req.onerror = function () {
-                    handleError(entry, "Failed to load audio");
-                };
-                // TODO(bruno): Handle progress events
-                req.send();
+                });
 
             } else {
                 var audio :Dynamic = Lib.document.createElement("audio");
@@ -101,14 +104,9 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
             }
 
         case Data:
-            var http = new Http(url);
-            http.onData = function (data) {
-                handleLoad(entry, data);
-            };
-            http.onError = function (error) {
-                handleError(entry, "Failed to load data: " + error);
-            };
-            http.request(false);
+            sendRequest(url, entry, "text", function (text) {
+                handleLoad(entry, text);
+            });
         }
     }
 
@@ -118,6 +116,24 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
             _audioFormats = detectAudioFormats();
         }
         return _audioFormats;
+    }
+
+    private function sendRequest (url :String, entry :AssetEntry, responseType :String, onLoad :Dynamic -> Void)
+    {
+        var xhr = untyped __new__("XMLHttpRequest");
+        xhr.open("GET", url, true);
+        xhr.responseType = responseType;
+        xhr.onload = function (_) {
+            onLoad(xhr.response);
+        };
+        xhr.onprogress = function (event :Dynamic) {
+            handleProgress(entry, event.loaded);
+        };
+        xhr.onerror = function (_) {
+            handleError(entry, "Failed to load asset: error #" + xhr.status);
+        };
+        xhr.send();
+        return xhr;
     }
 
     private static function detectAudioFormats () :Array<String>
@@ -134,7 +150,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
             return [];
         }
 
-        // Select what formats the browser supports and order them by confidence
+        // Select what formats the browser supports
         var formats = [
             { extension: "m4a", type: "audio/mp4; codecs=mp4a" },
             { extension: "mp3", type: "audio/mpeg" },
@@ -150,21 +166,25 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         return result;
     }
 
-    override private function handleLoad (entry :AssetEntry, asset :Dynamic)
+    private static function supportsBlob () :Bool
     {
-        // We don't get progress events in JS, the best we can do is to update it when an asset
-        // finishes loading
-        handleProgress(entry, entry.bytes);
-        super.handleLoad(entry, asset);
+        if (_detectBlobSupport) {
+            _detectBlobSupport = false;
+            _URL = HtmlUtil.loadExtension("URL").value;
+        }
+        return _URL != null && _URL.createObjectURL != null;
     }
 
     private static var _audioFormats :Array<String>;
 
     /**
      * Media elements get GCed during loading in Chrome and IE9. The spec is clear that elements
-     * shouldn't be GCed while playing, but vague about about GCing while loading. So, maintain a
-     * hard reference to all media elements being loaded to prevent GC.
+     * shouldn't be GCed while playing, but vague about GCing while loading. So, maintain a hard
+     * reference to all media elements being loaded to prevent GC.
      */
     private static var _mediaElements :IntHash<Dynamic>;
     private static var _mediaRefCount = 0;
+
+    private static var _detectBlobSupport = true;
+    private static var _URL :Dynamic;
 }

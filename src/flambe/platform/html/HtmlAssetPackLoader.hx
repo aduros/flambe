@@ -100,8 +100,14 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                     _mediaElements.remove(ref);
                     handleError(entry, "Failed to load audio: " + audio.error.code);
                 });
+                events.addListener(audio, "progress", function (_) {
+                    if (audio.buffered.length > 0 && audio.duration > 0) {
+                        // Estimate the bytes downloaded based on the available time range
+                        var progress = audio.buffered.end(0) / audio.duration;
+                        handleProgress(entry, Std.int(progress*entry.bytes));
+                    }
+                });
 
-                // TODO(bruno): Handle progress events
                 audio.src = url;
                 audio.load();
             }

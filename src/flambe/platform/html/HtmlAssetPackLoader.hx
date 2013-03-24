@@ -130,18 +130,50 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
     private function sendRequest (url :String, entry :AssetEntry, responseType :String, onLoad :Dynamic -> Void)
     {
         var xhr = untyped __new__("XMLHttpRequest");
-        xhr.open("GET", url, true);
         xhr.responseType = responseType;
+
+        var lastActivity = 0.0;
+        var start = function () {
+            lastActivity = HtmlUtil.now();
+            xhr.open("GET", url, true);
+            xhr.send();
+        };
+
+        var interval = 0;
+        if (Reflect.hasField(xhr, "onprogress")) {
+            var attempts = XHR_ATTEMPTS;
+            xhr.onprogress = function (event :Dynamic) {
+                lastActivity = HtmlUtil.now();
+                handleProgress(entry, event.loaded);
+            };
+            interval = (untyped Lib.window).setInterval(function () {
+                // If the download has started, and enough time has passed since the last progress
+                // event, consider it stalled and abort
+                if (xhr.readyState >= 1 && HtmlUtil.now() - lastActivity > XHR_TIMEOUT) {
+                    xhr.abort();
+
+                    // Retry stalled connections a few times
+                    --attempts;
+                    if (attempts > 0) {
+                        start();
+                    } else {
+                        (untyped Lib.window).clearInterval(interval);
+                        handleError(entry, "Failed to load asset: timeout");
+                    }
+                }
+            }, 1000);
+        }
+
         xhr.onload = function (_) {
+            (untyped Lib.window).clearInterval(interval);
             onLoad(xhr.response);
         };
-        xhr.onprogress = function (event :Dynamic) {
-            handleProgress(entry, event.loaded);
-        };
         xhr.onerror = function (_) {
+            (untyped Lib.window).clearInterval(interval);
             handleError(entry, "Failed to load asset: error #" + xhr.status);
         };
-        xhr.send();
+
+        start();
         return xhr;
     }
 
@@ -183,6 +215,9 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         }
         return _URL != null && _URL.createObjectURL != null;
     }
+
+    private static inline var XHR_TIMEOUT = 5000;
+    private static inline var XHR_ATTEMPTS = 4;
 
     private static var _audioFormats :Array<String>;
 

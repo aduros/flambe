@@ -129,18 +129,18 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
 
     private function sendRequest (url :String, entry :AssetEntry, responseType :String, onLoad :Dynamic -> Void)
     {
-        var xhr = untyped __new__("XMLHttpRequest");
-        xhr.responseType = responseType;
+        var xhr :Dynamic = untyped __new__("XMLHttpRequest");
 
         var lastActivity = 0.0;
         var start = function () {
             lastActivity = HtmlUtil.now();
             xhr.open("GET", url, true);
+            xhr.responseType = responseType;
             xhr.send();
         };
 
         var interval = 0;
-        if (Reflect.hasField(xhr, "onprogress")) {
+        if (untyped __js__("typeof")(xhr.onprogress) != "undefined") {
             var attempts = XHR_ATTEMPTS;
             xhr.onprogress = function (event :Dynamic) {
                 lastActivity = HtmlUtil.now();

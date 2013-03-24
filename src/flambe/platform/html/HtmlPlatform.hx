@@ -126,7 +126,7 @@ class HtmlPlatform
 
         // Detect touch support. See http://modernizr.github.com/Modernizr/touch.html for more
         // sophisticated detection methods, but this seems to cover all important browsers
-        var standardTouch :Bool = untyped __js__("'ontouchstart' in window");
+        var standardTouch :Bool = untyped __js__("typeof")(Lib.window.ontouchstart) != "undefined";
 
         // The pointer event handles mouse movement, touch events, and stylus events.
         // We check to see if multiple points are supported indicating true touch support.

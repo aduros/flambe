@@ -211,6 +211,16 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
     {
         if (_detectBlobSupport) {
             _detectBlobSupport = false;
+            try {
+                var xhr = untyped __new__("XMLHttpRequest");
+                xhr.responseType = "blob";
+                if (xhr.responseType != "blob") {
+                    return false; // Fails in iOS 6
+                }
+            } catch (_ :Dynamic) {
+                return false;
+            }
+
             _URL = HtmlUtil.loadExtension("URL").value;
         }
         return _URL != null && _URL.createObjectURL != null;
@@ -230,5 +240,5 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
     private static var _mediaRefCount = 0;
 
     private static var _detectBlobSupport = true;
-    private static var _URL :Dynamic;
+    private static var _URL :Dynamic = null;
 }

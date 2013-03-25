@@ -221,6 +221,12 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
     {
         if (_detectBlobSupport) {
             _detectBlobSupport = false;
+            try {
+                var xhr = untyped __new__("XMLHttpRequest");
+                xhr.responseType = "blob";
+            } catch (_ :Dynamic) {
+                return false;
+            }
             _URL = HtmlUtil.loadExtension("URL").value;
         }
         return _URL != null && _URL.createObjectURL != null;

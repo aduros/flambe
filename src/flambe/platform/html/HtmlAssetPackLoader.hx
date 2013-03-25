@@ -136,6 +136,10 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
             lastActivity = HtmlUtil.now();
             xhr.open("GET", url, true);
             xhr.responseType = responseType;
+            if (xhr.responseType == "") {
+                // Dumb hack for iOS 6, which supports blobs but not the blob responseType
+                xhr.responseType = "arraybuffer";
+            }
             xhr.send();
         };
 
@@ -166,7 +170,13 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
 
         xhr.onload = function (_) {
             (untyped Lib.window).clearInterval(interval);
-            onLoad(xhr.response);
+
+            var response = xhr.response;
+            if (responseType == "blob" && xhr.responseType == "arraybuffer") {
+                // Dumb hack for iOS 6, which supports blobs but not the blob responseType
+                response = untyped __new__("Blob", [xhr.response]);
+            }
+            onLoad(response);
         };
         xhr.onerror = function (_) {
             (untyped Lib.window).clearInterval(interval);
@@ -211,16 +221,6 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
     {
         if (_detectBlobSupport) {
             _detectBlobSupport = false;
-            try {
-                var xhr = untyped __new__("XMLHttpRequest");
-                xhr.responseType = "blob";
-                if (xhr.responseType != "blob") {
-                    return false; // Fails in iOS 6
-                }
-            } catch (_ :Dynamic) {
-                return false;
-            }
-
             _URL = HtmlUtil.loadExtension("URL").value;
         }
         return _URL != null && _URL.createObjectURL != null;

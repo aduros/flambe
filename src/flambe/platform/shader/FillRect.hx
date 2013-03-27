@@ -4,7 +4,7 @@
 
 package flambe.platform.shader;
 
-import format.hxsl.Shader;
+import hxsl.Shader;
 
 /**
  * Shader that draws solid colored triangles.
@@ -14,16 +14,16 @@ class FillRect extends Shader
     static var SRC = {
         var input :{
             pos :Float2,
-            rgb: Float3,
-            alpha: Float,
+            rgb :Float3,
+            alpha :Float,
         };
 
         var _color :Float4;
 
         function vertex () {
-            _color.rgb = rgb*alpha;
-            _color.a = alpha;
-            out = pos.xyzw;
+            _color.rgb = input.rgb*input.alpha;
+            _color.a = input.alpha;
+            out = input.pos.xyzw;
         }
 
         function fragment () {

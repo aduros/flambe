@@ -52,7 +52,7 @@ def apply_flambe(ctx):
         flags += ["-dce", "full"]
     flags += Utils.to_list(ctx.flags)
 
-    libs = ["format"] + Utils.to_list(ctx.libs)
+    libs = ["hxsl"] + Utils.to_list(ctx.libs)
     platforms = Utils.to_list(ctx.platforms)
     flash_version = ctx.flash_version
     debug = ctx.env.debug

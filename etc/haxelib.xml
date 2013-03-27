@@ -5,7 +5,7 @@
     Flambe is a fast, expressive, and cross-platform engine for Flash and HTML5 games.
   </description>
 
-  <depends name="format" version="1.26"/>
+  <depends name="hxsl" version="2.0"/>
   <depends name="air3" version="3.4"/>
 
   <version name="{{VERSION}}">See https://github.com/aduros/flambe/wiki/Changes</version>

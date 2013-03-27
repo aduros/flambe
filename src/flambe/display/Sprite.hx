@@ -535,12 +535,12 @@ class Sprite extends Component
     private static var _scratchPoint = new Point();
 
     // Various flags used by Sprite and subclasses
-    private static inline var VISIBLE = 1 << 0;
-    private static inline var POINTER_ENABLED = 1 << 1;
-    private static inline var LOCAL_MATRIX_DIRTY = 1 << 2;
-    private static inline var VIEW_MATRIX_DIRTY = 1 << 3;
-    private static inline var MOVIESPRITE_PAUSED = 1 << 4;
-    private static inline var TEXTSPRITE_DIRTY = 1 << 5;
+    private static inline var VISIBLE = 1;
+    private static inline var POINTER_ENABLED = 2;
+    private static inline var LOCAL_MATRIX_DIRTY = 4;
+    private static inline var VIEW_MATRIX_DIRTY = 8;
+    private static inline var MOVIESPRITE_PAUSED = 16;
+    private static inline var TEXTSPRITE_DIRTY = 32;
 
     private var _flags :Int;
 

@@ -35,7 +35,7 @@ flambe-demos/bin/build-all --debug
 
 # Run the Selenium tests if the Sauce auth key is available (not in pull requests), and only run on
 # one of the Python build workers
-if [ "$TRAVIS_SECURE_ENV_VARS" == "true" && "$TRAVIS_PYTHON_VERSION" == "2.7" ]; then
+if [ "$TRAVIS_SECURE_ENV_VARS" == "true" -a "$TRAVIS_PYTHON_VERSION" == "2.7" ]; then
     # Download and start Sauce Connect
     mkdir -p /tmp/sauce
     pushd /tmp/sauce

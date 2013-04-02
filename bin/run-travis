@@ -2,7 +2,9 @@
 #
 # Runs continuous integration tests, used by travis-ci.org
 
+# Fail on error, and kill child processes on exit
 set -e
+trap "kill 0" SIGINT SIGTERM EXIT
 
 FLAMBE_ROOT=`readlink -f $(dirname $0)/..`
 FLAMBE_SPACE="/tmp/flambe space"
@@ -48,7 +50,7 @@ if [ "$TRAVIS_SECURE_ENV_VARS" == "true" -a "$TRAVIS_PYTHON_VERSION" == "2.7" ];
 
     # Wait for Connect to be ready before continuing
     while [ ! -f "connect-ready" ]; do
-        sleep .5
+        sleep 0.5
     done
     popd
 
@@ -60,6 +62,6 @@ if [ "$TRAVIS_SECURE_ENV_VARS" == "true" -a "$TRAVIS_PYTHON_VERSION" == "2.7" ];
     echo "Running integration tests..."
     pushd flambe-demos/selenium
     pip install selenium nose --use-mirrors
-    nosetests --processes=5 --process-timeout=600 -v driver.py
+    nosetests --processes=4 --process-timeout=600 -v driver.py
     popd
 fi

@@ -13,8 +13,9 @@ class HtmlExternal
 {
     public var supported (get, null) :Bool;
 
-    public function new ()
+    public function new (target :Dynamic)
     {
+      _target = target;
     }
 
     public function get_supported ()
@@ -28,12 +29,14 @@ class HtmlExternal
             params = [];
         }
 
-        var method = Reflect.field(Browser.window, name);
+        var method = Reflect.field(_target, name);
         return Reflect.callMethod(null, method, params);
     }
 
     public function bind (name :String, fn :Dynamic)
     {
-        Reflect.setField(Browser.window, name, fn);
+        Reflect.setField(_target, name, fn);
     }
+
+    private var _target :Dynamic;
 }

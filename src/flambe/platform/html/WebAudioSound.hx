@@ -56,13 +56,15 @@ class WebAudioSound
             var AudioContext = HtmlUtil.loadExtension("AudioContext").value;
 
             if (AudioContext != null) {
-                ctx = untyped __new__(AudioContext);
-                gain = ctx.createGainNode();
-                gain.connect(ctx.destination);
+                try {
+                    ctx = untyped __new__(AudioContext);
+                    gain = ctx.createGainNode();
+                    gain.connect(ctx.destination);
 
-                System.volume.watch(function(volume, _) {
-                    gain.gain.value = volume;
-                });
+                    System.volume.watch(function(volume, _) {
+                        gain.gain.value = volume;
+                    });
+                } catch(e:Dynamic) {}
             }
         }
 

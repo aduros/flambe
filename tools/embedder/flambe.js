@@ -16,7 +16,7 @@ flambe.FLASH_VERSION = "10.1";
  * @return True if the game was successfully embedded. False if the browser doesn't have a
  *     recent enough browser or Flash player.
  */
-flambe.embed = function (urls, elementId) {
+flambe.embed = function (urls, elementId, callback) {
 
     if (typeof urls == "string") {
         urls = [ urls + "-flash.swf", urls + "-html.js" ];
@@ -69,7 +69,13 @@ flambe.embed = function (urls, elementId) {
                     allowFullScreen: "true",
                     fullscreenOnSelection: "true",
                     wmode: "direct"
-                }, {id: swf.id, name: swf.id});
+                }, {
+                    id: swf.id,
+                    name: swf.id
+                }, function(e) {
+                    if(callback)
+                        callback(e.success);
+                });
                 return true;
             }
             break;
@@ -79,17 +85,28 @@ flambe.embed = function (urls, elementId) {
                 var canvas = document.createElement("canvas");
                 if ("getContext" in canvas) {
                     canvas.id = elementId + "-canvas";
+                    // Force a width and height of 0 to prevent some user agents assigning a default width/height
+                    canvas.width = 0;
+                    canvas.height = 0;
                     container.appendChild(canvas);
 
                     // Expose the canvas so Haxe can use it
                     flambe.canvas = canvas;
 
                     var script = document.createElement("script");
+                    script.onerror = function() {
+                        flambe.canvas = null;
+                        if(callback)
+                            callback(false);
+                    };
                     script.onload = function () {
                         flambe.canvas = null;
+                        if(callback)
+                            callback(true);
                     };
                     script.src = url;
                     container.appendChild(script);
+
                     return true;
                 }
             }

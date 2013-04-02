@@ -4,7 +4,7 @@
 
 package flambe.platform.shader;
 
-import format.hxsl.Shader;
+import hxsl.Shader;
 
 /**
  * Shader that draws textured triangles with a given alpha.
@@ -22,9 +22,9 @@ class DrawImage extends Shader
         var _alpha :Float;
 
         function vertex () {
-            _uv = uv;
-            _alpha = alpha;
-            out = pos.xyzw;
+            _uv = input.uv;
+            _alpha = input.alpha;
+            out = input.pos.xyzw;
         }
 
         function fragment (texture :Texture) {

@@ -44,9 +44,10 @@ if [ "$TRAVIS_SECURE_ENV_VARS" == "true" -a "$TRAVIS_PYTHON_VERSION" == "2.7" ];
     curl "http://saucelabs.com/downloads/Sauce-Connect-latest.zip" > connect.zip
     unzip connect.zip
 
+    echo "Starting Sauce Connect..."
     java -jar Sauce-Connect.jar --readyfile "connect-ready" \
         --tunnel-identifier "$TRAVIS_JOB_NUMBER" \
-        flambe "$SAUCE_ACCESS_KEY" &
+        flambe "$SAUCE_ACCESS_KEY" > /dev/null &
 
     # Wait for Connect to be ready before continuing
     while [ ! -f "connect-ready" ]; do
@@ -55,8 +56,9 @@ if [ "$TRAVIS_SECURE_ENV_VARS" == "true" -a "$TRAVIS_PYTHON_VERSION" == "2.7" ];
     popd
 
     # Serve the integration test app to be proxied over Connect
+    echo "Starting web server..."
     pushd flambe-demos/selenium/deploy/web
-    python -m SimpleHTTPServer 5000 &
+    python -m SimpleHTTPServer 5000 &> /dev/null &
     popd
 
     echo "Running integration tests..."

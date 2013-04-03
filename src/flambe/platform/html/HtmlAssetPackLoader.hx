@@ -73,8 +73,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                         // seems that monochannel audio will always fail, try converting to stereo.
                         // Since this happens unpredictably, continue with a DummySound rather than
                         // rejecting the entire asset pack.
-                        Log.warn("Couldn't decode Web Audio, ignoring this asset." +
-                            " Is this a buggy browser?", ["url", url]);
+                        Log.warn("Couldn't decode Web Audio, ignoring this asset", ["url", url]);
                         handleLoad(entry, DummySound.getInstance());
                     });
                 });
@@ -98,7 +97,17 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                 });
                 events.addDisposingListener(audio, "error", function (_) {
                     _mediaElements.remove(ref);
-                    handleError(entry, "Failed to load audio: " + audio.error.code);
+                    var code = audio.error.code;
+                    if (code == 3 || code == 4) {
+                        // If the song successfully downloaded but this browser can't play it for
+                        // some reason (MEDIA_ERR_DECODE or MEDIA_ERR_SRC_NOT_SUPPORTED), warn and
+                        // press on with an empty sound.
+                        Log.warn("Couldn't decode HTML5 audio, ignoring this asset",
+                            ["url", url, "code", code]);
+                        handleLoad(entry, DummySound.getInstance());
+                    } else {
+                        handleError(entry, "Failed to load audio: " + audio.error.code);
+                    }
                 });
                 events.addListener(audio, "progress", function (_) {
                     if (audio.buffered.length > 0 && audio.duration > 0) {

@@ -64,6 +64,6 @@ if [ "$TRAVIS_SECURE_ENV_VARS" == "true" -a "$TRAVIS_PYTHON_VERSION" == "2.7" ];
     echo "Running integration tests..."
     pushd flambe-demos/selenium
     pip install selenium nose --use-mirrors
-    nosetests --processes=4 --process-timeout=600 -v driver.py
+    nosetests --processes=3 --process-timeout=600 -v driver.py
     popd
 fi

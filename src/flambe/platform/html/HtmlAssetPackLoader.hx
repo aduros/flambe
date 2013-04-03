@@ -210,7 +210,13 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         ];
         var result = [];
         for (format in formats) {
-            if (element.canPlayType(format.type) != "") {
+            // IE9's canPlayType() will throw an error in some rare cases:
+            // https://github.com/Modernizr/Modernizr/issues/224
+            var canPlayType = "";
+            try canPlayType = element.canPlayType(format.type)
+            catch (_ :Dynamic) {}
+
+            if (canPlayType != "") {
                 result.push(format.extension);
             }
         }

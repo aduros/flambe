@@ -172,7 +172,10 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
             (untyped Lib.window).clearInterval(interval);
 
             var response = xhr.response;
-            if (responseType == "blob" && xhr.responseType == "arraybuffer") {
+            if (response == null) {
+                // Hack for IE9, which doesn't have xhr.response, only responseText
+                response = xhr.responseText;
+            } else if (responseType == "blob" && xhr.responseType == "arraybuffer") {
                 // Dumb hack for iOS 6, which supports blobs but not the blob responseType
                 response = untyped __new__("Blob", [xhr.response]);
             }

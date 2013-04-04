@@ -137,22 +137,32 @@ class EmitterSprite extends Sprite
         alphaStartVariance.update(dt);
         angle.update(dt);
         angleVariance.update(dt);
+        emitX.update(dt);
+        emitXVariance.update(dt);
+        emitY.update(dt);
+        emitYVariance.update(dt);
         gravityX.update(dt);
         gravityY.update(dt);
         lifespan.update(dt);
         lifespanVariance.update(dt);
+        // maxRadius.update(dt);
+        // maxRadiusVariance.update(dt);
         radialAccel.update(dt);
         radialAccelVariance.update(dt);
+        // rotatePerSecond.update(dt);
+        // rotatePerSecondVariance.update(dt);
         rotationEnd.update(dt);
         rotationEndVariance.update(dt);
         rotationStart.update(dt);
         rotationStartVariance.update(dt);
+        sizeEnd.update(dt);
+        sizeEndVariance.update(dt);
+        sizeStart.update(dt);
+        sizeStartVariance.update(dt);
         speed.update(dt);
         speedVariance.update(dt);
         tangentialAccel.update(dt);
         tangentialAccelVariance.update(dt);
-        emitXVariance.update(dt);
-        emitYVariance.update(dt);
 
         // Update existing particles
         var ii = 0;
@@ -163,7 +173,7 @@ class EmitterSprite extends Sprite
                 particle.y += particle.velY * dt;
 
                 var accelX = gravityX._;
-                var accelY = gravityY._;
+                var accelY = -gravityY._;
 
                 if (particle.radialAccel != 0 || particle.tangentialAccel != 0) {
                     var dx = particle.x - particle.emitX;

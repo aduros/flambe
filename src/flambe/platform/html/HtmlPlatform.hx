@@ -293,7 +293,14 @@ class HtmlPlatform
 
     public function getLocale () :String
     {
-        return untyped Lib.window.navigator.language;
+        // https://developer.mozilla.org/en-US/docs/DOM/window.navigator.language
+        var locale = (untyped Lib.window).navigator.language;
+        if (locale == null) {
+            // IE uses the non-standard userLanguage (or browserLanguage or systemLanguage, but
+            // userLanguage seems to match String's locale-aware methods)
+            locale = (untyped Lib.window).navigator.userLanguage;
+        }
+        return locale;
     }
 
     public function createLogHandler (tag :String) :LogHandler

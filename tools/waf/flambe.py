@@ -38,12 +38,21 @@ def apply_flambe(ctx):
         dead_code_elimination=True, air_cert="etc/air-cert.pfx", air_desc="etc/air-desc.xml",
         air_password=None, ios_profile="etc/ios.mobileprovision")
 
-    classpath = [ ctx.path.find_dir("src"), flambe_src(ctx) ] + \
-        Utils.to_list(ctx.classpath) # The classpath option should be a list of nodes
+    hxproj = load_hxproj(ctx)
+
+    # The classpath option should be a list of waf nodes
+    classpath = [flambe_src(ctx)] + Utils.to_list(ctx.classpath)
+
+    if hxproj:
+        classpath += infer_classpaths(ctx, hxproj)
+    else:
+        # If no hxproj, assume a src directory
+        classpath.append(ctx.path.find_dir("src"))
 
     main = ctx.main
     if not main:
-        main = infer_main(ctx)
+        if hxproj:
+            main = infer_main(hxproj)
         if not main:
             ctx.bld.fatal("You must specify a main class in your wscript or hxproj")
 
@@ -346,21 +355,33 @@ def flambe_src(ctx):
     dir = root.find_dir(FLAMBE_ROOT + "/src")
     return dir if dir is not None else root.find_dir(FLAMBE_ROOT)
 
-def infer_main(ctx):
+def load_hxproj(ctx):
     from xml.dom.minidom import parse
     projs = ctx.path.ant_glob("*.hxproj")
     if projs:
         proj = projs[0]
         try:
-            xml = parse(proj.abspath())
+            return parse(proj.abspath())
         except Exception as e:
             ctx.bld.fatal("Could not parse %s: %s" % (proj.nice_path(), e))
+    return None
 
-        for node in xml.getElementsByTagName("build"):
-            for node in xml.getElementsByTagName("option"):
-                main = node.getAttribute("mainClass")
-                if main:
-                    return main
+def infer_classpaths(ctx, hxproj):
+    classpaths = []
+    for node in hxproj.getElementsByTagName("classpaths"):
+        for node in node.getElementsByTagName("class"):
+            path = node.getAttribute("path")
+            if path:
+                classpaths.append(ctx.path.find_dir(str(path)))
+    return classpaths
+
+def infer_main(hxproj):
+    for node in hxproj.getElementsByTagName("build"):
+        for node in node.getElementsByTagName("option"):
+            main = node.getAttribute("mainClass")
+            if main:
+                return str(main)
+    return None
 
 def infer_app_id(ctx, air_desc):
     from xml.dom.minidom import parse

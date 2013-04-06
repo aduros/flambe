@@ -254,12 +254,15 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         // Detect basic support for HTML5 audio
         var element :Dynamic = Lib.document.createElement("audio");
         if (element == null || element.canPlayType == null) {
+            Log.warn("Audio is not supported at all in this browser!");
             return [];
         }
 
         // Reject browsers that claim to support audio, but are too buggy or incomplete
         var blacklist = ~/\b(iPhone|iPod|iPad|Android)\b/;
-        if (!WebAudioSound.supported && blacklist.match(Lib.window.navigator.userAgent)) {
+        var userAgent = Lib.window.navigator.userAgent;
+        if (!WebAudioSound.supported && blacklist.match(userAgent)) {
+            Log.warn("HTML5 audio is blacklisted for this browser", ["userAgent", userAgent]);
             return [];
         }
 

@@ -9,6 +9,7 @@ import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
 import flambe.display.Texture;
 import flambe.sound.Sound;
+import flambe.util.Assert;
 import flambe.util.Promise;
 
 using Lambda;
@@ -31,7 +32,6 @@ class BasicAssetPackLoader
             handleSuccess();
 
         } else {
-            var bytesTotal = 0;
             var groups = new Hash<Array<AssetEntry>>();
 
             // Group assets by name
@@ -47,83 +47,73 @@ class BasicAssetPackLoader
             // Load the most suitable asset from each group
             _assetsRemaining = groups.count();
             for (group in groups) {
-                var bestEntry = (group.length > 1) ? pickBestEntry(group) : group[0];
-                var placeholder = createPlaceholder(bestEntry);
+                pickBestEntry(group, function (bestEntry :AssetEntry) {
+                    if (bestEntry != null) {
+                        var url = manifest.getFullURL(bestEntry);
+                        try {
+                            loadEntry(url, bestEntry);
+                        } catch (error :Dynamic) {
+                            handleError(bestEntry, "Unexpected error: " + error);
+                        }
+                        promise.total += bestEntry.bytes;
 
-                if (placeholder != null) {
-                    Log.warn("Using an asset placeholder",
-                        ["name", bestEntry.name, "type", bestEntry.type]);
-                    handleLoad(bestEntry, placeholder);
+                    } else {
+                        var badEntry = group[0];
+                        if (badEntry.type == Audio) {
+                            // Deal with missing audio files and bad browser support
+                            Log.warn("Could not find a supported audio format to load", ["name", badEntry.name]);
+                            handleLoad(badEntry, DummySound.getInstance());
+                        } else {
+                            handleError(badEntry, "Could not find a supported format to load");
+                        }
+                    }
+                });
+            }
+        }
+    }
 
-                } else {
-                    bytesTotal += bestEntry.bytes;
-                    var url = manifest.getFullURL(bestEntry);
-                    try {
-                        loadEntry(url, bestEntry);
-                    } catch (error :Dynamic) {
-                        handleError(bestEntry, "Unexpected error: " + error);
+    /**
+     * Out of a list of asset entries with the same name, select the one best supported by this
+     * environment, or null if none of them are supported.
+     */
+    private function pickBestEntry (entries :Array<AssetEntry>, fn :AssetEntry -> Void)
+    {
+        var onFormatsAvailable = function (extensions :Array<String>) {
+            for (extension in extensions) {
+                for (entry in entries) {
+                    if (entry.getUrlExtension() == extension) {
+                        fn(entry);
+                        return;
                     }
                 }
             }
+            fn(null); // This asset is not supported, we're boned
+        };
 
-            promise.total = bytesTotal;
-        }
-    }
-
-    /**
-     * Out of a list of asset entries with the same name, select the one best suited to this
-     * environment.
-     */
-    private function pickBestEntry (entries :Array<AssetEntry>)
-    {
         switch (entries[0].type) {
-            case Audio:
-                var extensions = getAudioFormats();
-                for (extension in extensions) {
-                    for (entry in entries) {
-                        if (entry.getUrlExtension() == extension) {
-                            return entry;
-                        }
-                    }
-                }
+            case Image: getImageFormats(onFormatsAvailable);
+            case Audio: getAudioFormats(onFormatsAvailable);
 
-            default:
-                // Fall through
+            // No preference, just use the first one
+            default: fn(entries[0]);
         }
-
-        // No preference, just use the first one
-        return entries[0];
-    }
-
-    /**
-     * If the asset isn't supported by the environment, return a placeholder instead. If null is
-     * returned, the asset is supported and we should go ahead and load it.
-     */
-    private function createPlaceholder (entry :AssetEntry) :Dynamic
-    {
-        switch (entry.type) {
-            case Audio:
-                if (!getAudioFormats().has(entry.getUrlExtension())) {
-                    return DummySound.getInstance();
-                }
-            default:
-                // Fall through
-        }
-        return null;
     }
 
     private function loadEntry (url :String, entry :AssetEntry)
     {
-        // See subclasses
+        Assert.fail(); // See subclasses
     }
 
-    /**
-     * Returns a list of audio file extensions the environment supports, ordered by preference.
-     */
-    private function getAudioFormats () :Array<String>
+    /** Gets the list of image file extensions the environment supports, ordered by preference. */
+    private function getImageFormats (fn :Array<String> -> Void)
     {
-        // See subclasses
-        return [];
+        Assert.fail(); // See subclasses
+    }
+
+    /** Gets the list of audio file extensions the environment supports, ordered by preference. */
+    private function getAudioFormats (fn :Array<String> -> Void)
+    {
+        Assert.fail(); // See subclasses
     }
 
     private function handleLoad (entry :AssetEntry, asset :Dynamic)

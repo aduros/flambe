@@ -128,12 +128,17 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         }
     }
 
-    override private function getAudioFormats () :Array<String>
+    override private function getImageFormats (fn :Array<String> -> Void)
+    {
+        fn(["png", "jpg", "gif"]);
+    }
+
+    override private function getAudioFormats (fn :Array<String> -> Void)
     {
         if (_audioFormats == null) {
             _audioFormats = detectAudioFormats();
         }
-        return _audioFormats;
+        fn(_audioFormats);
     }
 
     private function sendRequest (url :String, entry :AssetEntry, responseType :String, onLoad :Dynamic -> Void)
@@ -253,7 +258,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
     private static inline var XHR_TIMEOUT = 5000;
     private static inline var XHR_ATTEMPTS = 4;
 
-    private static var _audioFormats :Array<String>;
+    private static var _audioFormats :Array<String> = null;
 
     /**
      * Media elements get GCed during loading in Chrome and IE9. The spec is clear that elements

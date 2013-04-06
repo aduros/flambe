@@ -11,6 +11,7 @@ import haxe.Http;
 
 import flambe.asset.AssetEntry;
 import flambe.asset.Manifest;
+import flambe.util.Promise;
 import flambe.util.Signal0;
 import flambe.util.Signal1;
 
@@ -130,7 +131,11 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
 
     override private function getImageFormats (fn :Array<String> -> Void)
     {
-        fn(["png", "jpg", "gif"]);
+        if (_imageFormats == null) {
+            // Image format detection needs to be asynchronous
+            _imageFormats = detectImageFormats();
+        }
+        _imageFormats.get(fn);
     }
 
     override private function getAudioFormats (fn :Array<String> -> Void)
@@ -204,6 +209,25 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         return xhr;
     }
 
+    private static function detectImageFormats () :Promise<Array<String>>
+    {
+        var formats = ["png", "jpg", "gif"];
+        var p = new Promise();
+
+        // Detect WebP-lossless support (and assume that lossy works where lossless does)
+        // https://github.com/Modernizr/Modernizr/blob/master/feature-detects/img/webp-lossless.js
+        var webp :Dynamic = untyped __new__("Image");
+        webp.onload = webp.onerror = function () {
+            if (webp.width == 1) {
+                formats.unshift("webp");
+            }
+            p.result = formats;
+        };
+        webp.src = "data:image/webp;base64,UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==";
+
+        return p;
+    }
+
     private static function detectAudioFormats () :Array<String>
     {
         // Detect basic support for HTML5 audio
@@ -258,6 +282,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
     private static inline var XHR_TIMEOUT = 5000;
     private static inline var XHR_ATTEMPTS = 4;
 
+    private static var _imageFormats :Promise<Array<String>> = null;
     private static var _audioFormats :Array<String> = null;
 
     /**

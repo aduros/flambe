@@ -184,7 +184,7 @@ class Manifest
         var extension = url.split("?")[0].getFileExtension();
         if (extension != null) {
             switch (extension.toLowerCase()) {
-                case "png", "jpg", "gif": return Image;
+                case "webp", "png", "jpg", "gif": return Image;
                 case "ogg", "m4a", "mp3", "wav": return Audio;
             }
         }

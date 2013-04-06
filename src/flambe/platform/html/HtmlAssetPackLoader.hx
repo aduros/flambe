@@ -214,6 +214,15 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         var formats = ["png", "jpg", "gif"];
         var p = new Promise();
 
+        var formatTests = 2;
+        var checkRemaining = function () {
+            // Called when an image test completes
+            --formatTests;
+            if (formatTests == 0) {
+                p.result = formats;
+            }
+        };
+
         // Detect WebP-lossless support (and assume that lossy works where lossless does)
         // https://github.com/Modernizr/Modernizr/blob/master/feature-detects/img/webp-lossless.js
         var webp :Dynamic = untyped __new__("Image");
@@ -221,9 +230,21 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
             if (webp.width == 1) {
                 formats.unshift("webp");
             }
-            p.result = formats;
+            checkRemaining();
         };
         webp.src = "data:image/webp;base64,UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==";
+
+        // Detect JPEG XR support
+        var jxr :Dynamic = untyped __new__("Image");
+        jxr.onload = jxr.onerror = function () {
+            if (jxr.width == 1) {
+                formats.unshift("jxr");
+            }
+            checkRemaining();
+        };
+        // The smallest JXR I could generate (where pixel.tif is a 1x1 black image)
+        // ./jpegxr pixel.tif -c -o pixel.jxr -f YOnly -q 255 -b DCONLY -a 0 -w
+        jxr.src = "data:image/vnd.ms-photo;base64,SUm8AQgAAAAFAAG8AQAQAAAASgAAAIC8BAABAAAAAQAAAIG8BAABAAAAAQAAAMC8BAABAAAAWgAAAMG8BAABAAAAHwAAAAAAAAAkw91vA07+S7GFPXd2jckNV01QSE9UTwAZAYBxAAAAABP/gAAEb/8AAQAAAQAAAA==";
 
         return p;
     }

@@ -94,7 +94,7 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
 
     override private function getImageFormats (fn :Array<String> -> Void)
     {
-        fn(["png", "jpg", "gif"]);
+        fn(["jxr", "png", "jpg", "gif"]);
     }
 
     override private function getAudioFormats (fn :Array<String> -> Void)

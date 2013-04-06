@@ -63,6 +63,9 @@ def apply_flambe(ctx):
     flags += Utils.to_list(ctx.flags)
 
     libs = ["format"] + Utils.to_list(ctx.libs)
+    if hxproj:
+        libs += infer_haxelibs(hxproj)
+
     platforms = Utils.to_list(ctx.platforms)
     flash_version = ctx.flash_version
     debug = ctx.env.debug
@@ -382,6 +385,16 @@ def infer_main(hxproj):
             if main:
                 return str(main)
     return None
+
+def infer_haxelibs(hxproj):
+    libs = []
+    for node in hxproj.getElementsByTagName("haxelib"):
+        for node in node.getElementsByTagName("library"):
+            lib = node.getAttribute("name")
+            # Flambe itself is already included specially
+            if lib and lib != "flambe":
+                libs.append(str(lib))
+    return libs
 
 def infer_app_id(ctx, air_desc):
     from xml.dom.minidom import parse

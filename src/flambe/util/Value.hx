@@ -9,7 +9,9 @@ import flambe.util.Signal2;
 /**
  * Wraps a single value, notifying listeners when the value changes.
  */
-@:generic // Generate typed templates on static targets
+// FIXME(bruno): Generic with DCE is currently broken!
+// http://code.google.com/p/haxe/issues/detail?id=1683
+// @:generic // Generate typed templates on static targets
 class Value<A>
 {
     /**

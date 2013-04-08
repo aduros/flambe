@@ -385,11 +385,9 @@ class HtmlPlatform
     private function createRenderer (canvas :CanvasElement) :Renderer
     {
 #if flambe_enable_webgl
-        for (name in ["webgl", "experimental-webgl"]) {
-            var gl = (untyped canvas).getContext(name, {alpha: false, depth: false});
-            if (gl != null) {
-                return new WebGLRenderer(_stage, gl);
-            }
+        var gl = canvas.getContextWebGL({alpha: false, depth: false});
+        if (gl != null) {
+            return new WebGLRenderer(_stage, gl);
         }
         Log.info("WebGL not available, falling back to canvas");
 #end

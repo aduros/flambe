@@ -16,10 +16,10 @@ env:
 before_script:
     - sudo add-apt-repository ppa:eyecreate/haxe -y
     - sudo apt-get update -y
-    - sudo apt-get install haxe2 -y
+    - sudo apt-get install haxe -y
     - mkdir -p ~/.haxe/lib
-    - echo ~/.haxe/lib | haxelib setup
-    - until haxelib install format 1.26; do sleep 1; done
+    - haxelib setup ~/.haxe/lib
+    - until haxelib git hxsl git://github.com/ncannasse/hxsl.git; do sleep 1; done
     - until haxelib install nape; do sleep 1; done
 
 script: bin/run-travis

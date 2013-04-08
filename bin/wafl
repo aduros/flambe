@@ -15,7 +15,7 @@ try:
     try:
         with open(join(lib, ".dev")) as f:
             flambe_root = join(f.read(), "..")
-    except IOError:
+    except (IOError, OSError):
         with open(join(lib, ".current")) as f:
             flambe_root = join(lib, f.read().replace(".", ","))
 

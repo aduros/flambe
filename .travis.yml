@@ -8,15 +8,18 @@ python:
     - 2.6
     - 2.7
     - 3.2
+env:
+    global:
+        - secure: "gIXPIfKJcPgQxR/1YuT3RzNjoJCPRK7gsck9Z0IeyRoQH0PVblbov8K49wz8\nMsV7GpUbLhD8p/V4MbKCodhrC+rZUjr/zPnu6KHg+B6tkOk1bc2YKqrK5q7b\n4BBKgSSJS0jHudzzWAPfDDhPbnjRaBnrlONgVMVk5BS//g1KIbc="
 
 # Install Haxe
 before_script:
     - sudo add-apt-repository ppa:eyecreate/haxe -y
     - sudo apt-get update -y
-    - sudo apt-get install haxe -y
+    - sudo apt-get install haxe2 -y
     - mkdir -p ~/.haxe/lib
     - echo ~/.haxe/lib | haxelib setup
-    - haxelib install format 1.26 || true
-    - haxelib install nape || true
+    - until haxelib install format 1.26; do sleep 1; done
+    - until haxelib install nape; do sleep 1; done
 
 script: bin/run-travis

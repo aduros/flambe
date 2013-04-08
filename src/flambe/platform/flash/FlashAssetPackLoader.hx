@@ -92,10 +92,15 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
         events.addDisposingListener(dispatcher, SecurityErrorEvent.SECURITY_ERROR, onError);
     }
 
-    override private function getAudioFormats () :Array<String>
+    override private function getImageFormats (fn :Array<String> -> Void)
+    {
+        fn(["jxr", "png", "jpg", "gif"]);
+    }
+
+    override private function getAudioFormats (fn :Array<String> -> Void)
     {
         // TODO(bruno): Flash actually has an m4a decoder, but it's only accessible through the
         // horrendous NetStream API and not good old flash.media.Sound
-        return (Capabilities.hasAudio && Capabilities.hasMP3) ? [ "mp3" ] : [];
+        fn(Capabilities.hasAudio && Capabilities.hasMP3 ? ["mp3"] : []);
     }
 }

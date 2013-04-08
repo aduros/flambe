@@ -126,7 +126,7 @@ class HtmlPlatform
 
         // Detect touch support. See http://modernizr.github.com/Modernizr/touch.html for more
         // sophisticated detection methods, but this seems to cover all important browsers
-        var standardTouch :Bool = untyped __js__("'ontouchstart' in window");
+        var standardTouch :Bool = untyped __js__("typeof")(Lib.window.ontouchstart) != "undefined";
 
         // The pointer event handles mouse movement, touch events, and stylus events.
         // We check to see if multiple points are supported indicating true touch support.
@@ -293,7 +293,14 @@ class HtmlPlatform
 
     public function getLocale () :String
     {
-        return untyped Browser.window.navigator.language;
+        // https://developer.mozilla.org/en-US/docs/DOM/window.navigator.language
+        var locale = Browser.navigator.language;
+        if (locale == null) {
+            // IE uses the non-standard userLanguage (or browserLanguage or systemLanguage, but
+            // userLanguage seems to match String's locale-aware methods)
+            locale = (untyped Browser.navigator).userLanguage;
+        }
+        return locale;
     }
 
     public function createLogHandler (tag :String) :LogHandler

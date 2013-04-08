@@ -19,7 +19,7 @@ class WebGLRenderer
 
     public function new (stage :HtmlStage, gl :RenderingContext)
     {
-        Log.info("Using experimental WebGL renderer");
+        Log.info("Using experimental WebGL renderer", ["version", gl.getParameter(GL.VERSION)]);
 
         this.gl = gl;
         batcher = new WebGLBatcher(gl);

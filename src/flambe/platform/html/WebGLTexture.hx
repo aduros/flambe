@@ -4,11 +4,12 @@
 
 package flambe.platform.html;
 
+import js.html.webgl.RenderingContext;
+
 import haxe.io.Bytes;
 
 import flambe.display.Graphics;
 import flambe.display.Texture;
-import flambe.platform.html.WebGLTypes;
 
 class WebGLTexture
     implements Texture
@@ -17,8 +18,8 @@ class WebGLTexture
     public var height (get, null) :Int;
     public var graphics (get, null) :Graphics;
 
-    public var nativeTexture (default, null) :WebGLTypes.Texture;
-    public var framebuffer (default, null) :Framebuffer;
+    public var nativeTexture (default, null) :js.html.webgl.Texture;
+    // public var framebuffer (default, null) :Framebuffer;
 
     // The UV texture coordinates for the bottom right corner of the image. These are less than one
     // if the texture had to be resized to a power of 2.
@@ -39,11 +40,11 @@ class WebGLTexture
 
         var gl = renderer.gl;
         nativeTexture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, nativeTexture);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+        gl.bindTexture(GL.TEXTURE_2D, nativeTexture);
+        gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
+        gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
+        gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+        gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
     }
 
     public function uploadImageData (image :Dynamic)
@@ -57,9 +58,9 @@ class WebGLTexture
         }
 
         var gl = _renderer.gl;
-        gl.bindTexture(gl.TEXTURE_2D, nativeTexture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-        gl.generateMipmap(gl.TEXTURE_2D);
+        gl.bindTexture(GL.TEXTURE_2D, nativeTexture);
+        gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, image);
+        gl.generateMipmap(GL.TEXTURE_2D);
     }
 
     public function readPixels (x :Int, y :Int, width :Int, height :Int) :Bytes

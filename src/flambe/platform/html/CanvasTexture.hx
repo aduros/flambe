@@ -4,6 +4,9 @@
 
 package flambe.platform.html;
 
+import js.Browser;
+import js.html.*;
+
 import haxe.io.Bytes;
 
 import flambe.display.Graphics;
@@ -20,7 +23,7 @@ class CanvasTexture
     public var image (default, null) :Dynamic;
 
     // The CanvasPattern required for drawPattern, lazily created on demand
-    public var pattern :Dynamic;
+    public var pattern :CanvasPattern;
 
     public function new (image :Dynamic)
     {
@@ -29,7 +32,8 @@ class CanvasTexture
 
     public function readPixels (x :Int, y :Int, width :Int, height :Int) :Bytes
     {
-        return Bytes.ofData(getContext2d().getImageData(x, y, width, height).data);
+        var data :Array<Int> = cast getContext2d().getImageData(x, y, width, height).data;
+        return Bytes.ofData(data);
     }
 
     public function writePixels (pixels :Bytes, x :Int, y :Int, sourceW :Int, sourceH :Int)
@@ -77,17 +81,17 @@ class CanvasTexture
         return _graphics;
     }
 
-    private function getContext2d () :Dynamic
+    private function getContext2d () :CanvasRenderingContext2D
     {
         // Convert the image to a canvas when necessary. Why not have the image be a canvas to
         // begin with, you ask? Some browsers (notably Android 4) render canvases a LOT slower
         // than image elements, so we avoid using a canvas unless absolutely necessary. One day
         // when Android's browser joins the modern age, this can be simplified.
         // http://jsperf.com/canvas-drawimage
-        if (!Std.is(image, untyped HTMLCanvasElement)) {
+        if (!Std.is(image, CanvasElement)) {
             image = HtmlUtil.createCanvas(image);
         }
-        return image.getContext("2d");
+        return image.getContext2d();
     }
 
     private var _graphics :CanvasGraphics = null;

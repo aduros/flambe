@@ -10,8 +10,8 @@ import flambe.util.Disposable;
 import flash.events.IEventDispatcher;
 import flash.events.Event;
 #else
-private typedef IEventDispatcher = Dynamic;
-private typedef Event = Dynamic;
+import js.html.EventTarget in IEventDispatcher;
+import js.html.Event;
 #end
 
 private typedef Listener = Dynamic -> Void;

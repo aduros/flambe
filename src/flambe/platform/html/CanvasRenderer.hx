@@ -5,6 +5,7 @@
 package flambe.platform.html;
 
 import js.Browser;
+import js.html.*;
 
 import flambe.display.Graphics;
 import flambe.display.Texture;
@@ -12,7 +13,7 @@ import flambe.display.Texture;
 class CanvasRenderer
     implements Renderer
 {
-    public function new (canvas :Dynamic)
+    public function new (canvas :CanvasElement)
     {
         _graphics = new CanvasGraphics(canvas);
         _graphics.clear();

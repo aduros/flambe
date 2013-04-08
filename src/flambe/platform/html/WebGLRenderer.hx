@@ -5,10 +5,10 @@
 package flambe.platform.html;
 
 import js.Browser;
+import js.html.webgl.RenderingContext;
 
 import flambe.display.Graphics;
 import flambe.display.Texture;
-import flambe.platform.html.WebGLTypes;
 
 // TODO(bruno): Handle GL context loss
 class WebGLRenderer
@@ -26,8 +26,8 @@ class WebGLRenderer
         _graphics = new WebGLGraphics(gl, batcher);
 
         gl.clearColor(1, 1, 1, 1);
-        gl.enable(gl.BLEND);
-        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+        gl.enable(GL.BLEND);
+        gl.pixelStorei(GL.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
 
         stage.resize.connect(onResize);
         onResize();

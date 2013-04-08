@@ -4,7 +4,9 @@
 
 package flambe.platform.shader;
 
-import flambe.platform.html.WebGLTypes;
+import js.html.*;
+import js.html.webgl.*;
+import js.html.webgl.RenderingContext;
 
 class FillRectGL extends ShaderGL
 {
@@ -43,11 +45,11 @@ class FillRectGL extends ShaderGL
         _gl.enableVertexAttribArray(a_rgb);
         _gl.enableVertexAttribArray(a_alpha);
 
-        var bytesPerFloat = 4;
+        var bytesPerFloat = Float32Array.BYTES_PER_ELEMENT;
         var stride = 6*bytesPerFloat;
-        _gl.vertexAttribPointer(a_pos, 2, _gl.FLOAT, false, stride, 0*bytesPerFloat);
-        _gl.vertexAttribPointer(a_rgb, 3, _gl.FLOAT, false, stride, 2*bytesPerFloat);
-        _gl.vertexAttribPointer(a_alpha, 1, _gl.FLOAT, false, stride, 5*bytesPerFloat);
+        _gl.vertexAttribPointer(a_pos, 2, GL.FLOAT, false, stride, 0*bytesPerFloat);
+        _gl.vertexAttribPointer(a_rgb, 3, GL.FLOAT, false, stride, 2*bytesPerFloat);
+        _gl.vertexAttribPointer(a_alpha, 1, GL.FLOAT, false, stride, 5*bytesPerFloat);
     }
 
     private var a_pos :Int;

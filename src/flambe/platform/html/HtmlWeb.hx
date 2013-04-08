@@ -29,10 +29,10 @@ class HtmlWeb
 
     public function createView (x :Float, y :Float, width :Float, height :Float) :WebView
     {
-        var iframe = Browser.document.createElement("iframe");
+        var iframe = Browser.document.createIFrameElement();
         iframe.style.position = "absolute";
         iframe.style.border = "0";
-        (untyped iframe).scrolling = "no";
+        iframe.scrolling = "no";
         _container.appendChild(iframe);
 
         var view = new HtmlWebView(iframe, x, y, width, height);

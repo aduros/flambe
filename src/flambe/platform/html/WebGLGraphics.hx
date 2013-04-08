@@ -4,12 +4,15 @@
 
 package flambe.platform.html;
 
+import js.html.*;
+import js.html.webgl.*;
+import js.html.webgl.RenderingContext;
+
 import flambe.display.BlendMode;
 import flambe.display.Graphics;
 import flambe.display.Texture;
 import flambe.math.FMath;
 import flambe.math.Matrix;
-import flambe.platform.html.WebGLTypes;
 import flambe.util.Assert;
 
 class WebGLGraphics

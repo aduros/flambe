@@ -4,7 +4,10 @@
 
 package flambe.platform.shader;
 
-import flambe.platform.html.WebGLTypes;
+import js.html.*;
+import js.html.webgl.*;
+import js.html.webgl.RenderingContext;
+
 import flambe.util.Assert;
 
 /**
@@ -23,13 +26,13 @@ class ShaderGL
 
         _gl = gl;
         _program = gl.createProgram();
-        gl.attachShader(_program, createShader(gl, gl.VERTEX_SHADER, vertSource));
-        gl.attachShader(_program, createShader(gl, gl.FRAGMENT_SHADER, fragSource));
+        gl.attachShader(_program, createShader(gl, GL.VERTEX_SHADER, vertSource));
+        gl.attachShader(_program, createShader(gl, GL.FRAGMENT_SHADER, fragSource));
         gl.linkProgram(_program);
         gl.useProgram(_program);
 
 #if debug
-        if (!gl.getProgramParameter(_program, gl.LINK_STATUS)) {
+        if (!gl.getProgramParameter(_program, GL.LINK_STATUS)) {
             Log.error("Error linking shader program", ["log", gl.getProgramInfoLog(_program)]);
         }
 #end
@@ -66,8 +69,8 @@ class ShaderGL
         gl.compileShader(shader);
 
 #if debug
-        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-            var typeName = (type == gl.VERTEX_SHADER) ? "vertex" : "fragment";
+        if (!gl.getShaderParameter(shader, GL.COMPILE_STATUS)) {
+            var typeName = (type == GL.VERTEX_SHADER) ? "vertex" : "fragment";
             Log.error("Error compiling " + typeName + " shader", [
                 "log", gl.getShaderInfoLog(shader)]);
         }

@@ -4,8 +4,11 @@
 
 package flambe.platform.html;
 
+import js.html.*;
+import js.html.webgl.*;
+import js.html.webgl.RenderingContext;
+
 import flambe.display.BlendMode;
-import flambe.platform.html.WebGLTypes;
 import flambe.platform.shader.DrawImageGL;
 import flambe.platform.shader.DrawPatternGL;
 import flambe.platform.shader.FillRectGL;
@@ -20,10 +23,10 @@ class WebGLBatcher
         _gl = gl;
 
         _vertexBuffer = _gl.createBuffer();
-        _gl.bindBuffer(_gl.ARRAY_BUFFER, _vertexBuffer);
+        _gl.bindBuffer(GL.ARRAY_BUFFER, _vertexBuffer);
 
         _quadIndexBuffer = _gl.createBuffer();
-        _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, _quadIndexBuffer);
+        _gl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, _quadIndexBuffer);
 
         _drawImageShader = new DrawImageGL(gl);
         _drawPatternShader = new DrawPatternGL(gl);
@@ -34,7 +37,7 @@ class WebGLBatcher
 
     public function willRender ()
     {
-        // _gl.clear(_gl.COLOR_BUFFER_BIT);
+        // _gl.clear(GL.COLOR_BUFFER_BIT);
     }
 
     public function didRender ()
@@ -95,16 +98,16 @@ class WebGLBatcher
 
         if (_lastBlendMode != _currentBlendMode) {
             switch (_lastBlendMode) {
-                case Normal: _gl.blendFunc(_gl.ONE, _gl.ONE_MINUS_SRC_ALPHA);
-                case Add: _gl.blendFunc(_gl.ONE, _gl.ONE);
+                case Normal: _gl.blendFunc(GL.ONE, GL.ONE_MINUS_SRC_ALPHA);
+                case Add: _gl.blendFunc(GL.ONE, GL.ONE);
                 // TODO(bruno): Disable blending entirely?
-                case CopyExperimental: _gl.blendFunc(_gl.ONE, _gl.ZERO);
+                case CopyExperimental: _gl.blendFunc(GL.ONE, GL.ZERO);
             }
             _currentBlendMode = _lastBlendMode;
         }
 
         if (_lastTexture != _currentTexture) {
-            _gl.bindTexture(_gl.TEXTURE_2D, _lastTexture.nativeTexture);
+            _gl.bindTexture(GL.TEXTURE_2D, _lastTexture.nativeTexture);
             _currentTexture = _lastTexture;
         }
 
@@ -114,13 +117,12 @@ class WebGLBatcher
             _currentShader = _lastShader;
         }
 
-        switch (_lastShader) {
-        case cast _drawPatternShader:
+        if (_lastShader == _drawPatternShader) {
             _drawPatternShader.setMaxUV(_lastTexture.maxU, _lastTexture.maxV);
         }
 
-        _gl.bufferSubData(_gl.ARRAY_BUFFER, 0, data.subarray(0, _dataOffset));
-        _gl.drawElements(_gl.TRIANGLES, 6*_quads, _gl.UNSIGNED_SHORT, 0);
+        _gl.bufferSubData(GL.ARRAY_BUFFER, 0, data.subarray(0, _dataOffset));
+        _gl.drawElements(GL.TRIANGLES, 6*_quads, GL.UNSIGNED_SHORT, 0);
 
         _quads = 0;
         _dataOffset = 0;
@@ -137,8 +139,8 @@ class WebGLBatcher
 
         // Set the new vertex buffer size
         data = new Float32Array(maxQuads*4*MAX_ELEMENTS_PER_VERTEX);
-        _gl.bufferData(_gl.ARRAY_BUFFER,
-            data.length*Float32Array.BYTES_PER_ELEMENT, _gl.STREAM_DRAW);
+        _gl.bufferData(GL.ARRAY_BUFFER,
+            data.length*Float32Array.BYTES_PER_ELEMENT, GL.STREAM_DRAW);
 
         var indices = new Uint16Array(6*maxQuads);
         for (ii in 0...maxQuads) {
@@ -149,7 +151,7 @@ class WebGLBatcher
             indices[ii*6 + 4] = ii*4 + 3;
             indices[ii*6 + 5] = ii*4 + 0;
         }
-        _gl.bufferData(_gl.ELEMENT_ARRAY_BUFFER, indices, _gl.STATIC_DRAW);
+        _gl.bufferData(GL.ELEMENT_ARRAY_BUFFER, indices, GL.STATIC_DRAW);
     }
 
     private static inline var MAX_ELEMENTS_PER_VERTEX = 6;

@@ -5,6 +5,7 @@
 package flambe.platform.html;
 
 import js.Browser;
+import js.html.*;
 
 import flambe.display.Orientation;
 
@@ -21,7 +22,7 @@ class HtmlUtil
 
     public static function callLater (func :Void -> Void, delay :Int = 0)
     {
-        (untyped Browser.window).setTimeout(func, delay);
+        Browser.window.setTimeout(func, delay);
     }
 
     public static function hideMobileBrowser ()
@@ -95,7 +96,7 @@ class HtmlUtil
         style.setProperty(name, value);
     }
 
-    public static function addVendorListener (dispatcher :Dynamic, type :String,
+    public static function addVendorListener (dispatcher :EventTarget, type :String,
         listener :Dynamic -> Void, useCapture :Bool)
     {
         for (prefix in VENDOR_PREFIXES) {
@@ -122,19 +123,19 @@ class HtmlUtil
         return (untyped Date).now();
     }
 
-    public static function createEmptyCanvas (width :Int, height :Int) :Dynamic
+    public static function createEmptyCanvas (width :Int, height :Int) :CanvasElement
     {
-        var canvas :Dynamic = Browser.document.createElement("canvas");
+        var canvas = Browser.document.createCanvasElement();
         canvas.width = width;
         canvas.height = height;
         return canvas;
     }
 
-    public static function createCanvas (source :Dynamic) :Dynamic
+    public static function createCanvas (source :CanvasElement) :CanvasElement
     {
         var canvas = createEmptyCanvas(source.width, source.height);
 
-        var ctx = canvas.getContext("2d");
+        var ctx = canvas.getContext2d();
         ctx.save();
         ctx.globalCompositeOperation = "copy";
         ctx.drawImage(source, 0, 0);

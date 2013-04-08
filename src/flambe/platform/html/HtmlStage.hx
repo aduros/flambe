@@ -5,6 +5,7 @@
 package flambe.platform.html;
 
 import js.Browser;
+import js.html.*;
 
 import flambe.display.Orientation;
 import flambe.display.Stage;
@@ -24,7 +25,7 @@ class HtmlStage
 
     public var scaleFactor (default, null) :Float;
 
-    public function new (canvas :Dynamic)
+    public function new (canvas :CanvasElement)
     {
         _canvas = canvas;
         resize = new Signal0();
@@ -40,21 +41,21 @@ class HtmlStage
 
 #if !flambe_disable_autoresize
         if (HtmlUtil.SHOULD_HIDE_MOBILE_BROWSER) {
-            (untyped window).addEventListener("orientationchange", function () {
+            Browser.window.addEventListener("orientationchange", function (_) {
                 // Wait for the orientation change to finish... sigh
                 HtmlUtil.callLater(hideMobileBrowser, 200);
             }, false);
             hideMobileBrowser();
         }
 
-        (untyped window).addEventListener("resize", onWindowResize, false);
-        onWindowResize();
+        Browser.window.addEventListener("resize", onWindowResize, false);
+        onWindowResize(null);
 #end
 
         orientation = new Value<Orientation>(null);
-        if ((untyped window).orientation != null) {
-            (untyped window).addEventListener("orientationchange", onOrientationChange, false);
-            onOrientationChange();
+        if ((untyped Browser.window).orientation != null) {
+            Browser.window.addEventListener("orientationchange", onOrientationChange, false);
+            onOrientationChange(null);
         }
 
         fullscreen = new Value<Bool>(false);
@@ -101,7 +102,7 @@ class HtmlStage
     {
         if (resizeCanvas(width, height)) {
             // Fit the container to the requested canvas size
-            var container = _canvas.parentNode;
+            var container = _canvas.parentElement;
             container.style.width = width + "px";
             container.style.height = height + "px";
         }
@@ -110,7 +111,7 @@ class HtmlStage
     public function requestFullscreen (enable :Bool = true)
     {
         if (enable) {
-            var documentElement = untyped Browser.document.documentElement;
+            var documentElement = Browser.document.documentElement;
             var requestFullscreen = HtmlUtil.loadFirstExtension(
                ["requestFullscreen", "requestFullScreen"], documentElement).value;
             if (requestFullscreen != null) {
@@ -126,10 +127,10 @@ class HtmlStage
         }
     }
 
-    private function onWindowResize ()
+    private function onWindowResize (_)
     {
         // Resize the canvas to match its container's bounds
-        var container = _canvas.parentNode;
+        var container = _canvas.parentElement;
         var rect = container.getBoundingClientRect();
         resizeCanvas(rect.width, rect.height);
     }
@@ -144,8 +145,8 @@ class HtmlStage
             return false;
         }
 
-        _canvas.width = scaledWidth;
-        _canvas.height = scaledHeight;
+        _canvas.width = Std.int(scaledWidth);
+        _canvas.height = Std.int(scaledHeight);
         resize.emit();
         return true;
     }
@@ -156,7 +157,7 @@ class HtmlStage
         // The maximum size of the part of the browser that can be scrolled away
         var mobileAddressBar = 100;
 
-        var htmlStyle = (untyped Browser.document).documentElement.style;
+        var htmlStyle = Browser.document.documentElement.style;
 
         // Force the page to be tall enough to scroll
         htmlStyle.height = (Browser.window.innerHeight + mobileAddressBar) + "px";
@@ -171,14 +172,14 @@ class HtmlStage
                 // Fit the page to the new screen size
                 htmlStyle.height = Browser.window.innerHeight + "px";
 
-                onWindowResize();
+                onWindowResize(null);
             }, 100);
         });
     }
 
-    private function onOrientationChange ()
+    private function onOrientationChange (_)
     {
-        var value = HtmlUtil.orientation((untyped window).orientation);
+        var value = HtmlUtil.orientation((untyped Browser.window).orientation);
         orientation._ = value;
     }
 
@@ -194,14 +195,14 @@ class HtmlStage
         // Based on "Delivering Web Content on High Resolution Displays"
         // https://developer.apple.com/videos/wwdc/2012/?id=602
 
-        var devicePixelRatio = (untyped window).devicePixelRatio;
+        var devicePixelRatio = Browser.window.devicePixelRatio;
         if (devicePixelRatio == null) {
             devicePixelRatio = 1;
         }
 
         // Take into account any behind-the-scenes scaling of canvas elements
-        var canvas :Dynamic = Browser.document.createElement("canvas");
-        var ctx = canvas.getContext("2d");
+        var canvas = Browser.document.createCanvasElement();
+        var ctx = canvas.getContext2d();
         var backingStorePixelRatio = HtmlUtil.loadExtension("backingStorePixelRatio", ctx).value;
         if (backingStorePixelRatio == null) {
             backingStorePixelRatio = 1;
@@ -211,13 +212,13 @@ class HtmlStage
         // magic threshold. This was added to disable the retina display on the iPad 3, as
         // performance plummets there when scaling such a huge canvas
         var scale = devicePixelRatio / backingStorePixelRatio;
-        var screenWidth = (untyped screen).width;
-        var screenHeight = (untyped screen).height;
+        var screenWidth = Browser.window.screen.width;
+        var screenHeight = Browser.window.screen.height;
         if (scale*screenWidth > 1024 || scale*screenHeight > 1024) {
             return 1;
         }
         return scale;
     }
 
-    private var _canvas :Dynamic;
+    private var _canvas :CanvasElement;
 }

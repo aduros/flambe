@@ -71,7 +71,7 @@ class Component
         this.next = next;
     }
 
-    @:allow(flambe) inline private function setNext (next :Component)
+    @:allow(flambe) inline function setNext (next :Component)
     {
         this.next = next;
     }

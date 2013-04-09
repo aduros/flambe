@@ -187,6 +187,8 @@ class Manifest
                 case "webp", "jxr", "png", "jpg", "gif": return Image;
                 case "ogg", "m4a", "mp3", "wav": return Audio;
             }
+        } else {
+            Log.warn("No file extension for asset, it will be loaded as data", ["url", url]);
         }
         return Data;
     }

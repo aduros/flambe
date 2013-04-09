@@ -41,7 +41,7 @@ class Strings
         }
         var slash = url.lastIndexOf("/");
         if (slash >= 0) {
-            url = url.substr(slash+1, 0);
+            url = url.substr(slash+1);
         }
         return getFileExtension(url);
     }

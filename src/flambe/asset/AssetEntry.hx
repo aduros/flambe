@@ -46,9 +46,4 @@ class AssetEntry
         this.type = type;
         this.bytes = bytes;
     }
-
-    public function getUrlExtension () :String
-    {
-        return url.split("?")[0].getFileExtension().toLowerCase();
-    }
 }

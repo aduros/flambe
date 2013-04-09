@@ -12,7 +12,7 @@ using StringTools;
 class Strings
 {
     /**
-     * Gets the extension of a file name or URL, or null if there is no extension.
+     * Gets the extension of a file name, or null if there is no extension.
      */
     public static function getFileExtension (fileName :String) :String
     {
@@ -27,6 +27,23 @@ class Strings
     {
         var dot = fileName.lastIndexOf(".");
         return (dot > 0) ? fileName.substr(0, dot) : fileName;
+    }
+
+    /**
+     * Gets the extension of a full path or URL, with special handling for '/' and '?' characters.
+     * Returns null if there is no extension.
+     */
+    public static function getUrlExtension (url :String) :String
+    {
+        var question = url.lastIndexOf("?");
+        if (question >= 0) {
+            url = url.substr(0, question);
+        }
+        var slash = url.lastIndexOf("/");
+        if (slash >= 0) {
+            url = url.substr(slash+1, 0);
+        }
+        return getFileExtension(url);
     }
 
     /**

@@ -81,7 +81,10 @@ class BasicAssetPackLoader
         var onFormatsAvailable = function (extensions :Array<String>) {
             for (extension in extensions) {
                 for (entry in entries) {
-                    if (entry.getUrlExtension() == extension) {
+                    var urlExt = entry.url.getUrlExtension();
+                    // As long as we support at least one format, treat missing URL extensions as
+                    // fully supported
+                    if (urlExt == null || urlExt == extension) {
                         fn(entry);
                         return;
                     }

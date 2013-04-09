@@ -20,9 +20,9 @@ class KeyboardEvent
      */
     public var id (default, null) :Int;
 
-    /** @private */ public function new ()
+    @:allow(flambe) function new ()
     {
-        _internal_init(0, null);
+        init(0, null);
     }
 
     /**
@@ -31,11 +31,11 @@ class KeyboardEvent
     public function clone () :KeyboardEvent
     {
         var event = new KeyboardEvent();
-        event._internal_init(id, key);
+        event.init(id, key);
         return event;
     }
 
-    /** @private */ public function _internal_init (id :Int, key :Key)
+    @:allow(flambe) function init (id :Int, key :Key)
     {
         this.id = id;
         this.key = key;

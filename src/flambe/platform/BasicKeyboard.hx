@@ -60,7 +60,7 @@ class BasicKeyboard
 
         if (!isCodeDown(keyCode)) {
             _keyStates.set(keyCode, true);
-            _sharedEvent._internal_init(_sharedEvent.id+1, keyCode.toKey());
+            _sharedEvent.init(_sharedEvent.id+1, keyCode.toKey());
             down.emit(_sharedEvent);
         }
         return true;
@@ -73,7 +73,7 @@ class BasicKeyboard
     {
         if (isCodeDown(keyCode)) {
             _keyStates.remove(keyCode);
-            _sharedEvent._internal_init(_sharedEvent.id+1, keyCode.toKey());
+            _sharedEvent.init(_sharedEvent.id+1, keyCode.toKey());
             up.emit(_sharedEvent);
         }
     }

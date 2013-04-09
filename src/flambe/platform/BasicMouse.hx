@@ -124,7 +124,7 @@ class BasicMouse
     {
         _x = viewX;
         _y = viewY;
-        _sharedEvent._internal_init(_sharedEvent.id+1, viewX, viewY, button);
+        _sharedEvent.init(_sharedEvent.id+1, viewX, viewY, button);
     }
 
     private static var _sharedEvent = new MouseEvent();

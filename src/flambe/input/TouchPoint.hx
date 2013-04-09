@@ -29,18 +29,18 @@ class TouchPoint
      */
     public var id (default, null) :Int;
 
-    /** @private */ public function new (id :Int)
+    @:allow(flambe) function new (id :Int)
     {
         this.id = id;
-        _internal_source = Touch(this);
+        _source = Touch(this);
     }
 
-    /** @private */ public function _internal_init (viewX :Float, viewY :Float)
+    @:allow(flambe) function init (viewX :Float, viewY :Float)
     {
         this.viewX = viewX;
         this.viewY = viewY;
     }
 
     // Cached to avoid lots of allocation
-    /** @private */ public var _internal_source :EventSource;
+    @:allow(flambe) var _source :EventSource;
 }

@@ -77,12 +77,12 @@ using Lambda;
             p = p.next;
         }
         if (tail != null) {
-            tail._internal_setNext(component);
+            tail.setNext(component);
         } else {
             firstComponent = component;
         }
 
-        component._internal_init(this, null);
+        component.init(this, null);
         component.onAdded();
 
         return this;
@@ -101,7 +101,7 @@ using Lambda;
                 if (prev == null) {
                     firstComponent = next;
                 } else {
-                    prev._internal_init(this, next);
+                    prev.init(this, next);
                 }
 
                 // Remove it from the _compMap
@@ -113,7 +113,7 @@ using Lambda;
 
                 // Notify the component it was removed
                 p.onRemoved();
-                p._internal_init(null, null);
+                p.init(null, null);
                 return;
             }
             prev = p;

@@ -27,13 +27,13 @@ class SpeedAdjuster extends Component
     override public function onUpdate (dt :Float)
     {
         // Ensure this component is immune to its own time scaling
-        if (_internal_realDt > 0) {
-            dt = _internal_realDt;
-            _internal_realDt = 0;
+        if (_realDt > 0) {
+            dt = _realDt;
+            _realDt = 0;
         }
 
         scale.update(dt);
     }
 
-    /** @private */ public var _internal_realDt :Float = 0;
+    @:allow(flambe) var _realDt :Float = 0;
 }

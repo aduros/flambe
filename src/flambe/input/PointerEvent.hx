@@ -47,9 +47,9 @@ class PointerEvent
      */
     public var id (default, null) :Int;
 
-    /** @private */ public function new ()
+    @:allow(flambe) function new ()
     {
-        _internal_init(0, 0, 0, null, null);
+        init(0, 0, 0, null, null);
     }
 
     /**
@@ -58,7 +58,7 @@ class PointerEvent
      */
     inline public function stopPropagation ()
     {
-        _internal_stopped = true;
+        _stopped = true;
     }
 
     /**
@@ -74,11 +74,11 @@ class PointerEvent
         }
 
         var event = new PointerEvent();
-        event._internal_init(id, viewX, viewY, hit, sourceCopy);
+        event.init(id, viewX, viewY, hit, sourceCopy);
         return event;
     }
 
-    /** @private */ public function _internal_init (
+    @:allow(flambe) function init (
         id :Int, viewX :Float, viewY :Float, hit :Sprite, source :EventSource)
     {
         this.id = id;
@@ -86,8 +86,8 @@ class PointerEvent
         this.viewY = viewY;
         this.hit = hit;
         this.source = source;
-        _internal_stopped = false;
+        _stopped = false;
     }
 
-    /** @private */ public var _internal_stopped :Bool;
+    @:allow(flambe) var _stopped :Bool;
 }

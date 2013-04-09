@@ -30,9 +30,9 @@ class MouseEvent
      */
     public var id (default, null) :Int;
 
-    /** @private */ public function new ()
+    @:allow(flambe) function new ()
     {
-        _internal_init(0, 0, 0, null);
+        init(0, 0, 0, null);
     }
 
     /**
@@ -41,11 +41,11 @@ class MouseEvent
     public function clone () :MouseEvent
     {
         var event = new MouseEvent();
-        event._internal_init(id, viewX, viewY, button);
+        event.init(id, viewX, viewY, button);
         return event;
     }
 
-    /** @private */ public function _internal_init (
+    @:allow(flambe) function init (
         id :Int, viewX :Float, viewY :Float, button :MouseButton)
     {
         this.id = id;

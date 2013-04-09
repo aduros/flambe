@@ -100,7 +100,7 @@ class Font
                     case "second":
                         second = pair.getInt();
                     case "amount":
-                        first._internal_setKerning(second, pair.getInt());
+                        first.setKerning(second, pair.getInt());
                     }
                 }
             }
@@ -210,7 +210,7 @@ class Glyph
 
     public var xAdvance :Int;
 
-    /** @private */ public function new (charCode :Int)
+    @:allow(flambe) function new (charCode :Int)
     {
         this.charCode = charCode;
     }
@@ -231,7 +231,7 @@ class Glyph
         return (_kernings != null) ? Std.int(_kernings.get(nextCharCode)) : 0;
     }
 
-    /** @private */ public function _internal_setKerning (nextCharCode :Int, amount :Int)
+    @:allow(flambe) function setKerning (nextCharCode :Int, amount :Int)
     {
         if (_kernings == null) {
             _kernings = new Map();

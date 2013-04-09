@@ -15,11 +15,10 @@ class SignalConnection
      */
     public var stayInList (default, null) :Bool;
 
-    /** @private */
-    public function new (signal :SignalBase, listener :Dynamic)
+    @:allow(flambe) function new (signal :SignalBase, listener :Dynamic)
     {
         _signal = signal;
-        _internal_listener = listener;
+        _listener = listener;
         stayInList = true;
     }
 
@@ -39,13 +38,13 @@ class SignalConnection
     public function dispose ()
     {
         if (_signal != null) {
-            _signal._internal_disconnect(this);
+            _signal.disconnect(this);
             _signal = null;
         }
     }
 
-    /** @private */ public var _internal_next :SignalConnection = null;
+    @:allow(flambe) var _next :SignalConnection = null;
 
-    /** @private */ public var _internal_listener :Dynamic;
+    @:allow(flambe) var _listener :Dynamic;
     private var _signal :SignalBase;
 }

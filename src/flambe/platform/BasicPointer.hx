@@ -84,10 +84,10 @@ class BasicPointer
         prepare(viewX, viewY, hit, source);
         for (sprite in chain) {
             // Avoid calling the public getter and lazily instanciating this signal
-            var signal = sprite._internal_pointerDown;
+            var signal = sprite._pointerDown;
             if (signal != null) {
                 signal.emit(_sharedEvent);
-                if (_sharedEvent._internal_stopped) {
+                if (_sharedEvent._stopped) {
                     return;
                 }
             }
@@ -118,10 +118,10 @@ class BasicPointer
         prepare(viewX, viewY, hit, source);
         for (sprite in chain) {
             // Avoid calling the public getter and lazily instanciating this signal
-            var signal = sprite._internal_pointerMove;
+            var signal = sprite._pointerMove;
             if (signal != null) {
                 signal.emit(_sharedEvent);
-                if (_sharedEvent._internal_stopped) {
+                if (_sharedEvent._stopped) {
                     return;
                 }
             }
@@ -157,10 +157,10 @@ class BasicPointer
         prepare(viewX, viewY, hit, source);
         for (sprite in chain) {
             // Avoid calling the public getter and lazily instanciating this signal
-            var signal = sprite._internal_pointerUp;
+            var signal = sprite._pointerUp;
             if (signal != null) {
                 signal.emit(_sharedEvent);
-                if (_sharedEvent._internal_stopped) {
+                if (_sharedEvent._stopped) {
                     return;
                 }
             }
@@ -172,7 +172,7 @@ class BasicPointer
     {
         _x = viewX;
         _y = viewY;
-        _sharedEvent._internal_init(_sharedEvent.id+1, viewX, viewY, hit, source);
+        _sharedEvent.init(_sharedEvent.id+1, viewX, viewY, hit, source);
     }
 
     private static var _sharedEvent = new PointerEvent();

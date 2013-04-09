@@ -82,7 +82,7 @@ class MainLoop
         // Handle update speed adjustment
         var speed = entity.get(SpeedAdjuster);
         if (speed != null) {
-            speed._internal_realDt = dt;
+            speed._realDt = dt;
 
             dt *= speed.scale._;
             if (dt <= 0) {

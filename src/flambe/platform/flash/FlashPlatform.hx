@@ -45,13 +45,13 @@ class FlashPlatform
     {
     }
 
-    public function init ()
+    public function init (?context:Stage3DContext)
     {
         Log.info("Initializing Flash platform");
 
         var stage = Lib.current.stage;
 
-        _stage = new FlashStage(stage);
+        _stage = new FlashStage(stage, context == null ? false : context.shared);
         _pointer = new BasicPointer();
         _mouse = FlashMouse.shouldUse() ? new FlashMouse(_pointer, stage) : new DummyMouse();
 #if flambe_air
@@ -61,7 +61,8 @@ class FlashPlatform
 #end
         _keyboard = FlashKeyboard.shouldUse() ? new FlashKeyboard(stage) : new DummyKeyboard();
 
-        _renderer = new Stage3DRenderer();
+        _renderer = new Stage3DRenderer(context);
+
         mainLoop = new MainLoop();
 
         stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);

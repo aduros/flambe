@@ -26,9 +26,10 @@ class Stage3DBatcher
 {
     public var data (default, null) :Vector<Float>;
 
-    public function new (context3D :Context3D)
+    public function new (context :Stage3DContext)
     {
-        _context3D = context3D;
+        _context3D = context.context3D;
+        _shared = context.shared;
         _drawImageShader = new DrawImage();
         _drawPatternShader = new DrawPattern();
         _fillRectShader = new FillRect();
@@ -49,15 +50,19 @@ class Stage3DBatcher
             _context3D.setRenderToBackBuffer();
             _currentRenderTarget = _lastRenderTarget = null;
         }
-        // And clear it as required by Stage3D
-        _context3D.clear(0, 0, 0);
+
+        if(!_shared) {
+          // And clear it as required by Stage3D
+          _context3D.clear(0, 0, 0);
+        }
     }
 
     public function didRender ()
     {
         // Flush any remaining quads and present the back buffer
         flush();
-        _context3D.present();
+        if(!_shared)
+          _context3D.present();
 
         _lastTexture = null;
         // _lastBlendMode = null;
@@ -343,6 +348,7 @@ class Stage3DBatcher
     private static var _scratchVector3D = new Vector3D();
 
     private var _context3D :Context3D;
+    private var _shared :Bool;
 
     // Used to keep track of context changes requiring a flush
     private var _lastBlendMode :BlendMode;

@@ -178,10 +178,11 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                     // Retry stalled connections a few times
                     --attempts;
                     if (attempts > 0) {
+                        Log.warn("Retrying stalled asset request", ["url", entry.url]);
                         start();
                     } else {
                         (untyped Lib.window).clearInterval(interval);
-                        handleError(entry, "Failed to load asset: timeout");
+                        handleError(entry, "Request timed out");
                     }
                 }
             }, 1000);

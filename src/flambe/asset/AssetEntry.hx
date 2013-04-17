@@ -6,10 +6,16 @@ package flambe.asset;
 
 using flambe.util.Strings;
 
-enum AssetType
+/** Specifies all supported asset formats across all Flambe platforms. */
+enum AssetFormat
 {
-    Image;
-    Audio;
+    // Images
+    WEBP; JXR; PNG; JPG; GIF;
+
+    // Audio
+    MP3; M4A; OGG; WAV;
+
+    // Raw text/data
     Data;
 }
 
@@ -30,20 +36,20 @@ class AssetEntry
     public var url (default, null) :String;
 
     /**
-     * This asset's content type.
+     * The format this asset will be loaded as.
      */
-    public var type (default, null) :AssetType;
+    public var format (default, null) :AssetFormat;
 
     /**
      * The size of this asset in bytes, or 0 if unknown.
      */
     public var bytes (default, null) :Int;
 
-    public function new (name :String, url :String, type :AssetType, bytes :Int)
+    public function new (name :String, url :String, format :AssetFormat, bytes :Int)
     {
         this.name = name;
         this.url = url;
-        this.type = type;
+        this.format = format;
         this.bytes = bytes;
     }
 }

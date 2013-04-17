@@ -21,6 +21,7 @@ import flash.system.LoaderContext;
 
 import flambe.asset.AssetEntry;
 import flambe.asset.Manifest;
+import flambe.util.Assert;
 
 class FlashAssetPackLoader extends BasicAssetPackLoader
 {
@@ -39,8 +40,8 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
         // The function called to create the asset after its content loads
         var create :Void -> Dynamic;
 
-        switch (entry.type) {
-        case Image:
+        switch (entry.format) {
+        case JXR, PNG, JPG, GIF:
             var loader = new Loader();
             dispatcher = loader.contentLoaderInfo;
             create = function () {
@@ -54,7 +55,7 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
             ctx.imageDecodingPolicy = ON_LOAD;
             loader.load(req, ctx);
 
-        case Audio:
+        case MP3:
             var sound = new Sound(req);
             dispatcher = sound;
             create = function () return new FlashSound(sound);
@@ -63,6 +64,11 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
             var urlLoader = new URLLoader(req);
             dispatcher = urlLoader;
             create = function () return urlLoader.data;
+
+        default:
+            // Should never happen
+            Assert.fail("Unsupported format", ["format", entry.format]);
+            return;
         }
 
         var events = new EventGroup();
@@ -92,15 +98,8 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
         events.addDisposingListener(dispatcher, SecurityErrorEvent.SECURITY_ERROR, onError);
     }
 
-    override private function getImageFormats (fn :Array<String> -> Void)
+    override private function getAssetFormats (fn :Array<AssetFormat> -> Void)
     {
-        fn(["jxr", "png", "jpg", "gif"]);
-    }
-
-    override private function getAudioFormats (fn :Array<String> -> Void)
-    {
-        // TODO(bruno): Flash actually has an m4a decoder, but it's only accessible through the
-        // horrendous NetStream API and not good old flash.media.Sound
-        fn(Capabilities.hasAudio && Capabilities.hasMP3 ? ["mp3"] : []);
+        fn([JXR, PNG, JPG, GIF, MP3, Data]);
     }
 }

@@ -290,21 +290,22 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
     {
         if (_detectBlobSupport) {
             _detectBlobSupport = false;
-            try {
-                var xhr = untyped __new__("XMLHttpRequest");
 
-                // Hack for IE, which throws an InvalidStateError upon setting the responseType when
-                // in the UNSENT state, despite the spec being clear about only throwing in LOADING
-                // or DONE: http://www.w3.org/TR/XMLHttpRequest2/#dom-xmlhttprequest-responsetype
-                //
-                // Forcing it into the OPENED state does the trick, and doesn't actually send the
-                // request so it's all good.
-                xhr.open("GET", ".", true);
+            var xhr = untyped __new__("XMLHttpRequest");
+            // Hack for IE, which throws an InvalidStateError upon setting the responseType when
+            // in the UNSENT state, despite the spec being clear about only throwing in LOADING
+            // or DONE: http://www.w3.org/TR/XMLHttpRequest2/#dom-xmlhttprequest-responsetype
+            //
+            // Forcing it into the OPENED state does the trick, and doesn't actually send the
+            // request so it's all good.
+            xhr.open("GET", ".", true);
 
-                xhr.responseType = "blob";
-            } catch (_ :Dynamic) {
+            // Ensure the blob responseType is supported
+            xhr.responseType = "blob";
+            if (xhr.responseType != "blob") {
                 return false;
             }
+
             _URL = HtmlUtil.loadExtension("URL").value;
         }
         return _URL != null && _URL.createObjectURL != null;

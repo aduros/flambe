@@ -59,7 +59,7 @@ class BasicAssetPackLoader
 
                     } else {
                         var badEntry = group[0];
-                        if (badEntry.type == Audio) {
+                        if (isAudio(badEntry.format)) {
                             // Deal with missing audio files and bad browser support
                             Log.warn("Could not find a supported audio format to load", ["name", badEntry.name]);
                             handleLoad(badEntry, DummySound.getInstance());
@@ -78,13 +78,10 @@ class BasicAssetPackLoader
      */
     private function pickBestEntry (entries :Array<AssetEntry>, fn :AssetEntry -> Void)
     {
-        var onFormatsAvailable = function (extensions :Array<String>) {
-            for (extension in extensions) {
+        var onFormatsAvailable = function (formats :Array<AssetFormat>) {
+            for (format in formats) {
                 for (entry in entries) {
-                    var urlExt = entry.url.getUrlExtension();
-                    // As long as we support at least one format, treat missing URL extensions as
-                    // fully supported
-                    if (urlExt == null || urlExt == extension) {
+                    if (entry.format == format) {
                         fn(entry);
                         return;
                     }
@@ -93,13 +90,7 @@ class BasicAssetPackLoader
             fn(null); // This asset is not supported, we're boned
         };
 
-        switch (entries[0].type) {
-            case Image: getImageFormats(onFormatsAvailable);
-            case Audio: getAudioFormats(onFormatsAvailable);
-
-            // No preference, just use the first one
-            default: fn(entries[0]);
-        }
+        getAssetFormats(onFormatsAvailable);
     }
 
     private function loadEntry (url :String, entry :AssetEntry)
@@ -107,14 +98,8 @@ class BasicAssetPackLoader
         Assert.fail(); // See subclasses
     }
 
-    /** Gets the list of image file extensions the environment supports, ordered by preference. */
-    private function getImageFormats (fn :Array<String> -> Void)
-    {
-        Assert.fail(); // See subclasses
-    }
-
-    /** Gets the list of audio file extensions the environment supports, ordered by preference. */
-    private function getAudioFormats (fn :Array<String> -> Void)
+    /** Gets the list of asset formats the environment supports, ordered by preference. */
+    private function getAssetFormats (fn :Array<AssetFormat> -> Void)
     {
         Assert.fail(); // See subclasses
     }
@@ -125,10 +110,13 @@ class BasicAssetPackLoader
         handleProgress(entry, entry.bytes);
 
         var name = entry.name;
-        switch (entry.type) {
-            case Image: _pack.textures.set(name, asset);
-            case Audio: _pack.sounds.set(name, asset);
-            case Data: _pack.files.set(name, asset);
+        switch (entry.format) {
+        case WEBP, JXR, PNG, JPG, GIF:
+            _pack.textures.set(name, asset);
+        case MP3, M4A, OGG, WAV:
+            _pack.sounds.set(name, asset);
+        case Data:
+            _pack.files.set(name, asset);
         }
 
         _assetsRemaining -= 1;
@@ -162,6 +150,14 @@ class BasicAssetPackLoader
     private function handleTextureError (entry :AssetEntry)
     {
         handleError(entry, "Failed to create texture. Is the GPU context unavailable?");
+    }
+
+    private static function isAudio (format :AssetFormat) :Bool
+    {
+        switch (format) {
+            case MP3, M4A, OGG, WAV: return true;
+            default: return false;
+        }
     }
 
     private var _platform :Platform;

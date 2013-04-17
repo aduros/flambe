@@ -11,6 +11,7 @@ import haxe.Http;
 
 import flambe.asset.AssetEntry;
 import flambe.asset.Manifest;
+import flambe.util.Assert;
 import flambe.util.Promise;
 import flambe.util.Signal0;
 import flambe.util.Signal1;
@@ -24,8 +25,8 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
 
     override private function loadEntry (url :String, entry :AssetEntry)
     {
-        switch (entry.type) {
-        case Image:
+        switch (entry.format) {
+        case WEBP, JXR, PNG, JPG, GIF:
             var image = Browser.document.createImageElement();
             var events = new EventGroup();
 
@@ -63,7 +64,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                 image.src = url;
             }
 
-        case Audio:
+        case MP3, M4A, OGG, WAV:
             // If we made it this far, we definitely support audio and can play this asset
             if (WebAudioSound.supported) {
                 sendRequest(url, entry, "arraybuffer", function (buffer) {
@@ -129,21 +130,15 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         }
     }
 
-    override private function getImageFormats (fn :Array<String> -> Void)
+    override private function getAssetFormats (fn :Array<AssetFormat> -> Void)
     {
-        if (_imageFormats == null) {
-            // Image format detection needs to be asynchronous
-            _imageFormats = detectImageFormats();
+        if (_supportedFormats == null) {
+            _supportedFormats = new Promise();
+            detectImageFormats(function (imageFormats) {
+                _supportedFormats.result = imageFormats.concat(detectAudioFormats()).concat([Data]);
+            });
         }
-        _imageFormats.get(fn);
-    }
-
-    override private function getAudioFormats (fn :Array<String> -> Void)
-    {
-        if (_audioFormats == null) {
-            _audioFormats = detectAudioFormats();
-        }
-        fn(_audioFormats);
+        _supportedFormats.get(fn);
     }
 
     private function sendRequest (url :String, entry :AssetEntry, responseType :String, onLoad :Dynamic -> Void)
@@ -209,17 +204,16 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         return xhr;
     }
 
-    private static function detectImageFormats () :Promise<Array<String>>
+    private static function detectImageFormats (fn :Array<AssetFormat> -> Void)
     {
-        var formats = ["png", "jpg", "gif"];
-        var p = new Promise();
+        var formats = [PNG, JPG, GIF];
 
         var formatTests = 2;
         var checkRemaining = function () {
             // Called when an image test completes
             --formatTests;
             if (formatTests == 0) {
-                p.result = formats;
+                fn(formats);
             }
         };
 
@@ -228,7 +222,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         var webp = Browser.document.createImageElement();
         webp.onload = webp.onerror = function (_) {
             if (webp.width == 1) {
-                formats.unshift("webp");
+                formats.unshift(WEBP);
             }
             checkRemaining();
         };
@@ -238,18 +232,16 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         var jxr = Browser.document.createImageElement();
         jxr.onload = jxr.onerror = function (_) {
             if (jxr.width == 1) {
-                formats.unshift("jxr");
+                formats.unshift(JXR);
             }
             checkRemaining();
         };
         // The smallest JXR I could generate (where pixel.tif is a 1x1 black image)
         // ./jpegxr pixel.tif -c -o pixel.jxr -f YOnly -q 255 -b DCONLY -a 0 -w
         jxr.src = "data:image/vnd.ms-photo;base64,SUm8AQgAAAAFAAG8AQAQAAAASgAAAIC8BAABAAAAAQAAAIG8BAABAAAAAQAAAMC8BAABAAAAWgAAAMG8BAABAAAAHwAAAAAAAAAkw91vA07+S7GFPXd2jckNV01QSE9UTwAZAYBxAAAAABP/gAAEb/8AAQAAAQAAAA==";
-
-        return p;
     }
 
-    private static function detectAudioFormats () :Array<String>
+    private static function detectAudioFormats () :Array<AssetFormat>
     {
         // Detect basic support for HTML5 audio
         var audio = Browser.document.createAudioElement();
@@ -267,22 +259,22 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         }
 
         // Select what formats the browser supports
-        var formats = [
-            { extension: "m4a", type: "audio/mp4; codecs=mp4a" },
-            { extension: "mp3", type: "audio/mpeg" },
-            { extension: "ogg", type: "audio/ogg; codecs=vorbis" },
-            { extension: "wav", type: "audio/wav" },
+        var types = [
+            { format: M4A, mimeType: "audio/mp4; codecs=mp4a" },
+            { format: MP3, mimeType: "audio/mpeg" },
+            { format: OGG, mimeType: "audio/ogg; codecs=vorbis" },
+            { format: WAV, mimeType: "audio/wav" },
         ];
         var result = [];
-        for (format in formats) {
+        for (type in types) {
             // IE9's canPlayType() will throw an error in some rare cases:
             // https://github.com/Modernizr/Modernizr/issues/224
             var canPlayType = "";
-            try canPlayType = audio.canPlayType(format.type)
+            try canPlayType = audio.canPlayType(type.mimeType)
             catch (_ :Dynamic) {}
 
             if (canPlayType != "") {
-                result.push(format.extension);
+                result.push(type.format);
             }
         }
         return result;
@@ -294,6 +286,15 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
             _detectBlobSupport = false;
             try {
                 var xhr = new XMLHttpRequest();
+
+                // Hack for IE, which throws an InvalidStateError upon setting the responseType when
+                // in the UNSENT state, despite the spec being clear about only throwing in LOADING
+                // or DONE: http://www.w3.org/TR/XMLHttpRequest2/#dom-xmlhttprequest-responsetype
+                //
+                // Forcing it into the OPENED state does the trick, and doesn't actually send the
+                // request so it's all good.
+                xhr.open("GET", ".", true);
+
                 xhr.responseType = "blob";
             } catch (_ :Dynamic) {
                 return false;
@@ -306,8 +307,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
     private static inline var XHR_TIMEOUT = 5000;
     private static inline var XHR_ATTEMPTS = 4;
 
-    private static var _imageFormats :Promise<Array<String>> = null;
-    private static var _audioFormats :Array<String> = null;
+    private static var _supportedFormats :Promise<Array<AssetFormat>> = null;
 
     /**
      * Media elements get GCed during loading in Chrome and IE9. The spec is clear that elements

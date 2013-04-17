@@ -95,15 +95,15 @@ class Manifest
      * @param name The name of the asset.
      * @param url The URL this asset will be downloaded from.
      * @param bytes The size in bytes.
-     * @param type Optionally specified content type, by default infer it from the URL.
+     * @param format Optionally specified content format, by default infer it from the URL.
      */
-    public function add (name :String, url :String, bytes :Int = 0, ?type :AssetType) :AssetEntry
+    public function add (name :String, url :String, bytes :Int = 0, ?format :AssetFormat) :AssetEntry
     {
-        if (type == null) {
-            type = inferType(url);
+        if (format == null) {
+            format = inferFormat(url);
         }
 
-        var entry = new AssetEntry(name, url, type, bytes);
+        var entry = new AssetEntry(name, url, format, bytes);
         _entries.push(entry);
         return entry;
     }
@@ -130,7 +130,7 @@ class Manifest
 
     /**
      * Get the full URL to load an asset from. May prepend relativeBasePath or externalBasePath
-     * depending on cross-domain support and the asset type.
+     * depending on cross-domain support and the asset format.
      */
     public function getFullURL (entry :AssetEntry) :String
     {
@@ -140,7 +140,7 @@ class Manifest
 
         var base = unrestricted;
 #if html
-        if (entry.type == Data) {
+        if (entry.format == Data) {
             // Without CORS, readable data must be loaded from the same origin
             // TODO(bruno): Do this for Images too, required for readPixels.
             base = restricted;
@@ -179,13 +179,21 @@ class Manifest
         return basePath;
     }
 
-    private static function inferType (url :String) :AssetType
+    private static function inferFormat (url :String) :AssetFormat
     {
         var extension = url.getUrlExtension();
         if (extension != null) {
             switch (extension.toLowerCase()) {
-                case "webp", "jxr", "png", "jpg", "gif": return Image;
-                case "ogg", "m4a", "mp3", "wav": return Audio;
+                case "gif": return GIF;
+                case "jpg", "jpeg": return JPG;
+                case "jxr": return JXR;
+                case "png": return PNG;
+                case "webp": return WEBP;
+
+                case "m4a": return M4A;
+                case "mp3": return MP3;
+                case "ogg": return OGG;
+                case "wav": return WAV;
             }
         } else {
             Log.warn("No file extension for asset, it will be loaded as data", ["url", url]);
@@ -207,14 +215,14 @@ class Manifest
                 var name = asset.name;
                 var path = packName + "/" + name + "?v=" + asset.md5;
 
-                var type = inferType(name);
-                if (type == Image || type == Audio) {
+                var format = inferFormat(name);
+                if (format != Data) {
                     // If this an asset that not all platforms may support, trim the extension from
                     // the name. We'll only load one of the assets if this creates a name collision.
                     name = name.removeFileExtension();
                 }
 
-                manifest.add(name, path, asset.bytes, type);
+                manifest.add(name, path, asset.bytes, format);
             }
             manifests.set(packName, manifest);
         }

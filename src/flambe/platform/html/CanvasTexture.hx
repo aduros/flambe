@@ -11,6 +11,7 @@ import haxe.io.Bytes;
 
 import flambe.display.Graphics;
 import flambe.display.Texture;
+import flambe.math.Rectangle;
 
 class CanvasTexture
     implements Texture
@@ -55,6 +56,48 @@ class CanvasTexture
         // Draw the pixels, and invalidate our contents
         ctx2d.putImageData(imageData, x, y);
         dirtyContents();
+    }
+
+    public function getColorBounds(mask :Int, color :Int, negate = false) :Rectangle
+    {
+        var data :Array<Int> = cast getContext2d().getImageData(0, 0, width, height).data;
+        var bounds = [ width, height, 0, 0 ];
+
+        // We need to split the check in two as left shifting in JS is contrained to 32 bits
+        var masks = [ mask >>> 16, mask & 0xffff ];
+        var targets = [ (color >>> 16) & masks[0], color & masks[1] ];
+
+        var i = 0;
+        while(i < data.length) {
+            if( ((data[i + 3] << 8) + data[i])     & masks[0] == targets[0] &&
+                ((data[i + 1] << 8) + data[i + 2]) & masks[1] == targets[1] ) {
+                if(negate) {
+                    i += 4;
+                    continue;
+                }
+            } else {
+                if(!negate) {
+                    i += 4;
+                    continue;
+                }
+            }
+
+            var x = Std.int(i / 4) % width;
+            var y = Std.int(Std.int(i / 4) / width);
+
+            if(x < bounds[0]) bounds[0] = x;
+            if(x > bounds[2]) bounds[2] = x;
+
+            if(y < bounds[1]) bounds[1] = y;
+            if(y > bounds[3]) bounds[3] = y;
+
+            i += 4;
+        }
+
+        if(bounds[2] == 0 || bounds[3] == 0)
+          return new Rectangle(0, 0, 0, 0);
+        else
+          return new Rectangle(bounds[0], bounds[1], bounds[2] - bounds[0] + 1, bounds[3] - bounds[1] + 1);
     }
 
     inline public function dirtyContents ()

@@ -51,6 +51,7 @@ the [forum], [email me] privately, or talk to me in #Haxe on
 irc.freenode.net.
 
 [![Build Status](https://secure.travis-ci.org/aduros/flambe.png?branch=master)](http://travis-ci.org/aduros/flambe)
+[![Selenium Test Status](https://saucelabs.com/buildstatus/flambe)](https://saucelabs.com/u/flambe)
 
 [Flambe wiki]: https://github.com/aduros/flambe/wiki
 [install guide]: https://github.com/aduros/flambe/wiki/Installation

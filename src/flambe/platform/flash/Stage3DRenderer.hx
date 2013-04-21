@@ -69,7 +69,7 @@ class Stage3DRenderer
 
     public function createGraphics (renderTarget :Stage3DTexture) :Stage3DGraphics
     {
-        return new Stage3DGraphics(_context3D, batcher, renderTarget);
+        return new Stage3DGraphics(batcher, renderTarget);
     }
 
     public function willRender () :Graphics

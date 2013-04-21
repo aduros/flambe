@@ -65,7 +65,7 @@ def apply_haxe(self):
 
     if target.endswith(".swf"):
         flags += ["-swf", target, "--flash-strict", "-D", "nativeTrace",
-            "-swf-header", "640:480:60:ffffff"]
+            "-swf-header", "640:480:60:000000"]
         if (self.swflib is not None):
             swflib = self.path.get_bld().make_node(self.swflib)
             inputs += [swflib]

@@ -20,10 +20,8 @@ import flambe.util.Assert;
 class Stage3DGraphics
     implements Graphics
 {
-    public function new (context3D :Context3D, batcher :Stage3DBatcher,
-        renderTarget :Stage3DTexture)
+    public function new (batcher :Stage3DBatcher, renderTarget :Stage3DTexture)
     {
-        _context3D = context3D;
         _batcher = batcher;
         _renderTarget = renderTarget;
 
@@ -327,7 +325,6 @@ class Stage3DGraphics
         return v;
     })();
 
-    private var _context3D :Context3D;
     private var _batcher :Stage3DBatcher;
     private var _renderTarget :Stage3DTexture;
 

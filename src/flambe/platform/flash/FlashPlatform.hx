@@ -8,7 +8,6 @@ package flambe.platform.flash;
 import flash.Lib;
 import flash.display.Sprite;
 import flash.events.Event;
-import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.events.TouchEvent;
 import flash.events.UncaughtErrorEvent;
@@ -27,7 +26,6 @@ import flambe.input.Keyboard;
 import flambe.input.Mouse;
 import flambe.input.Pointer;
 import flambe.input.Touch;
-import flambe.platform.BasicKeyboard;
 import flambe.platform.BasicPointer;
 import flambe.platform.MainLoop;
 import flambe.platform.Platform;
@@ -61,15 +59,13 @@ class FlashPlatform
 #else
         _touch = new DummyTouch();
 #end
-        _keyboard = new BasicKeyboard();
+        _keyboard = FlashKeyboard.shouldUse() ? new FlashKeyboard(stage) : new DummyKeyboard();
+
         _renderer = new Stage3DRenderer();
         mainLoop = new MainLoop();
 
         stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
         stage.addEventListener(Event.RENDER, onRender);
-
-        stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
-        stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
 
         Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(
             UncaughtErrorEvent.UNCAUGHT_ERROR, onUncaughtError);
@@ -195,18 +191,6 @@ class FlashPlatform
         return (_timeOffset+Lib.getTimer()) / 1000;
     }
 
-    private function onKeyDown (event :KeyboardEvent)
-    {
-        if (_keyboard.submitDown(event.keyCode)) {
-            event.preventDefault();
-        }
-    }
-
-    private function onKeyUp (event :KeyboardEvent)
-    {
-        _keyboard.submitUp(event.keyCode);
-    }
-
     private function onEnterFrame (_)
     {
         var now = Lib.getTimer();
@@ -243,7 +227,7 @@ class FlashPlatform
     private var _pointer :BasicPointer;
     private var _mouse :Mouse;
     private var _touch :Touch;
-    private var _keyboard :BasicKeyboard;
+    private var _keyboard :Keyboard;
     private var _storage :Storage;
     private var _web :Web;
     private var _external :External;

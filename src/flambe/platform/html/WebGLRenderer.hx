@@ -25,7 +25,7 @@ class WebGLRenderer
         batcher = new WebGLBatcher(gl);
         _graphics = new WebGLGraphics(gl, batcher);
 
-        gl.clearColor(1, 1, 1, 1);
+        gl.clearColor(0, 0, 0, 1);
         gl.enable(GL.BLEND);
         gl.pixelStorei(GL.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
 

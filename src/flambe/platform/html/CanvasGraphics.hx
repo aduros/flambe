@@ -21,13 +21,6 @@ class CanvasGraphics
         _canvasCtx = canvas.getContext2d();
     }
 
-    public function clear ()
-    {
-        // Clear to opaque white
-        _canvasCtx.fillStyle = "#ffffff";
-        _canvasCtx.fillRect(0, 0, _canvasCtx.canvas.width, _canvasCtx.canvas.height);
-    }
-
     public function save ()
     {
         _canvasCtx.save();

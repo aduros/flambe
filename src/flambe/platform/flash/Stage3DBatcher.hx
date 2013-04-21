@@ -50,7 +50,7 @@ class Stage3DBatcher
             _currentRenderTarget = _lastRenderTarget = null;
         }
         // And clear it as required by Stage3D
-        _context3D.clear(1, 1, 1);
+        _context3D.clear(0, 0, 0);
     }
 
     public function didRender ()
@@ -155,7 +155,7 @@ class Stage3DBatcher
         // Restore the back buffer to its previous state
         var stage = Lib.current.stage;
         _context3D.configureBackBuffer(stage.stageWidth, stage.stageHeight, 2, false);
-        _context3D.clear(1, 1, 1);
+        _context3D.clear(0, 0, 0);
 
         return pixels;
     }

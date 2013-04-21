@@ -16,7 +16,6 @@ class CanvasRenderer
     public function new (canvas :CanvasElement)
     {
         _graphics = new CanvasGraphics(canvas);
-        _graphics.clear();
     }
 
     public function createTexture (image :Dynamic) :Texture

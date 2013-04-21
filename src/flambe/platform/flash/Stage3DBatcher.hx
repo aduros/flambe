@@ -267,6 +267,7 @@ class Stage3DBatcher
         // TODO(bruno): Optimize with switch/case?
         if (_lastShader == _drawImageShader) {
             _drawImageShader.texture = _lastTexture.nativeTexture;
+            _drawImageShader.rebuildVars();
             vertexBuffer = _vertexBuffer5;
 
         } else if (_lastShader == _drawPatternShader) {
@@ -277,6 +278,7 @@ class Stage3DBatcher
             // maxUV.w = 0;
             _drawPatternShader.texture = _lastTexture.nativeTexture;
             _drawPatternShader.maxUV = maxUV;
+            _drawPatternShader.rebuildVars();
             vertexBuffer = _vertexBuffer5;
 
         } else if (_lastShader == _fillRectShader) {

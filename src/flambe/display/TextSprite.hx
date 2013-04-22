@@ -16,17 +16,27 @@ using flambe.util.BitSets;
 class TextSprite extends Sprite
 {
     public var text (get_text, set_text) :String;
+
+    /** The font used to display the text. */
     public var font (get_font, set_font) :Font;
 
+    /**
+     * The maximum available width of this text before word wrapping to a new line. Defaults to 0
+     * (no word wrapping).
+     */
     public var wrapWidth (default, null) :AnimatedFloat;
-    public var align :TextAlign;
+
+    /**
+     * The horizontal text alignment, for multiline text. Left by default.
+     */
+    public var align (get_align, set_align) :TextAlign;
 
     public function new (font :Font, ?text :String = "")
     {
         super();
         _font = font;
         _text = text;
-        align = Left;
+        _align = Left;
         _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
 
         wrapWidth = new AnimatedFloat(0, function (_,_) {
@@ -37,19 +47,32 @@ class TextSprite extends Sprite
     override public function draw (g :Graphics)
     {
         updateLayout();
+
+#if flambe_debug_text
+        // Draw the bounding boxes for debugging
+        g.fillRect(0xff0000, 0, 0, getNaturalWidth(), getNaturalHeight());
+        g.fillRect(0x00ff00, _layout.bounds.x, _layout.bounds.y, _layout.bounds.width, _layout.bounds.height);
+#end
+
         _layout.draw(g, align);
     }
 
     override public function getNaturalWidth () :Float
     {
         updateLayout();
-        return _layout.width;
+        return (wrapWidth._ > 0) ? wrapWidth._ : _layout.bounds.width;
     }
 
     override public function getNaturalHeight () :Float
     {
         updateLayout();
-        return _layout.height;
+        return _layout.lines * _font.size;
+    }
+
+    override public function containsLocal (localX :Float, localY :Float) :Bool
+    {
+        updateLayout();
+        return _layout.bounds.contains(localX, localY);
     }
 
     inline private function get_text () :String
@@ -76,11 +99,23 @@ class TextSprite extends Sprite
         return font;
     }
 
+    inline private function get_align () :TextAlign
+    {
+        return _align;
+    }
+
+    private function set_align (align :TextAlign) :TextAlign
+    {
+        _align = align;
+        _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
+        return align;
+    }
+
     private function updateLayout ()
     {
         if (_flags.contains(Sprite.TEXTSPRITE_DIRTY)) {
             _flags = _flags.remove(Sprite.TEXTSPRITE_DIRTY);
-            _layout = font.layoutText(_text, wrapWidth._);
+            _layout = font.layoutText(_text, _align, wrapWidth._);
         }
     }
 
@@ -92,6 +127,7 @@ class TextSprite extends Sprite
 
     private var _font :Font;
     private var _text :String;
+    private var _align :TextAlign;
 
     private var _layout :TextLayout = null;
 }

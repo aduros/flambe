@@ -6,6 +6,7 @@ package flambe.display;
 
 import flambe.asset.AssetPack;
 import flambe.math.FMath;
+import flambe.math.Rectangle;
 
 using StringTools;
 using flambe.util.Strings;
@@ -58,10 +59,10 @@ class Font
                 var file :String = null;
                 for (pair in parser.pairs()) {
                     switch (pair.key) {
-                        case "id":
-                            pageId = pair.getInt();
-                        case "file":
-                            file = pair.getString();
+                    case "id":
+                        pageId = pair.getInt();
+                    case "file":
+                        file = pair.getString();
                     }
                 }
                 pages.set(pageId, pack.getTexture(basePath + file.removeFileExtension()));
@@ -175,9 +176,12 @@ class Font
         return list;
     }
 
-    public function layoutText (text :String, wrapWidth :Float = 0) :TextLayout
+    public function layoutText (text :String, ?align :TextAlign, wrapWidth :Float = 0) :TextLayout
     {
-        return new TextLayout(this, text, wrapWidth);
+        if (align == null) {
+            align = Left;
+        }
+        return new TextLayout(this, text, align, wrapWidth);
     }
 
     /**
@@ -264,21 +268,20 @@ enum TextAlign
  */
 class TextLayout
 {
-    /** Total width of the text, in pixels. */
-    public var width (default, null) :Float = 0;
-
-    /** Total height of the text, in pixels. */
-    public var height (default, null) :Float = 0;
+    /** The bounding box that contains this text. */
+    public var bounds (default, null) :Rectangle;
 
     /** The number of lines in this text. */
     public var lines (default, null) :Int = 0;
 
-    /** @private */ public function new (font :Font, text :String, wrapWidth :Float)
+    /** @private */ public function new (font :Font, text :String, align :TextAlign, wrapWidth :Float)
     {
         _font = font;
         _glyphs = [];
         _offsets = [];
-        _lineWidths = [];
+
+        bounds = new Rectangle();
+        var lineWidths = [];
 
         var ll = text.length;
         for (ii in 0...ll) {
@@ -295,12 +298,13 @@ class TextLayout
         var lastSpaceIdx = -1;
         var lineWidth = 0.0;
         var lineHeight = 0.0;
-        var newline = font.getGlyph('\n'.code);
+        var newline = font.getGlyph("\n".code);
 
         var addLine = function () {
-            width = FMath.max(width, lineWidth);
-            height += lineHeight;
-            _lineWidths[lines] = lineWidth;
+            bounds.width = FMath.max(bounds.width, lineWidth);
+            bounds.height += lineHeight;
+
+            lineWidths[lines] = lineWidth;
             lineWidth = 0;
             lineHeight = 0;
             ++lines;
@@ -347,6 +351,37 @@ class TextLayout
 
         // Handle the remaining lineWidth/Height
         addLine();
+
+        var lineY = 0.0;
+        var alignOffset = getAlignOffset(align, lineWidths[0], wrapWidth);
+
+        var top = FMath.FLOAT_MAX;
+        var bottom = FMath.FLOAT_MIN;
+
+        // Pack bounds
+        var line = 0;
+        var ii = 0;
+        var ll = _glyphs.length;
+        while (ii < ll) {
+            var glyph = _glyphs[ii];
+
+            if (glyph.charCode == "\n".code) {
+                lineY += font.size;
+                ++line;
+                alignOffset = getAlignOffset(align, lineWidths[line], wrapWidth);
+            }
+            _offsets[ii] += alignOffset;
+
+            var glyphY = lineY + glyph.yOffset;
+            top = FMath.min(top, glyphY);
+            bottom = FMath.max(bottom, glyphY + glyph.height);
+
+            ++ii;
+        }
+
+        bounds.x = getAlignOffset(align, bounds.width, wrapWidth);
+        bounds.y = top;
+        bounds.height = bottom - top;
     }
 
     /** Draws this text to a Graphics. */
@@ -355,37 +390,32 @@ class TextLayout
         var y = 0.0;
         var ii = 0;
         var ll = _glyphs.length;
-        var line = 0;
-        var alignOffset = getAlignOffset(align, line);
 
         while (ii < ll) {
             var glyph = _glyphs[ii];
             if (glyph.charCode == "\n".code) {
                 y += _font.size;
-                ++line;
-                alignOffset = getAlignOffset(align, line);
-
             } else {
                 var x = _offsets[ii];
-                glyph.draw(g, alignOffset + x, y);
+                glyph.draw(g, x, y);
             }
             ++ii;
         }
     }
 
-    private function getAlignOffset (align :TextAlign, line :Int) :Float
+    private static function getAlignOffset (align :TextAlign,
+        lineWidth :Float, totalWidth :Float) :Float
     {
         switch (align) {
             case Left: return 0;
-            case Right: return width - _lineWidths[line];
-            case Center: return (width-_lineWidths[line]) / 2;
+            case Right: return totalWidth - lineWidth;
+            case Center: return (totalWidth - lineWidth) / 2;
         }
     }
 
     private var _font :Font;
     private var _glyphs :Array<Glyph>;
     private var _offsets :Array<Float>;
-    private var _lineWidths :Array<Float>;
 }
 
 private class ConfigParser

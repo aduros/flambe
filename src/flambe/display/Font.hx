@@ -5,6 +5,8 @@
 package flambe.display;
 
 import flambe.asset.AssetPack;
+import flambe.math.FMath;
+import flambe.math.Rectangle;
 
 using StringTools;
 using flambe.util.Strings;
@@ -33,6 +35,7 @@ class Font
     {
         this.name = name;
         _glyphs = new Map();
+        _glyphs.set(NEWLINE.charCode, NEWLINE);
 
         var parser = new ConfigParser(pack.getFile(name + ".fnt"));
         var pages = new Map<Int,Texture>();
@@ -56,10 +59,10 @@ class Font
                 var file :String = null;
                 for (pair in parser.pairs()) {
                     switch (pair.key) {
-                        case "id":
-                            pageId = pair.getInt();
-                        case "file":
-                            file = pair.getString();
+                    case "id":
+                        pageId = pair.getInt();
+                    case "file":
+                        file = pair.getString();
                     }
                 }
                 pages.set(pageId, pack.getTexture(basePath + file.removeFileExtension()));
@@ -173,6 +176,14 @@ class Font
         return list;
     }
 
+    public function layoutText (text :String, ?align :TextAlign, wrapWidth :Float = 0) :TextLayout
+    {
+        if (align == null) {
+            align = Left;
+        }
+        return new TextLayout(this, text, align, wrapWidth);
+    }
+
     /**
      * Get the Glyph for a given character code.
      */
@@ -180,6 +191,9 @@ class Font
     {
         return _glyphs.get(charCode);
     }
+
+    // A special glyph to handle the newline character, which is not included in most fonts
+    private static var NEWLINE = new Glyph('\n'.code);
 
     private var _glyphs :Map<Int,Glyph>;
 }
@@ -195,20 +209,20 @@ class Glyph
     public var charCode (default, null) :Int;
 
     // Location and dimensions of this glyph on the sprite sheet
-    public var x :Int;
-    public var y :Int;
-    public var width :Int;
-    public var height :Int;
+    public var x :Int = 0;
+    public var y :Int = 0;
+    public var width :Int = 0;
+    public var height :Int = 0;
 
     /**
      * The atlas that contains this glyph.
      */
-    public var page :Texture;
+    public var page :Texture = null;
 
-    public var xOffset :Int;
-    public var yOffset :Int;
+    public var xOffset :Int = 0;
+    public var yOffset :Int = 0;
 
-    public var xAdvance :Int;
+    public var xAdvance :Int = 0;
 
     @:allow(flambe) function new (charCode :Int)
     {
@@ -239,7 +253,169 @@ class Glyph
         _kernings.set(nextCharCode, amount);
     }
 
-    private var _kernings :Map<Int,Int>;
+    private var _kernings :Map<Int,Int> = null;
+}
+
+enum TextAlign
+{
+    Left;
+    Center;
+    Right;
+}
+
+/**
+ * Measures and lays out a block of text, handling word wrapping, alignment and newline characters.
+ */
+class TextLayout
+{
+    /** The bounding box that contains this text. */
+    public var bounds (default, null) :Rectangle;
+
+    /** The number of lines in this text. */
+    public var lines (default, null) :Int = 0;
+
+    @:allow(flambe) function new (font :Font, text :String, align :TextAlign, wrapWidth :Float)
+    {
+        _font = font;
+        _glyphs = [];
+        _offsets = [];
+
+        bounds = new Rectangle();
+        var lineWidths = [];
+
+        var ll = text.length;
+        for (ii in 0...ll) {
+            var charCode = text.fastCodeAt(ii);
+            var glyph = font.getGlyph(charCode);
+            if (glyph != null) {
+                _glyphs.push(glyph);
+            } else {
+                Log.warn("Requested a missing character from font",
+                    ["font", font.name, "charCode", charCode]);
+            }
+        }
+
+        var lastSpaceIdx = -1;
+        var lineWidth = 0.0;
+        var lineHeight = 0.0;
+        var newline = font.getGlyph("\n".code);
+
+        var addLine = function () {
+            bounds.width = FMath.max(bounds.width, lineWidth);
+            bounds.height += lineHeight;
+
+            lineWidths[lines] = lineWidth;
+            lineWidth = 0;
+            lineHeight = 0;
+            ++lines;
+        };
+
+        var ii = 0;
+        while (ii < _glyphs.length) {
+            var glyph = _glyphs[ii];
+            _offsets[ii] = lineWidth;
+
+            var wordWrap = wrapWidth > 0 && lineWidth + glyph.width > wrapWidth;
+            if (wordWrap || glyph == newline) {
+                // Wrap using the last word divider
+                if (wordWrap) {
+                    if (lastSpaceIdx >= 0) {
+                        _glyphs[lastSpaceIdx] = newline;
+                        lineWidth = _offsets[lastSpaceIdx];
+                        ii = lastSpaceIdx;
+                    } else {
+                        _glyphs.insert(ii, newline);
+                    }
+                }
+                lastSpaceIdx = -1;
+
+                lineHeight = font.size;
+                addLine();
+
+            } else {
+                if (glyph.charCode == " ".code) {
+                    lastSpaceIdx = ii;
+                }
+                lineWidth += glyph.xAdvance;
+                lineHeight = FMath.max(lineHeight, glyph.height + glyph.yOffset);
+
+                // Handle kerning with the next glyph
+                if (ii+1 < _glyphs.length) {
+                    var nextGlyph = _glyphs[ii+1];
+                    lineWidth += glyph.getKerning(nextGlyph.charCode);
+                }
+            }
+
+            ++ii;
+        }
+
+        // Handle the remaining lineWidth/Height
+        addLine();
+
+        var lineY = 0.0;
+        var alignOffset = getAlignOffset(align, lineWidths[0], wrapWidth);
+
+        var top = FMath.FLOAT_MAX;
+        var bottom = FMath.FLOAT_MIN;
+
+        // Pack bounds
+        var line = 0;
+        var ii = 0;
+        var ll = _glyphs.length;
+        while (ii < ll) {
+            var glyph = _glyphs[ii];
+
+            if (glyph.charCode == "\n".code) {
+                lineY += font.size;
+                ++line;
+                alignOffset = getAlignOffset(align, lineWidths[line], wrapWidth);
+            }
+            _offsets[ii] += alignOffset;
+
+            var glyphY = lineY + glyph.yOffset;
+            top = FMath.min(top, glyphY);
+            bottom = FMath.max(bottom, glyphY + glyph.height);
+
+            ++ii;
+        }
+
+        bounds.x = getAlignOffset(align, bounds.width, wrapWidth);
+        bounds.y = top;
+        bounds.height = bottom - top;
+    }
+
+    /** Draws this text to a Graphics. */
+    public function draw (g :Graphics, align :TextAlign)
+    {
+        var y = 0.0;
+        var ii = 0;
+        var ll = _glyphs.length;
+
+        while (ii < ll) {
+            var glyph = _glyphs[ii];
+            if (glyph.charCode == "\n".code) {
+                y += _font.size;
+            } else {
+                var x = _offsets[ii];
+                glyph.draw(g, x, y);
+            }
+            ++ii;
+        }
+    }
+
+    private static function getAlignOffset (align :TextAlign,
+        lineWidth :Float, totalWidth :Float) :Float
+    {
+        switch (align) {
+            case Left: return 0;
+            case Right: return totalWidth - lineWidth;
+            case Center: return (totalWidth - lineWidth) / 2;
+        }
+    }
+
+    private var _font :Font;
+    private var _glyphs :Array<Glyph>;
+    private var _offsets :Array<Float>;
 }
 
 private class ConfigParser

@@ -4,6 +4,7 @@
 
 package flambe.display;
 
+import flambe.animation.AnimatedFloat;
 import flambe.display.Font;
 import flambe.math.FMath;
 
@@ -15,40 +16,63 @@ using flambe.util.BitSets;
 class TextSprite extends Sprite
 {
     public var text (get, set) :String;
+
+    /** The font used to display the text. */
     public var font (get, set) :Font;
+
+    /**
+     * The maximum available width of this text before word wrapping to a new line. Defaults to 0
+     * (no word wrapping).
+     */
+    public var wrapWidth (default, null) :AnimatedFloat;
+
+    /**
+     * The horizontal text alignment, for multiline text. Left by default.
+     */
+    public var align (get, set) :TextAlign;
 
     public function new (font :Font, ?text :String = "")
     {
         super();
         _font = font;
         _text = text;
+        _align = Left;
         _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
+
+        wrapWidth = new AnimatedFloat(0, function (_,_) {
+            _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
+        });
     }
 
     override public function draw (g :Graphics)
     {
-        updateGlyphs();
+        updateLayout();
 
-        var ii = 0;
-        var ll = _glyphs.length;
-        while (ii < ll) {
-            var glyph = _glyphs[ii];
-            var offset = _offsets[ii];
-            glyph.draw(g, offset, 0);
-            ++ii;
-        }
+#if flambe_debug_text
+        // Draw the bounding boxes for debugging
+        g.fillRect(0xff0000, 0, 0, getNaturalWidth(), getNaturalHeight());
+        g.fillRect(0x00ff00, _layout.bounds.x, _layout.bounds.y, _layout.bounds.width, _layout.bounds.height);
+#end
+
+        _layout.draw(g, align);
     }
 
     override public function getNaturalWidth () :Float
     {
-        updateGlyphs();
-        return _width;
+        updateLayout();
+        return (wrapWidth._ > 0) ? wrapWidth._ : _layout.bounds.width;
     }
 
     override public function getNaturalHeight () :Float
     {
-        updateGlyphs();
-        return _height;
+        updateLayout();
+        return _layout.lines * _font.size;
+    }
+
+    override public function containsLocal (localX :Float, localY :Float) :Bool
+    {
+        updateLayout();
+        return _layout.bounds.contains(localX, localY);
     }
 
     inline private function get_text () :String
@@ -75,40 +99,35 @@ class TextSprite extends Sprite
         return font;
     }
 
-    private function updateGlyphs ()
+    inline private function get_align () :TextAlign
+    {
+        return _align;
+    }
+
+    private function set_align (align :TextAlign) :TextAlign
+    {
+        _align = align;
+        _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
+        return align;
+    }
+
+    private function updateLayout ()
     {
         if (_flags.contains(Sprite.TEXTSPRITE_DIRTY)) {
             _flags = _flags.remove(Sprite.TEXTSPRITE_DIRTY);
-
-            _glyphs = font.getGlyphs(text);
-            _offsets = [0];
-            _width = 0;
-            _height = 0;
-
-            var ii = 0;
-            var ll = _glyphs.length;
-            while (ii < ll) {
-                var glyph = _glyphs[ii];
-                ++ii;
-
-                if (ii == ll) {
-                    // Last glyph, only advance up until its right edge
-                    _width += glyph.width;
-                } else {
-                    var nextGlyph = _glyphs[ii];
-                    _width += glyph.xAdvance + glyph.getKerning(nextGlyph.charCode);
-                    _offsets.push(_width);
-                }
-                _height = FMath.max(_height, glyph.height + glyph.yOffset);
-            }
+            _layout = font.layoutText(_text, _align, wrapWidth._);
         }
     }
 
-    private var _glyphs :Array<Glyph> = null;
-    private var _offsets :Array<Float> = null;
-    private var _font :Font = null;
-    private var _text :String = null;
+    override public function onUpdate (dt :Float)
+    {
+        super.onUpdate(dt);
+        wrapWidth.update(dt);
+    }
 
-    private var _width :Float = 0;
-    private var _height :Float = 0;
+    private var _font :Font;
+    private var _text :String;
+    private var _align :TextAlign;
+
+    private var _layout :TextLayout = null;
 }

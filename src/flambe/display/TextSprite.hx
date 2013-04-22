@@ -19,12 +19,14 @@ class TextSprite extends Sprite
     public var font (get_font, set_font) :Font;
 
     public var wrapWidth (default, null) :AnimatedFloat;
+    public var align :TextAlign;
 
     public function new (font :Font, ?text :String = "")
     {
         super();
         _font = font;
         _text = text;
+        align = Left;
         _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
 
         wrapWidth = new AnimatedFloat(0, function (_,_) {
@@ -35,7 +37,7 @@ class TextSprite extends Sprite
     override public function draw (g :Graphics)
     {
         updateLayout();
-        _layout.draw(g);
+        _layout.draw(g, align);
     }
 
     override public function getNaturalWidth () :Float
@@ -88,8 +90,8 @@ class TextSprite extends Sprite
         wrapWidth.update(dt);
     }
 
-    private var _font :Font = null;
-    private var _text :String = null;
+    private var _font :Font;
+    private var _text :String;
 
     private var _layout :TextLayout = null;
 }

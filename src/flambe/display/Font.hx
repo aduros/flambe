@@ -252,6 +252,13 @@ class Glyph
     private var _kernings :IntHash<Int> = null;
 }
 
+enum TextAlign
+{
+    Left;
+    Center;
+    Right;
+}
+
 /**
  * Measures and lays out a block of text, handling word wrapping, alignment and newline characters.
  */
@@ -264,13 +271,14 @@ class TextLayout
     public var height (default, null) :Float = 0;
 
     /** The number of lines in this text. */
-    public var lines (default, null) :Int = 1;
+    public var lines (default, null) :Int = 0;
 
     /** @private */ public function new (font :Font, text :String, wrapWidth :Float)
     {
         _font = font;
         _glyphs = [];
         _offsets = [];
+        _lineWidths = [];
 
         var ll = text.length;
         for (ii in 0...ll) {
@@ -289,6 +297,15 @@ class TextLayout
         var lineHeight = 0.0;
         var newline = font.getGlyph('\n'.code);
 
+        var addLine = function () {
+            width = FMath.max(width, lineWidth);
+            height += lineHeight;
+            _lineWidths[lines] = lineWidth;
+            lineWidth = 0;
+            lineHeight = 0;
+            ++lines;
+        };
+
         var ii = 0;
         while (ii < _glyphs.length) {
             var glyph = _glyphs[ii];
@@ -296,23 +313,20 @@ class TextLayout
 
             var wordWrap = wrapWidth > 0 && lineWidth + glyph.width > wrapWidth;
             if (wordWrap || glyph == newline) {
-                // Add a new line
-                width = FMath.max(width, lineWidth);
-                height += font.size;
-                lineWidth = 0;
-                lineHeight = 0;
-                ++lines;
-
                 // Wrap using the last word divider
                 if (wordWrap) {
                     if (lastSpaceIdx >= 0) {
                         _glyphs[lastSpaceIdx] = newline;
+                        lineWidth = _offsets[lastSpaceIdx];
                         ii = lastSpaceIdx;
                     } else {
                         _glyphs.insert(ii, newline);
                     }
                 }
                 lastSpaceIdx = -1;
+
+                lineHeight = font.size;
+                addLine();
 
             } else {
                 if (glyph.charCode == " ".code) {
@@ -332,31 +346,46 @@ class TextLayout
         }
 
         // Handle the remaining lineWidth/Height
-        width = FMath.max(width, lineWidth);
-        height += lineHeight;
+        addLine();
     }
 
     /** Draws this text to a Graphics. */
-    public function draw (g :Graphics)
+    public function draw (g :Graphics, align :TextAlign)
     {
         var y = 0.0;
         var ii = 0;
         var ll = _glyphs.length;
+        var line = 0;
+        var alignOffset = getAlignOffset(align, line);
 
         while (ii < ll) {
             var glyph = _glyphs[ii];
             if (glyph.charCode == "\n".code) {
                 y += _font.size;
+                ++line;
+                alignOffset = getAlignOffset(align, line);
+
             } else {
-                glyph.draw(g, _offsets[ii], y);
+                var x = _offsets[ii];
+                glyph.draw(g, alignOffset + x, y);
             }
             ++ii;
+        }
+    }
+
+    private function getAlignOffset (align :TextAlign, line :Int) :Float
+    {
+        switch (align) {
+            case Left: return 0;
+            case Right: return width - _lineWidths[line];
+            case Center: return (width-_lineWidths[line]) / 2;
         }
     }
 
     private var _font :Font;
     private var _glyphs :Array<Glyph>;
     private var _offsets :Array<Float>;
+    private var _lineWidths :Array<Float>;
 }
 
 private class ConfigParser

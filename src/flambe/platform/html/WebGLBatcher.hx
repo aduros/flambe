@@ -14,6 +14,10 @@ import flambe.platform.shader.DrawPatternGL;
 import flambe.platform.shader.FillRectGL;
 import flambe.platform.shader.ShaderGL;
 
+/**
+ * Batches up geometry to glDrawElements and avoids redundant state changes. All GL state changes
+ * MUST go through the batcher.
+ */
 class WebGLBatcher
 {
     public var data (default, null) :Float32Array;
@@ -22,11 +26,15 @@ class WebGLBatcher
     {
         _gl = gl;
 
-        _vertexBuffer = _gl.createBuffer();
-        _gl.bindBuffer(GL.ARRAY_BUFFER, _vertexBuffer);
+        gl.clearColor(0, 0, 0, 1);
+        gl.enable(GL.BLEND);
+        gl.pixelStorei(GL.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
 
-        _quadIndexBuffer = _gl.createBuffer();
-        _gl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, _quadIndexBuffer);
+        _vertexBuffer = gl.createBuffer();
+        gl.bindBuffer(GL.ARRAY_BUFFER, _vertexBuffer);
+
+        _quadIndexBuffer = gl.createBuffer();
+        gl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, _quadIndexBuffer);
 
         _drawImageShader = new DrawImageGL(gl);
         _drawPatternShader = new DrawPatternGL(gl);
@@ -43,6 +51,16 @@ class WebGLBatcher
     public function didRender ()
     {
         flush();
+    }
+
+    /** Safely bind a texture, flushing the buffer if necessary. */
+    public function bindTexture (texture :Texture)
+    {
+        flush();
+        _lastTexture = null;
+        _currentTexture = null;
+
+        _gl.bindTexture(GL.TEXTURE_2D, texture);
     }
 
     public function prepareDrawImage (blendMode :BlendMode, texture :WebGLTexture) :Int

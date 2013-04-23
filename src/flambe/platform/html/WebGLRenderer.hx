@@ -23,11 +23,7 @@ class WebGLRenderer
 
         this.gl = gl;
         batcher = new WebGLBatcher(gl);
-        _graphics = new WebGLGraphics(gl, batcher);
-
-        gl.clearColor(0, 0, 0, 1);
-        gl.enable(GL.BLEND);
-        gl.pixelStorei(GL.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
+        _graphics = new WebGLGraphics(batcher);
 
         stage.resize.connect(onResize);
         onResize();

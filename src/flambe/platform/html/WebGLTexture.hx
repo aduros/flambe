@@ -40,7 +40,7 @@ class WebGLTexture
 
         var gl = renderer.gl;
         nativeTexture = gl.createTexture();
-        gl.bindTexture(GL.TEXTURE_2D, nativeTexture);
+        renderer.batcher.bindTexture(nativeTexture);
         gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
         gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
         gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
@@ -58,7 +58,7 @@ class WebGLTexture
         }
 
         var gl = _renderer.gl;
-        gl.bindTexture(GL.TEXTURE_2D, nativeTexture);
+        _renderer.batcher.bindTexture(nativeTexture);
         gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, image);
         gl.generateMipmap(GL.TEXTURE_2D);
     }

@@ -23,7 +23,7 @@ class WebGLRenderer
 
         this.gl = gl;
         batcher = new WebGLBatcher(gl);
-        _graphics = new WebGLGraphics(batcher);
+        _graphics = new WebGLGraphics(batcher, null);
 
         stage.resize.connect(onResize);
         onResize();
@@ -31,14 +31,16 @@ class WebGLRenderer
 
     public function createTexture (image :Dynamic) :WebGLTexture
     {
-        var texture = createEmptyTexture(image.width, image.height);
+        var texture = new WebGLTexture(this, image.width, image.height);
         texture.uploadImageData(image);
         return texture;
     }
 
     public function createEmptyTexture (width :Int, height :Int) :WebGLTexture
     {
-        return new WebGLTexture(this, width, height);
+        var texture = new WebGLTexture(this, width, height);
+        texture.clear();
+        return texture;
     }
 
     public function willRender () :Graphics

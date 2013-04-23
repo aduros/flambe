@@ -53,7 +53,7 @@ class WebGLBatcher
         flush();
     }
 
-    /** Safely bind a texture, flushing the buffer if necessary. */
+    /** Safely bind a texture. */
     public function bindTexture (texture :Texture)
     {
         flush();
@@ -63,32 +63,48 @@ class WebGLBatcher
         _gl.bindTexture(GL.TEXTURE_2D, texture);
     }
 
-    public function prepareDrawImage (blendMode :BlendMode, texture :WebGLTexture) :Int
+    /** Safely bind a framebuffer. */
+    public function bindFramebuffer (framebuffer :Framebuffer)
+    {
+        flush();
+        _lastRenderTarget = null;
+        _currentRenderTarget = null;
+
+        _gl.bindFramebuffer(GL.FRAMEBUFFER, framebuffer);
+    }
+
+    public function prepareDrawImage (renderTarget :WebGLTexture,
+        blendMode :BlendMode, texture :WebGLTexture) :Int
     {
         if (texture != _lastTexture) {
             flush();
             _lastTexture = texture;
         }
-        return prepareQuad(5, blendMode, _drawImageShader);
+        return prepareQuad(5, renderTarget, blendMode, _drawImageShader);
     }
 
-    public function prepareDrawPattern (blendMode :BlendMode, texture :WebGLTexture) :Int
+    public function prepareDrawPattern (renderTarget :WebGLTexture,
+        blendMode :BlendMode, texture :WebGLTexture) :Int
     {
         if (texture != _lastTexture) {
             flush();
             _lastTexture = texture;
         }
-        return prepareQuad(5, blendMode, _drawPatternShader);
+        return prepareQuad(5, renderTarget, blendMode, _drawPatternShader);
     }
 
-    public function prepareFillRect (blendMode :BlendMode) :Int
+    public function prepareFillRect (renderTarget :WebGLTexture, blendMode :BlendMode) :Int
     {
-        return prepareQuad(6, blendMode, _fillRectShader);
+        return prepareQuad(6, renderTarget, blendMode, _fillRectShader);
     }
 
-    private function prepareQuad (elementsPerVertex :Int,
+    private function prepareQuad (elementsPerVertex :Int, renderTarget :WebGLTexture,
         blendMode :BlendMode, shader :ShaderGL) :Int
     {
+        if (renderTarget != _lastRenderTarget) {
+            flush();
+            _lastRenderTarget = renderTarget;
+        }
         if (blendMode != _lastBlendMode) {
             flush();
             _lastBlendMode = blendMode;
@@ -112,6 +128,13 @@ class WebGLBatcher
     {
         if (_quads < 1) {
             return;
+        }
+
+        if (_lastRenderTarget != _currentRenderTarget) {
+            // Bind the texture framebuffer, or the original backbuffer
+            _gl.bindFramebuffer(GL.FRAMEBUFFER, (_lastRenderTarget != null) ?
+                _lastRenderTarget.framebuffer : null);
+            _currentRenderTarget = _lastRenderTarget;
         }
 
         if (_lastBlendMode != _currentBlendMode) {
@@ -179,6 +202,7 @@ class WebGLBatcher
 
     // Used to keep track of context changes requiring a flush
     private var _lastBlendMode :BlendMode = null;
+    private var _lastRenderTarget :WebGLTexture = null;
     private var _lastShader :ShaderGL = null;
     private var _lastTexture :WebGLTexture = null;
 
@@ -186,6 +210,7 @@ class WebGLBatcher
     private var _currentBlendMode :BlendMode = null;
     private var _currentShader :ShaderGL = null;
     private var _currentTexture :WebGLTexture = null;
+    private var _currentRenderTarget :WebGLTexture = null;
 
     private var _vertexBuffer :Buffer;
     private var _quadIndexBuffer :Buffer;

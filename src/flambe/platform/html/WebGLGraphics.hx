@@ -18,7 +18,7 @@ import flambe.util.Assert;
 class WebGLGraphics
     implements Graphics
 {
-    public function new (batcher :WebGLBatcher)
+    public function new (batcher :WebGLBatcher, renderTarget :WebGLTexture)
     {
         // Initialize this here to prevent blowing up during static init on browsers without typed
         // array support
@@ -27,6 +27,7 @@ class WebGLGraphics
         }
 
         _batcher = batcher;
+        _renderTarget = renderTarget;
     }
 
     public function save ()
@@ -95,7 +96,7 @@ class WebGLGraphics
         var v2 = texture.maxV*(sourceY + sourceH) / h;
         var alpha = state.alpha;
 
-        var offset = _batcher.prepareDrawImage(state.blendMode, texture);
+        var offset = _batcher.prepareDrawImage(_renderTarget, state.blendMode, texture);
         var data = _batcher.data;
 
         data[  offset] = pos[0];
@@ -133,7 +134,7 @@ class WebGLGraphics
         var v2 = texture.maxV * (height / texture.height);
         var alpha = state.alpha;
 
-        var offset = _batcher.prepareDrawPattern(state.blendMode, texture);
+        var offset = _batcher.prepareDrawPattern(_renderTarget, state.blendMode, texture);
         var data = _batcher.data;
 
         data[  offset] = pos[0];
@@ -171,7 +172,7 @@ class WebGLGraphics
         var b = (color & 0x0000ff) / 0x0000ff;
         var a = state.alpha;
 
-        var offset = _batcher.prepareFillRect(state.blendMode);
+        var offset = _batcher.prepareFillRect(_renderTarget, state.blendMode);
         var data = _batcher.data;
 
         data[  offset] = pos[0];
@@ -260,6 +261,7 @@ class WebGLGraphics
     private static var _scratchQuadArray :Float32Array = null;
 
     private var _batcher :WebGLBatcher;
+    private var _renderTarget :WebGLTexture;
 
     private var _stateList :DrawingState = null;
 }

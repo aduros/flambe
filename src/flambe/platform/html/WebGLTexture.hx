@@ -4,8 +4,9 @@
 
 package flambe.platform.html;
 
-import js.html.webgl.RenderingContext;
+import js.html.Uint8Array;
 import js.html.webgl.Framebuffer;
+import js.html.webgl.RenderingContext;
 
 import haxe.io.Bytes;
 
@@ -75,12 +76,23 @@ class WebGLTexture
 
     public function readPixels (x :Int, y :Int, width :Int, height :Int) :Bytes
     {
-        return throw "TODO";
+        get_graphics(); // Ensure we have a framebuffer
+        _renderer.batcher.bindFramebuffer(framebuffer);
+
+        var pixels = new Uint8Array(4*width*height);
+        var gl = _renderer.gl;
+        gl.readPixels(x, y, width, height, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
+        return Bytes.ofData(cast pixels);
     }
 
     public function writePixels (pixels :Bytes, x :Int, y :Int, sourceW :Int, sourceH :Int)
     {
-        return throw "TODO";
+        _renderer.batcher.bindTexture(nativeTexture);
+
+        // TODO(bruno): Avoid the redundant Uint8Array copy
+        var gl = _renderer.gl;
+        gl.texSubImage2D(GL.TEXTURE_2D, 0, x, y, sourceW, sourceH,
+            GL.RGBA, GL.UNSIGNED_BYTE, new Uint8Array(pixels.getData()));
     }
 
     inline private function get_width () :Int

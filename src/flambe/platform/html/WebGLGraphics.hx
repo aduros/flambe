@@ -227,7 +227,10 @@ class WebGLGraphics
     public function reset (width :Int, height :Int)
     {
         _stateList = new DrawingState();
-        _stateList.matrix.set(2/width, 0, 0, -2/height, -1, 1);
+
+        // Framebuffers need to be vertically flipped
+        var flip = (_renderTarget != null) ? -1 : 1;
+        _stateList.matrix.set(2/width, 0, 0, flip * -2/height, -1, flip);
     }
 
     inline private function getTopState () :DrawingState

@@ -169,8 +169,8 @@ class WebGLTexture
     private var _width :Int;
     private var _height :Int;
 
-    public var _widthPow2 :Int;
-    public var _heightPow2 :Int;
+    private var _widthPow2 :Int;
+    private var _heightPow2 :Int;
 
     private var _graphics :WebGLGraphics = null;
 }

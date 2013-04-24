@@ -82,12 +82,28 @@ class WebGLTexture
         var pixels = new Uint8Array(4*width*height);
         var gl = _renderer.gl;
         gl.readPixels(x, y, width, height, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
+
+        // Undo alpha premultiplication. This is lossy!
+        var ii = 0, ll = pixels.length;
+        while (ii < ll) {
+            var invAlpha = 255 / pixels[ii+3];
+            pixels[ii] = cast pixels[ii] * invAlpha;
+            ++ii;
+            pixels[ii] = cast pixels[ii] * invAlpha;
+            ++ii;
+            pixels[ii] = cast pixels[ii] * invAlpha;
+            ii += 2; // Advance to next pixel
+        }
+
         return Bytes.ofData(cast pixels);
     }
 
     public function writePixels (pixels :Bytes, x :Int, y :Int, sourceW :Int, sourceH :Int)
     {
         _renderer.batcher.bindTexture(nativeTexture);
+
+        // Can't update a texture used by a bound framebuffer apparently
+        _renderer.batcher.bindFramebuffer(null);
 
         // TODO(bruno): Avoid the redundant Uint8Array copy
         var gl = _renderer.gl;

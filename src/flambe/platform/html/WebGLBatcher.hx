@@ -43,6 +43,13 @@ class WebGLBatcher
         resize(16);
     }
 
+    public function reset (width :Int, height :Int)
+    {
+        _gl.viewport(0, 0, width, height);
+        _backbufferWidth = width;
+        _backbufferHeight = height;
+    }
+
     public function willRender ()
     {
         // _gl.clear(GL.COLOR_BUFFER_BIT);
@@ -132,8 +139,13 @@ class WebGLBatcher
 
         if (_lastRenderTarget != _currentRenderTarget) {
             // Bind the texture framebuffer, or the original backbuffer
-            _gl.bindFramebuffer(GL.FRAMEBUFFER, (_lastRenderTarget != null) ?
-                _lastRenderTarget.framebuffer : null);
+            if (_lastRenderTarget != null) {
+                _gl.bindFramebuffer(GL.FRAMEBUFFER, _lastRenderTarget.framebuffer);
+                _gl.viewport(0, 0, _lastRenderTarget.width, _lastRenderTarget.height);
+            } else {
+                _gl.bindFramebuffer(GL.FRAMEBUFFER, null);
+                _gl.viewport(0, 0, _backbufferWidth, _backbufferHeight);
+            }
             _currentRenderTarget = _lastRenderTarget;
         }
 
@@ -222,4 +234,7 @@ class WebGLBatcher
     private var _quads :Int = 0;
     private var _maxQuads :Int = 0;
     private var _dataOffset :Int = 0;
+
+    private var _backbufferWidth :Int = 0;
+    private var _backbufferHeight :Int = 0;
 }

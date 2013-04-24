@@ -59,7 +59,7 @@ class WebGLRenderer
         var width = gl.canvas.width;
         var height = gl.canvas.height;
 
-        gl.viewport(0, 0, width, height);
+        batcher.reset(width, height);
         _graphics.reset(width, height);
     }
 

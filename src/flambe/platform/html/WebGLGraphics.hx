@@ -50,17 +50,35 @@ class WebGLGraphics
 
     public function translate (x :Float, y :Float)
     {
-        throw "TODO";
+        var matrix = getTopState().matrix;
+        matrix.m02 += matrix.m00*x + matrix.m01*y;
+        matrix.m12 += matrix.m10*x + matrix.m11*y;
     }
 
     public function scale (x :Float, y :Float)
     {
-        throw "TODO";
+        var matrix = getTopState().matrix;
+        matrix.m00 *= x;
+        matrix.m10 *= x;
+        matrix.m01 *= y;
+        matrix.m11 *= y;
     }
 
     public function rotate (rotation :Float)
     {
-        throw "TODO";
+        var matrix = getTopState().matrix;
+        rotation = FMath.toRadians(rotation);
+        var sin = Math.sin(rotation);
+        var cos = Math.cos(rotation);
+        var m00 = matrix.m00;
+        var m10 = matrix.m10;
+        var m01 = matrix.m01;
+        var m11 = matrix.m11;
+
+        matrix.m00 = m00*cos + m01*sin;
+        matrix.m10 = m10*cos + m11*sin;
+        matrix.m01 = m01*cos - m00*sin;
+        matrix.m11 = m11*cos - m10*sin;
     }
 
     public function transform (m00 :Float, m10 :Float, m01 :Float, m11 :Float, m02 :Float, m12 :Float)

@@ -49,14 +49,15 @@ def apply_flambe(ctx):
         # If no hxproj, assume a src directory
         classpath.append(ctx.path.find_dir("src"))
 
+    flags = []
+
     main = ctx.main
     if not main:
         if hxproj:
             main = infer_main(hxproj)
-        if not main:
-            ctx.bld.fatal("You must specify a main class in your wscript or hxproj")
+    if main:
+        flags += ["-main", main]
 
-    flags = ["-main", main]
     if ctx.dead_code_elimination:
         flags += ["-dce", "full"]
     flags += Utils.to_list(ctx.flags)
@@ -71,6 +72,7 @@ def apply_flambe(ctx):
 
     # Figure out what should be built
     build_flash = "flash" in platforms and ctx.env.has_flash
+    build_swc = "swc" in platforms and ctx.env.has_flash
     build_html = "html" in platforms and ctx.env.has_html
     build_android = "android" in platforms and ctx.env.has_android
     build_ios = "ios" in platforms and ctx.env.has_ios
@@ -103,6 +105,18 @@ def apply_flambe(ctx):
             libs=libs,
             target=swf)
         ctx.bld.install_files(install_prefix + "web/targets", swf)
+
+    if build_swc:
+        flash_flags = ["-swf-version", flash_version]
+
+        swc = build_prefix + "flash.swc"
+        outputs.append(swc)
+
+        ctx.bld(features="haxe", classpath=classpath,
+            flags=flags + flash_flags,
+            libs=libs,
+            target=swc)
+        ctx.bld.install_files(install_prefix + "web/targets", swc)
 
     if build_html:
         html_flags = "-D html".split()

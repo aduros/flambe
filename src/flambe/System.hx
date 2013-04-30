@@ -14,6 +14,7 @@ import flambe.input.Keyboard;
 import flambe.input.Mouse;
 import flambe.input.Pointer;
 import flambe.input.Touch;
+import flambe.input.Accelerometer;
 import flambe.platform.Platform;
 import flambe.storage.Storage;
 import flambe.util.Assert;
@@ -49,12 +50,12 @@ class System
     public static var pointer (get_pointer, null) :Pointer;
 
     /**
-     * The Mouse subsystem, for direct access to the mouse.
+     * The Mouse subsystem, for direct access to the mouse. Test blah blah
      */
     public static var mouse (get_mouse, null) :Mouse;
 
     /**
-     * The Touch subsystem, for direct access to the multi-touch.
+     * The Touch subsystem, for direct access to the multi-touch. Some other thing
      */
     public static var touch (get_touch, null) :Touch;
 
@@ -72,6 +73,11 @@ class System
      * The External subsystem, for interaction with external code.
      */
     public static var external (get_external, null) :External;
+
+    /**
+     * 
+     */
+    public static var accelerometer (get_accelerometer, null) :Accelerometer;
 
     // TODO(bruno): Subsystems for accelerometer, gamepads, haptic, geolocation, video, textInput
 
@@ -220,6 +226,17 @@ class System
     {
         #if debug assertCalledInit(); #end
         return _platform.getLocale();
+    }
+
+    inline static function get_accelerometer () :Accelerometer
+    {
+        #if debug assertCalledInit(); #end
+        return _platform.getAccelerometer();
+    }
+
+    public static function disposeAccelerometer():Void
+    {
+        _platform.disposeAccelerometer();
     }
 
     private static function assertCalledInit ()

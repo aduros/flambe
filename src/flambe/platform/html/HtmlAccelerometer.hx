@@ -1,9 +1,11 @@
 package flambe.platform.html;
 
+import flambe.util.Signal0;
 import flambe.util.Signal1;
 import flambe.input.Accelerometer;
 import flambe.input.AccelerometerMotion;
 import flambe.input.AccelerometerOrientation;
+import flambe.platform.EventGroup;
 import Type;
 
 import js.Lib;
@@ -14,119 +16,127 @@ import js.Lib;
  */
 class HtmlAccelerometer implements Accelerometer
 {
-    /** Native orientation of the <i>device</i>, either landscape or portait. */
-    private var _deviceNativeOrienation:String;
-     /**
+    /**
+     * Device motion relative to window orientation.
+     * <code>null</code> if not supported.
      */
-    private var _windowOrientation:Float;
-
-    private var _win:Dynamic;
-
-    public function new()
-    {
-        _win = (untyped Lib.window);
-
-        supported = Type.typeof(_win.orientation) == ValueType.TInt;
-        //supported = win.DeviceOrientationEvent != null || win.DeviceMotionEvent != null; 
-        
-        if (supported)
-        {
-            if (_win.screen.height > _win.screen.width) //Are relative to native orientation. :)
-            {   
-                _deviceNativeOrienation = "portrait";
-            }
-            else
-            {
-                _deviceNativeOrienation = "landscape";
-            }
-
-            if (_win.DeviceOrientationEvent)
-            {
-                orientation = new AccelerometerOrientation();
-                orientationChange = new Signal1();
-
-                _win.addEventListener("deviceorientation", handleAccelerometerOrientation, true);
-            }
-
-            if (_win.DeviceMotionEvent)
-            {
-                motion = new AccelerometerMotion();
-                motionChange = new Signal1();
-            }
-
-        }
-
-    }
-
-    private function updateOrientation(pitch:Float, roll:Float, azimuth:Float)
-    {
-        orientation.update(pitch, roll, azimuth);
-        orientationChange.emit(orientation);
-    }
-
-    private function handleAccelerometerOrientation(event):Void
-    {
-        _windowOrientation = _win.orientation;
-
-        //switch properties to make them consistent with game orientation as opposed to native device orientation.
-        if (_deviceNativeOrienation == "landscape") 
-        {
-            //alpha = z = azimuth, beta = x = pitch, gamma = y = roll
-            if (_windowOrientation == 0 || _windowOrientation == -90)
-            {
-                updateOrientation(event.beta, -event.gamma, event.alpha);
-            }
-            else
-            {
-                updateOrientation(-event.beta, event.gamma, event.alpha);
-            }
-        }
-        else
-        {
-            //alpha = z = azimuth, beta = x = pitch, gamma = y = roll
-            if (_windowOrientation == 0 || _windowOrientation == -90)
-            {
-                updateOrientation(event.gamma, event.beta, event.alpha);
-            }
-            else
-            {
-                updateOrientation(-event.gamma, -event.beta, event.alpha);
-            }
-
-        }
-
-        orientationChange.emit(orientation);
-
-    }
-
-    public function die()
-    {
-        var win = (untyped Lib.window);
-        win.removeEventListener("deviceorientation", handleAccelerometerOrientation, true);
-    }
-
+    //public var motion(default, null):AccelerometerMotion;//TODO
     /**
      * Device position relative to window orientation.
      * <code>null</code> if not supported.
      */
     public var orientation(default, null):AccelerometerOrientation;
     /**
-     * Device motion relative to window orientation.
-     * <code>null</code> if not supported.
+     * 
      */
-    public var motion(default, null):AccelerometerMotion;
+    //public var motionSupported (default, null) :Bool;//TODO
+    /**
+     * 
+     */
+    public var orientationSupported (default, null) :Bool;
     /** 
-    * Returns true if either acceleration or orientation are suppored.
+    * <code>null</code> if not supported.
     */
-    public var supported (default, null) :Bool;
+    //public var motionChange(default, null): Signal1<AccelerometerMotion>;//TODO
     /** 
-    * 
-    */
-    public var motionChange(default, null): Signal1<AccelerometerMotion>;
-    /** 
-    * 
+    * <code>null</code> if not supported.
     */
     public var orientationChange(default, null): Signal1<AccelerometerOrientation>;
+    /**
+     * 
+     */
+    public var disposed(default, null):Signal0;
+
+    /**
+     * 
+     */
+    public function new(platform:Platform)
+    {   
+        disposed = new Signal0();
+
+        _eventGroup = new EventGroup();
+
+        _win = (untyped Lib.window);
+
+        //motionSupported = _win.DeviceMotionEvent != null; 
+        orientationSupported = _win.DeviceOrientationEvent != null; 
+
+        // if (motionSupported)
+        // {
+        //     motion = new AccelerometerMotion();
+        //     motionChange = new Signal1();
+        // }
+
+        if (orientationSupported)
+        {
+            orientation = new AccelerometerOrientation();
+            orientationChange = new Signal1();
+
+            _eventGroup.addListener(_win, "deviceorientation", handleAccelerometerOrientation);
+
+        }
+
+    }
+
+    /**
+     * 
+     */
+    private function updateOrientation(pitch:Float, roll:Float, azimuth:Float)
+    {
+        orientation.update(pitch, roll, azimuth);
+        orientationChange.emit(orientation);
+    }
+
+    /**
+     * 
+     */
+    private function handleAccelerometerOrientation(event):Void
+    {
+        _windowOrientation = _win.orientation;
+
+        //alpha = z = azimuth, beta = x = pitch, gamma = y = roll
+        if (_windowOrientation == -90)
+        {
+            updateOrientation(event.gamma, -event.beta, event.alpha);
+        }
+        else if (_windowOrientation == 0)
+        {
+            updateOrientation(event.beta, event.gamma, event.alpha);
+        }
+        else if (_windowOrientation == 90)
+        {
+            updateOrientation(-event.gamma, event.beta, event.alpha);
+        }
+        else if (_windowOrientation == 180)
+        {
+            updateOrientation(-event.beta, -event.gamma, event.alpha);
+        }
+        else
+        {
+            trace("Window orientation " + _windowOrientation + " not valid.");
+        }
+
+        orientationChange.emit(orientation);
+
+    }
+
+    /**
+     * 
+     */
+    public function dispose()
+    {
+        trace('adflajfd');
+        _eventGroup.dispose();
+        _eventGroup = null;
+        orientation = null;
+        //motion = null;
+        disposed.emit();
+        disposed = null;
+    }
+
+    private var _windowOrientation:Float;
+    private var _win:Dynamic;
+    private var _eventGroup:EventGroup;
 
 }
 

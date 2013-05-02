@@ -1,9 +1,11 @@
 package flambe.platform.flash;
 
+import flambe.util.Signal0;
 import flambe.util.Signal1;
 import flambe.input.Accelerometer;
 import flambe.input.AccelerometerMotion;
 import flambe.input.AccelerometerOrientation;
+import flambe.platform.EventGroup;
 import Type;
 
 import flash.external.ExternalInterface;
@@ -18,15 +20,47 @@ import flash.system.Capabilities;
  */
 class FlashAccelerometer implements Accelerometer
 {
-    /** Native orientation of the <i>device</i>, either landscape or portait. */
-    private var _deviceNativeOrienation:String;
-    /**  */
-    private var _windowOrientation:Float;
-
-     /**
+    /**
+     * Device motion relative to window orientation.
+     * <code>null</code> if not supported.
+     */
+    //public var motion(default, null):AccelerometerMotion;//TODO
+    /**
+     * Device position relative to window orientation.
+     * <code>null</code> if not supported.
+     */
+    public var orientation(default, null):AccelerometerOrientation;
+    /**
+     * 
+     */
+    //public var motionSupported (default, null) :Bool;//TODO
+    /**
+     * 
+     */
+    public var orientationSupported (default, null) :Bool;
+    /** 
+    * <code>null</code> if not supported.
+    */
+    //public var motionChange(default, null): Signal1<AccelerometerMotion>;//TODO
+    /** 
+    * <code>null</code> if not supported.
+    */
+    public var orientationChange(default, null): Signal1<AccelerometerOrientation>;
+    /**
+     * 
+     */
+    public var disposed(default, null):Signal0;
+    /**
+     *
      */
     public function new()
     {
+        disposed = new Signal0();
+
+        _eventGroup = new EventGroup();
+
+        //Coming back to this. It's very outdated, and was never in working order!
+
         // var cap = Capabilities;
 
         // if (ExternalInterface.available)
@@ -46,45 +80,6 @@ class FlashAccelerometer implements Accelerometer
             //     var literal:String = "function() {return window.orientation}";
 
             //     var ret:Dynamic = ExternalInterface.call(literal);
-
-
-
-            //     // if (cap.screenResolutionY < cap.screenResolutionX)
-            //     // {
-            //     //     if (_windowOrientation == 90)
-            //     //     {   
-            //     //         _deviceNativeOrienation = "portrait";
-            //     //     }
-            //     //     else
-            //     //     {
-            //     //         _deviceNativeOrienation = "landscape";
-            //     //     }
-            //     // }
-            //     // else
-            //     // {
-            //     //     if (_windowOrientation != 90)
-            //     //     {   
-            //     //         _deviceNativeOrienation = "portrait";
-            //     //     }
-            //     //     else
-            //     //     {
-            //     //         _deviceNativeOrienation = "landscape";
-            //     //     }
-            //     //     //TODO, this may need to be done every time the window rotates in 
-            //     //     //Windows Metro, but we don't really know yet, because accelerometer
-            //     //     //is not implemented yet.
-
-            //     // }
-
-            //     if (cap.screenResolutionY < cap.screenResolutionX) //Should be relative to native orientation?
-            //     {   
-            //         _deviceNativeOrienation = "portrait";
-            //     }
-            //     else
-            //     {
-            //         _deviceNativeOrienation = "landscape";
-            //     }
-
 
             //     ExternalInterface.addCallback('handleOrientation', handleAccelerometerOrientation);
 
@@ -124,6 +119,9 @@ class FlashAccelerometer implements Accelerometer
 
     }
 
+    /**
+     *
+     */
     private function getSWFObjectName(): String {
         // Returns the SWF's object name for getElementById
 
@@ -155,75 +153,64 @@ class FlashAccelerometer implements Accelerometer
         return ExternalInterface.call(js, __randomFunction);
     }
 
-    
+    /**
+     *
+     */
     private function updateOrientation(pitch:Float, roll:Float, azimuth:Float)
     {
         orientation.update(pitch, roll, azimuth);
         orientationChange.emit(orientation);
     }
 
+    /**
+     *
+     */
     private function handleAccelerometerOrientation(alpha:Float, beta:Float, gamma:Float):Void
     {
-        //var win = (untyped Lib.window);
-        //var windowOrientation = win.orientation;
+        //_windowOrientation = _win.orientation;
 
-        if (_deviceNativeOrienation == "landscape") 
+        //alpha = z = azimuth, beta = x = pitch, gamma = y = roll
+        if (_windowOrientation == -90)
         {
-            //alpha = z = azimuth, beta = x = pitch, gamma = y = roll
-            if (_windowOrientation == 0 || _windowOrientation == -90)
-            {
-                updateOrientation(beta, -gamma, alpha);
-            }
-            else
-            {
-                updateOrientation(-beta, gamma, alpha);
-            }
+            updateOrientation(event.gamma, -event.beta, event.alpha);
+        }
+        else if (_windowOrientation == 0)
+        {
+            updateOrientation(event.beta, event.gamma, event.alpha);
+        }
+        else if (_windowOrientation == 90)
+        {
+            updateOrientation(-event.gamma, event.beta, event.alpha);
+        }
+        else if (_windowOrientation == 180)
+        {
+            updateOrientation(-event.beta, -event.gamma, event.alpha);
         }
         else
         {
-            //alpha = z = azimuth, beta = x = pitch, gamma = y = roll
-            if (_windowOrientation == 0 || _windowOrientation == -90)
-            {
-                updateOrientation(gamma, beta, alpha);
-            }
-            else
-            {
-                updateOrientation(-gamma, -beta, alpha);
-            }
-
+            trace("Window orientation " + _windowOrientation + " not valid.");
         }
 
         orientationChange.emit(orientation);
 
     }
 
-    public function die()
+    /**
+     *
+     */
+    public function dispose()
     {
-
+        _eventGroup.dispose();
+        _eventGroup = null;
+        orientation = null;
+        //motion = null;
+        disposed.emit();
+        disposed = null;
     }
 
-    /**
-     * Device position relative to window orientation.
-     * <code>null</code> if not supported.
-     */
-    public var orientation(default, null):AccelerometerOrientation;
-    /**
-     * Device motion relative to window orientation.
-     * <code>null</code> if not supported.
-     */
-    public var motion(default, null):AccelerometerMotion;
-    /** 
-    * Returns true if either acceleration or orientation are suppored.
-    */
-    public var supported (default, null) :Bool;
-    /** 
-    * 
-    */
-    public var motionChange(default, null): Signal1<AccelerometerMotion>;
-    /** 
-    * 
-    */
-    public var orientationChange(default, null): Signal1<AccelerometerOrientation>;
+    private var _deviceNativeOrienation:String;
+    private var _windowOrientation:Float;
+    private var _eventGroup:EventGroup;
 
 }
 

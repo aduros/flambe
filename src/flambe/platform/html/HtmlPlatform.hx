@@ -373,16 +373,16 @@ class HtmlPlatform
     {
         if (_accelerometer == null)
         {
-            _accelerometer = new HtmlAccelerometer();
+            _accelerometer = new HtmlAccelerometer(this);
+            _accelerometer.disposed.connect(handleAccelerometerDisposed);
         }
 
         return _accelerometer;
     }
 
-    public function destroyAccelerometer():Void
+    public function handleAccelerometerDisposed():Void
     {
-        _accelerometer.die();
-        _accelerometer == null;
+        _accelerometer = null;
     }
 
     public function getRenderer () :Renderer

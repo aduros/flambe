@@ -13,9 +13,9 @@ class AccelerometerOrientation
 {
 	public function new()
 	{
-		azimuth = new Value<Float>(0);
 		pitch = new Value<Float>(0);
 		roll = new Value<Float>(0);
+		azimuth = new Value<Float>(0);
 	}
 
     public function update(pitch:Float, roll:Float, azimuth:Float):Void
@@ -25,8 +25,19 @@ class AccelerometerOrientation
 		this.azimuth._ = azimuth;
     }
 
-    public var azimuth(default, null):Value<Float>;
+    /**
+     *
+     */
     public var pitch(default, null):Value<Float>;
+    /**
+     *
+     */
     public var roll(default, null):Value<Float>;
+    /**
+     * Relative to the heading of the device at page load, NOT magnetic or true north.
+     * Does not currently take into account changes in window orientation; need to determine
+     * if that would be a better implementation.
+     */
+    public var azimuth(default, null):Value<Float>;
 
 }

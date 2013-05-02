@@ -34,7 +34,6 @@ interface Platform
     function getExternal () :External;
 
     function getAccelerometer(): Accelerometer;
-    function destroyAccelerometer():Void;
 
     function getRenderer () :Renderer;
 

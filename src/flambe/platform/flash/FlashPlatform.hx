@@ -178,10 +178,9 @@ class FlashPlatform
         return _accelerometer;
     }
 
-    public function destroyAccelerometer():Void
+    public function nullifyAccelerometer():Void
     {
-        _accelerometer.die();
-        _accelerometer == null;
+        _accelerometer = null;
     }
 
     public function getRenderer () :Renderer

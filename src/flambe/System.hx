@@ -234,11 +234,6 @@ class System
         return _platform.getAccelerometer();
     }
 
-    public static function disposeAccelerometer():Void
-    {
-        _platform.disposeAccelerometer();
-    }
-
     private static function assertCalledInit ()
     {
         Assert.that(_calledInit, "You must call System.init() first");

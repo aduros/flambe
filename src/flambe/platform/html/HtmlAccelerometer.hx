@@ -54,19 +54,16 @@ class HtmlAccelerometer implements Accelerometer
         // {
         //     _motion = new AccelerometerMotion();
 
-        //     motion = new AccelerometerMotion();
-        //     motionChange = new NotifyingSignal1();
+        //     motionChange = _motionChange = new NotifyingSignal1();
 
-        //     motionUpdate = _motionUpdate = new NotifyingSignal1();
-
-        //     _motionUpdate.addedFirst.connect(function()
+        //     _motionChange.addedFirst.connect(function()
         //         {
         //             _motionEventGroup = new EventGroup();
         //             _motionEventGroup.addListener(_win, "devicemotion", handleAccelerometerMotion);
         //         }
         //     );
 
-        //     _motionUpdate.disposedLast.connect(function()
+        //     _motionChange.disposedLast.connect(function()
         //         {
         //             _motionEventGroup.dispose();
         //             _motionEventGroup = null;
@@ -130,7 +127,7 @@ class HtmlAccelerometer implements Accelerometer
 
     }
 
-    //private var _motionUpdate:NotifyingSignal1<AccelerometerOrientation>;
+    //private var _motionChange:NotifyingSignal1<AccelerometerOrientation>;
     private var _orientationUpdate:NotifyingSignal1<AccelerometerOrientation>;
     private var _windowOrientation:Float;
     private var _win:Dynamic;

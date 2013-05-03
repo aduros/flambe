@@ -62,6 +62,8 @@ class FlashPlatform
 #end
         _keyboard = FlashKeyboard.shouldUse() ? new FlashKeyboard(stage) : new DummyKeyboard();
 
+        _accelerometer = new FlashAccelerometer();
+
         _renderer = new Stage3DRenderer();
         mainLoop = new MainLoop();
 
@@ -170,17 +172,7 @@ class FlashPlatform
 
     public function getAccelerometer(): Accelerometer
     {
-        if (_accelerometer == null)
-        {
-            _accelerometer = new FlashAccelerometer();
-        }
-
         return _accelerometer;
-    }
-
-    public function nullifyAccelerometer():Void
-    {
-        _accelerometer = null;
     }
 
     public function getRenderer () :Renderer

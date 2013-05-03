@@ -68,6 +68,7 @@ class HtmlPlatform
         _pointer = new BasicPointer();
         _mouse = new HtmlMouse(_pointer, canvas);
         _keyboard = new BasicKeyboard();
+        _accelerometer = new HtmlAccelerometer();
 
         _renderer = createRenderer(canvas);
         System.hasGPU._ = true;
@@ -371,18 +372,7 @@ class HtmlPlatform
 
     public function getAccelerometer(): Accelerometer
     {
-        if (_accelerometer == null)
-        {
-            _accelerometer = new HtmlAccelerometer(this);
-            _accelerometer.disposed.connect(handleAccelerometerDisposed);
-        }
-
         return _accelerometer;
-    }
-
-    public function handleAccelerometerDisposed():Void
-    {
-        _accelerometer = null;
     }
 
     public function getRenderer () :Renderer

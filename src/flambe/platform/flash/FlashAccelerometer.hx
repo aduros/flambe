@@ -21,16 +21,6 @@ import flash.system.Capabilities;
 class FlashAccelerometer implements Accelerometer
 {
     /**
-     * Device motion relative to window orientation.
-     * <code>null</code> if not supported.
-     */
-    //public var motion(default, null):AccelerometerMotion;//TODO
-    /**
-     * Device position relative to window orientation.
-     * <code>null</code> if not supported.
-     */
-    public var orientation(default, null):AccelerometerOrientation;
-    /**
      * 
      */
     //public var motionSupported (default, null) :Bool;//TODO
@@ -45,18 +35,13 @@ class FlashAccelerometer implements Accelerometer
     /** 
     * <code>null</code> if not supported.
     */
-    public var orientationChange(default, null): Signal1<AccelerometerOrientation>;
-    /**
-     * 
-     */
-    public var disposed(default, null):Signal0;
+    public var orientationUpdate(default, null): Signal1<AccelerometerOrientation>;
+
     /**
      *
      */
     public function new()
     {
-        disposed = new Signal0();
-
         _eventGroup = new EventGroup();
 
         //Coming back to this. It's very outdated, and was never in working order!
@@ -85,8 +70,8 @@ class FlashAccelerometer implements Accelerometer
 
             //     if (ExternalInterface.call('function() {return Boolean(window.DeviceOrientationEvent)}') != false)
             //     {
-            //         orientation = new AccelerometerOrientation();
-            //         orientationChange = new Signal1();
+            //         _orientation = new AccelerometerOrientation();
+            //         orientation = new Signal1();
 
             //         var func:String = '
             //             function(e) {
@@ -105,8 +90,8 @@ class FlashAccelerometer implements Accelerometer
 
             //     if (ExternalInterface.call('function() {return Boolean(window.DeviceMotionEvent)}') != false)
             //     {
-            //         motion = new AccelerometerMotion();
-            //         motionChange = new Signal1();
+            //         _motion = new AccelerometerMotion();
+            //         motion = new Signal1();
             //     }
 
             //}
@@ -156,15 +141,6 @@ class FlashAccelerometer implements Accelerometer
     /**
      *
      */
-    private function updateOrientation(pitch:Float, roll:Float, azimuth:Float)
-    {
-        orientation.update(pitch, roll, azimuth);
-        orientationChange.emit(orientation);
-    }
-
-    /**
-     *
-     */
     private function handleAccelerometerOrientation(alpha:Float, beta:Float, gamma:Float):Void
     {
         //_windowOrientation = _win.orientation;
@@ -172,46 +148,43 @@ class FlashAccelerometer implements Accelerometer
         //alpha = z = azimuth, beta = x = pitch, gamma = y = roll
         if (_windowOrientation == -90)
         {
-            updateOrientation(event.gamma, -event.beta, event.alpha);
+            orientation.update(event.gamma, -event.beta, event.alpha);
         }
         else if (_windowOrientation == 0)
         {
-            updateOrientation(event.beta, event.gamma, event.alpha);
+            orientation.update(event.beta, event.gamma, event.alpha);
         }
         else if (_windowOrientation == 90)
         {
-            updateOrientation(-event.gamma, event.beta, event.alpha);
+            orientation.update(-event.gamma, event.beta, event.alpha);
         }
         else if (_windowOrientation == 180)
         {
-            updateOrientation(-event.beta, -event.gamma, event.alpha);
+            orientation.update(-event.beta, -event.gamma, event.alpha);
         }
-        else
-        {
-            trace("Window orientation " + _windowOrientation + " not valid.");
-        }
+        // else
+        // {
+        //     trace("Window orientation " + _windowOrientation + " not valid.");
+        // }
 
-        orientationChange.emit(orientation);
+        orientationUpdate.emit(orientation);
 
     }
 
     /**
      *
      */
-    public function dispose()
+    private function stop()
     {
         _eventGroup.dispose();
         _eventGroup = null;
-        orientation = null;
-        //motion = null;
-        disposed.emit();
-        disposed = null;
     }
 
     private var _deviceNativeOrienation:String;
     private var _windowOrientation:Float;
     private var _eventGroup:EventGroup;
-
+    private var _orientation:AccelerometerOrientation;
+    private var _motion:AccelerometerMotion;
 }
 
 

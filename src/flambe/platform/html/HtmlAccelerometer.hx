@@ -17,16 +17,6 @@ import js.Lib;
 class HtmlAccelerometer implements Accelerometer
 {
     /**
-     * Device motion relative to window orientation.
-     * <code>null</code> if not supported.
-     */
-    //public var motion(default, null):AccelerometerMotion;//TODO
-    /**
-     * Device position relative to window orientation.
-     * <code>null</code> if not supported.
-     */
-    public var orientation(default, null):AccelerometerOrientation;
-    /**
      * 
      */
     //public var motionSupported (default, null) :Bool;//TODO
@@ -41,7 +31,7 @@ class HtmlAccelerometer implements Accelerometer
     /** 
     * <code>null</code> if not supported.
     */
-    public var orientationChange(default, null): Signal1<AccelerometerOrientation>;
+    public var orientationUpdate(default, null): Signal1<AccelerometerOrientation>;
     /**
      * 
      */
@@ -50,7 +40,7 @@ class HtmlAccelerometer implements Accelerometer
     /**
      * 
      */
-    public function new(platform:Platform)
+    public function new()
     {   
         disposed = new Signal0();
 
@@ -69,22 +59,13 @@ class HtmlAccelerometer implements Accelerometer
 
         if (orientationSupported)
         {
-            orientation = new AccelerometerOrientation();
-            orientationChange = new Signal1();
+            _orientation = new AccelerometerOrientation();
+            orientationUpdate = new Signal1();
 
             _eventGroup.addListener(_win, "deviceorientation", handleAccelerometerOrientation);
 
         }
 
-    }
-
-    /**
-     * 
-     */
-    private function updateOrientation(pitch:Float, roll:Float, azimuth:Float)
-    {
-        orientation.update(pitch, roll, azimuth);
-        orientationChange.emit(orientation);
     }
 
     /**
@@ -97,47 +78,43 @@ class HtmlAccelerometer implements Accelerometer
         //alpha = z = azimuth, beta = x = pitch, gamma = y = roll
         if (_windowOrientation == -90)
         {
-            updateOrientation(event.gamma, -event.beta, event.alpha);
+            _orientation.update(event.gamma, -event.beta, event.alpha);
         }
         else if (_windowOrientation == 0)
         {
-            updateOrientation(event.beta, event.gamma, event.alpha);
+            _orientation.update(event.beta, event.gamma, event.alpha);
         }
         else if (_windowOrientation == 90)
         {
-            updateOrientation(-event.gamma, event.beta, event.alpha);
+            _orientation.update(-event.gamma, event.beta, event.alpha);
         }
         else if (_windowOrientation == 180)
         {
-            updateOrientation(-event.beta, -event.gamma, event.alpha);
+            _orientation.update(-event.beta, -event.gamma, event.alpha);
         }
-        else
-        {
-            trace("Window orientation " + _windowOrientation + " not valid.");
-        }
+        // else
+        // {
+        //     trace("Window orientation " + _windowOrientation + " not valid.");
+        // }
 
-        orientationChange.emit(orientation);
+        orientationUpdate.emit(_orientation);
 
     }
 
     /**
      * 
      */
-    public function dispose()
+    private function stop()
     {
-        trace('adflajfd');
         _eventGroup.dispose();
         _eventGroup = null;
-        orientation = null;
-        //motion = null;
-        disposed.emit();
-        disposed = null;
     }
 
     private var _windowOrientation:Float;
     private var _win:Dynamic;
     private var _eventGroup:EventGroup;
-
+    private var _orientation:AccelerometerOrientation;
+    private var _motion:AccelerometerMotion;
 }
 
 

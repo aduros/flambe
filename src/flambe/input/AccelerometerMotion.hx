@@ -13,20 +13,20 @@ class AccelerometerMotion
 {
 	public function new()
 	{
-		x = new Value<Float>(0);
-		y = new Value<Float>(0);
-		z = new Value<Float>(0);
+		x = 0;
+		y = 0;
+		z = 0;
 	}
 
-    public function update(x:Float, y:Float, z:Float):Void
+    public function _internal_update(x:Float, y:Float, z:Float):Void
     {
-		this.x._ = x;
-		this.y._ = y;
-		this.z._ = z;
+		this.x = x;
+		this.y = y;
+		this.z = z;
     }
 
-    public var x(default, null):Value<Float>;//TODO
-    public var y(default, null):Value<Float>;//TODO
-    public var z(default, null):Value<Float>;//TODO
+    public var x(default, null):Float;//TODO
+    public var y(default, null):Float;//TODO
+    public var z(default, null):Float;//TODO
 
 }

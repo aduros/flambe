@@ -104,19 +104,19 @@ class HtmlAccelerometer implements Accelerometer
         //alpha = z = azimuth, beta = x = pitch, gamma = y = roll
         if (_windowOrientation == -90)
         {
-            _orientation.update(event.gamma, -event.beta, event.alpha);
+            _orientation._internal_update(event.gamma, -event.beta, event.alpha);
         }
         else if (_windowOrientation == 0)
         {
-            _orientation.update(event.beta, event.gamma, event.alpha);
+            _orientation._internal_update(event.beta, event.gamma, event.alpha);
         }
         else if (_windowOrientation == 90)
         {
-            _orientation.update(-event.gamma, event.beta, event.alpha);
+            _orientation._internal_update(-event.gamma, event.beta, event.alpha);
         }
         else if (_windowOrientation == 180)
         {
-            _orientation.update(-event.beta, -event.gamma, event.alpha);
+            _orientation._internal_update(-event.beta, -event.gamma, event.alpha);
         }
         // else
         // {

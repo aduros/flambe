@@ -87,8 +87,8 @@ class HtmlAccelerometer implements Accelerometer
 
             _orientationUpdate.disposedLast.connect(function()
                 {
-                    _motionEventGroup.dispose();
-                    _motionEventGroup = null;
+                    _orientationEventGroup.dispose();
+                    _orientationEventGroup = null;
                 }
             );
         }

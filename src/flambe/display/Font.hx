@@ -34,11 +34,11 @@ class Font
     public function new (pack :AssetPack, name :String)
     {
         this.name = name;
-        _glyphs = new IntHash();
+        _glyphs = new Map();
         _glyphs.set(NEWLINE.charCode, NEWLINE);
 
         var parser = new ConfigParser(pack.getFile(name + ".fnt"));
-        var pages = new IntHash<Texture>();
+        var pages = new Map<Int,Texture>();
 
         // The basename of the font's path, where we'll find the textures
         var idx = name.lastIndexOf("/");
@@ -103,7 +103,7 @@ class Font
                     case "second":
                         second = pair.getInt();
                     case "amount":
-                        first._internal_setKerning(second, pair.getInt());
+                        first.setKerning(second, pair.getInt());
                     }
                 }
             }
@@ -195,7 +195,7 @@ class Font
     // A special glyph to handle the newline character, which is not included in most fonts
     private static var NEWLINE = new Glyph('\n'.code);
 
-    private var _glyphs :IntHash<Glyph>;
+    private var _glyphs :Map<Int,Glyph>;
 }
 
 /**
@@ -224,7 +224,7 @@ class Glyph
 
     public var xAdvance :Int = 0;
 
-    /** @private */ public function new (charCode :Int)
+    @:allow(flambe) function new (charCode :Int)
     {
         this.charCode = charCode;
     }
@@ -245,15 +245,15 @@ class Glyph
         return (_kernings != null) ? Std.int(_kernings.get(nextCharCode)) : 0;
     }
 
-    /** @private */ public function _internal_setKerning (nextCharCode :Int, amount :Int)
+    @:allow(flambe) function setKerning (nextCharCode :Int, amount :Int)
     {
         if (_kernings == null) {
-            _kernings = new IntHash();
+            _kernings = new Map();
         }
         _kernings.set(nextCharCode, amount);
     }
 
-    private var _kernings :IntHash<Int> = null;
+    private var _kernings :Map<Int,Int> = null;
 }
 
 enum TextAlign
@@ -274,7 +274,7 @@ class TextLayout
     /** The number of lines in this text. */
     public var lines (default, null) :Int = 0;
 
-    /** @private */ public function new (font :Font, text :String, align :TextAlign, wrapWidth :Float)
+    @:allow(flambe) function new (font :Font, text :String, align :TextAlign, wrapWidth :Float)
     {
         _font = font;
         _glyphs = [];

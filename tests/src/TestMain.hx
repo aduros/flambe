@@ -2,15 +2,13 @@
 // Flambe - Rapid game development
 // https://github.com/aduros/flambe/blob/master/LICENSE.txt
 
-import haxe.Firebug;
 import haxe.unit.TestRunner;
 
 class TestMain
 {
     public static function main ()
     {
-        // Redirect prints/traces to console.log
-        TestRunner.print = cast Firebug.trace;
+        TestRunner.print = untyped console.log;
 
         var runner = new TestRunner();
 

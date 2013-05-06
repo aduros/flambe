@@ -9,21 +9,21 @@ import flambe.util.Signal2;
 /**
  * Wraps a single value, notifying listeners when the value changes.
  */
+// FIXME(bruno): Generic with DCE is currently broken!
+// http://code.google.com/p/haxe/issues/detail?id=1683
+// @:generic // Generate typed templates on static targets
 class Value<A>
-#if (flash || cpp || cs || java)
-    implements haxe.rtti.Generic // Generate typed templates on static targets
-#end
 {
     /**
      * The wrapped value, setting this to a different value will fire the 'changed' signal.
      */
-    public var _ (get__, set__) :A;
+    public var _ (get, set) :A;
 
     /**
      * Emitted when the value has changed. The first listener parameter is the new current value,
      * the second parameter is the old previous value.
      */
-    public var changed (get_changed, null) :Signal2<A,A>;
+    public var changed (get, null) :Signal2<A,A>;
 
     public function new (value :A, ?listener :Listener2<A,A>)
     {

@@ -12,7 +12,7 @@ import flambe.sound.Sound;
 class WebAudioSound
     implements Sound
 {
-    public static var supported (get_supported, null) :Bool;
+    public static var supported (get, null) :Bool;
 
     /**
      * The shared AudioContext.
@@ -24,7 +24,7 @@ class WebAudioSound
      */
     public static var gain :Dynamic;
 
-    public var duration (get_duration, null) :Float;
+    public var duration (get, null) :Float;
 
     public var buffer :Dynamic;
 
@@ -73,14 +73,14 @@ class WebAudioSound
 }
 
 private class WebAudioPlayback
-    implements Playback,
+    implements Playback
     implements Tickable
 {
     public var volume (default, null) :AnimatedFloat;
-    public var paused (get_paused, set_paused) :Bool;
-    public var ended (get_ended, null) :Bool;
-    public var position (get_position, null) :Float;
-    public var sound (get_sound, null) :Sound;
+    public var paused (get, set) :Bool;
+    public var ended (get, null) :Bool;
+    public var position (get, null) :Float;
+    public var sound (get, null) :Sound;
 
     public function new (sound :WebAudioSound, volume :Float, loop :Bool)
     {

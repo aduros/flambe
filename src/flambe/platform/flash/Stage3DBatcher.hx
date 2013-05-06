@@ -14,7 +14,7 @@ import flash.geom.Matrix3D;
 import flash.geom.Rectangle;
 import flash.geom.Vector3D;
 
-import format.hxsl.Shader;
+import hxsl.Shader;
 
 import flambe.display.BlendMode;
 import flambe.platform.shader.DrawImage;
@@ -29,9 +29,9 @@ class Stage3DBatcher
     public function new (context3D :Context3D)
     {
         _context3D = context3D;
-        _drawImageShader = new DrawImage(context3D);
-        _drawPatternShader = new DrawPattern(context3D);
-        _fillRectShader = new FillRect(context3D);
+        _drawImageShader = new DrawImage();
+        _drawPatternShader = new DrawPattern();
+        _fillRectShader = new FillRect();
 
         _scratchScissor = new Rectangle();
 
@@ -253,6 +253,7 @@ class Stage3DBatcher
             switch (_lastBlendMode) {
                 case Normal: _context3D.setBlendFactors(ONE, ONE_MINUS_SOURCE_ALPHA);
                 case Add: _context3D.setBlendFactors(ONE, ONE);
+                case Mask: _context3D.setBlendFactors(ZERO, SOURCE_ALPHA);
                 case CopyExperimental: _context3D.setBlendFactors(ONE, ZERO);
             }
             _currentBlendMode = _lastBlendMode;
@@ -264,30 +265,32 @@ class Stage3DBatcher
         }
 
         var vertexBuffer = null;
-        switch (_lastShader) {
-        case cast _drawImageShader:
-            _drawImageShader.init({}, {texture: _lastTexture.nativeTexture});
+        // TODO(bruno): Optimize with switch/case?
+        if (_lastShader == _drawImageShader) {
+            _drawImageShader.texture = _lastTexture.nativeTexture;
+            _drawImageShader.rebuildVars();
             vertexBuffer = _vertexBuffer5;
 
-        case cast _drawPatternShader:
+        } else if (_lastShader == _drawPatternShader) {
             var maxUV = _scratchVector3D;
             maxUV.x = _lastTexture.maxU;
             maxUV.y = _lastTexture.maxV;
             // maxUV.z = 0;
             // maxUV.w = 0;
-            _drawPatternShader.init({}, {texture: _lastTexture.nativeTexture, maxUV: maxUV});
+            _drawPatternShader.texture = _lastTexture.nativeTexture;
+            _drawPatternShader.maxUV = maxUV;
+            _drawPatternShader.rebuildVars();
             vertexBuffer = _vertexBuffer5;
 
-        case cast _fillRectShader:
-            _fillRectShader.init({}, {});
+        } else if (_lastShader == _fillRectShader) {
             vertexBuffer = _vertexBuffer6;
         }
 
         // vertexBuffer.uploadFromVector(data, 0, _quads*4);
         vertexBuffer.uploadFromVector(data, 0, _maxQuads*4);
-        _lastShader.bind(vertexBuffer);
+        _lastShader.bind(_context3D, vertexBuffer);
         _context3D.drawTriangles(_quadIndexBuffer, 0, _quads*2);
-        _lastShader.unbind();
+        _lastShader.unbind(_context3D);
 
 #if flambe_debug_renderer
         trace("Flushed " + _quads + " / " + _maxQuads + " quads");

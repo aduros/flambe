@@ -23,7 +23,7 @@ class BasicAssetPackLoader
     {
         _platform = platform;
         promise = new Promise();
-        _bytesLoaded = new Hash();
+        _bytesLoaded = new Map();
         _pack = new BasicAssetPack(manifest);
 
         var entries = manifest.array();
@@ -32,7 +32,7 @@ class BasicAssetPackLoader
             handleSuccess();
 
         } else {
-            var groups = new Hash<Array<AssetEntry>>();
+            var groups = new Map<String,Array<AssetEntry>>();
 
             // Group assets by name
             for (entry in entries) {
@@ -166,27 +166,27 @@ class BasicAssetPackLoader
     private var _assetsRemaining :Int;
 
     // How many bytes of each asset have been loaded
-    private var _bytesLoaded :Hash<Int>;
+    private var _bytesLoaded :Map<String,Int>;
 
     private var _pack :BasicAssetPack;
 }
 
-// A simple AssetPack backed by a Hash
+// A simple AssetPack backed by a Map
 private class BasicAssetPack
     implements AssetPack
 {
-    public var manifest (get_manifest, null) :Manifest;
+    public var manifest (get, null) :Manifest;
 
-    public var textures :Hash<Texture>;
-    public var sounds :Hash<Sound>;
-    public var files :Hash<String>;
+    public var textures :Map<String,Texture>;
+    public var sounds :Map<String,Sound>;
+    public var files :Map<String,String>;
 
     public function new (manifest :Manifest)
     {
         _manifest = manifest;
-        textures = new Hash();
-        sounds = new Hash();
-        files = new Hash();
+        textures = new Map();
+        sounds = new Map();
+        files = new Map();
     }
 
     public function getTexture (name :String, required :Bool = true) :Texture

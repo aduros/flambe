@@ -14,7 +14,7 @@ import flambe.util.Value;
  */
 class AnimatedFloat extends Value<Float>
 {
-    public var behavior (get_behavior, set_behavior) :Behavior;
+    public var behavior (get, set) :Behavior;
 
     public function new (value :Float, ?listener :Listener2<Float,Float>)
     {

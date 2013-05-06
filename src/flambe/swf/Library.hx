@@ -29,7 +29,7 @@ class Library
      */
     public function new (pack :AssetPack, baseDir :String)
     {
-        _symbols = new Hash();
+        _symbols = new Map();
 
         var json :Format = Json.parse(pack.getFile(baseDir + "/library.json"));
 
@@ -117,5 +117,5 @@ class Library
         return _symbols.iterator();
     }
 
-    private var _symbols :Hash<Symbol>;
+    private var _symbols :Map<String,Symbol>;
 }

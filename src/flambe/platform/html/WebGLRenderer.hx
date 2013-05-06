@@ -4,11 +4,11 @@
 
 package flambe.platform.html;
 
-import js.Lib;
+import js.Browser;
+import js.html.webgl.RenderingContext;
 
 import flambe.display.Graphics;
 import flambe.display.Texture;
-import flambe.platform.html.WebGLTypes;
 
 // TODO(bruno): Handle GL context loss
 class WebGLRenderer
@@ -19,15 +19,11 @@ class WebGLRenderer
 
     public function new (stage :HtmlStage, gl :RenderingContext)
     {
-        Log.info("Using experimental WebGL renderer");
+        Log.info("Using experimental WebGL renderer", ["version", gl.getParameter(GL.VERSION)]);
 
         this.gl = gl;
         batcher = new WebGLBatcher(gl);
-        _graphics = new WebGLGraphics(gl, batcher);
-
-        gl.clearColor(0, 0, 0, 1);
-        gl.enable(gl.BLEND);
-        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+        _graphics = new WebGLGraphics(batcher, null);
 
         stage.resize.connect(onResize);
         onResize();
@@ -35,14 +31,16 @@ class WebGLRenderer
 
     public function createTexture (image :Dynamic) :WebGLTexture
     {
-        var texture = createEmptyTexture(image.width, image.height);
+        var texture = new WebGLTexture(this, image.width, image.height);
         texture.uploadImageData(image);
         return texture;
     }
 
     public function createEmptyTexture (width :Int, height :Int) :WebGLTexture
     {
-        return new WebGLTexture(this, width, height);
+        var texture = new WebGLTexture(this, width, height);
+        texture.clear();
+        return texture;
     }
 
     public function willRender () :Graphics
@@ -61,7 +59,7 @@ class WebGLRenderer
         var width = gl.canvas.width;
         var height = gl.canvas.height;
 
-        gl.viewport(0, 0, width, height);
+        batcher.reset(width, height);
         _graphics.reset(width, height);
     }
 

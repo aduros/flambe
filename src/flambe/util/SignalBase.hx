@@ -33,7 +33,7 @@ class SignalBase
         return conn;
     }
 
-    /** @private */ public function _internal_disconnect (conn :SignalConnection)
+    @:allow(flambe) function disconnect (conn :SignalConnection)
     {
         if (dispatching()) {
             defer(function () {
@@ -49,11 +49,11 @@ class SignalBase
         var head = willEmit();
         var p = head;
         while (p != null) {
-            p._internal_listener();
+            p._listener();
             if (!p.stayInList) {
                 p.dispose();
             }
-            p = p._internal_next;
+            p = p._next;
         }
         didEmit(head);
     }
@@ -63,11 +63,11 @@ class SignalBase
         var head = willEmit();
         var p = head;
         while (p != null) {
-            p._internal_listener(arg1);
+            p._listener(arg1);
             if (!p.stayInList) {
                 p.dispose();
             }
-            p = p._internal_next;
+            p = p._next;
         }
         didEmit(head);
     }
@@ -77,11 +77,11 @@ class SignalBase
         var head = willEmit();
         var p = head;
         while (p != null) {
-            p._internal_listener(arg1, arg2);
+            p._listener(arg1, arg2);
             if (!p.stayInList) {
                 p.dispose();
             }
-            p = p._internal_next;
+            p = p._next;
         }
         didEmit(head);
     }
@@ -123,17 +123,17 @@ class SignalBase
     {
         if (prioritize) {
             // Prepend it to the beginning of the list
-            conn._internal_next = _head;
+            conn._next = _head;
             _head = conn;
         } else {
             // Append it to the end of the list
             var tail = null, p = _head;
             while (p != null) {
                 tail = p;
-                p = p._internal_next;
+                p = p._next;
             }
             if (tail != null) {
-                tail._internal_next = conn;
+                tail._next = conn;
             } else {
                 _head = conn;
             }
@@ -146,16 +146,16 @@ class SignalBase
         while (p != null) {
             if (p == conn) {
                 // Splice out p
-                var next = p._internal_next;
+                var next = p._next;
                 if (prev == null) {
                     _head = next;
                 } else {
-                    prev._internal_next = next;
+                    prev._next = next;
                 }
                 return;
             }
             prev = p;
-            p = p._internal_next;
+            p = p._next;
         }
     }
 

@@ -4,7 +4,8 @@
 
 package flambe.platform.html;
 
-import js.Lib;
+import js.Browser;
+import js.html.*;
 
 import flambe.animation.AnimatedFloat;
 import flambe.Entity;
@@ -44,10 +45,10 @@ class HtmlPlatform
     {
         Log.info("Initializing HTML platform");
 
-        var canvas :Dynamic = null;
+        var canvas :CanvasElement = null;
         try {
             // Use the canvas assigned to us by the flambe.js embedder
-            canvas = (untyped Lib.window).flambe.canvas;
+            canvas = (untyped Browser.window).flambe.canvas;
         } catch (error :Dynamic) {
         }
         Assert.that(canvas != null,
@@ -73,17 +74,17 @@ class HtmlPlatform
 
         mainLoop = new MainLoop();
 
-        _container = canvas.parentNode;
+        _container = canvas.parentElement;
         _container.style.overflow = "hidden";
         _container.style.position = "relative";
 
         // Prevent double tap zooming on IE10. Maybe this should be in the MSPointer block below,
         // but I have no idea without testing, so apply it always
         // http://msdn.microsoft.com/en-us/library/windows/apps/Hh767313.aspx
-        _container.style.msTouchAction = "none";
+        (untyped _container.style).msTouchAction = "none";
 
         var lastTouchTime = 0;
-        var onMouse = function (event) {
+        var onMouse = function (event :MouseEvent) {
             if (event.timeStamp - lastTouchTime < 1000) {
                 // Ignore if there was too recent a touch event, to filter out mouse events emulated
                 // by mobile browsers: http://www.w3.org/TR/touch-events/#mouse-events
@@ -98,7 +99,7 @@ class HtmlPlatform
                 if (event.target == canvas) {
                     event.preventDefault();
                     _mouse.submitDown(x, y, event.button);
-                    event.target.focus();
+                    canvas.focus();
                 }
 
             case "mousemove":
@@ -108,7 +109,7 @@ class HtmlPlatform
                 _mouse.submitUp(x, y, event.button);
 
             case "mousewheel", "DOMMouseScroll":
-                var velocity = (event.type == "mousewheel") ? event.wheelDelta/40 : -event.detail;
+                var velocity = (event.type == "mousewheel") ? (untyped event).wheelDelta/40 : -event.detail;
                 if (_mouse.submitScroll(x, y, velocity)) {
                     // Only prevent page scrolling if the event was handled
                     event.preventDefault();
@@ -116,9 +117,9 @@ class HtmlPlatform
             }
         };
         // Add listeners on the window object so dragging and releasing outside of the canvas works
-        (untyped window).addEventListener("mousedown", onMouse, false);
-        (untyped window).addEventListener("mousemove", onMouse, false);
-        (untyped window).addEventListener("mouseup", onMouse, false);
+        Browser.window.addEventListener("mousedown", onMouse, false);
+        Browser.window.addEventListener("mousemove", onMouse, false);
+        Browser.window.addEventListener("mouseup", onMouse, false);
 
         // But the wheel listener should only go on the canvas
         canvas.addEventListener("mousewheel", onMouse, false);
@@ -126,7 +127,7 @@ class HtmlPlatform
 
         // Detect touch support. See http://modernizr.github.com/Modernizr/touch.html for more
         // sophisticated detection methods, but this seems to cover all important browsers
-        var standardTouch :Bool = untyped __js__("typeof")(Lib.window.ontouchstart) != "undefined";
+        var standardTouch :Bool = untyped __js__("typeof")(Browser.window.ontouchstart) != "undefined";
 
         // The pointer event handles mouse movement, touch events, and stylus events.
         // We check to see if multiple points are supported indicating true touch support.
@@ -134,12 +135,12 @@ class HtmlPlatform
         var msTouch :Bool = untyped __js__("'msMaxTouchPoints' in window.navigator && (window.navigator.msMaxTouchPoints > 1)");
 
         if (standardTouch || msTouch) {
-            var basicTouch = new BasicTouch(_pointer, msTouch ?
-                untyped __js__("window.navigator.msMaxTouchPoints") : 4);
+            var basicTouch = new BasicTouch(_pointer, standardTouch ?
+                4 : (untyped Browser.navigator).msMaxTouchPoints);
             _touch = basicTouch;
 
             var onTouch = function (event :Dynamic) {
-                var changedTouches :Array<Dynamic> = standardTouch ?  event.changedTouches : [ event ];
+                var changedTouches :Array<Dynamic> = standardTouch ? event.changedTouches : [event];
                 var bounds = event.target.getBoundingClientRect();
                 lastTouchTime = event.timeStamp;
 
@@ -190,7 +191,9 @@ class HtmlPlatform
             _touch = new DummyTouch();
         }
 
-        var onKey = function (event) {
+        // canvas.onkeydown = function (event :KeyboardEvent) {};
+
+        var onKey = function (event :KeyboardEvent) {
             switch (event.type) {
             case "keydown":
                 if (_keyboard.submitDown(event.keyCode)) {
@@ -204,21 +207,21 @@ class HtmlPlatform
         canvas.addEventListener("keyup", onKey, false);
 
         // Handle uncaught errors
-        var oldErrorHandler = (untyped Lib.window).onerror;
-        (untyped Lib.window).onerror = function (message, url, line) {
+        var oldErrorHandler = (untyped Browser.window).onerror;
+        (untyped Browser.window).onerror = function (message :String, url :String, line :Int) {
             System.uncaughtError.emit(message);
             return (oldErrorHandler != null) ? oldErrorHandler(message, url, line) : false;
         };
 
         // Handle visibility changes if the browser supports them
         // http://www.w3.org/TR/page-visibility/
-        var hiddenApi = HtmlUtil.loadExtension("hidden", Lib.document);
+        var hiddenApi = HtmlUtil.loadExtension("hidden", Browser.document);
         if (hiddenApi.value != null) {
-            var onVisibilityChanged = function () {
-                System.hidden._ = Reflect.field(Lib.document, hiddenApi.field);
+            var onVisibilityChanged = function (_) {
+                System.hidden._ = Reflect.field(Browser.document, hiddenApi.field);
             };
-            onVisibilityChanged(); // Update now
-            (untyped Lib.document).addEventListener(hiddenApi.prefix + "visibilitychange",
+            onVisibilityChanged(null); // Update now
+            Browser.document.addEventListener(hiddenApi.prefix + "visibilitychange",
                 onVisibilityChanged, false);
             System.hidden.changed.connect(function (hidden,_) {
                 if (!hidden) {
@@ -236,7 +239,7 @@ class HtmlPlatform
         if (requestAnimationFrame != null) {
             // Use the high resolution, monotonic timer if available
             // http://www.w3.org/TR/hr-time/
-            var performance :{ now :Void -> Float } = untyped Lib.window.performance;
+            var performance :Performance = Browser.window.performance;
             var hasPerfNow = (performance != null) && HtmlUtil.polyfill("now", performance);
 
             if (hasPerfNow) {
@@ -255,9 +258,9 @@ class HtmlPlatform
 
         } else {
             Log.warn("No requestAnimationFrame support, falling back to setInterval");
-            (untyped Lib.window).setInterval(function () {
+            Browser.window.setInterval(function () {
                 update(HtmlUtil.now());
-            }, 1000/60);
+            }, 16); // ~60 FPS
         }
     }
 
@@ -274,13 +277,9 @@ class HtmlPlatform
     public function getStorage () :Storage
     {
         if (_storage == null) {
-            var localStorage = null;
-            try {
-                localStorage = (untyped Lib.window).localStorage;
-            } catch (error :Dynamic) {
-                // Browsers may throw an error on accessing localStorage:
-                // http://dev.w3.org/html5/webstorage/#dom-localstorage
-            }
+            // Safely access localStorage (browsers may throw an error on direct access)
+            // http://dev.w3.org/html5/webstorage/#dom-localstorage
+            var localStorage = Browser.getLocalStorage();
             if (localStorage != null) {
                 _storage = new HtmlStorage(localStorage);
             } else {
@@ -294,11 +293,11 @@ class HtmlPlatform
     public function getLocale () :String
     {
         // https://developer.mozilla.org/en-US/docs/DOM/window.navigator.language
-        var locale = (untyped Lib.window).navigator.language;
+        var locale = Browser.navigator.language;
         if (locale == null) {
             // IE uses the non-standard userLanguage (or browserLanguage or systemLanguage, but
             // userLanguage seems to match String's locale-aware methods)
-            locale = (untyped Lib.window).navigator.userLanguage;
+            locale = (untyped Browser.navigator).userLanguage;
         }
         return locale;
     }
@@ -383,14 +382,12 @@ class HtmlPlatform
         return _stage.scaleFactor*(event.clientY - bounds.top);
     }
 
-    private function createRenderer (canvas :Dynamic) :Renderer
+    private function createRenderer (canvas :CanvasElement) :Renderer
     {
 #if flambe_enable_webgl
-        for (name in ["webgl", "experimental-webgl"]) {
-            var gl = canvas.getContext(name, {alpha: false, depth: false});
-            if (gl != null) {
-                return new WebGLRenderer(_stage, gl);
-            }
+        var gl = canvas.getContextWebGL({alpha: false, depth: false});
+        if (gl != null) {
+            return new WebGLRenderer(_stage, gl);
         }
         Log.info("WebGL not available, falling back to canvas");
 #end
@@ -407,7 +404,7 @@ class HtmlPlatform
     private var _external :External;
     private var _renderer :Renderer;
 
-    private var _container :Dynamic;
+    private var _container :Element;
 
     private var _lastUpdate :Float;
     private var _skipFrame :Bool;

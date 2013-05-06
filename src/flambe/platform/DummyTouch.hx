@@ -11,9 +11,9 @@ import flambe.util.Signal1;
 class DummyTouch
     implements Touch
 {
-    public var supported (get_supported, null) :Bool;
-    public var maxPoints (get_maxPoints, null) :Int;
-    public var points (get_points, null) :Array<TouchPoint>;
+    public var supported (get, null) :Bool;
+    public var maxPoints (get, null) :Int;
+    public var points (get, null) :Array<TouchPoint>;
 
     public var down (default, null) :Signal1<TouchPoint>;
     public var move (default, null) :Signal1<TouchPoint>;

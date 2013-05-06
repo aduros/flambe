@@ -5,16 +5,16 @@
 package flambe.util;
 
 /**
- * Utility mixins for Hashes. Designed to be imported with 'using'.
+ * Utility mixins for Maps. Designed to be imported with 'using'.
  */
-class Hashes
+class Maps
 {
     /**
      * Fetch a string from a hash, converting it from another type if necessary.
      * @param defaultValue The value to return if the key was not found.
      */
     public static function getString (
-        hash :Hash<Dynamic>, key :String, defaultValue :String = null) :String
+        hash :Map<String,Dynamic>, key :String, defaultValue :String = null) :String
     {
         var value = hash.get(key);
         return (value != null) ? ""+value : defaultValue;
@@ -25,7 +25,7 @@ class Hashes
      * @param defaultValue The value to return if the key was not found.
      */
     public static function getFloat (
-        hash :Hash<Dynamic>, key :String, defaultValue :Float = 0) :Float
+        hash :Map<String,Dynamic>, key :String, defaultValue :Float = 0) :Float
     {
         var value = hash.get(key);
         return (value != null) ? Std.parseFloat(""+value) : defaultValue;
@@ -36,7 +36,7 @@ class Hashes
      * @param defaultValue The value to return if the key was not found.
      */
     public static function getInt (
-        hash :Hash<Dynamic>, key :String, defaultValue :Int = 0) :Int
+        hash :Map<String,Dynamic>, key :String, defaultValue :Int = 0) :Int
     {
         var value = hash.get(key);
         return (value != null) ? Std.parseInt(""+value) : defaultValue;
@@ -47,7 +47,7 @@ class Hashes
      * @param defaultValue The value to return if the key was not found.
      */
     public static function getBool (
-        hash :Hash<Dynamic>, key :String, defaultValue :Bool = false) :Bool
+        hash :Map<String,Dynamic>, key :String, defaultValue :Bool = false) :Bool
     {
         var value = hash.get(key);
         return (value != null) ? value != 0 && value != false && value != "false" : defaultValue;

@@ -14,7 +14,7 @@ interface Mouse
     /**
      * True if the environment has a mouse.
      */
-    var supported (get_supported, null) :Bool;
+    var supported (get, null) :Bool;
 
     /**
      * Emitted when a mouse button is pressed down.
@@ -41,17 +41,17 @@ interface Mouse
     /**
      * The last recorded X coordinate of the mouse.
      */
-    var x (get_x, null) :Float;
+    var x (get, null) :Float;
 
     /**
      * The last recorded Y coordinate of the mouse.
      */
-    var y (get_y, null) :Float;
+    var y (get, null) :Float;
 
     /**
      * The style of the mouse cursor.
      */
-    var cursor (get_cursor, set_cursor) :MouseCursor;
+    var cursor (get, set) :MouseCursor;
 
     /**
      * @returns True if the given button is currently being held down.

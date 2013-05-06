@@ -23,13 +23,13 @@ class Manifest
     /**
      * A relative path to load this manifest's assets from, or null.
      */
-    public var relativeBasePath (get_relativeBasePath, set_relativeBasePath) :String;
+    public var relativeBasePath (get, set) :String;
 
     /**
      * A URL on another domain to load this manifest's assets from, or null. May be used to load
      * assets from a CDN, in browsers that support cross-domain requests.
      */
-    public var externalBasePath (get_externalBasePath, set_externalBasePath) :String;
+    public var externalBasePath (get, set) :String;
 
     public function new ()
     {
@@ -203,10 +203,10 @@ class Manifest
 
     private static function createBuildManifests ()
     {
-        var macroData = new Hash<Array<Dynamic>>();
+        var macroData = new Map<String,Array<Dynamic>>();
         ManifestBuilder.populate(macroData);
 
-        var manifests = new Hash();
+        var manifests = new Map();
         for (packName in macroData.keys()) {
             var manifest = new Manifest();
             manifest.relativeBasePath = "assets";
@@ -229,7 +229,7 @@ class Manifest
         return manifests;
     }
 
-    private static var _buildManifest :Hash<Manifest> = createBuildManifests();
+    private static var _buildManifest :Map<String,Manifest> = createBuildManifests();
 
     // Whether the environment fully supports loading assets from another domain
     private static var _supportsCrossOrigin :Bool = (function () {
@@ -242,7 +242,7 @@ class Manifest
         // TODO(bruno): Better UA detection that only blacklists the stock browser, not Chrome or FF
         // for Android
         var blacklist = ~/\b(Android)\b/;
-        if (blacklist.match(js.Lib.window.navigator.userAgent)) {
+        if (blacklist.match(js.Browser.window.navigator.userAgent)) {
             return false;
         }
 

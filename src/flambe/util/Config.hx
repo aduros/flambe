@@ -6,7 +6,7 @@ package flambe.util;
 
 using StringTools;
 
-typedef ConfigSection = Hash<String>;
+typedef ConfigSection = Map<String,String>;
 
 /**
  * An INI-like config file parser.
@@ -21,12 +21,12 @@ typedef ConfigSection = Hash<String>;
 class Config
 {
     public var mainSection (default, null) :ConfigSection;
-    public var sections (default, null) :Hash<ConfigSection>;
+    public var sections (default, null) :Map<String,ConfigSection>;
 
     public function new ()
     {
         mainSection = new ConfigSection();
-        sections = new Hash();
+        sections = new Map();
     }
 
     /** Parse the contents of an INI file. */

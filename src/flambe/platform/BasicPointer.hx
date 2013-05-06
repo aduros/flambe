@@ -17,14 +17,14 @@ using Lambda;
 class BasicPointer
     implements Pointer
 {
-    public var supported (get_supported, null) :Bool;
+    public var supported (get, null) :Bool;
 
     public var down (default, null) :Signal1<PointerEvent>;
     public var move (default, null) :Signal1<PointerEvent>;
     public var up (default, null) :Signal1<PointerEvent>;
 
-    public var x (get_x, null) :Float;
-    public var y (get_y, null) :Float;
+    public var x (get, null) :Float;
+    public var y (get, null) :Float;
 
     public function new (x :Float = 0, y :Float = 0, isDown :Bool = false)
     {
@@ -84,10 +84,10 @@ class BasicPointer
         prepare(viewX, viewY, hit, source);
         for (sprite in chain) {
             // Avoid calling the public getter and lazily instanciating this signal
-            var signal = sprite._internal_pointerDown;
+            var signal = sprite._pointerDown;
             if (signal != null) {
                 signal.emit(_sharedEvent);
-                if (_sharedEvent._internal_stopped) {
+                if (_sharedEvent._stopped) {
                     return;
                 }
             }
@@ -118,10 +118,10 @@ class BasicPointer
         prepare(viewX, viewY, hit, source);
         for (sprite in chain) {
             // Avoid calling the public getter and lazily instanciating this signal
-            var signal = sprite._internal_pointerMove;
+            var signal = sprite._pointerMove;
             if (signal != null) {
                 signal.emit(_sharedEvent);
-                if (_sharedEvent._internal_stopped) {
+                if (_sharedEvent._stopped) {
                     return;
                 }
             }
@@ -157,10 +157,10 @@ class BasicPointer
         prepare(viewX, viewY, hit, source);
         for (sprite in chain) {
             // Avoid calling the public getter and lazily instanciating this signal
-            var signal = sprite._internal_pointerUp;
+            var signal = sprite._pointerUp;
             if (signal != null) {
                 signal.emit(_sharedEvent);
-                if (_sharedEvent._internal_stopped) {
+                if (_sharedEvent._stopped) {
                     return;
                 }
             }
@@ -172,7 +172,7 @@ class BasicPointer
     {
         _x = viewX;
         _y = viewY;
-        _sharedEvent._internal_init(_sharedEvent.id+1, viewX, viewY, hit, source);
+        _sharedEvent.init(_sharedEvent.id+1, viewX, viewY, hit, source);
     }
 
     private static var _sharedEvent = new PointerEvent();

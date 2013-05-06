@@ -14,7 +14,7 @@ interface Symbol
     /**
      * The name of this symbol.
      */
-    var name (get_name, null) :String;
+    var name (get, null) :String;
 
     /**
      * Instantiate a sprite that displays this symbol.

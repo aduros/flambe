@@ -4,14 +4,14 @@
 
 package flambe.platform.html;
 
-import js.Lib;
+import js.Browser;
 
 import flambe.external.External;
 
 class HtmlExternal
     implements External
 {
-    public var supported (get_supported, null) :Bool;
+    public var supported (get, null) :Bool;
 
     public function new ()
     {
@@ -28,12 +28,12 @@ class HtmlExternal
             params = [];
         }
 
-        var method = Reflect.field(Lib.window, name);
+        var method = Reflect.field(Browser.window, name);
         return Reflect.callMethod(null, method, params);
     }
 
     public function bind (name :String, fn :Dynamic)
     {
-        Reflect.setField(Lib.window, name, fn);
+        Reflect.setField(Browser.window, name, fn);
     }
 }

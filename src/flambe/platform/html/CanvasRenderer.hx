@@ -4,7 +4,8 @@
 
 package flambe.platform.html;
 
-import js.Lib;
+import js.Browser;
+import js.html.*;
 
 import flambe.display.Graphics;
 import flambe.display.Texture;
@@ -12,7 +13,7 @@ import flambe.display.Texture;
 class CanvasRenderer
     implements Renderer
 {
-    public function new (canvas :Dynamic)
+    public function new (canvas :CanvasElement)
     {
         _graphics = new CanvasGraphics(canvas);
     }
@@ -42,7 +43,7 @@ class CanvasRenderer
         // On iOS, canvas textures are way faster
         // http://jsperf.com/drawimage-vs-canvaspattern/8
         var pattern = ~/(iPhone|iPod|iPad)/;
-        return pattern.match(Lib.window.navigator.userAgent);
+        return pattern.match(Browser.window.navigator.userAgent);
     })();
 
     private var _graphics :CanvasGraphics;

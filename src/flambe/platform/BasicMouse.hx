@@ -16,16 +16,16 @@ using flambe.platform.MouseCodes;
 class BasicMouse
     implements Mouse
 {
-    public var supported (get_supported, null) :Bool;
+    public var supported (get, null) :Bool;
 
     public var down (default, null) :Signal1<MouseEvent>;
     public var move (default, null) :Signal1<MouseEvent>;
     public var up (default, null) :Signal1<MouseEvent>;
     public var scroll (default, null) :Signal1<Float>;
 
-    public var x (get_x, null) :Float;
-    public var y (get_y, null) :Float;
-    public var cursor (get_cursor, set_cursor) :MouseCursor;
+    public var x (get, null) :Float;
+    public var y (get, null) :Float;
+    public var cursor (get, set) :MouseCursor;
 
     public function new (pointer :BasicPointer)
     {
@@ -39,7 +39,7 @@ class BasicMouse
         _x = 0;
         _y = 0;
         _cursor = Default;
-        _buttonStates = new IntHash();
+        _buttonStates = new Map();
     }
 
     public function get_supported () :Bool
@@ -124,7 +124,7 @@ class BasicMouse
     {
         _x = viewX;
         _y = viewY;
-        _sharedEvent._internal_init(_sharedEvent.id+1, viewX, viewY, button);
+        _sharedEvent.init(_sharedEvent.id+1, viewX, viewY, button);
     }
 
     private static var _sharedEvent = new MouseEvent();
@@ -135,5 +135,5 @@ class BasicMouse
     private var _x :Float;
     private var _y :Float;
     private var _cursor :MouseCursor;
-    private var _buttonStates :IntHash<Bool>;
+    private var _buttonStates :Map<Int,Bool>;
 }

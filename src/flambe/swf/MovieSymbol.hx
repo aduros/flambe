@@ -17,7 +17,7 @@ using flambe.util.Arrays;
 class MovieSymbol
     implements Symbol
 {
-    public var name (get_name, null) :String;
+    public var name (get, null) :String;
 
     public var layers (default, null) :Array<MovieLayer>;
 
@@ -68,7 +68,7 @@ class MovieLayer
 {
     public var name (default, null) :String;
     public var keyframes (default, null) :Array<MovieKeyframe>;
-    public var frames (get_frames, null) :Int;
+    public var frames (get, null) :Int;
 
     /** The symbol in the last keyframe that has one, or null if there are no symbol keyframes. */
     public var lastSymbol :Symbol = null;

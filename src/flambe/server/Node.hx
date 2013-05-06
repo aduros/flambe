@@ -9,9 +9,9 @@ import flambe.util.Logger;
 // TODO(bruno): Use one of the nodejs externs on haxelib
 class Node
 {
-    public static var require (get_require, null) :String -> Dynamic;
-    public static var console (get_console, null) :Dynamic;
-    public static var process (get_process, null) :Dynamic;
+    public static var require (get, null) :String -> Dynamic;
+    public static var console (get, null) :Dynamic;
+    public static var process (get, null) :Dynamic;
 
     // FIXME(bruno): Creating multiple loggers with different tags are not supported
     public static function createLogger (tag :String) :Logger
@@ -40,7 +40,7 @@ class Node
         throw untyped __js__("new Error")(message);
     }
 
-    inline private static function get_require () return untyped __js__("require")
-    inline private static function get_console () return untyped __js__("console")
-    inline private static function get_process () return untyped __js__("process")
+    inline private static function get_require () return untyped __js__("require");
+    inline private static function get_console () return untyped __js__("console");
+    inline private static function get_process () return untyped __js__("process");
 }

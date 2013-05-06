@@ -4,18 +4,21 @@
 
 package flambe.platform.html;
 
+import js.html.*;
+import js.html.webgl.*;
+import js.html.webgl.RenderingContext;
+
 import flambe.display.BlendMode;
 import flambe.display.Graphics;
 import flambe.display.Texture;
 import flambe.math.FMath;
 import flambe.math.Matrix;
-import flambe.platform.html.WebGLTypes;
 import flambe.util.Assert;
 
 class WebGLGraphics
     implements Graphics
 {
-    public function new (gl :RenderingContext, batcher :WebGLBatcher)
+    public function new (batcher :WebGLBatcher, renderTarget :WebGLTexture)
     {
         // Initialize this here to prevent blowing up during static init on browsers without typed
         // array support
@@ -23,8 +26,8 @@ class WebGLGraphics
             _scratchQuadArray = new Float32Array(8);
         }
 
-        _gl = gl;
         _batcher = batcher;
+        _renderTarget = renderTarget;
     }
 
     public function save ()
@@ -47,17 +50,35 @@ class WebGLGraphics
 
     public function translate (x :Float, y :Float)
     {
-        throw "TODO";
+        var matrix = getTopState().matrix;
+        matrix.m02 += matrix.m00*x + matrix.m01*y;
+        matrix.m12 += matrix.m10*x + matrix.m11*y;
     }
 
     public function scale (x :Float, y :Float)
     {
-        throw "TODO";
+        var matrix = getTopState().matrix;
+        matrix.m00 *= x;
+        matrix.m10 *= x;
+        matrix.m01 *= y;
+        matrix.m11 *= y;
     }
 
     public function rotate (rotation :Float)
     {
-        throw "TODO";
+        var matrix = getTopState().matrix;
+        rotation = FMath.toRadians(rotation);
+        var sin = Math.sin(rotation);
+        var cos = Math.cos(rotation);
+        var m00 = matrix.m00;
+        var m10 = matrix.m10;
+        var m01 = matrix.m01;
+        var m11 = matrix.m11;
+
+        matrix.m00 = m00*cos + m01*sin;
+        matrix.m10 = m10*cos + m11*sin;
+        matrix.m01 = m01*cos - m00*sin;
+        matrix.m11 = m11*cos - m10*sin;
     }
 
     public function transform (m00 :Float, m10 :Float, m01 :Float, m11 :Float, m02 :Float, m12 :Float)
@@ -93,7 +114,7 @@ class WebGLGraphics
         var v2 = texture.maxV*(sourceY + sourceH) / h;
         var alpha = state.alpha;
 
-        var offset = _batcher.prepareDrawImage(state.blendMode, texture);
+        var offset = _batcher.prepareDrawImage(_renderTarget, state.blendMode, texture);
         var data = _batcher.data;
 
         data[  offset] = pos[0];
@@ -131,7 +152,7 @@ class WebGLGraphics
         var v2 = texture.maxV * (height / texture.height);
         var alpha = state.alpha;
 
-        var offset = _batcher.prepareDrawPattern(state.blendMode, texture);
+        var offset = _batcher.prepareDrawPattern(_renderTarget, state.blendMode, texture);
         var data = _batcher.data;
 
         data[  offset] = pos[0];
@@ -169,7 +190,7 @@ class WebGLGraphics
         var b = (color & 0x0000ff) / 0x0000ff;
         var a = state.alpha;
 
-        var offset = _batcher.prepareFillRect(state.blendMode);
+        var offset = _batcher.prepareFillRect(_renderTarget, state.blendMode);
         var data = _batcher.data;
 
         data[  offset] = pos[0];
@@ -224,7 +245,10 @@ class WebGLGraphics
     public function reset (width :Int, height :Int)
     {
         _stateList = new DrawingState();
-        _stateList.matrix.set(2/width, 0, 0, -2/height, -1, 1);
+
+        // Framebuffers need to be vertically flipped
+        var flip = (_renderTarget != null) ? -1 : 1;
+        _stateList.matrix.set(2/width, 0, 0, flip * -2/height, -1, flip);
     }
 
     inline private function getTopState () :DrawingState
@@ -257,8 +281,8 @@ class WebGLGraphics
     private static var _scratchMatrix = new Matrix();
     private static var _scratchQuadArray :Float32Array = null;
 
-    private var _gl :RenderingContext;
     private var _batcher :WebGLBatcher;
+    private var _renderTarget :WebGLTexture;
 
     private var _stateList :DrawingState = null;
 }

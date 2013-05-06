@@ -4,6 +4,9 @@
 
 package flambe.platform.html;
 
+import js.Browser;
+import js.html.*;
+
 import flambe.display.BlendMode;
 import flambe.display.Graphics;
 import flambe.display.Texture;
@@ -13,9 +16,9 @@ import flambe.math.FMath;
 class CanvasGraphics
     implements Graphics
 {
-    public function new (canvas :Dynamic)
+    public function new (canvas :CanvasElement)
     {
-        _canvasCtx = canvas.getContext("2d");
+        _canvasCtx = canvas.getContext2d();
     }
 
     public function save ()
@@ -128,6 +131,7 @@ class CanvasGraphics
         switch (blendMode) {
             case Normal: op = "source-over";
             case Add: op = "lighter";
+            case Mask: op = "destination-in";
             case CopyExperimental:
                 // No, we can't use the canvas "copy" globalCompositeOperation, as it's unbounded.
                 // ie. Drawing a small square with copy will erase the ENTIRE rest of the stage.
@@ -152,6 +156,6 @@ class CanvasGraphics
         _firstDraw = true;
     }
 
-    private var _canvasCtx :Dynamic;
+    private var _canvasCtx :CanvasRenderingContext2D;
     private var _firstDraw :Bool = false;
 }

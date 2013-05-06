@@ -14,7 +14,7 @@ class Promise<A>
      * yet available. Read hasResult to check availability first, or use get(). When setting, throws
      * an error if the result was already previously assigned.
      */
-    public var result (get_result, set_result) :A;
+    public var result (get, set) :A;
 
     /**
      * Whether the result is available yet.
@@ -39,8 +39,8 @@ class Promise<A>
     /**
      * Context on how close this promise is to being fulfilled. For file IO, these are in bytes.
      */
-    public var progress (get_progress, set_progress) :Float;
-    public var total (get_total, set_total) :Float;
+    public var progress (get, set) :Float;
+    public var total (get, set) :Float;
 
     public function new ()
     {

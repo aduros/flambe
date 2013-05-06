@@ -11,9 +11,9 @@ import flambe.util.Signal1;
 class BasicTouch
     implements Touch
 {
-    public var supported (get_supported, null) :Bool;
-    public var maxPoints (get_maxPoints, null) :Int;
-    public var points (get_points, null) :Array<TouchPoint>;
+    public var supported (get, null) :Bool;
+    public var maxPoints (get, null) :Int;
+    public var points (get, null) :Array<TouchPoint>;
 
     public var down (default, null) :Signal1<TouchPoint>;
     public var move (default, null) :Signal1<TouchPoint>;
@@ -23,7 +23,7 @@ class BasicTouch
     {
         _pointer = pointer;
         _maxPoints = maxPoints;
-        _pointMap = new IntHash();
+        _pointMap = new Map();
         _points = [];
 
         down = new Signal1();
@@ -50,14 +50,14 @@ class BasicTouch
     {
         if (!_pointMap.exists(id)) {
             var point = new TouchPoint(id);
-            point._internal_init(viewX, viewY);
+            point.init(viewX, viewY);
             _pointMap.set(id, point);
             _points.push(point);
 
             if (_pointerTouch == null) {
                 // Make this touch point the tracked pointer
                 _pointerTouch = point;
-                _pointer.submitDown(viewX, viewY, point._internal_source);
+                _pointer.submitDown(viewX, viewY, point._source);
             }
             down.emit(point);
         }
@@ -67,10 +67,10 @@ class BasicTouch
     {
         var point = _pointMap.get(id);
         if (point != null) {
-            point._internal_init(viewX, viewY);
+            point.init(viewX, viewY);
 
             if (_pointerTouch == point) {
-                _pointer.submitMove(viewX, viewY, point._internal_source);
+                _pointer.submitMove(viewX, viewY, point._source);
             }
             move.emit(point);
         }
@@ -80,13 +80,13 @@ class BasicTouch
     {
         var point = _pointMap.get(id);
         if (point != null) {
-            point._internal_init(viewX, viewY);
+            point.init(viewX, viewY);
             _pointMap.remove(id);
             _points.remove(point);
 
             if (_pointerTouch == point) {
                 _pointerTouch = null;
-                _pointer.submitUp(viewX, viewY, point._internal_source);
+                _pointer.submitUp(viewX, viewY, point._source);
             }
             up.emit(point);
         }
@@ -96,6 +96,6 @@ class BasicTouch
     private var _pointerTouch :TouchPoint;
 
     private var _maxPoints :Int;
-    private var _pointMap :IntHash<TouchPoint>;
+    private var _pointMap :Map<Int,TouchPoint>;
     private var _points :Array<TouchPoint>;
 }

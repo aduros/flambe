@@ -18,7 +18,7 @@ class Build
     /**
      * Expands to the date at compile time, formatted as a string.
      */
-    @:macro public static function date () :Expr
+    macro public static function date () :Expr
     {
         return Context.makeExpr(Date.now().toString(), Context.currentPos());
     }

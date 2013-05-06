@@ -4,8 +4,8 @@
 
 package flambe.platform.html;
 
-import js.Dom;
-import js.Lib;
+import js.Browser;
+import js.html.*;
 
 import haxe.Http;
 
@@ -27,7 +27,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
     {
         switch (entry.format) {
         case WEBP, JXR, PNG, JPG, GIF:
-            var image :Dynamic = untyped __new__("Image");
+            var image = Browser.document.createImageElement();
             var events = new EventGroup();
 
             events.addDisposingListener(image, "load", function (_) {
@@ -81,14 +81,14 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                 });
 
             } else {
-                var audio :Dynamic = Lib.document.createElement("audio");
+                var audio = Browser.document.createAudioElement();
                 audio.preload = "auto"; // Hint that we want to preload the entire file
 
                 // Maintain a hard reference to the audio during loading to prevent GC on some
                 // browsers
                 var ref = ++_mediaRefCount;
                 if (_mediaElements == null) {
-                    _mediaElements = new IntHash();
+                    _mediaElements = new Map<Int,Dynamic>();
                 }
                 _mediaElements.set(ref, audio);
 
@@ -127,11 +127,6 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
             sendRequest(url, entry, "text", function (text) {
                 handleLoad(entry, text);
             });
-
-        default:
-            // Should never happen
-            Assert.fail("Unsupported format", ["format", entry.format]);
-            return;
         }
     }
 
@@ -148,7 +143,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
 
     private function sendRequest (url :String, entry :AssetEntry, responseType :String, onLoad :Dynamic -> Void)
     {
-        var xhr :Dynamic = untyped __new__("XMLHttpRequest");
+        var xhr = new XMLHttpRequest();
 
         var lastActivity = 0.0;
         var start = function () {
@@ -169,7 +164,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                 lastActivity = HtmlUtil.now();
                 handleProgress(entry, event.loaded);
             };
-            interval = (untyped Lib.window).setInterval(function () {
+            interval = Browser.window.setInterval(function () {
                 // If the download has started, and enough time has passed since the last progress
                 // event, consider it stalled and abort
                 if (xhr.readyState >= 1 && HtmlUtil.now() - lastActivity > XHR_TIMEOUT) {
@@ -181,7 +176,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                         Log.warn("Retrying stalled asset request", ["url", entry.url]);
                         start();
                     } else {
-                        (untyped Lib.window).clearInterval(interval);
+                        Browser.window.clearInterval(interval);
                         handleError(entry, "Request timed out");
                     }
                 }
@@ -189,20 +184,20 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         }
 
         xhr.onload = function (_) {
-            (untyped Lib.window).clearInterval(interval);
+            Browser.window.clearInterval(interval);
 
-            var response = xhr.response;
+            var response :Dynamic = xhr.response;
             if (response == null) {
                 // Hack for IE9, which doesn't have xhr.response, only responseText
                 response = xhr.responseText;
             } else if (responseType == "blob" && xhr.responseType == "arraybuffer") {
                 // Dumb hack for iOS 6, which supports blobs but not the blob responseType
-                response = untyped __new__("Blob", [xhr.response]);
+                response = new Blob([xhr.response]);
             }
             onLoad(response);
         };
         xhr.onerror = function (_) {
-            (untyped Lib.window).clearInterval(interval);
+            Browser.window.clearInterval(interval);
             handleError(entry, "Failed to load asset: error #" + xhr.status);
         };
 
@@ -225,8 +220,8 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
 
         // Detect WebP-lossless support (and assume that lossy works where lossless does)
         // https://github.com/Modernizr/Modernizr/blob/master/feature-detects/img/webp-lossless.js
-        var webp :Dynamic = untyped __new__("Image");
-        webp.onload = webp.onerror = function () {
+        var webp = Browser.document.createImageElement();
+        webp.onload = webp.onerror = function (_) {
             if (webp.width == 1) {
                 formats.unshift(WEBP);
             }
@@ -235,8 +230,8 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         webp.src = "data:image/webp;base64,UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==";
 
         // Detect JPEG XR support
-        var jxr :Dynamic = untyped __new__("Image");
-        jxr.onload = jxr.onerror = function () {
+        var jxr = Browser.document.createImageElement();
+        jxr.onload = jxr.onerror = function (_) {
             if (jxr.width == 1) {
                 formats.unshift(JXR);
             }
@@ -250,15 +245,15 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
     private static function detectAudioFormats () :Array<AssetFormat>
     {
         // Detect basic support for HTML5 audio
-        var element :Dynamic = Lib.document.createElement("audio");
-        if (element == null || element.canPlayType == null) {
+        var audio = Browser.document.createAudioElement();
+        if (audio == null || audio.canPlayType == null) {
             Log.warn("Audio is not supported at all in this browser!");
             return [];
         }
 
         // Reject browsers that claim to support audio, but are too buggy or incomplete
         var blacklist = ~/\b(iPhone|iPod|iPad|Android)\b/;
-        var userAgent = Lib.window.navigator.userAgent;
+        var userAgent = Browser.window.navigator.userAgent;
         if (!WebAudioSound.supported && blacklist.match(userAgent)) {
             Log.warn("HTML5 audio is blacklisted for this browser", ["userAgent", userAgent]);
             return [];
@@ -276,7 +271,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
             // IE9's canPlayType() will throw an error in some rare cases:
             // https://github.com/Modernizr/Modernizr/issues/224
             var canPlayType = "";
-            try canPlayType = element.canPlayType(type.mimeType)
+            try canPlayType = audio.canPlayType(type.mimeType)
             catch (_ :Dynamic) {}
 
             if (canPlayType != "") {
@@ -291,7 +286,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         if (_detectBlobSupport) {
             _detectBlobSupport = false;
 
-            var xhr = untyped __new__("XMLHttpRequest");
+            var xhr = new XMLHttpRequest();
             // Hack for IE, which throws an InvalidStateError upon setting the responseType when
             // in the UNSENT state, despite the spec being clear about only throwing in LOADING
             // or DONE: http://www.w3.org/TR/XMLHttpRequest2/#dom-xmlhttprequest-responsetype
@@ -321,7 +316,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
      * shouldn't be GCed while playing, but vague about GCing while loading. So, maintain a hard
      * reference to all media elements being loaded to prevent GC.
      */
-    private static var _mediaElements :IntHash<Dynamic>;
+    private static var _mediaElements :Map<Int,Dynamic>;
     private static var _mediaRefCount = 0;
 
     private static var _detectBlobSupport = true;

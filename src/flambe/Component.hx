@@ -26,7 +26,7 @@ class Component
      * The component's name, generated based on its class. Components with the same name replace
      * eachother when added to an entity.
      */
-    public var name (get_name, null) :String;
+    public var name (get, null) :String;
 
     /**
      * Called after this component has been added to an entity.
@@ -65,13 +65,13 @@ class Component
         return null; // Subclasses will automagically implement this
     }
 
-    /** @private */ public function _internal_init (owner :Entity, next :Component)
+    @:allow(flambe) function init (owner :Entity, next :Component)
     {
         this.owner = owner;
         this.next = next;
     }
 
-    /** @private */ inline public function _internal_setNext (next :Component)
+    @:allow(flambe) inline function setNext (next :Component)
     {
         this.next = next;
     }

@@ -77,12 +77,12 @@ using Lambda;
             p = p.next;
         }
         if (tail != null) {
-            tail._internal_setNext(component);
+            tail.setNext(component);
         } else {
             firstComponent = component;
         }
 
-        component._internal_init(this, null);
+        component.init(this, null);
         component.onAdded();
 
         return this;
@@ -101,7 +101,7 @@ using Lambda;
                 if (prev == null) {
                     firstComponent = next;
                 } else {
-                    prev._internal_init(this, next);
+                    prev.init(this, next);
                 }
 
                 // Remove it from the _compMap
@@ -113,7 +113,7 @@ using Lambda;
 
                 // Notify the component it was removed
                 p.onRemoved();
-                p._internal_init(null, null);
+                p.init(null, null);
                 return;
             }
             prev = p;
@@ -124,33 +124,17 @@ using Lambda;
     /**
      * Gets a component of a given class from this entity.
      */
-    @:macro
-    public function get<A> (self :Expr, componentClass :ExprRequire<Class<A>>) :ExprRequire<A>
+    macro public function get<A> (self :Expr, componentClass :ExprOf<Class<A>>) :ExprOf<A>
     {
-        // Rewrites self.get(ComponentClass) to ComponentClass.getFrom(self)
-        return {
-            expr: ECall({
-                expr: EType(componentClass, "getFrom"),
-                pos: self.pos
-            }, [ self ]),
-            pos: self.pos
-        };
+        return macro $componentClass.getFrom($self);
     }
 
     /**
      * Checks if this entity has a component of the given class.
      */
-    @:macro
-    public function has<A> (self :Expr, componentClass :ExprRequire<Class<A>>) :ExprRequire<Bool>
+    macro public function has<A> (self :Expr, componentClass :ExprOf<Class<A>>) :ExprOf<Bool>
     {
-        // Rewrites self.has(ComponentClass) to ComponentClass.hasIn(self)
-        return {
-            expr: ECall({
-                expr: EType(componentClass, "hasIn"),
-                pos: self.pos
-            }, [ self ]),
-            pos: self.pos
-        };
+        return macro $componentClass.hasIn($self);
     }
 
     /**
@@ -277,7 +261,7 @@ using Lambda;
     }
 
     /**
-     * Maps String -> Component. Usually you would use a Haxe Hash here, but I'm dropping down to plain
+     * Maps String -> Component. Usually you would use a Haxe Map here, but I'm dropping down to plain
      * Object/Dictionary for the quickest possible lookups in this critical part of Flambe.
      */
     private var _compMap :Dynamic<Component>;

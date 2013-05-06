@@ -4,13 +4,20 @@
 
 package flambe.platform.html;
 
+import js.html.*;
+import js.html.webgl.*;
+import js.html.webgl.RenderingContext;
+
 import flambe.display.BlendMode;
-import flambe.platform.html.WebGLTypes;
 import flambe.platform.shader.DrawImageGL;
 import flambe.platform.shader.DrawPatternGL;
 import flambe.platform.shader.FillRectGL;
 import flambe.platform.shader.ShaderGL;
 
+/**
+ * Batches up geometry to glDrawElements and avoids redundant state changes. All GL state changes
+ * MUST go through the batcher.
+ */
 class WebGLBatcher
 {
     public var data (default, null) :Float32Array;
@@ -19,11 +26,15 @@ class WebGLBatcher
     {
         _gl = gl;
 
-        _vertexBuffer = _gl.createBuffer();
-        _gl.bindBuffer(_gl.ARRAY_BUFFER, _vertexBuffer);
+        gl.clearColor(0, 0, 0, 1);
+        gl.enable(GL.BLEND);
+        gl.pixelStorei(GL.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
 
-        _quadIndexBuffer = _gl.createBuffer();
-        _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, _quadIndexBuffer);
+        _vertexBuffer = gl.createBuffer();
+        gl.bindBuffer(GL.ARRAY_BUFFER, _vertexBuffer);
+
+        _quadIndexBuffer = gl.createBuffer();
+        gl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, _quadIndexBuffer);
 
         _drawImageShader = new DrawImageGL(gl);
         _drawPatternShader = new DrawPatternGL(gl);
@@ -32,9 +43,16 @@ class WebGLBatcher
         resize(16);
     }
 
+    public function reset (width :Int, height :Int)
+    {
+        _gl.viewport(0, 0, width, height);
+        _backbufferWidth = width;
+        _backbufferHeight = height;
+    }
+
     public function willRender ()
     {
-        // _gl.clear(_gl.COLOR_BUFFER_BIT);
+        // _gl.clear(GL.COLOR_BUFFER_BIT);
     }
 
     public function didRender ()
@@ -42,32 +60,58 @@ class WebGLBatcher
         flush();
     }
 
-    public function prepareDrawImage (blendMode :BlendMode, texture :WebGLTexture) :Int
+    /** Safely bind a texture. */
+    public function bindTexture (texture :Texture)
+    {
+        flush();
+        _lastTexture = null;
+        _currentTexture = null;
+
+        _gl.bindTexture(GL.TEXTURE_2D, texture);
+    }
+
+    /** Safely bind a framebuffer. */
+    public function bindFramebuffer (framebuffer :Framebuffer)
+    {
+        flush();
+        _lastRenderTarget = null;
+        _currentRenderTarget = null;
+
+        _gl.bindFramebuffer(GL.FRAMEBUFFER, framebuffer);
+    }
+
+    public function prepareDrawImage (renderTarget :WebGLTexture,
+        blendMode :BlendMode, texture :WebGLTexture) :Int
     {
         if (texture != _lastTexture) {
             flush();
             _lastTexture = texture;
         }
-        return prepareQuad(5, blendMode, _drawImageShader);
+        return prepareQuad(5, renderTarget, blendMode, _drawImageShader);
     }
 
-    public function prepareDrawPattern (blendMode :BlendMode, texture :WebGLTexture) :Int
+    public function prepareDrawPattern (renderTarget :WebGLTexture,
+        blendMode :BlendMode, texture :WebGLTexture) :Int
     {
         if (texture != _lastTexture) {
             flush();
             _lastTexture = texture;
         }
-        return prepareQuad(5, blendMode, _drawPatternShader);
+        return prepareQuad(5, renderTarget, blendMode, _drawPatternShader);
     }
 
-    public function prepareFillRect (blendMode :BlendMode) :Int
+    public function prepareFillRect (renderTarget :WebGLTexture, blendMode :BlendMode) :Int
     {
-        return prepareQuad(6, blendMode, _fillRectShader);
+        return prepareQuad(6, renderTarget, blendMode, _fillRectShader);
     }
 
-    private function prepareQuad (elementsPerVertex :Int,
+    private function prepareQuad (elementsPerVertex :Int, renderTarget :WebGLTexture,
         blendMode :BlendMode, shader :ShaderGL) :Int
     {
+        if (renderTarget != _lastRenderTarget) {
+            flush();
+            _lastRenderTarget = renderTarget;
+        }
         if (blendMode != _lastBlendMode) {
             flush();
             _lastBlendMode = blendMode;
@@ -93,18 +137,30 @@ class WebGLBatcher
             return;
         }
 
+        if (_lastRenderTarget != _currentRenderTarget) {
+            // Bind the texture framebuffer, or the original backbuffer
+            if (_lastRenderTarget != null) {
+                _gl.bindFramebuffer(GL.FRAMEBUFFER, _lastRenderTarget.framebuffer);
+                _gl.viewport(0, 0, _lastRenderTarget.width, _lastRenderTarget.height);
+            } else {
+                _gl.bindFramebuffer(GL.FRAMEBUFFER, null);
+                _gl.viewport(0, 0, _backbufferWidth, _backbufferHeight);
+            }
+            _currentRenderTarget = _lastRenderTarget;
+        }
+
         if (_lastBlendMode != _currentBlendMode) {
             switch (_lastBlendMode) {
-                case Normal: _gl.blendFunc(_gl.ONE, _gl.ONE_MINUS_SRC_ALPHA);
-                case Add: _gl.blendFunc(_gl.ONE, _gl.ONE);
+                case Normal: _gl.blendFunc(GL.ONE, GL.ONE_MINUS_SRC_ALPHA);
+                case Add: _gl.blendFunc(GL.ONE, GL.ONE);
                 // TODO(bruno): Disable blending entirely?
-                case CopyExperimental: _gl.blendFunc(_gl.ONE, _gl.ZERO);
+                case CopyExperimental: _gl.blendFunc(GL.ONE, GL.ZERO);
             }
             _currentBlendMode = _lastBlendMode;
         }
 
         if (_lastTexture != _currentTexture) {
-            _gl.bindTexture(_gl.TEXTURE_2D, _lastTexture.nativeTexture);
+            _gl.bindTexture(GL.TEXTURE_2D, _lastTexture.nativeTexture);
             _currentTexture = _lastTexture;
         }
 
@@ -114,13 +170,12 @@ class WebGLBatcher
             _currentShader = _lastShader;
         }
 
-        switch (_lastShader) {
-        case cast _drawPatternShader:
+        if (_lastShader == _drawPatternShader) {
             _drawPatternShader.setMaxUV(_lastTexture.maxU, _lastTexture.maxV);
         }
 
-        _gl.bufferSubData(_gl.ARRAY_BUFFER, 0, data.subarray(0, _dataOffset));
-        _gl.drawElements(_gl.TRIANGLES, 6*_quads, _gl.UNSIGNED_SHORT, 0);
+        _gl.bufferSubData(GL.ARRAY_BUFFER, 0, data.subarray(0, _dataOffset));
+        _gl.drawElements(GL.TRIANGLES, 6*_quads, GL.UNSIGNED_SHORT, 0);
 
         _quads = 0;
         _dataOffset = 0;
@@ -137,8 +192,8 @@ class WebGLBatcher
 
         // Set the new vertex buffer size
         data = new Float32Array(maxQuads*4*MAX_ELEMENTS_PER_VERTEX);
-        _gl.bufferData(_gl.ARRAY_BUFFER,
-            data.length*Float32Array.BYTES_PER_ELEMENT, _gl.STREAM_DRAW);
+        _gl.bufferData(GL.ARRAY_BUFFER,
+            data.length*Float32Array.BYTES_PER_ELEMENT, GL.STREAM_DRAW);
 
         var indices = new Uint16Array(6*maxQuads);
         for (ii in 0...maxQuads) {
@@ -149,7 +204,7 @@ class WebGLBatcher
             indices[ii*6 + 4] = ii*4 + 3;
             indices[ii*6 + 5] = ii*4 + 0;
         }
-        _gl.bufferData(_gl.ELEMENT_ARRAY_BUFFER, indices, _gl.STATIC_DRAW);
+        _gl.bufferData(GL.ELEMENT_ARRAY_BUFFER, indices, GL.STATIC_DRAW);
     }
 
     private static inline var MAX_ELEMENTS_PER_VERTEX = 6;
@@ -159,6 +214,7 @@ class WebGLBatcher
 
     // Used to keep track of context changes requiring a flush
     private var _lastBlendMode :BlendMode = null;
+    private var _lastRenderTarget :WebGLTexture = null;
     private var _lastShader :ShaderGL = null;
     private var _lastTexture :WebGLTexture = null;
 
@@ -166,6 +222,7 @@ class WebGLBatcher
     private var _currentBlendMode :BlendMode = null;
     private var _currentShader :ShaderGL = null;
     private var _currentTexture :WebGLTexture = null;
+    private var _currentRenderTarget :WebGLTexture = null;
 
     private var _vertexBuffer :Buffer;
     private var _quadIndexBuffer :Buffer;
@@ -177,4 +234,7 @@ class WebGLBatcher
     private var _quads :Int = 0;
     private var _maxQuads :Int = 0;
     private var _dataOffset :Int = 0;
+
+    private var _backbufferWidth :Int = 0;
+    private var _backbufferHeight :Int = 0;
 }

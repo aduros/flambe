@@ -14,8 +14,7 @@ import flambe.util.Value;
  * AIR, it uses StageWebView. On Android, make sure your app manifest contains the INTERNET
  * permission.
  */
-interface WebView
-    implements Disposable
+interface WebView extends Disposable
 {
     /**
      * The URL currently being displayed. Can be set to load a different URL. In AIR, this value

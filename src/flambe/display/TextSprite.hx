@@ -15,10 +15,10 @@ using flambe.util.BitSets;
  */
 class TextSprite extends Sprite
 {
-    public var text (get_text, set_text) :String;
+    public var text (get, set) :String;
 
     /** The font used to display the text. */
-    public var font (get_font, set_font) :Font;
+    public var font (get, set) :Font;
 
     /**
      * The maximum available width of this text before word wrapping to a new line. Defaults to 0
@@ -29,7 +29,7 @@ class TextSprite extends Sprite
     /**
      * The horizontal text alignment, for multiline text. Left by default.
      */
-    public var align (get_align, set_align) :TextAlign;
+    public var align (get, set) :TextAlign;
 
     public function new (font :Font, ?text :String = "")
     {

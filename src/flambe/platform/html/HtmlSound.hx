@@ -4,7 +4,7 @@
 
 package flambe.platform.html;
 
-import js.Lib;
+import js.Browser;
 
 import flambe.animation.AnimatedFloat;
 import flambe.platform.Tickable;
@@ -15,7 +15,7 @@ import flambe.util.Disposable;
 class HtmlSound
     implements Sound
 {
-    public var duration (get_duration, null) :Float;
+    public var duration (get, null) :Float;
     public var audioElement :Dynamic; // TODO(bruno): Use typed audio element extern
 
     public function new (audioElement :Dynamic)
@@ -40,14 +40,14 @@ class HtmlSound
 }
 
 private class HtmlPlayback
-    implements Playback,
+    implements Playback
     implements Tickable
 {
     public var volume (default, null) :AnimatedFloat;
-    public var paused (get_paused, set_paused) :Bool;
-    public var ended (get_ended, null) :Bool;
-    public var position (get_position, null) :Float;
-    public var sound (get_sound, null) :Sound;
+    public var paused (get, set) :Bool;
+    public var ended (get, null) :Bool;
+    public var position (get, null) :Float;
+    public var sound (get, null) :Sound;
 
     public function new (sound :HtmlSound, volume :Float, loop :Bool)
     {
@@ -55,7 +55,7 @@ private class HtmlPlayback
         _tickableAdded = false;
 
         // Create a copy of the original sound's element. Note that cloneNode() doesn't work in IE
-        _clonedElement = Lib.document.createElement("audio");
+        _clonedElement = Browser.document.createAudioElement();
         _clonedElement.loop = loop;
         _clonedElement.src = sound.audioElement.src;
 

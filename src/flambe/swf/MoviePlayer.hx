@@ -22,7 +22,7 @@ class MoviePlayer extends Component
     public var movie (default, null) :Value<MovieSprite>;
 
     /** Whether the current movie is being looped. */
-    public var looping (get_looping, null) :Bool;
+    public var looping (get, null) :Bool;
 
     public function new (lib :Library)
     {
@@ -41,7 +41,7 @@ class MoviePlayer extends Component
      */
     public function setCache (cache :Bool) :MoviePlayer
     {
-        _cache = cache ? new Hash() : null;
+        _cache = cache ? new Map() : null;
         return this;
     }
 
@@ -158,5 +158,5 @@ class MoviePlayer extends Component
     private var _loopingSprite :MovieSprite = null;
 
     private var _decorator :MovieSprite->Void;
-    private var _cache :Hash<MovieSprite>;
+    private var _cache :Map<String,MovieSprite>;
 }

@@ -17,7 +17,7 @@ class EmitterSprite extends Sprite
     /** The particle texture, must be square. */
     public var texture :Texture;
 
-    public var maxParticles (get_maxParticles, set_maxParticles) :Int;
+    public var maxParticles (get, set) :Int;
 
     public var emitX (default, null) :AnimatedFloat;
     public var emitXVariance (default, null) :AnimatedFloat;

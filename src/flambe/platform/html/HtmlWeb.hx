@@ -4,7 +4,7 @@
 
 package flambe.platform.html;
 
-import js.Lib;
+import js.Browser;
 
 import flambe.animation.AnimatedFloat;
 import flambe.util.Signal1;
@@ -15,7 +15,7 @@ import flambe.web.WebView;
 class HtmlWeb
     implements Web
 {
-    public var supported (get_supported, null) :Bool;
+    public var supported (get, null) :Bool;
 
     public function new (container :Dynamic)
     {
@@ -29,10 +29,10 @@ class HtmlWeb
 
     public function createView (x :Float, y :Float, width :Float, height :Float) :WebView
     {
-        var iframe = Lib.document.createElement("iframe");
+        var iframe = Browser.document.createIFrameElement();
         iframe.style.position = "absolute";
         iframe.style.border = "0";
-        (untyped iframe).scrolling = "no";
+        iframe.scrolling = "no";
         _container.appendChild(iframe);
 
         var view = new HtmlWebView(iframe, x, y, width, height);
@@ -42,14 +42,14 @@ class HtmlWeb
 
     public function openBrowser (url :String)
     {
-        Lib.window.open(url, "_blank");
+        Browser.window.open(url, "_blank");
     }
 
     private var _container :Dynamic;
 }
 
 class HtmlWebView
-    implements WebView,
+    implements WebView
     implements Tickable
 {
     public var url (default, null) :Value<String>;
@@ -74,7 +74,7 @@ class HtmlWebView
         this.height = new AnimatedFloat(height, onBoundsChanged);
         updateBounds();
 
-        url = new Value(null, function (url, _) loadUrl(url));
+        url = new Value<String>(null, function (url, _) loadUrl(url));
         error = new Signal1();
     }
 

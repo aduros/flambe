@@ -23,7 +23,7 @@ class MovieSprite extends Sprite
     public var symbol (default, null) :MovieSymbol;
 
     /** The current playback position in seconds. */
-    public var position (get_position, set_position) :Float;
+    public var position (get, set) :Float;
 
     /**
      * The playback speed multiplier of this movie, defaults to 1.0. Higher values will play faster.
@@ -31,10 +31,10 @@ class MovieSprite extends Sprite
     public var speed (default, null) :AnimatedFloat;
 
     /** Whether this movie is currently paused. */
-    public var paused (get_paused, set_paused) :Bool;
+    public var paused (get, set) :Bool;
 
     /** Emitted when this movie loops back to the beginning. */
-    public var looped (get_looped, null) :Signal0;
+    public var looped (get, null) :Signal0;
 
     public function new (symbol :MovieSymbol)
     {

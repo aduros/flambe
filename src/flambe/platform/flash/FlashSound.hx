@@ -17,7 +17,7 @@ import flambe.sound.Sound;
 class FlashSound
     implements Sound
 {
-    public var duration (get_duration, null) :Float;
+    public var duration (get, null) :Float;
     public var nativeSound :flash.media.Sound;
 
     public function new (nativeSound :flash.media.Sound)
@@ -42,14 +42,14 @@ class FlashSound
 }
 
 private class FlashPlayback
-    implements Playback,
+    implements Playback
     implements Tickable
 {
     public var volume (default, null) :AnimatedFloat;
-    public var paused (get_paused, set_paused) :Bool;
-    public var ended (get_ended, null) :Bool;
-    public var position (get_position, null) :Float;
-    public var sound (get_sound, null) :Sound;
+    public var paused (get, set) :Bool;
+    public var ended (get, null) :Bool;
+    public var position (get, null) :Float;
+    public var sound (get, null) :Sound;
 
     public function new (sound :FlashSound, volume :Float, loops :Int)
     {

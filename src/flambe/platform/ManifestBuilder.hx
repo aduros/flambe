@@ -5,9 +5,8 @@
 package flambe.platform;
 
 #if macro
-import neko.FileSystem;
-import neko.io.File;
-import neko.Lib;
+import sys.FileSystem;
+import sys.io.File;
 
 import haxe.macro.Expr;
 import haxe.macro.Context;
@@ -24,7 +23,7 @@ using Type;
  */
 class ManifestBuilder
 {
-    @:macro public static function populate (hash :Expr) :Expr
+    macro public static function populate (hash :Expr) :Expr
     {
         if (Context.defined("display")) {
             // When running in code completion, skip out early

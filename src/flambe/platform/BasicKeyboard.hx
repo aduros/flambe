@@ -15,7 +15,7 @@ using flambe.platform.KeyCodes;
 class BasicKeyboard
     implements Keyboard
 {
-    public var supported (get_supported, null) :Bool;
+    public var supported (get, null) :Bool;
 
     public var down (default, null) :Signal1<KeyboardEvent>;
     public var up (default, null) :Signal1<KeyboardEvent>;
@@ -26,7 +26,7 @@ class BasicKeyboard
         down = new Signal1();
         up = new Signal1();
         backButton = new Signal0();
-        _keyStates = new IntHash();
+        _keyStates = new Map();
     }
 
     public function get_supported () :Bool
@@ -60,7 +60,7 @@ class BasicKeyboard
 
         if (!isCodeDown(keyCode)) {
             _keyStates.set(keyCode, true);
-            _sharedEvent._internal_init(_sharedEvent.id+1, keyCode.toKey());
+            _sharedEvent.init(_sharedEvent.id+1, keyCode.toKey());
             down.emit(_sharedEvent);
         }
         return true;
@@ -73,12 +73,12 @@ class BasicKeyboard
     {
         if (isCodeDown(keyCode)) {
             _keyStates.remove(keyCode);
-            _sharedEvent._internal_init(_sharedEvent.id+1, keyCode.toKey());
+            _sharedEvent.init(_sharedEvent.id+1, keyCode.toKey());
             up.emit(_sharedEvent);
         }
     }
 
     private static var _sharedEvent = new KeyboardEvent();
 
-    private var _keyStates :IntHash<Bool>;
+    private var _keyStates :Map<Int,Bool>;
 }

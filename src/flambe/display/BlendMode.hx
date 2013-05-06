@@ -15,6 +15,9 @@ enum BlendMode {
     /** Adds the source and destination colors, lightening the final image. */
     Add;
 
+    /** Masks the overlapping area by applying the source alpha to the destination image */
+    Mask;
+
     /**
      * Ignores the destination color, and copies the source without handling transparency. NOTE:
      * Supported only in the Stage3D renderer, everywhere else it's the same as Normal.

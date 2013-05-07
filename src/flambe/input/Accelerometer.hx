@@ -12,7 +12,7 @@ interface Accelerometer
     /*
      * Returns true if acceleration is suppored.
      */
-    //public var motionSupported (default, null) :Bool;//TODO
+    public var motionSupported (default, null) :Bool;//TODO
     /*
      * Returns true if either orientation or orientation are suppored.
      */
@@ -20,7 +20,7 @@ interface Accelerometer
     /*
      * Device motions updates.
      */
-    //public var motionChange(default, null): Signal1<AccelerometerMotion>;//TODO
+    public var motionChange(default, null): Signal1<AccelerometerMotion>;//TODO
     /*
      * Device orientation updates, not to be confused with window orientation.
      */

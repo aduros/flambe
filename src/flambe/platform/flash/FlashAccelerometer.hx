@@ -24,7 +24,7 @@ class FlashAccelerometer implements Accelerometer
     /**
      * 
      */
-    //public var motionSupported (default, null) :Bool;//TODO
+    public var motionSupported (default, null) :Bool;//TODO
     /**
      * 
      */
@@ -32,7 +32,7 @@ class FlashAccelerometer implements Accelerometer
     /** 
     * <code>null</code> if not supported.
     */
-    //public var motionChange(default, null): Signal1<AccelerometerMotion>;//TODO
+    public var motionChange(default, null): Signal1<AccelerometerMotion>;//TODO
     /** 
     * <code>null</code> if not supported.
     */
@@ -171,12 +171,12 @@ class FlashAccelerometer implements Accelerometer
 
     }
 
-    //private var _motionUpdate:NotifyingSignal1<AccelerometerOrientation>;
+    private var _motionUpdate:NotifyingSignal1<AccelerometerOrientation>;
     private var _orientationUpdate:NotifyingSignal1<AccelerometerOrientation>;
     private var _windowOrientation:Float;
     private var _orientationEventGroup:EventGroup;
     private var _motionEventGroup:EventGroup;
-    //private var _motion:AccelerometerMotion;
+    private var _motion:AccelerometerMotion;
     private var _orientation:AccelerometerOrientation;
 
 }

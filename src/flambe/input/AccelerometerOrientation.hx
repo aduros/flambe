@@ -39,5 +39,9 @@ class AccelerometerOrientation
      * if that would be a better implementation.
      */
     public var azimuth(default, null):Float;
+    /* TODO: Add this, and make relative to game orientation. */
+    //public var compassHeading(default, null):Float;
+    /* TODO: Add this. */
+    //public var compassAccuracy(default, null):Float;
 
 }

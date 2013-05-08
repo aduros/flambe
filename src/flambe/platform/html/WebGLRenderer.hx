@@ -5,7 +5,7 @@
 package flambe.platform.html;
 
 import js.Browser;
-import js.html.webgl.RenderingContext;
+import js.html.webgl.*;
 
 import flambe.display.Graphics;
 import flambe.display.Texture;

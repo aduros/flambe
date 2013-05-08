@@ -9,6 +9,7 @@ import js.html.webgl.*;
 import js.html.webgl.RenderingContext;
 
 import flambe.display.BlendMode;
+import flambe.math.Rectangle;
 import flambe.platform.shader.DrawImageGL;
 import flambe.platform.shader.DrawPatternGL;
 import flambe.platform.shader.FillRectGL;
@@ -81,32 +82,33 @@ class WebGLBatcher
     }
 
     public function prepareDrawImage (renderTarget :WebGLTexture,
-        blendMode :BlendMode, texture :WebGLTexture) :Int
+        blendMode :BlendMode, scissor :Rectangle, texture :WebGLTexture) :Int
     {
         if (texture != _lastTexture) {
             flush();
             _lastTexture = texture;
         }
-        return prepareQuad(5, renderTarget, blendMode, _drawImageShader);
+        return prepareQuad(5, renderTarget, blendMode, scissor, _drawImageShader);
     }
 
     public function prepareDrawPattern (renderTarget :WebGLTexture,
-        blendMode :BlendMode, texture :WebGLTexture) :Int
+        blendMode :BlendMode, scissor :Rectangle, texture :WebGLTexture) :Int
     {
         if (texture != _lastTexture) {
             flush();
             _lastTexture = texture;
         }
-        return prepareQuad(5, renderTarget, blendMode, _drawPatternShader);
+        return prepareQuad(5, renderTarget, blendMode, scissor, _drawPatternShader);
     }
 
-    public function prepareFillRect (renderTarget :WebGLTexture, blendMode :BlendMode) :Int
+    public function prepareFillRect (renderTarget :WebGLTexture,
+        blendMode :BlendMode, scissor :Rectangle) :Int
     {
-        return prepareQuad(6, renderTarget, blendMode, _fillRectShader);
+        return prepareQuad(6, renderTarget, blendMode, scissor, _fillRectShader);
     }
 
     private function prepareQuad (elementsPerVertex :Int, renderTarget :WebGLTexture,
-        blendMode :BlendMode, shader :ShaderGL) :Int
+        blendMode :BlendMode, scissor :Rectangle, shader :ShaderGL) :Int
     {
         if (renderTarget != _lastRenderTarget) {
             flush();
@@ -119,6 +121,15 @@ class WebGLBatcher
         if (shader != _lastShader) {
             flush();
             _lastShader = shader;
+        }
+
+        // Handle changes to the scissor rectangle
+        if (scissor != null || _lastScissor != null) {
+            if (scissor == null || _lastScissor == null || !_lastScissor.equals(scissor)) {
+                flush();
+                _lastScissor = (scissor != null) ? scissor.clone(_lastScissor) : null;
+                _pendingSetScissor = true;
+            }
         }
 
         if (_quads >= _maxQuads) {
@@ -157,6 +168,17 @@ class WebGLBatcher
                 case CopyExperimental: _gl.blendFunc(GL.ONE, GL.ZERO);
             }
             _currentBlendMode = _lastBlendMode;
+        }
+
+        if (_pendingSetScissor) {
+            if (_lastScissor != null) {
+                _gl.enable(GL.SCISSOR_TEST);
+                _gl.scissor(Std.int(_lastScissor.x), Std.int(_lastScissor.y),
+                    Std.int(_lastScissor.width), Std.int(_lastScissor.height));
+            } else {
+                _gl.disable(GL.SCISSOR_TEST);
+            }
+            _pendingSetScissor = false;
         }
 
         if (_lastTexture != _currentTexture) {
@@ -217,12 +239,14 @@ class WebGLBatcher
     private var _lastRenderTarget :WebGLTexture = null;
     private var _lastShader :ShaderGL = null;
     private var _lastTexture :WebGLTexture = null;
+    private var _lastScissor :Rectangle = null;
 
     // Used to avoid redundant GL calls
     private var _currentBlendMode :BlendMode = null;
     private var _currentShader :ShaderGL = null;
     private var _currentTexture :WebGLTexture = null;
     private var _currentRenderTarget :WebGLTexture = null;
+    private var _pendingSetScissor :Bool = false;
 
     private var _vertexBuffer :Buffer;
     private var _quadIndexBuffer :Buffer;

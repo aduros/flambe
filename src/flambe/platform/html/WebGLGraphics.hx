@@ -6,13 +6,13 @@ package flambe.platform.html;
 
 import js.html.*;
 import js.html.webgl.*;
-import js.html.webgl.RenderingContext;
 
 import flambe.display.BlendMode;
 import flambe.display.Graphics;
 import flambe.display.Texture;
 import flambe.math.FMath;
 import flambe.math.Matrix;
+import flambe.math.Rectangle;
 import flambe.util.Assert;
 
 class WebGLGraphics
@@ -45,6 +45,7 @@ class WebGLGraphics
         current.matrix.clone(state.matrix);
         state.alpha = current.alpha;
         state.blendMode = current.blendMode;
+        state.scissor = (current.scissor != null) ? current.scissor.clone(state.scissor) : null;
         _stateList = state;
     }
 
@@ -114,7 +115,7 @@ class WebGLGraphics
         var v2 = texture.maxV*(sourceY + sourceH) / h;
         var alpha = state.alpha;
 
-        var offset = _batcher.prepareDrawImage(_renderTarget, state.blendMode, texture);
+        var offset = _batcher.prepareDrawImage(_renderTarget, state.blendMode, state.scissor, texture);
         var data = _batcher.data;
 
         data[  offset] = pos[0];
@@ -152,7 +153,7 @@ class WebGLGraphics
         var v2 = texture.maxV * (height / texture.height);
         var alpha = state.alpha;
 
-        var offset = _batcher.prepareDrawPattern(_renderTarget, state.blendMode, texture);
+        var offset = _batcher.prepareDrawPattern(_renderTarget, state.blendMode, state.scissor, texture);
         var data = _batcher.data;
 
         data[  offset] = pos[0];
@@ -190,7 +191,7 @@ class WebGLGraphics
         var b = (color & 0x0000ff) / 0x0000ff;
         var a = state.alpha;
 
-        var offset = _batcher.prepareFillRect(_renderTarget, state.blendMode);
+        var offset = _batcher.prepareFillRect(_renderTarget, state.blendMode, state.scissor);
         var data = _batcher.data;
 
         data[  offset] = pos[0];
@@ -239,7 +240,32 @@ class WebGLGraphics
 
     public function applyScissor (x :Float, y :Float, width :Float, height :Float)
     {
-        throw "TODO";
+        var state = getTopState();
+        var rect = _scratchQuadArray;
+        rect[0] = x;
+        rect[1] = y;
+        rect[2] = x + width;
+        rect[3] = y + height;
+
+        state.matrix.transformArray(cast rect, 4, cast rect);
+        _inverseProjection.transformArray(cast rect, 4, cast rect);
+
+        x = rect[0];
+        y = rect[1];
+        width = rect[2] - x;
+        height = rect[3] - y;
+
+        // Handle negative rectangles
+        if (width < 0) {
+            x += width;
+            width = -width;
+        }
+        if (height < 0) {
+            y += height;
+            height = -height;
+        }
+
+        state.applyScissor(x, y, width, height);
     }
 
     public function reset (width :Int, height :Int)
@@ -249,6 +275,11 @@ class WebGLGraphics
         // Framebuffers need to be vertically flipped
         var flip = (_renderTarget != null) ? -1 : 1;
         _stateList.matrix.set(2/width, 0, 0, flip * -2/height, -1, flip);
+
+        // May be used to transform back into screen coordinates
+        _inverseProjection = new Matrix();
+        _inverseProjection.set(2/width, 0, 0, 2/height, -1, -1);
+        _inverseProjection.invert();
     }
 
     inline private function getTopState () :DrawingState
@@ -284,6 +315,7 @@ class WebGLGraphics
     private var _batcher :WebGLBatcher;
     private var _renderTarget :WebGLTexture;
 
+    private var _inverseProjection :Matrix = null;
     private var _stateList :DrawingState = null;
 }
 
@@ -292,6 +324,7 @@ private class DrawingState
     public var matrix :Matrix;
     public var alpha :Float;
     public var blendMode :BlendMode;
+    public var scissor :Rectangle = null;
 
     public var prev :DrawingState = null;
     public var next :DrawingState = null;
@@ -301,5 +334,23 @@ private class DrawingState
         matrix = new Matrix();
         alpha = 1;
         blendMode = Normal;
+    }
+
+    public function applyScissor (x :Float, y :Float, width :Float, height :Float)
+    {
+        if (scissor != null) {
+            // Intersection with the previous scissor rectangle
+            var x1 = FMath.max(scissor.x, x);
+            var y1 = FMath.max(scissor.y, y);
+            var x2 = FMath.min(scissor.x + scissor.width, x + width);
+            var y2 = FMath.min(scissor.y + scissor.height, y + height);
+            x = x1;
+            y = y1;
+            width = x2 - x1;
+            height = y2 - y1;
+        } else {
+            scissor = new Rectangle();
+        }
+        scissor.set(Math.round(x), Math.round(y), Math.round(width), Math.round(height));
     }
 }

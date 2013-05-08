@@ -32,9 +32,27 @@ class Rectangle
      */
     public function contains (x :Float, y :Float) :Bool
     {
+        // A little more complicated than usual due to proper handling of negative widths/heights
+
         x -= this.x;
+        if (width >= 0) {
+            if (x < 0 || x > width) {
+                return false;
+            }
+        } else if (x > 0 || x < width) {
+            return false;
+        }
+
         y -= this.y;
-        return x >= 0 && y >= 0 && x <= width && y <= height;
+        if (height >= 0) {
+            if (y < 0 || y > height) {
+                return false;
+            }
+        } else if (y > 0 || y < height) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -47,6 +65,11 @@ class Rectangle
         }
         result.set(x, y, width, height);
         return result;
+    }
+
+    public function equals (other :Rectangle) :Bool
+    {
+        return x == other.x && y == other.y && width == other.width && height == other.height;
     }
 
     #if debug @:keep #end public function toString () :String

@@ -5,8 +5,7 @@
 package flambe.platform.html;
 
 import js.html.Uint8Array;
-import js.html.webgl.Framebuffer;
-import js.html.webgl.RenderingContext;
+import js.html.webgl.*;
 
 import haxe.io.Bytes;
 

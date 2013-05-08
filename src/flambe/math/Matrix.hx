@@ -81,6 +81,19 @@ class Matrix
         m11 = t11;
     }
 
+    /** @return Whether the matrix was inverted. */
+    public function invert () :Bool
+    {
+        var det = determinant();
+        if (det == 0) {
+            return false;
+        }
+        set(m11/det, -m01/det, -m10/det, m00/det,
+            (m01*m12 - m11*m02) / det,
+            (m10*m02 - m00*m12) / det);
+        return true;
+    }
+
     public function transform (x :Float, y :Float, ?result :Point) :Point
     {
         if (result == null) {

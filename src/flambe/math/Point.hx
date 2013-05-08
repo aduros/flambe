@@ -93,6 +93,11 @@ class Point
         return result;
     }
 
+    public function equals (other :Point) :Bool
+    {
+        return x == other.x && y == other.y;
+    }
+
     #if debug @:keep #end public function toString () :String
     {
         return "(" + x + "," + y + ")";

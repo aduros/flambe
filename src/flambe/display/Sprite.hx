@@ -69,7 +69,7 @@ class Sprite extends Component
     /**
      * <p>The scissor rectangle used for clipping/masking, in the local coordinate system. The
      * scissor rectangle affects both rendering and hit testing, and applies to this sprite and all
-     * children.</p>
+     * children. Rectangles with negative width or height are OK.</p>
      *
      * <p><b>WARNING</b>: When using scissor testing, this sprite (and its parents) must not be
      * rotated. The scissor rectangle must be axis-aligned when converted to screen coordinates.</p>

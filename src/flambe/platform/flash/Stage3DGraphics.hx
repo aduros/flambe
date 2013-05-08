@@ -248,11 +248,9 @@ class Stage3DGraphics
     {
         var state = getTopState();
         var rect = _scratchClipVector;
-
         rect[0] = x;
         rect[1] = y;
         // rect[2] = 0;
-
         rect[3] = x + width;
         rect[4] = y + height;
         // rect[5] = 0;
@@ -264,6 +262,17 @@ class Stage3DGraphics
         y = rect[1];
         width = rect[3] - x;
         height = rect[4] - y;
+
+        // Handle negative rectangles
+        if (width < 0) {
+            x += width;
+            width = -width;
+        }
+        if (height < 0) {
+            y += height;
+            height = -height;
+        }
+
         state.applyScissor(x, y, width, height);
     }
 

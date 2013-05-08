@@ -4,7 +4,6 @@
 
 package flambe.platform.html;
 
-import js.Browser;
 import js.html.webgl.*;
 
 import flambe.display.Graphics;
@@ -22,11 +21,20 @@ class WebGLRenderer
         Log.info("Using experimental WebGL renderer", ["version", gl.getParameter(GL.VERSION)]);
 
         this.gl = gl;
-        batcher = new WebGLBatcher(gl);
-        _graphics = new WebGLGraphics(batcher, null);
+
+        // Handle GL context loss
+        gl.canvas.addEventListener("webglcontextlost", function (event) {
+            event.preventDefault();
+            Log.warn("WebGL context lost");
+            System.hasGPU._ = false;
+        }, false);
+        gl.canvas.addEventListener("webglcontextrestore", function (event) {
+            Log.warn("WebGL context restored");
+            init();
+        }, false);
 
         stage.resize.connect(onResize);
-        onResize();
+        init();
     }
 
     public function createTexture (image :Dynamic) :WebGLTexture
@@ -61,6 +69,14 @@ class WebGLRenderer
 
         batcher.reset(width, height);
         _graphics.reset(width, height);
+    }
+
+    private function init ()
+    {
+        batcher = new WebGLBatcher(gl);
+        _graphics = new WebGLGraphics(batcher, null);
+        onResize();
+        System.hasGPU._ = true;
     }
 
     private var _graphics :WebGLGraphics;

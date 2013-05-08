@@ -70,7 +70,6 @@ class HtmlPlatform
         _keyboard = new BasicKeyboard();
 
         _renderer = createRenderer(canvas);
-        System.hasGPU._ = true;
 
         mainLoop = new MainLoop();
 

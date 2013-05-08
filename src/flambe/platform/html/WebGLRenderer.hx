@@ -9,7 +9,6 @@ import js.html.webgl.*;
 import flambe.display.Graphics;
 import flambe.display.Texture;
 
-// TODO(bruno): Handle GL context loss
 class WebGLRenderer
     implements Renderer
 {

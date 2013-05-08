@@ -107,6 +107,10 @@ private class HtmlPlayback
 
             // Release System references
             _volumeBinding.dispose();
+            if (!System.hidden._) {
+                _hideBinding.dispose();
+            }
+
             return true;
         }
         return false;
@@ -127,6 +131,9 @@ private class HtmlPlayback
 
             // Claim System references
             _volumeBinding = System.volume.changed.connect(function(_,_) updateVolume());
+            _hideBinding = System.hidden.changed.connect(function(v,_) {
+                this.paused = v;
+            });
         }
     }
 
@@ -139,4 +146,5 @@ private class HtmlPlayback
     private var _clonedElement :Dynamic;
     private var _volumeBinding :Disposable;
     private var _tickableAdded :Bool;
+    private var _hideBinding :Disposable;
 }

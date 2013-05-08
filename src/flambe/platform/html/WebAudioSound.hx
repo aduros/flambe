@@ -196,7 +196,12 @@ private class WebAudioPlayback
             _tickableAdded = true;
             HtmlPlatform.instance.mainLoop.addTickable(this);
             _hideBinding = System.hidden.changed.connect(function(v,_) {
-                this.paused = v;
+                if (v) {
+                    _wasPaused = get_paused();
+                    this.paused = true;
+                } else {
+                    this.paused = _wasPaused;
+                }
             });
         }
     }
@@ -205,6 +210,7 @@ private class WebAudioPlayback
 
     private var _pausedAt :Float;
     private var _startedAt :Float;
+    private var _wasPaused :Bool;
 
     private var _sourceNode :Dynamic;
     private var _gainNode :Dynamic;

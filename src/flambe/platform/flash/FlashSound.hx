@@ -145,7 +145,12 @@ private class FlashPlayback
             FlashPlatform.instance.mainLoop.addTickable(this);
 
             _hideBinding = System.hidden.changed.connect(function(v,_) {
-                this.paused = v;
+                if (v) {
+                    _wasPaused = get_paused();
+                    this.paused = true;
+                } else {
+                    this.paused = _wasPaused;
+                }
             });
 
             _tickableAdded = true;
@@ -157,6 +162,7 @@ private class FlashPlayback
     private var _loops :Int;
 
     private var _pausePosition :Float;
+    private var _wasPaused :Bool;
     private var _ended :Bool;
     private var _tickableAdded :Bool;
     private var _hideBinding :Disposable;

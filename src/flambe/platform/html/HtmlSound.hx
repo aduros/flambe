@@ -132,7 +132,12 @@ private class HtmlPlayback
             // Claim System references
             _volumeBinding = System.volume.changed.connect(function(_,_) updateVolume());
             _hideBinding = System.hidden.changed.connect(function(v,_) {
-                this.paused = v;
+                if (v) {
+                    _wasPaused = get_paused();
+                    this.paused = true;
+                } else {
+                    this.paused = _wasPaused;
+                }
             });
         }
     }
@@ -147,4 +152,6 @@ private class HtmlPlayback
     private var _volumeBinding :Disposable;
     private var _tickableAdded :Bool;
     private var _hideBinding :Disposable;
+    private var _wasPaused :Bool;
+
 }

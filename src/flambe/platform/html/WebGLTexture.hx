@@ -4,6 +4,7 @@
 
 package flambe.platform.html;
 
+import js.html.CanvasElement;
 import js.html.Uint8Array;
 import js.html.webgl.*;
 
@@ -53,7 +54,7 @@ class WebGLTexture
         if (_widthPow2 != image.width || _heightPow2 != image.height) {
             // Resize up to the next power of two, padding with transparent black
             var resized = HtmlUtil.createEmptyCanvas(_widthPow2, _heightPow2);
-            resized.getContext("2d").drawImage(image, 0, 0);
+            resized.getContext2d().drawImage(image, 0, 0);
             drawBorder(resized, image.width, image.height);
             image = resized;
         }
@@ -148,19 +149,17 @@ class WebGLTexture
      * Extends the right and bottom edge pixels of a bitmap. This is to prevent artifacts caused by
      * sampling the outer transparency when the edge pixels are sampled.
      */
-    private static function drawBorder (canvas :Dynamic, width :Int, height :Int)
+    private static function drawBorder (canvas :CanvasElement, width :Int, height :Int)
     {
-        // TODO
-        //
-        // // Right edge
-        // bitmapData.copyPixels(bitmapData,
-        //     new Rectangle(width-1, 0, 1, height), new Point(width, 0));
+        var ctx = canvas.getContext2d();
 
-        // // Bottom edge
-        // bitmapData.copyPixels(bitmapData,
-        //     new Rectangle(0, height-1, width, 1), new Point(0, height));
+        // Right edge
+        ctx.drawImage(canvas, width-1, 0, 1, height, width, 0, 1, height);
 
-        // // Is a one pixel border enough?
+        // Bottom edge
+        ctx.drawImage(canvas, 0, height-1, width, 1, 0, height, width, 1);
+
+        // Is a one pixel border enough?
     }
 
     private var _renderer :WebGLRenderer;

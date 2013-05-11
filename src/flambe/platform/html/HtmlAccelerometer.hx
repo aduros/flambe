@@ -23,7 +23,7 @@ class HtmlAccelerometer implements Accelerometer
     /**
      * 
      */
-    public var orientationSupported (default, null) :Bool;
+    public var orientationSupported (get_orientationSupported, null) :Bool;
     /** 
     * <code>null</code> if not supported.
     */
@@ -47,7 +47,6 @@ class HtmlAccelerometer implements Accelerometer
         _win = (untyped Lib.window);
 
         //motionSupported = _win.DeviceMotionEvent != null; 
-        orientationSupported = _win.DeviceOrientationEvent != null; 
 
         // if (motionSupported)
         // {
@@ -86,6 +85,11 @@ class HtmlAccelerometer implements Accelerometer
                 }
             });
         }
+    }
+
+    private function get_orientationSupported () :Bool
+    {
+        return (untyped Lib.window).DeviceOrientationEvent != null;
     }
 
     /**

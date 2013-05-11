@@ -27,7 +27,7 @@ class FlashAccelerometer implements Accelerometer
     /**
      * 
      */
-    public var orientationSupported (default, null) :Bool;
+    public var orientationSupported (get_orientationSupported, null) :Bool;
     /** 
     * <code>null</code> if not supported.
     */
@@ -101,6 +101,11 @@ class FlashAccelerometer implements Accelerometer
         //     throw("ExternalInterface must be available for Accelerometer use.");
         // }
 
+    }
+
+    private function get_orientationSupported () :Bool
+    {
+        return true;
     }
 
     /**

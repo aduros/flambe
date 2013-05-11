@@ -62,7 +62,7 @@ class FlashPlatform
 #end
         _keyboard = FlashKeyboard.shouldUse() ? new FlashKeyboard(stage) : new DummyKeyboard();
 
-        _accelerometer = new FlashAccelerometer();
+        _accelerometer = new DummyAccelerometer();
 
         _renderer = new Stage3DRenderer();
         mainLoop = new MainLoop();

@@ -220,34 +220,25 @@ class HtmlPlatform
             onVisibilityChanged(); // Update now
             (untyped Lib.document).addEventListener(hiddenApi.prefix + "visibilitychange",
                 onVisibilityChanged, false);
-            System.hidden.changed.connect(function (hidden,_) {
-                if (!hidden) {
-                    _skipFrame = true;
-                }
-            });
         } else {
-
-            // Adds some lock screen support for iOS, possibly other devices that don't support the page visibility api.
-            var onPageTransitionChange = function(event) {
-                var hide:Bool = (Reflect.getProperty(event,"type") != 'pageshow');
-                if(System.hidden._ != hide) {
-                    System.hidden._ = hide;
-                }
+            // Adds some lock screen support for iOS, possibly other devices that don't support the
+            // page visibility api.
+            var onPageTransitionChange = function (event) {
+                System.hidden._ = (event.type == "pagehide");
             };
-            System.hidden._ = false;
-            (untyped Lib.window).addEventListener('pageshow', onPageTransitionChange, false);
-            (untyped Lib.window).addEventListener('pagehide', onPageTransitionChange, false);
-            
-            System.hidden.changed.connect(function (hidden,_) {
-                if (!hidden) {
-                    _skipFrame = true;
-                }
-            });
-
+            (untyped Lib.window).addEventListener("pageshow", onPageTransitionChange, false);
+            (untyped Lib.window).addEventListener("pagehide", onPageTransitionChange, false);
         }
 
-        _lastUpdate = HtmlUtil.now();
+        // Skip the next frame when coming back from being hidden
+        System.hidden.changed.connect(function (hidden,_) {
+            if (!hidden) {
+                _skipFrame = true;
+            }
+        });
         _skipFrame = false;
+
+        _lastUpdate = HtmlUtil.now();
 
         // Use requestAnimationFrame if available, otherwise a 60 FPS setInterval
         // https://developer.mozilla.org/en/DOM/window.mozRequestAnimationFrame

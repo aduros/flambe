@@ -7,8 +7,12 @@ package flambe.platform.html;
 import js.Browser;
 import js.html.*;
 
+import haxe.io.Bytes;
+
+import flambe.asset.AssetEntry;
 import flambe.display.Graphics;
 import flambe.display.Texture;
+import flambe.util.Assert;
 
 class CanvasRenderer
     implements Renderer
@@ -27,6 +31,17 @@ class CanvasRenderer
     public function createEmptyTexture (width :Int, height :Int) :Texture
     {
         return new CanvasTexture(HtmlUtil.createEmptyCanvas(width, height));
+    }
+
+    public function getCompressedTextureFormats () :Array<AssetFormat>
+    {
+        return [];
+    }
+
+    public function createCompressedTexture (format :AssetFormat, data :Bytes) :WebGLTexture
+    {
+        Assert.fail(); // Unsupported
+        return null;
     }
 
     public function willRender () :Graphics

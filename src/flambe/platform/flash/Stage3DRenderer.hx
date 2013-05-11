@@ -11,8 +11,12 @@ import flash.events.ErrorEvent;
 import flash.events.Event;
 import flash.Lib;
 
+import haxe.io.Bytes;
+
+import flambe.asset.AssetEntry;
 import flambe.display.Graphics;
 import flambe.display.Texture;
+import flambe.util.Assert;
 
 class Stage3DRenderer
     implements Renderer
@@ -65,6 +69,17 @@ class Stage3DRenderer
         var texture = new Stage3DTexture(this, width, height);
         texture.init(_context3D, true);
         return texture;
+    }
+
+    public function getCompressedTextureFormats () :Array<AssetFormat>
+    {
+        return [];
+    }
+
+    public function createCompressedTexture (format :AssetFormat, data :Bytes) :Stage3DTexture
+    {
+        Assert.fail(); // Unsupported
+        return null;
     }
 
     public function createGraphics (renderTarget :Stage3DTexture) :Stage3DGraphics

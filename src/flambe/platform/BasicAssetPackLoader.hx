@@ -111,7 +111,7 @@ class BasicAssetPackLoader
 
         var name = entry.name;
         switch (entry.format) {
-        case WEBP, JXR, PNG, JPG, GIF:
+        case WEBP, JXR, PNG, JPG, GIF, DDS, PVR, PKM:
             _pack.textures.set(name, asset);
         case MP3, M4A, OGG, WAV:
             _pack.sounds.set(name, asset);

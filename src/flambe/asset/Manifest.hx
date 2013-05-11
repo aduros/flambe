@@ -190,6 +190,10 @@ class Manifest
                 case "png": return PNG;
                 case "webp": return WEBP;
 
+                case "dds": return DDS;
+                case "pvr": return PVR;
+                case "pkm": return PKM;
+
                 case "m4a": return M4A;
                 case "mp3": return MP3;
                 case "ogg": return OGG;

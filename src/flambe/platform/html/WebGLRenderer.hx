@@ -6,8 +6,12 @@ package flambe.platform.html;
 
 import js.html.webgl.*;
 
+import haxe.io.Bytes;
+
+import flambe.asset.AssetEntry;
 import flambe.display.Graphics;
 import flambe.display.Texture;
+import flambe.util.Assert;
 
 class WebGLRenderer
     implements Renderer
@@ -54,6 +58,21 @@ class WebGLRenderer
         var texture = new WebGLTexture(this, width, height);
         texture.clear();
         return texture;
+    }
+
+    public function getCompressedTextureFormats () :Array<AssetFormat>
+    {
+        // TODO(bruno): Detect supported texture extensions
+        return [];
+    }
+
+    public function createCompressedTexture (format :AssetFormat, data :Bytes) :WebGLTexture
+    {
+        if (gl.isContextLost()) {
+            return null;
+        }
+        Assert.fail(); // Unsupported
+        return null;
     }
 
     public function willRender () :Graphics

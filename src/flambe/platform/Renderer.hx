@@ -4,6 +4,9 @@
 
 package flambe.platform;
 
+import haxe.io.Bytes;
+
+import flambe.asset.AssetEntry;
 import flambe.display.Graphics;
 import flambe.display.Texture;
 
@@ -18,6 +21,13 @@ interface Renderer
      * Creates a texture, initialized to transparent black.
      */
     function createEmptyTexture (width :Int, height :Int) :Texture;
+
+    /**
+     * The compressed texture formats supported by this renderer.
+     */
+    function getCompressedTextureFormats () :Array<AssetFormat>;
+
+    function createCompressedTexture (format :AssetFormat, data :Bytes) :Texture;
 
     /**
      * Notifies the renderer that things are about to be drawn. Returns the drawing context that

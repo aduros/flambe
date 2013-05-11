@@ -64,6 +64,16 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                 image.src = url;
             }
 
+        case DDS, PVR, PKM:
+            sendRequest(url, entry, "arraybuffer", function (buffer) {
+                var texture = _platform.getRenderer().createCompressedTexture(entry.format, buffer);
+                if (texture != null) {
+                    handleLoad(entry, texture);
+                } else {
+                    handleTextureError(entry);
+                }
+            });
+
         case MP3, M4A, OGG, WAV:
             // If we made it this far, we definitely support audio and can play this asset
             if (WebAudioSound.supported) {
@@ -135,7 +145,8 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         if (_supportedFormats == null) {
             _supportedFormats = new Promise();
             detectImageFormats(function (imageFormats) {
-                _supportedFormats.result = imageFormats.concat(detectAudioFormats()).concat([Data]);
+                _supportedFormats.result = _platform.getRenderer().getCompressedTextureFormats()
+                    .concat(imageFormats).concat(detectAudioFormats()).concat([Data]);
             });
         }
         _supportedFormats.get(fn);

@@ -12,6 +12,9 @@ enum AssetFormat
     // Images
     WEBP; JXR; PNG; JPG; GIF;
 
+    // Compressed textures
+    DDS; PVR; PKM;
+
     // Audio
     MP3; M4A; OGG; WAV;
 

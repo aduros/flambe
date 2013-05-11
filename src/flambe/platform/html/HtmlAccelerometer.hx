@@ -69,11 +69,10 @@ class HtmlAccelerometer implements Accelerometer
         //     );
         // }
 
+        orientationUpdate = _orientationUpdate = new HeavySignal1();
         if (orientationSupported)
         {
             _orientation = new AccelerometerOrientation();
-
-            orientationUpdate = _orientationUpdate = new HeavySignal1();
 
             _orientationUpdate.hasListenersValue.changed.connect(function (hasListeners,_) {
                 if (hasListeners) {

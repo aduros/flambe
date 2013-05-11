@@ -26,6 +26,7 @@ import flambe.input.Keyboard;
 import flambe.input.Mouse;
 import flambe.input.Pointer;
 import flambe.input.Touch;
+import flambe.input.Accelerometer;
 import flambe.platform.BasicPointer;
 import flambe.platform.MainLoop;
 import flambe.platform.Platform;
@@ -60,6 +61,8 @@ class FlashPlatform
         _touch = new DummyTouch();
 #end
         _keyboard = FlashKeyboard.shouldUse() ? new FlashKeyboard(stage) : new DummyKeyboard();
+
+        _accelerometer = new FlashAccelerometer();
 
         _renderer = new Stage3DRenderer();
         mainLoop = new MainLoop();
@@ -167,6 +170,11 @@ class FlashPlatform
         return _external;
     }
 
+    public function getAccelerometer(): Accelerometer
+    {
+        return _accelerometer;
+    }
+
     public function getRenderer () :Renderer
     {
         return _renderer;
@@ -235,6 +243,7 @@ class FlashPlatform
     private var _web :Web;
     private var _external :External;
     private var _renderer :Renderer;
+    private var _accelerometer :Accelerometer;
 
     private var _lastUpdate :Int;
     private var _skipFrame :Bool;

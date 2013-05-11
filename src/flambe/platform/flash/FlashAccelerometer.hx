@@ -1,3 +1,7 @@
+//
+// Flambe - Rapid game development
+// https://github.com/aduros/flambe/blob/master/LICENSE.txt
+
 package flambe.platform.flash;
 
 import flambe.util.Signal0;

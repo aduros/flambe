@@ -7,6 +7,11 @@ package flambe.input;
 import flambe.util.Signal0;
 import flambe.util.Signal1;
 
+/**
+ * <p>Functions related to the device's accelerometer.</p>
+ *
+ * <p>NOTE: Not yet supported in Flash/AIR.</p>
+ */
 interface Accelerometer
 {
     // /**
@@ -27,5 +32,8 @@ interface Accelerometer
      */
     public var orientationSupported (get_orientationSupported, null) :Bool;
 
+    /**
+     * Emitted periodically with the current device orientation.
+     */
     public var orientationUpdate (default, null) :Signal1<AccelerometerOrientation>;
 }

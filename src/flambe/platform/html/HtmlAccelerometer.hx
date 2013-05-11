@@ -1,51 +1,25 @@
+//
+// Flambe - Rapid game development
+// https://github.com/aduros/flambe/blob/master/LICENSE.txt
+
 package flambe.platform.html;
 
-import flambe.util.Signal0;
-import flambe.util.Signal1;
+import js.Lib;
+
 import flambe.input.Accelerometer;
 import flambe.input.AccelerometerMotion;
 import flambe.input.AccelerometerOrientation;
 import flambe.platform.EventGroup;
-import Type;
+import flambe.util.Signal1;
 
-import js.Lib;
-
- /**
- * Basic idea is to conform differences in accelerometer support for each
- * device/platform as much as possible.
- */
-class HtmlAccelerometer implements Accelerometer
+class HtmlAccelerometer
+    implements Accelerometer
 {
-    /**
-     * 
-     */
-    //public var motionSupported (default, null) :Bool;//TODO
-    /**
-     * 
-     */
     public var orientationSupported (get_orientationSupported, null) :Bool;
-    /** 
-    * <code>null</code> if not supported.
-    */
-    //public var motionChange(default, null): Signal1<AccelerometerMotion>;//TODO
-    /** 
-    * <code>null</code> if not supported.
-    */
-    public var orientationUpdate(default, null): Signal1<AccelerometerOrientation>;
-    /**
-     * 
-     */
-    public var disposed(default, null):Signal0;
+    public var orientationUpdate (default, null) :Signal1<AccelerometerOrientation>;
 
-    /**
-     * 
-     */
     public function new()
-    {   
-        disposed = new Signal0();
-
-        _win = (untyped Lib.window);
-
+    {
         //motionSupported = _win.DeviceMotionEvent != null; 
 
         // if (motionSupported)
@@ -70,14 +44,14 @@ class HtmlAccelerometer implements Accelerometer
         // }
 
         orientationUpdate = _orientationUpdate = new HeavySignal1();
-        if (orientationSupported)
-        {
+        if (orientationSupported) {
             _orientation = new AccelerometerOrientation();
 
             _orientationUpdate.hasListenersValue.changed.connect(function (hasListeners,_) {
                 if (hasListeners) {
                     _orientationEventGroup = new EventGroup();
-                    _orientationEventGroup.addListener(_win, "deviceorientation", handleAccelerometerOrientation);
+                    _orientationEventGroup.addListener(Lib.window,
+                        "deviceorientation", handleAccelerometerOrientation);
                 } else {
                     _orientationEventGroup.dispose();
                     _orientationEventGroup = null;
@@ -91,46 +65,27 @@ class HtmlAccelerometer implements Accelerometer
         return (untyped Lib.window).DeviceOrientationEvent != null;
     }
 
-    /**
-     * 
-     */
-    private function handleAccelerometerOrientation(event):Void
+    private function handleAccelerometerOrientation (event :Dynamic)
     {
-        _windowOrientation = _win.orientation;
-
-        //alpha = z = azimuth, beta = x = pitch, gamma = y = roll
-        if (_windowOrientation == -90)
-        {
+        switch ((untyped Lib.window).orientation) {
+        case -90:
             _orientation._internal_update(event.gamma, -event.beta, event.alpha);
-        }
-        else if (_windowOrientation == 0)
-        {
+        case 0:
             _orientation._internal_update(event.beta, event.gamma, event.alpha);
-        }
-        else if (_windowOrientation == 90)
-        {
+        case 90:
             _orientation._internal_update(-event.gamma, event.beta, event.alpha);
-        }
-        else if (_windowOrientation == 180)
-        {
+        case 180:
             _orientation._internal_update(-event.beta, -event.gamma, event.alpha);
         }
-        // else
-        // {
-        //     trace("Window orientation " + _windowOrientation + " not valid.");
-        // }
 
         orientationUpdate.emit(_orientation);
-
     }
 
-    //private var _motionChange:HeavySignal1<AccelerometerOrientation>;
-    private var _orientationUpdate:HeavySignal1<AccelerometerOrientation>;
-    private var _windowOrientation:Float;
-    private var _win:Dynamic;
-    private var _orientationEventGroup:EventGroup;
-    private var _motionEventGroup:EventGroup;
-    //private var _motion:AccelerometerMotion;
-    private var _orientation:AccelerometerOrientation;
+    // private var _motionChange:HeavySignal1<AccelerometerOrientation>;
+    // private var _motionEventGroup:EventGroup;
+    // private var _motion:AccelerometerMotion;
 
+    private var _orientationUpdate :HeavySignal1<AccelerometerOrientation>;
+    private var _orientationEventGroup :EventGroup;
+    private var _orientation :AccelerometerOrientation;
 }

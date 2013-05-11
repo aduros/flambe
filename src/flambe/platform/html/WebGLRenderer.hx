@@ -38,6 +38,9 @@ class WebGLRenderer
 
     public function createTexture (image :Dynamic) :WebGLTexture
     {
+        if (gl.isContextLost()) {
+            return null;
+        }
         var texture = new WebGLTexture(this, image.width, image.height);
         texture.uploadImageData(image);
         return texture;
@@ -45,6 +48,9 @@ class WebGLRenderer
 
     public function createEmptyTexture (width :Int, height :Int) :WebGLTexture
     {
+        if (gl.isContextLost()) {
+            return null;
+        }
         var texture = new WebGLTexture(this, width, height);
         texture.clear();
         return texture;

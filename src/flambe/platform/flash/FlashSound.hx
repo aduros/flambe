@@ -114,9 +114,8 @@ private class FlashPlayback
             // Allow ended or paused sounds to be garbage collected
             _tickableAdded = false;
 
-            if (!System.hidden._) {
-                _hideBinding.dispose();
-            }
+            // Release System references
+            _hideBinding.dispose();
 
             return true;
         }
@@ -143,17 +142,17 @@ private class FlashPlayback
 
         if (!_tickableAdded) {
             FlashPlatform.instance.mainLoop.addTickable(this);
+            _tickableAdded = true;
 
-            _hideBinding = System.hidden.changed.connect(function(v,_) {
-                if (v) {
+            // Claim System references
+            _hideBinding = System.hidden.changed.connect(function(hidden,_) {
+                if (hidden) {
                     _wasPaused = get_paused();
                     this.paused = true;
                 } else {
                     this.paused = _wasPaused;
                 }
             });
-
-            _tickableAdded = true;
         }
     }
 
@@ -166,5 +165,4 @@ private class FlashPlayback
     private var _ended :Bool;
     private var _tickableAdded :Bool;
     private var _hideBinding :Disposable;
-
 }

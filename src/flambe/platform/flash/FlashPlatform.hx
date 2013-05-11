@@ -197,6 +197,9 @@ class FlashPlatform
         var dt = (now-_lastUpdate) / 1000;
         _lastUpdate = now;
 
+        if (System.hidden._) {
+            return; // Prevent updates while hidden
+        }
         if (_skipFrame) {
             _skipFrame = false;
             return;

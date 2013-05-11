@@ -107,9 +107,7 @@ private class HtmlPlayback
 
             // Release System references
             _volumeBinding.dispose();
-            if (!System.hidden._) {
-                _hideBinding.dispose();
-            }
+            _hideBinding.dispose();
 
             return true;
         }
@@ -131,8 +129,8 @@ private class HtmlPlayback
 
             // Claim System references
             _volumeBinding = System.volume.changed.connect(function(_,_) updateVolume());
-            _hideBinding = System.hidden.changed.connect(function(v,_) {
-                if (v) {
+            _hideBinding = System.hidden.changed.connect(function(hidden,_) {
+                if (hidden) {
                     _wasPaused = get_paused();
                     this.paused = true;
                 } else {
@@ -153,5 +151,4 @@ private class HtmlPlayback
     private var _tickableAdded :Bool;
     private var _hideBinding :Disposable;
     private var _wasPaused :Bool;
-
 }

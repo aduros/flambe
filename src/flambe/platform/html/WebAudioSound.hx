@@ -153,9 +153,8 @@ private class WebAudioPlayback
             // Allow ended or paused sounds to be garbage collected
             _tickableAdded = false;
 
-            if (!System.hidden._) {
-                _hideBinding.dispose();
-            }
+            // Release System references
+            _hideBinding.dispose();
 
             return true;
         }
@@ -193,10 +192,12 @@ private class WebAudioPlayback
         _pausedAt = -1;
 
         if (!_tickableAdded) {
-            _tickableAdded = true;
             HtmlPlatform.instance.mainLoop.addTickable(this);
-            _hideBinding = System.hidden.changed.connect(function(v,_) {
-                if (v) {
+            _tickableAdded = true;
+
+            // Claim System references
+            _hideBinding = System.hidden.changed.connect(function(hidden,_) {
+                if (hidden) {
                     _wasPaused = get_paused();
                     this.paused = true;
                 } else {

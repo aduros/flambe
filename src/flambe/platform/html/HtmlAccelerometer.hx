@@ -2,7 +2,6 @@ package flambe.platform.html;
 
 import flambe.util.Signal0;
 import flambe.util.Signal1;
-import flambe.util.SignalConnection;
 import flambe.input.Accelerometer;
 import flambe.input.AccelerometerMotion;
 import flambe.input.AccelerometerOrientation;
@@ -54,7 +53,7 @@ class HtmlAccelerometer implements Accelerometer
         // {
         //     _motion = new AccelerometerMotion();
 
-        //     motionChange = _motionChange = new NotifyingSignal1();
+        //     motionChange = _motionChange = new HeavySignal1();
 
         //     _motionChange.addedFirst.connect(function()
         //         {
@@ -75,22 +74,17 @@ class HtmlAccelerometer implements Accelerometer
         {
             _orientation = new AccelerometerOrientation();
 
-            orientationUpdate = _orientationUpdate = new NotifyingSignal1();
+            orientationUpdate = _orientationUpdate = new HeavySignal1();
 
-            _orientationUpdate.addedFirst.connect(function()
-                {
-
+            _orientationUpdate.hasListenersValue.changed.connect(function (hasListeners,_) {
+                if (hasListeners) {
                     _orientationEventGroup = new EventGroup();
                     _orientationEventGroup.addListener(_win, "deviceorientation", handleAccelerometerOrientation);
-                }
-            );
-
-            _orientationUpdate.disposedLast.connect(function()
-                {
+                } else {
                     _orientationEventGroup.dispose();
                     _orientationEventGroup = null;
                 }
-            );
+            });
         }
     }
 
@@ -127,8 +121,8 @@ class HtmlAccelerometer implements Accelerometer
 
     }
 
-    //private var _motionChange:NotifyingSignal1<AccelerometerOrientation>;
-    private var _orientationUpdate:NotifyingSignal1<AccelerometerOrientation>;
+    //private var _motionChange:HeavySignal1<AccelerometerOrientation>;
+    private var _orientationUpdate:HeavySignal1<AccelerometerOrientation>;
     private var _windowOrientation:Float;
     private var _win:Dynamic;
     private var _orientationEventGroup:EventGroup;
@@ -137,47 +131,3 @@ class HtmlAccelerometer implements Accelerometer
     private var _orientation:AccelerometerOrientation;
 
 }
-
-private class NotifyingSignal1<A> extends Signal1<A>
-{
-    public var disposedLast(default, null):Signal0;
-    public var addedFirst(default, null):Signal0;
-
-    public function new (?listener :Listener1<A>)
-    {
-        super(listener);
-
-        disposedLast = new Signal0();
-        addedFirst = new Signal0();
-    }
-
-    override public function connect (listener :Listener1<A>, prioritize :Bool = false) :SignalConnection
-    {
-        if (!hasListeners())
-        {
-            // Added the first listener.
-            addedFirst.emit();
-        }
-
-        return super.connect(listener, prioritize);
-    }
-
-    override public function _internal_disconnect (conn :SignalConnection)
-    {
-        super._internal_disconnect(conn);
-
-        if (!hasListeners()) {
-            // Disposed the last listener.
-            disposedLast.emit();
-        }
-
-    }
-
-}
-
-
-
-
-
-
-

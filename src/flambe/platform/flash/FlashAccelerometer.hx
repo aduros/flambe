@@ -2,7 +2,6 @@ package flambe.platform.flash;
 
 import flambe.util.Signal0;
 import flambe.util.Signal1;
-import flambe.util.SignalConnection;
 import flambe.input.Accelerometer;
 import flambe.input.AccelerometerMotion;
 import flambe.input.AccelerometerOrientation;
@@ -171,53 +170,11 @@ class FlashAccelerometer implements Accelerometer
 
     }
 
-    //private var _motionUpdate:NotifyingSignal1<AccelerometerOrientation>;
-    private var _orientationUpdate:NotifyingSignal1<AccelerometerOrientation>;
+    //private var _motionUpdate:HeavySignal1<AccelerometerOrientation>;
+    private var _orientationUpdate:HeavySignal1<AccelerometerOrientation>;
     private var _windowOrientation:Float;
     private var _orientationEventGroup:EventGroup;
     private var _motionEventGroup:EventGroup;
     //private var _motion:AccelerometerMotion;
     private var _orientation:AccelerometerOrientation;
-
 }
-
-private class NotifyingSignal1<A> extends Signal1<A>
-{
-    public var disposedLast(default, null):Signal0;
-    public var addedFirst(default, null):Signal0;
-
-    public function new (?listener :Listener1<A>)
-    {
-        super(listener);
-
-        disposedLast = new Signal0();
-        addedFirst = new Signal0();
-    }
-
-    override public function connect (listener :Listener1<A>, prioritize :Bool = false) :SignalConnection
-    {
-        if (!hasListeners())
-        {
-            // Added the first listener.
-            addedFirst.emit();
-        }
-
-        return super.connect(listener, prioritize);
-    }
-
-    override public function _internal_disconnect (conn :SignalConnection)
-    {
-        super._internal_disconnect(conn);
-
-        if (!hasListeners()) {
-            // Disposed the last listener.
-            disposedLast.emit();
-        }
-    }
-}
-
-
-
-
-
-

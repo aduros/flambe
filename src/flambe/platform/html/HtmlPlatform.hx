@@ -18,6 +18,7 @@ import flambe.input.Keyboard;
 import flambe.input.Mouse;
 import flambe.input.Pointer;
 import flambe.input.Touch;
+import flambe.input.Accelerometer;
 import flambe.platform.BasicKeyboard;
 import flambe.platform.BasicPointer;
 import flambe.platform.MainLoop;
@@ -67,6 +68,7 @@ class HtmlPlatform
         _pointer = new BasicPointer();
         _mouse = new HtmlMouse(_pointer, canvas);
         _keyboard = new BasicKeyboard();
+        _accelerometer = new HtmlAccelerometer();
 
         _renderer = createRenderer(canvas);
         System.hasGPU._ = true;
@@ -382,6 +384,11 @@ class HtmlPlatform
         return _external;
     }
 
+    public function getAccelerometer(): Accelerometer
+    {
+        return _accelerometer;
+    }
+
     public function getRenderer () :Renderer
     {
         return _renderer;
@@ -420,6 +427,7 @@ class HtmlPlatform
     private var _web :Web;
     private var _external :External;
     private var _renderer :Renderer;
+    private var _accelerometer :Accelerometer;
 
     private var _container :Dynamic;
 

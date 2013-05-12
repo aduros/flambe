@@ -361,7 +361,7 @@ class HtmlPlatform
     public function getExternal () :External
     {
         if (_external == null) {
-            _external = new HtmlExternal();
+            _external = new HtmlExternal(_container);
         }
         return _external;
     }

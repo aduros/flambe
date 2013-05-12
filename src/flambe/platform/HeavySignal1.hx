@@ -35,4 +35,10 @@ class HeavySignal1<A> extends Signal1<A>
         super._internal_disconnect(conn);
         hasListenersValue._ = hasListeners();
     }
+
+    override private function didEmit (head :SignalConnection)
+    {
+        super.didEmit(head);
+        hasListenersValue._ = hasListeners();
+    }
 }

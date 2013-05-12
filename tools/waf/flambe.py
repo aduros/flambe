@@ -55,8 +55,9 @@ def apply_flambe(ctx):
     if not main:
         if hxproj:
             main = infer_main(hxproj)
-    if main:
-        flags += ["-main", main]
+        if not main:
+            ctx.bld.fatal("You must specify a main class in your wscript or hxproj")
+    flags += ["-main", main]
 
     if ctx.dead_code_elimination:
         flags += ["-dce", "full"]

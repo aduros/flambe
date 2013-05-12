@@ -60,7 +60,6 @@ class FlashPlatform
 #else
         _touch = new DummyTouch();
 #end
-        _keyboard = FlashKeyboard.shouldUse() ? new FlashKeyboard(stage) : new DummyKeyboard();
 
         _renderer = new Stage3DRenderer();
         mainLoop = new MainLoop();
@@ -140,6 +139,10 @@ class FlashPlatform
 
     public function getKeyboard () :Keyboard
     {
+        if (_keyboard == null) {
+            _keyboard = FlashKeyboard.shouldUse() ?
+                new FlashKeyboard(_stage.nativeStage) : new DummyKeyboard();
+        }
         return _keyboard;
     }
 
@@ -236,7 +239,6 @@ class FlashPlatform
 #end
 
     // Statically initialized subsystems
-    private var _keyboard :Keyboard;
     private var _mouse :Mouse;
     private var _pointer :BasicPointer;
     private var _renderer :Renderer;
@@ -246,8 +248,9 @@ class FlashPlatform
     // Lazily initialized subsystems
     private var _accelerometer :Accelerometer;
     private var _external :External;
-    private var _web :Web;
+    private var _keyboard :Keyboard;
     private var _storage :Storage;
+    private var _web :Web;
 
     private var _lastUpdate :Int;
     private var _skipFrame :Bool;

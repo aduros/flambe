@@ -67,13 +67,13 @@ class HtmlPlatform
         _stage = new HtmlStage(canvas);
         _pointer = new BasicPointer();
         _mouse = new HtmlMouse(_pointer, canvas);
-        _keyboard = new BasicKeyboard();
 
         _renderer = createRenderer(canvas);
         System.hasGPU._ = true;
 
         mainLoop = new MainLoop();
 
+        _canvas = canvas;
         _container = canvas.parentNode;
         _container.style.overflow = "hidden";
         _container.style.position = "relative";
@@ -190,19 +190,6 @@ class HtmlPlatform
         } else {
             _touch = new DummyTouch();
         }
-
-        var onKey = function (event) {
-            switch (event.type) {
-            case "keydown":
-                if (_keyboard.submitDown(event.keyCode)) {
-                    event.preventDefault();
-                }
-            case "keyup":
-                _keyboard.submitUp(event.keyCode);
-            }
-        };
-        canvas.addEventListener("keydown", onKey, false);
-        canvas.addEventListener("keyup", onKey, false);
 
         // Handle uncaught errors
         var oldErrorHandler = (untyped Lib.window).onerror;
@@ -364,6 +351,21 @@ class HtmlPlatform
 
     public function getKeyboard () :Keyboard
     {
+        if (_keyboard == null) {
+            _keyboard = new BasicKeyboard();
+            var onKey = function (event) {
+                switch (event.type) {
+                case "keydown":
+                    if (_keyboard.submitDown(event.keyCode)) {
+                        event.preventDefault();
+                    }
+                case "keyup":
+                    _keyboard.submitUp(event.keyCode);
+                }
+            };
+            _canvas.addEventListener("keydown", onKey, false);
+            _canvas.addEventListener("keyup", onKey, false);
+        }
         return _keyboard;
     }
 
@@ -421,7 +423,6 @@ class HtmlPlatform
     }
 
     // Statically initialized subsystems
-    private var _keyboard :BasicKeyboard;
     private var _mouse :HtmlMouse;
     private var _pointer :BasicPointer;
     private var _renderer :Renderer;
@@ -431,9 +432,11 @@ class HtmlPlatform
     // Lazily initialized subsystems
     private var _accelerometer :Accelerometer;
     private var _external :External;
+    private var _keyboard :BasicKeyboard;
     private var _storage :Storage;
     private var _web :Web;
 
+    private var _canvas :Dynamic;
     private var _container :Dynamic;
 
     private var _lastUpdate :Float;

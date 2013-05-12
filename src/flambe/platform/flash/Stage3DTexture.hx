@@ -112,6 +112,13 @@ class Stage3DTexture
         }
     }
 
+    public function getColorBounds(mask :Int, color :Int, ?negate = false) :flambe.math.Rectangle
+    {
+        var bitmapData = _renderer.batcher.readPixels(this, 0, 0, width, height);
+        var bounds = bitmapData.getColorBoundsRect(mask, color, !negate);
+        return new flambe.math.Rectangle(bounds.x, bounds.y, bounds.width, bounds.height);
+    }
+
     inline private function get_width () :Int
     {
         return _width;

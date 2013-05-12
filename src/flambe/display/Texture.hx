@@ -4,6 +4,8 @@
 
 package flambe.display;
 
+import flambe.math.Rectangle;
+
 import haxe.io.Bytes;
 
 /**
@@ -49,4 +51,21 @@ interface Texture
      * @param pixels A byte buffer in RGBA order.
      */
     function writePixels (pixels :Bytes, x :Int, y :Int, sourceW :Int, sourceH :Int) :Void;
+
+    /**
+     * <p>Determines a rectangular region that fully encloses all pixels of a specified color within
+     * the texture.</p>
+     *
+     * <p>Use mask to specify which values you are interested in (e.g. 0xff000000 = transparency,
+     * 0xff = blue, etc.).  Use the color to specify the color to match.  Pixels whose masked color
+     * does not match the given color will be discounted from the returned area.</p>
+     *
+     * <p>Color values are ARGB.</p>
+     *
+     * @param The mask for extracting values of interest from pixels.
+     * @param The color to search for.
+     * @param Set this to true to find bounds that do not match the color.
+     * @return The bounds of the image matching the color.
+     */
+    function getColorBounds(mask :Int, color :Int, ?negate :Bool) :Rectangle;
 }

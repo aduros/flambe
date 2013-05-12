@@ -11,6 +11,7 @@ import flash.display3D.Context3D;
 import flash.display3D.IndexBuffer3D;
 import flash.display3D.VertexBuffer3D;
 import flash.geom.Matrix3D;
+import flash.geom.Point;
 import flash.geom.Rectangle;
 import flash.geom.Vector3D;
 
@@ -77,20 +78,60 @@ class Stage3DBatcher
         //   3. Call drawToBitmapData (which only works on the back buffer)
         //   4. Restore the back buffer
         //
+        // Additionally, to ensure best compatibility the back buffer cannot be configured to be
+        // larger than the stage, so the texture must be read in stageWidth x stageHeight
+        // rectangles.
+        //
         // Oy.
 
         // Flush any pending draws before the back buffer is messed with
         flush();
 
+        // Prepare to iterate through stageWidth x stageHeight rectangles
+        var stage = Lib.current.stage;
+        var result = new BitmapData(width, height);
+        var sourceRect = new Rectangle(0, 0, Math.min(width, stage.stageWidth),
+          Math.min(height, stage.stageHeight));
+        var targetPoint = new Point(0, 0);
+
+        while(true) {
+          // Read some pixels from the texture
+          readPixelsImpl(texture, sourceRect, result, targetPoint);
+          if(targetPoint.x + sourceRect.width >= width && targetPoint.y + sourceRect.height >= height)
+            // We've copied all the data
+            break;
+          else if(targetPoint.x + sourceRect.width >= width) {
+            // We've reached the end of a 'row', move to the next 'row'
+            targetPoint.x = 0;
+            targetPoint.y += stage.stageHeight;
+            sourceRect.width = Math.min(width - targetPoint.x, stage.stageWidth);
+            sourceRect.height = Math.min(height - targetPoint.y, stage.stageHeight);
+          } else {
+            // Keep moving along the 'row'
+            targetPoint.x += stage.stageWidth;
+            sourceRect.width = Math.min(width - targetPoint.x, stage.stageWidth);
+          }
+        }
+
+        // Restore the back buffer to its previous state
+        _context3D.configureBackBuffer(stage.stageWidth, stage.stageHeight, 2, false);
+        _context3D.clear(0, 0, 0);
+
+        return result;
+    }
+
+    private function readPixelsImpl(source :Stage3DTexture, sourceRect :Rectangle,
+        target :BitmapData, targetPoint :Point)
+    {
         // The minimum back buffer size is 50x50
-        if (width < 50) width = 50;
-        if (height < 50) height = 50;
+        var width = Math.round(sourceRect.width < 50 ? 50 : sourceRect.width);
+        var height = Math.round(sourceRect.height < 50 ? 50 : sourceRect.height);
 
         var scratch = new Vector<Float>(12, true);
-        var x1 = -x;
-        var y1 = -y;
-        var x2 = x1 + texture.width;
-        var y2 = y1 + texture.height;
+        var x1 = -sourceRect.x;
+        var y1 = -sourceRect.y;
+        var x2 = x1 + source.width;
+        var y2 = y1 + source.height;
 
         scratch[0] = x1;
         scratch[1] = y1;
@@ -116,7 +157,7 @@ class Stage3DBatcher
         ]));
         ortho.transformVectors(scratch, scratch);
 
-        var offset = prepareDrawImage(null, CopyExperimental, null, texture);
+        var offset = prepareDrawImage(null, CopyExperimental, null, source);
         data[  offset] = scratch[0];
         data[++offset] = scratch[1];
         data[++offset] = 0;
@@ -125,20 +166,20 @@ class Stage3DBatcher
 
         data[++offset] = scratch[3];
         data[++offset] = scratch[4];
-        data[++offset] = texture.maxU;
+        data[++offset] = source.maxU;
         data[++offset] = 0;
         data[++offset] = 1;
 
         data[++offset] = scratch[6];
         data[++offset] = scratch[7];
-        data[++offset] = texture.maxU;
-        data[++offset] = texture.maxV;
+        data[++offset] = source.maxU;
+        data[++offset] = source.maxV;
         data[++offset] = 1;
 
         data[++offset] = scratch[9];
         data[++offset] = scratch[10];
         data[++offset] = 0;
-        data[++offset] = texture.maxV;
+        data[++offset] = source.maxV;
         data[++offset] = 1;
 
         // Create a temporary back buffer of the given size, and draw the texture on it
@@ -152,12 +193,9 @@ class Stage3DBatcher
         var pixels = new BitmapData(width, height);
         _context3D.drawToBitmapData(pixels);
 
-        // Restore the back buffer to its previous state
-        var stage = Lib.current.stage;
-        _context3D.configureBackBuffer(stage.stageWidth, stage.stageHeight, 2, false);
-        _context3D.clear(0, 0, 0);
-
-        return pixels;
+        // Copy the pixels into the target bitmapdata
+        target.copyPixels(pixels, new Rectangle(0, 0, sourceRect.width, sourceRect.height),
+          new Point(targetPoint.x, targetPoint.y));
     }
 
     /** Adds a quad to the batch, using the DrawImage shader. */

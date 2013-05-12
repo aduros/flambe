@@ -58,8 +58,11 @@ using Lambda;
      */
     public function add (component :Component) :Entity
     {
-        // Remove the component from any previous owner
-        component.dispose();
+        // Remove the component from any previous owner. Don't just call dispose, which has
+        // additional behavior in some components (like Disposer).
+        if (component.owner != null) {
+            component.owner.remove(component);
+        }
 
         var name = component.name;
         var prev = getComponent(name);

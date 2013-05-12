@@ -21,7 +21,7 @@ import flambe.web.Web;
 
 interface Platform
 {
-    function init () :Void;
+    function init (?context:Context) :Void;
 
     function getKeyboard () :Keyboard;
     function getMouse () :Mouse;

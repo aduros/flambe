@@ -104,8 +104,8 @@ class Matrix
         return result;
     }
 
-    public function transformArray (points :ArrayAccess<Float>, length :Int,
-        result :ArrayAccess<Float>)
+    public function transformArray (points :Array<Float>, length :Int,
+        result :Array<Float>)
     {
         var ii = 0;
         while (ii < length) {

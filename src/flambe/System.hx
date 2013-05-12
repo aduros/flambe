@@ -14,7 +14,9 @@ import flambe.input.Keyboard;
 import flambe.input.Mouse;
 import flambe.input.Pointer;
 import flambe.input.Touch;
+import flambe.platform.Context;
 import flambe.platform.Platform;
+import flambe.platform.Renderer;
 import flambe.storage.Storage;
 import flambe.util.Assert;
 import flambe.util.Logger;
@@ -37,6 +39,11 @@ class System
      * The Stage subsystem, for controlling the display viewport.
      */
     public static var stage (get, null) :Stage;
+
+    /**
+     * A renderer instance from the platform for fine-grained rendering control.
+     */
+    public static var renderer (get, null) :Renderer;
 
     /**
      * The Storage subsystem, for persisting values.
@@ -117,10 +124,10 @@ class System
     /**
      * Starts up Flambe, this should usually be the first thing a game does.
      */
-    public static function init ()
+    public static function init (?context:Context)
     {
         if (!_calledInit) {
-            _platform.init();
+            _platform.init(context);
             _calledInit = true;
         }
     }
@@ -172,6 +179,12 @@ class System
     {
         #if debug assertCalledInit(); #end
         return _platform.getStage();
+    }
+
+    inline private static function get_renderer () :Renderer
+    {
+      #if debug assertCalledInit(); #end
+      return _platform.getRenderer();
     }
 
     inline private static function get_storage () :Storage

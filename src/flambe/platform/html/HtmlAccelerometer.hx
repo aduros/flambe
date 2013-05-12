@@ -18,7 +18,7 @@ class HtmlAccelerometer
     public var orientationSupported (get_orientationSupported, null) :Bool;
     public var orientationUpdate (default, null) :Signal1<AccelerometerOrientation>;
 
-    public function new()
+    public function new ()
     {
         //motionSupported = _win.DeviceMotionEvent != null; 
 

@@ -62,8 +62,6 @@ class FlashPlatform
 #end
         _keyboard = FlashKeyboard.shouldUse() ? new FlashKeyboard(stage) : new DummyKeyboard();
 
-        _accelerometer = new DummyAccelerometer();
-
         _renderer = new Stage3DRenderer();
         mainLoop = new MainLoop();
 
@@ -172,6 +170,9 @@ class FlashPlatform
 
     public function getAccelerometer(): Accelerometer
     {
+        if (_accelerometer == null) {
+            _accelerometer = new DummyAccelerometer();
+        }
         return _accelerometer;
     }
 
@@ -234,16 +235,19 @@ class FlashPlatform
     }
 #end
 
-    private var _stage :FlashStage;
-    private var _pointer :BasicPointer;
-    private var _mouse :Mouse;
-    private var _touch :Touch;
+    // Statically initialized subsystems
     private var _keyboard :Keyboard;
-    private var _storage :Storage;
-    private var _web :Web;
-    private var _external :External;
+    private var _mouse :Mouse;
+    private var _pointer :BasicPointer;
     private var _renderer :Renderer;
+    private var _stage :FlashStage;
+    private var _touch :Touch;
+
+    // Lazily initialized subsystems
     private var _accelerometer :Accelerometer;
+    private var _external :External;
+    private var _web :Web;
+    private var _storage :Storage;
 
     private var _lastUpdate :Int;
     private var _skipFrame :Bool;

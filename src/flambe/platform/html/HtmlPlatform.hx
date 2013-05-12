@@ -68,7 +68,6 @@ class HtmlPlatform
         _pointer = new BasicPointer();
         _mouse = new HtmlMouse(_pointer, canvas);
         _keyboard = new BasicKeyboard();
-        _accelerometer = new HtmlAccelerometer();
 
         _renderer = createRenderer(canvas);
         System.hasGPU._ = true;
@@ -384,8 +383,11 @@ class HtmlPlatform
         return _external;
     }
 
-    public function getAccelerometer(): Accelerometer
+    public function getAccelerometer() :Accelerometer
     {
+        if (_accelerometer == null) {
+            _accelerometer = new HtmlAccelerometer();
+        }
         return _accelerometer;
     }
 
@@ -418,16 +420,19 @@ class HtmlPlatform
         return new CanvasRenderer(canvas);
     }
 
-    private var _stage :HtmlStage;
-    private var _pointer :BasicPointer;
-    private var _mouse :HtmlMouse;
-    private var _touch :Touch;
+    // Statically initialized subsystems
     private var _keyboard :BasicKeyboard;
+    private var _mouse :HtmlMouse;
+    private var _pointer :BasicPointer;
+    private var _renderer :Renderer;
+    private var _stage :HtmlStage;
+    private var _touch :Touch;
+
+    // Lazily initialized subsystems
+    private var _accelerometer :Accelerometer;
+    private var _external :External;
     private var _storage :Storage;
     private var _web :Web;
-    private var _external :External;
-    private var _renderer :Renderer;
-    private var _accelerometer :Accelerometer;
 
     private var _container :Dynamic;
 

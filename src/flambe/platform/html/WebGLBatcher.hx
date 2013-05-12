@@ -164,6 +164,7 @@ class WebGLBatcher
             switch (_lastBlendMode) {
                 case Normal: _gl.blendFunc(GL.ONE, GL.ONE_MINUS_SRC_ALPHA);
                 case Add: _gl.blendFunc(GL.ONE, GL.ONE);
+                case Mask: _gl.blendFunc(GL.ZERO, GL.SRC_ALPHA);
                 // TODO(bruno): Disable blending entirely?
                 case CopyExperimental: _gl.blendFunc(GL.ONE, GL.ZERO);
             }

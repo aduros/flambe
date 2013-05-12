@@ -253,6 +253,7 @@ class Stage3DBatcher
             switch (_lastBlendMode) {
                 case Normal: _context3D.setBlendFactors(ONE, ONE_MINUS_SOURCE_ALPHA);
                 case Add: _context3D.setBlendFactors(ONE, ONE);
+                case Mask: _context3D.setBlendFactors(ZERO, SOURCE_ALPHA);
                 case CopyExperimental: _context3D.setBlendFactors(ONE, ZERO);
             }
             _currentBlendMode = _lastBlendMode;

@@ -41,7 +41,13 @@ renamed_types = {
     "neko.io.File": "sys.io.File",
 }
 
-for root, dirs, files in os.walk("src"):
+for root, dirs, files in os.walk(".", followlinks=True):
+    # Process unhidden .hx files only
+    files = [path for path in files if path[0] != "." and path.endswith(".hx")]
+
+    # Don't go into hidden directories
+    dirs[:] = [path for path in dirs if path[0] != "."]
+
     for path in files:
         path = os.path.join(root, path)
         renamed_methods = {}

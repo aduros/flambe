@@ -116,7 +116,7 @@ class Stage3DBatcher
         ]));
         ortho.transformVectors(scratch, scratch);
 
-        var offset = prepareDrawImage(null, CopyExperimental, null, texture);
+        var offset = prepareDrawImage(null, Copy, null, texture);
         data[  offset] = scratch[0];
         data[++offset] = scratch[1];
         data[++offset] = 0;
@@ -254,7 +254,7 @@ class Stage3DBatcher
                 case Normal: _context3D.setBlendFactors(ONE, ONE_MINUS_SOURCE_ALPHA);
                 case Add: _context3D.setBlendFactors(ONE, ONE);
                 case Mask: _context3D.setBlendFactors(ZERO, SOURCE_ALPHA);
-                case CopyExperimental: _context3D.setBlendFactors(ONE, ZERO);
+                case Copy: _context3D.setBlendFactors(ONE, ZERO);
             }
             _currentBlendMode = _lastBlendMode;
         }

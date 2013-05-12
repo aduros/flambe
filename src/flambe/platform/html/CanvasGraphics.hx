@@ -132,12 +132,7 @@ class CanvasGraphics
             case Normal: op = "source-over";
             case Add: op = "lighter";
             case Mask: op = "destination-in";
-            case CopyExperimental:
-                // No, we can't use the canvas "copy" globalCompositeOperation, as it's unbounded.
-                // ie. Drawing a small square with copy will erase the ENTIRE rest of the stage.
-                // Maybe this could be properly implemented with a mask, but that will probably kill
-                // performance, which is sort of half the point of using copy.
-                op = "source-over";
+            case Copy: op = "copy";
         };
         _canvasCtx.globalCompositeOperation = op;
     }

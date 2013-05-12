@@ -164,7 +164,7 @@ class Stage3DTexture
         ]));
         ortho.transformVectors(scratch, scratch);
 
-        var offset = _renderer.batcher.prepareDrawImage(this, CopyExperimental, null, source);
+        var offset = _renderer.batcher.prepareDrawImage(this, Copy, null, source);
         var data = _renderer.batcher.data;
         var u1 = source.maxU * sourceX/source.width;
         var v1 = source.maxV * sourceY/source.height;

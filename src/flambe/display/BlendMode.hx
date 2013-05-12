@@ -9,20 +9,35 @@ package flambe.display;
  * https://en.wikipedia.org/wiki/Blend_modes
  */
 enum BlendMode {
-    /** Blends the source color on top of the destination, respecting transparency. */
+    /**
+     * <p>Blends the source color on top of the destination, respecting transparency.</p>
+     * <p><img src="https://aduros.com/flambe/images/BlendMode-Normal.png"></p>
+     */
     Normal;
 
-    /** Adds the source and destination colors, lightening the final image. */
+    /**
+     * <p>Adds the source and destination colors, lightening the final image.</p>
+     * <p><img src="https://aduros.com/flambe/images/BlendMode-Add.png"></p>
+     */
     Add;
 
-    /** Masks the overlapping area by applying the source alpha to the destination image */
+    /**
+     * <p>Masks the overlapping area by applying the source alpha to the destination image.</p>
+     *
+     * <p>WARNING: In HTML5 canvas, this blend mode is unbounded. It will clear the entire
+     * destination image, not just the bounds within the source image.</p>
+     *
+     * <p><img src="https://aduros.com/flambe/images/BlendMode-Mask.png"></p>
+     */
     Mask;
 
     /**
-     * Ignores the destination color, and copies the source without handling transparency. NOTE:
-     * Supported only in the Stage3D renderer, everywhere else it's the same as Normal.
+     * <p>Ignores the destination color, and copies the source without handling transparency.</p>
      *
-     * This is an experimental blend mode and may be modified or removed in the future.
+     * <p>WARNING: In HTML5 canvas, this blend mode is unbounded. It will clear the entire
+     * destination image, not just the bounds within the source image.</p>
+     *
+     * <p><img src="https://aduros.com/flambe/images/BlendMode-Copy.png"></p>
      */
-    CopyExperimental;
+    Copy;
 }

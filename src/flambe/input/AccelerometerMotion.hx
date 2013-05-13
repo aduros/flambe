@@ -6,27 +6,23 @@ package flambe.input;
 
 import flambe.util.Value;
 
-/**
- * 
- */
+// TODO: Document/implement
+/** @private */
 class AccelerometerMotion
 {
-	public function new()
-	{
-		x = 0;
-		y = 0;
-		z = 0;
-	}
+    public var x (default, null) :Float;
+    public var y (default, null) :Float;
+    public var z (default, null) :Float;
 
-    public function _internal_update(x:Float, y:Float, z:Float):Void
+    /** @private */ public function new ()
     {
-		this.x = x;
-		this.y = y;
-		this.z = z;
+        _internal_update(0, 0, 0);
     }
 
-    public var x(default, null):Float;//TODO
-    public var y(default, null):Float;//TODO
-    public var z(default, null):Float;//TODO
-
+    /** @private */ public function _internal_update (x :Float, y :Float, z :Float)
+    {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
 }

@@ -7,32 +7,20 @@ package flambe.input;
 import flambe.util.Value;
 
 /**
- * 
+ * TODO: Document.
  */
 class AccelerometerOrientation
 {
-	public function new()
-	{
-		pitch = 0;
-		roll = 0;
-		azimuth = 0;
-	}
-
-    public function _internal_update(pitch:Float, roll:Float, azimuth:Float):Void
-    {
-		this.pitch = pitch;
-		this.roll = roll;
-		this.azimuth = azimuth;
-    }
+    /**
+     *
+     */
+    public var pitch(default, null) :Float;
 
     /**
      *
      */
-    public var pitch(default, null):Float;
-    /**
-     *
-     */
-    public var roll(default, null):Float;
+    public var roll (default, null) :Float;
+
     /**
      * Relative to the heading of the device at page load, NOT magnetic or true north.
      * Does not currently take into account changes in window orientation; need to determine
@@ -44,4 +32,15 @@ class AccelerometerOrientation
     /* TODO: Add this. */
     //public var compassAccuracy(default, null):Float;
 
+    /** @private */ public function new ()
+    {
+        _internal_update(0, 0, 0);
+    }
+
+    /** @private */ public function _internal_update (pitch :Float, roll :Float, azimuth :Float)
+    {
+        this.pitch = pitch;
+        this.roll = roll;
+        this.azimuth = azimuth;
+    }
 }

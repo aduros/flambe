@@ -4,26 +4,32 @@
 
 package flambe.input;
 
-import flambe.util.Signal0;
 import flambe.util.Signal1;
 
+/**
+ * <p>Functions related to the device's accelerometer.</p>
+ *
+ * <p>NOTE: Not yet supported in Flash/AIR.</p>
+ */
 interface Accelerometer
 {
-    /*
-     * Returns true if acceleration is suppored.
+    /**
+     * Whether device motion events are supported.
      */
-    public var motionSupported (default, null) :Bool;//TODO
-    /*
-     * Returns true if either orientation or orientation are suppored.
-     */
-    public var orientationSupported (default, null) :Bool;
-    /*
-     * Device motions updates.
-     */
-    public var motionChange(default, null): Signal1<AccelerometerMotion>;//TODO
-    /*
-     * Device orientation updates, not to be confused with window orientation.
-     */
-    public var orientationUpdate(default, null): Signal1<AccelerometerOrientation>;
+    public var motionSupported (get_motionSupported, null) :Bool;
 
+    /*
+     * Emitted upon detected changes in device motion.
+     */
+    public var motionChange (default, null) :Signal1<AccelerometerMotion>;
+
+    /**
+     * Whether device orientation events are supported.
+     */
+    public var orientationSupported (get_orientationSupported, null) :Bool;
+
+    /**
+     * Emitted on regular interval with the current device orientation.
+     */
+    public var orientationUpdate (default, null) :Signal1<AccelerometerOrientation>;
 }

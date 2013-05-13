@@ -1,214 +1,124 @@
+//
+// Flambe - Rapid game development
+// https://github.com/aduros/flambe/blob/master/LICENSE.txt
+
 package flambe.platform.html;
 
-import flambe.util.Signal0;
+import js.Lib;
+
 import flambe.util.Signal1;
-import flambe.util.SignalConnection;
 import flambe.input.Accelerometer;
 import flambe.input.AccelerometerMotion;
 import flambe.input.AccelerometerOrientation;
 import flambe.platform.EventGroup;
 import Type;
 
-import js.Lib;
-
- /**
- * Basic idea is to conform differences in accelerometer support for each
- * device/platform as much as possible.
- */
-class HtmlAccelerometer implements Accelerometer
+class HtmlAccelerometer
+    implements Accelerometer
 {
     /**
      * 
      */
-    public var motionSupported (default, null) :Bool;//TODO
+    public var motionSupported (get_motionSupported, null) :Bool;
     /**
      * 
      */
-    public var orientationSupported (default, null) :Bool;
+    public var orientationSupported (get_orientationSupported, null) :Bool;
     /** 
-    * <code>null</code> if not supported.
+    * 
     */
-    public var motionChange(default, null): Signal1<AccelerometerMotion>;//TODO
+    public var motionChange (default, null) :Signal1<AccelerometerMotion>;
     /** 
-    * <code>null</code> if not supported.
+    * 
     */
-    public var orientationUpdate(default, null): Signal1<AccelerometerOrientation>;
+    public var orientationUpdate (default, null) :Signal1<AccelerometerOrientation>;
 
-    /**
-     * 
-     */
-    public function new()
-    {   
-        _win = (untyped Lib.window);
+    public function new ()
+    {
+        orientationUpdate = _orientationUpdate = new HeavySignal1();
 
-        motionSupported = _win.DeviceMotionEvent != null; 
-        orientationSupported = _win.DeviceOrientationEvent != null; 
-
-        if (motionSupported)
-        {
-            _motion = new AccelerometerMotion();
-
-            motionChange = _motionChange = new NotifyingSignal1();
-
-            _motionChange.addedFirst.connect(function()
-                {
-                    _motionEventGroup = new EventGroup();
-                    _motionEventGroup.addListener(_win, "devicemotion", handleAccelerometerMotion);
-                }
-            );
-
-            _motionChange.disposedLast.connect(function()
-                {
-                    _motionEventGroup.dispose();
-                    _motionEventGroup = null;
-                }
-            );
-        }
-
-        if (orientationSupported)
-        {
+        if (orientationSupported) {
             _orientation = new AccelerometerOrientation();
 
-            orientationUpdate = _orientationUpdate = new NotifyingSignal1();
-
-            _orientationUpdate.addedFirst.connect(function()
-                {
-
+            _orientationUpdate.hasListenersValue.changed.connect(function (hasListeners,_) {
+                if (hasListeners) {
                     _orientationEventGroup = new EventGroup();
-                    _orientationEventGroup.addListener(_win, "deviceorientation", handleAccelerometerOrientation);
-                }
-            );
-
-            _orientationUpdate.disposedLast.connect(function()
-                {
+                    _orientationEventGroup.addListener(Lib.window,
+                        "deviceorientation", handleAccelerometerOrientation);
+                } else {
                     _orientationEventGroup.dispose();
                     _orientationEventGroup = null;
                 }
-            );
+            });
+        }
+
+        motionChange = _motionChange = new HeavySignal1();
+
+        if (motionSupported) {
+            _motion = new AccelerometerMotion();
+
+            _motionChange.hasListenersValue.changed.connect(function (hasListeners,_) {
+                if (hasListeners) {
+                    _motionEventGroup = new EventGroup();
+                    _motionEventGroup.addListener(Lib.window,
+                        "devicemotion", handleAccelerometerMotion);
+                } else {
+                    _motionEventGroup.dispose();
+                    _motionEventGroup = null;
+                }
+            });
         }
     }
 
-    /**
-     * 
-     */
-    private function handleAccelerometerMotion(event):Void
+    private function get_orientationSupported () :Bool
     {
-        //trace(event.x);
-
-        var acceleration = event.acceleration;
-
-        _windowOrientation = _win.orientation;
-
-        //alpha = z = azimuth, beta = x = pitch, gamma = y = roll
-        if (_windowOrientation == -90)
-        {
-            _motion._internal_update(acceleration.y, -acceleration.x, acceleration.z);
-        }
-        else if (_windowOrientation == 0)
-        {
-            _motion._internal_update(acceleration.x, acceleration.y, acceleration.z);
-        }
-        else if (_windowOrientation == 90)
-        {
-            _motion._internal_update(-acceleration.y, acceleration.x, acceleration.z);
-        }
-        else if (_windowOrientation == 180)
-        {
-            _motion._internal_update(-acceleration.x, -acceleration.y, acceleration.z);
-        }
-        // else
-        // {
-        //     trace("Window orientation " + _windowOrientation + " not valid.");
-        // }
-
-        motionChange.emit(_motion);
-
+        return (untyped Lib.window).DeviceOrientationEvent != null;
     }
 
-    /**
-     * 
-     */
-    private function handleAccelerometerOrientation(event):Void
+    private function get_motionSupported () :Bool
     {
-        _windowOrientation = _win.orientation;
+        return (untyped Lib.window).DeviceMotionEvent != null;
+    }
 
-        //alpha = z = azimuth, beta = x = pitch, gamma = y = roll
-        if (_windowOrientation == -90)
-        {
+    private function handleAccelerometerOrientation (event :Dynamic)
+    {
+        switch ((untyped Lib.window).orientation) {
+        case -90:
             _orientation._internal_update(event.gamma, -event.beta, event.alpha);
-        }
-        else if (_windowOrientation == 0)
-        {
+        case 0:
             _orientation._internal_update(event.beta, event.gamma, event.alpha);
-        }
-        else if (_windowOrientation == 90)
-        {
+        case 90:
             _orientation._internal_update(-event.gamma, event.beta, event.alpha);
-        }
-        else if (_windowOrientation == 180)
-        {
+        case 180:
             _orientation._internal_update(-event.beta, -event.gamma, event.alpha);
         }
-        // else
-        // {
-        //     trace("Window orientation " + _windowOrientation + " not valid.");
-        // }
 
         orientationUpdate.emit(_orientation);
-
     }
-
-    private var _motionChange:NotifyingSignal1<AccelerometerMotion>;
-    private var _orientationUpdate:NotifyingSignal1<AccelerometerOrientation>;
-    private var _windowOrientation:Float;
-    private var _win:Dynamic;
-    private var _orientationEventGroup:EventGroup;
-    private var _motionEventGroup:EventGroup;
-    private var _motion:AccelerometerMotion;
-    private var _orientation:AccelerometerOrientation;
-
-}
-
-private class NotifyingSignal1<A> extends Signal1<A>
-{
-    public var disposedLast(default, null):Signal0;
-    public var addedFirst(default, null):Signal0;
-
-    public function new (?listener :Listener1<A>)
+	
+	private function handleAccelerometerMotion (event :Dynamic)
     {
-        super(listener);
-
-        disposedLast = new Signal0();
-        addedFirst = new Signal0();
-    }
-
-    override public function connect (listener :Listener1<A>, prioritize :Bool = false) :SignalConnection
-    {
-        if (!hasListeners())
-        {
-            // Added the first listener.
-            addedFirst.emit();
+        var acceleration = event.acceleration;
+        
+        switch ((untyped Lib.window).orientation) {
+        case -90:
+            _motion._internal_update(acceleration.y, -acceleration.x, acceleration.z);
+        case 0:
+            _motion._internal_update(acceleration.x, acceleration.y, acceleration.z);
+        case 90:
+            _motion._internal_update(-acceleration.y, acceleration.x, acceleration.z);
+        case 180:
+            _motion._internal_update(-acceleration.x, -acceleration.y, acceleration.z);
         }
 
-        return super.connect(listener, prioritize);
+        motionChange.emit(_motion);
     }
 
-    override public function _internal_disconnect (conn :SignalConnection)
-    {
-        super._internal_disconnect(conn);
+    private var _orientationUpdate :HeavySignal1<AccelerometerOrientation>;
+    private var _orientationEventGroup :EventGroup;
+    private var _orientation :AccelerometerOrientation;
 
-        if (!hasListeners()) {
-            // Disposed the last listener.
-            disposedLast.emit();
-        }
-
-    }
-
+    private var _motionChange:HeavySignal1<AccelerometerMotion>;
+    private var _motionEventGroup :EventGroup;
+    private var _motion :AccelerometerMotion;
 }
-
-
-
-
-
-
-

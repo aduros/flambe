@@ -4,25 +4,61 @@
 
 package flambe.input;
 
-import flambe.util.Value;
+import flambe.input.Accelerometer;
 
-// TODO: Document/implement
-/** @private */
 class AccelerometerMotion
 {
-    public var x (default, null) :Float;
-    public var y (default, null) :Float;
-    public var z (default, null) :Float;
+    /**
+     * <p>The acceleration (x, y, z) that the user is giving to the device.</p>
+     */
+    public var acceleration (default, null) :AccelerometerDelta;
+    /**
+     * <p>The total acceleration (x, y, z) of the device, which includes the user acceleration and the gravity.</p>
+     */
+    public var accelerationIncludingGravity (default, null) :AccelerometerDelta;
+    /**
+     * <p>A holder for the interval in milliseconds since the last device motion event. <code>null</code> when not available.</p>
+     */
+    public var interval :AccelerometerFloat;
+    /**
+     * <p>A holder for the rotation rate of the device. <code>null</code> when not available.</p>
+     */
+    public var rotationRate :AccelerometerFloat;
 
-    /** @private */ public function new ()
+    /** @private */ public function new()
     {
-        _internal_update(0, 0, 0);
+        acceleration = new AccelerometerDelta();
+        accelerationIncludingGravity = new AccelerometerDelta();
+
+        interval = null;
+        rotationRate = null;
+
+        _internal_update(0, 0, 0, 0, 0, 0);
     }
 
-    /** @private */ public function _internal_update (x :Float, y :Float, z :Float)
+    /** @private */ public function _internal_update_interval (value:Float):Void
     {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        if (interval == null)
+        {
+            interval = new AccelerometerFloat();
+        }
+
+        interval._internal_set_value(value);
+    }
+
+    /** @private */ public function _internal_update_rotation_rate (value:Float):Void
+    {
+        if (rotationRate == null)
+        {
+            rotationRate = new AccelerometerFloat();
+        }
+
+        rotationRate._internal_set_value(value);
+    }
+
+    /** @private */ public function _internal_update(aX:Float, aY:Float, aZ:Float, aicX:Float, aicY:Float, aicZ:Float):Void
+    {
+        acceleration._internal_set_xyz(aX, aY, aZ);
+        accelerationIncludingGravity._internal_set_xyz(aicX, aicY, aicZ);
     }
 }

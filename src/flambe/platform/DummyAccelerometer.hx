@@ -12,11 +12,25 @@ import flambe.util.Signal1;
 class DummyAccelerometer
     implements Accelerometer
 {
-    public var orientationSupported (get_orientationSupported, null) :Bool;
-    public var orientationUpdate (default, null) :Signal1<AccelerometerOrientation>;
-
+    /**
+     * <p>Whether device motion events are supported.</p>
+     */
     public var motionSupported (get_motionSupported, null) :Bool;
+
+    /*
+     * <p>Emitted upon detected changes in device motion.</p>
+     */
     public var motionChange (default, null) :Signal1<AccelerometerMotion>;
+
+    /**
+     * <p>Whether device orientation events are supported.</p>
+     */
+    public var orientationSupported (get_orientationSupported, null) :Bool;
+
+    /**
+     * <p>Emitted on regular interval with the current device orientation.</p>
+     */
+    public var orientationUpdate (default, null) :Signal1<AccelerometerOrientation>;
 
     public function new ()
     {

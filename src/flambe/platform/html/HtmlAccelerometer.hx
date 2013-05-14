@@ -17,20 +17,23 @@ class HtmlAccelerometer
     implements Accelerometer
 {
     /**
-     * 
+     * <p>Whether device motion events are supported.</p>
      */
     public var motionSupported (get_motionSupported, null) :Bool;
+
+    /*
+     * <p>Emitted upon detected changes in device motion.</p>
+     */
+    public var motionChange (default, null) :Signal1<AccelerometerMotion>;
+
     /**
-     * 
+     * <p>Whether device orientation events are supported.</p>
      */
     public var orientationSupported (get_orientationSupported, null) :Bool;
-    /** 
-    * 
-    */
-    public var motionChange (default, null) :Signal1<AccelerometerMotion>;
-    /** 
-    * 
-    */
+
+    /**
+     * <p>Emitted on regular interval with the current device orientation.</p>
+     */
     public var orientationUpdate (default, null) :Signal1<AccelerometerOrientation>;
 
     public function new ()
@@ -80,35 +83,54 @@ class HtmlAccelerometer
         return (untyped Lib.window).DeviceMotionEvent != null;
     }
 
-    private function handleAccelerometerOrientation (event :Dynamic)
+    private function handleAccelerometerOrientation (event :Dynamic):Void
     {
+        var compassAccuracy:Dynamic = (event.compassAccuracy != null) ? event.compassAccuracy : event.webkitCompassAccuracy;
+        var compassHeading:Dynamic = (event.compassHeading != null) ? event.compassHeading : event.webkitCompassHeading;
+
+        if (compassAccuracy != null)
+        {
+            _orientation._internal_update_accuracy(compassAccuracy);
+        }
+
+        if (event.compassHeading != null)
+        {
+            _orientation._internal_update_heading(compassHeading);
+        }
+
         switch ((untyped Lib.window).orientation) {
         case -90:
-            _orientation._internal_update(event.gamma, -event.beta, event.alpha);
+            _orientation._internal_update( event.gamma, -event.beta , event.alpha);
         case 0:
-            _orientation._internal_update(event.beta, event.gamma, event.alpha);
+            _orientation._internal_update( event.beta ,  event.gamma, event.alpha);
         case 90:
-            _orientation._internal_update(-event.gamma, event.beta, event.alpha);
+            _orientation._internal_update(-event.gamma,  event.beta , event.alpha);
         case 180:
-            _orientation._internal_update(-event.beta, -event.gamma, event.alpha);
+            _orientation._internal_update(-event.beta , -event.gamma, event.alpha);
         }
 
         orientationUpdate.emit(_orientation);
     }
 	
-	private function handleAccelerometerMotion (event :Dynamic)
+	private function handleAccelerometerMotion (event :Dynamic):Void
     {
-        var acceleration = event.acceleration;
+        var a:Dynamic = event.acceleration;
+        var aic:Dynamic = event.accelerationIncludingGravity;
+        var interval:Dynamic = event.interval;
+        var rotationRate:Dynamic = event.rotationRate;
         
+        _motion._internal_update_interval(interval);
+        _motion._internal_update_rotation_rate(rotationRate);
+
         switch ((untyped Lib.window).orientation) {
         case -90:
-            _motion._internal_update(acceleration.y, -acceleration.x, acceleration.z);
+            _motion._internal_update( a.y, -a.x, a.z,  aic.y, -aic.x, aic.z);
         case 0:
-            _motion._internal_update(acceleration.x, acceleration.y, acceleration.z);
+            _motion._internal_update( a.x,  a.y, a.z,  aic.x,  aic.y, aic.z);
         case 90:
-            _motion._internal_update(-acceleration.y, acceleration.x, acceleration.z);
+            _motion._internal_update(-a.y,  a.x, a.z, -aic.y,  aic.x, aic.z);
         case 180:
-            _motion._internal_update(-acceleration.x, -acceleration.y, acceleration.z);
+            _motion._internal_update(-a.x, -a.y, a.z, -aic.x, -aic.y, aic.z);
         }
 
         motionChange.emit(_motion);
@@ -118,7 +140,7 @@ class HtmlAccelerometer
     private var _orientationEventGroup :EventGroup;
     private var _orientation :AccelerometerOrientation;
 
-    private var _motionChange:HeavySignal1<AccelerometerMotion>;
+    private var _motionChange :HeavySignal1<AccelerometerMotion>;
     private var _motionEventGroup :EventGroup;
     private var _motion :AccelerometerMotion;
 }

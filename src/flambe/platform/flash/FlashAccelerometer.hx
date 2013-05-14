@@ -25,20 +25,23 @@ import flash.system.Capabilities;
 class FlashAccelerometer implements Accelerometer
 {
     /**
-     * 
+     * <p>Whether device motion events are supported.</p>
      */
     public var motionSupported (get_motionSupported, null) :Bool;
+
+    /*
+     * <p>Emitted upon detected changes in device motion.</p>
+     */
+    public var motionChange (default, null) :Signal1<AccelerometerMotion>;
+
     /**
-     * 
+     * <p>Whether device orientation events are supported.</p>
      */
     public var orientationSupported (get_orientationSupported, null) :Bool;
-    /** 
-    * 
-    */
-    public var motionChange (default, null) :Signal1<AccelerometerMotion>;
-    /** 
-    * 
-    */
+
+    /**
+     * <p>Emitted on regular interval with the current device orientation.</p>
+     */
     public var orientationUpdate (default, null) :Signal1<AccelerometerOrientation>;
 
     /**
@@ -175,10 +178,6 @@ class FlashAccelerometer implements Accelerometer
         {
             orientation._internal_update(-event.beta, -event.gamma, event.alpha);
         }
-        // else
-        // {
-        //     trace("Window orientation " + _windowOrientation + " not valid.");
-        // }
 
         orientationUpdate.emit(orientation);
 

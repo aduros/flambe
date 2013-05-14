@@ -14,22 +14,50 @@ import flambe.util.Signal1;
 interface Accelerometer
 {
     /**
-     * Whether device motion events are supported.
+     * <p>Whether device motion events are supported.</p>
      */
     public var motionSupported (get_motionSupported, null) :Bool;
 
     /*
-     * Emitted upon detected changes in device motion.
+     * <p>Emitted upon detected changes in device motion.</p>
      */
     public var motionChange (default, null) :Signal1<AccelerometerMotion>;
 
     /**
-     * Whether device orientation events are supported.
+     * <p>Whether device orientation events are supported.</p>
      */
     public var orientationSupported (get_orientationSupported, null) :Bool;
 
     /**
-     * Emitted on regular interval with the current device orientation.
+     * <p>Emitted on regular interval with the current device orientation.</p>
      */
     public var orientationUpdate (default, null) :Signal1<AccelerometerOrientation>;
+}
+
+class AccelerometerFloat
+{   
+    public var _ (default, null):Float;
+
+    /** @private */ public function new () {}
+
+    /** @private */ public function _internal_set_value(value:Float):Void
+    {
+        _ = value;
+    }
+}
+
+class AccelerometerDelta
+{   
+    public var x (default, null):Float;
+    public var y (default, null):Float;
+    public var z (default, null):Float;
+
+    /** @private */ public function new () {}
+
+    /** @private */ public function _internal_set_xyz (x:Float, y:Float, z:Float):Void
+    {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
 }

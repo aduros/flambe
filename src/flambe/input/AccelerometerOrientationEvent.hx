@@ -9,16 +9,16 @@ import flambe.input.Accelerometer;
 /**
  * TODO: Document.
  */
-class AccelerometerOrientation
+class AccelerometerOrientationEvent
 {
 
     /**
-     * <p>Rotation, in degrees, of the window frame around its x-axis (left/right).</p>
+     * <p>Rotation, in degrees, of the window frame around its y-axis (left/right).</p>
      */
     public var roll (default, null) :Float;
 
     /**
-     * <p>Rotation, in degrees, of the window frame around its y-axis (forward/back).</p>
+     * <p>Rotation, in degrees, of the window frame around its z-axis (forward/back).</p>
      */
     public var pitch(default, null) :Float;
     /**
@@ -29,39 +29,39 @@ class AccelerometerOrientation
     /**
      * <p>A holder for accuracy of the compass data in degrees. <code>null</code> when not available.</p>
      */
-    public var compassHeading(default, null):AccelerometerFloat;
+    //public var compassHeading(default, null):AccelerometerFloat;
     /**
      * <p>A holder for direction that is measured in degrees relative to magnetic north. <code>null</code> when not available.</p>
      * <p>TODO: Make relative to window frame.</p>
      */
-    public var compassAccuracy(default, null):AccelerometerFloat;
+    //public var compassAccuracy(default, null):AccelerometerFloat;
 
     /** @private */ public function new ()
     {
-        compassHeading = null;
-        compassAccuracy = null;
+        //compassHeading = null;
+        //compassAccuracy = null;
         _internal_update(0, 0, 0);
     }
 
-    /** @private */ public function _internal_update_heading (value:Float):Void
-    {
-        if (compassHeading == null)
-        {
-            compassHeading = new AccelerometerFloat();
-        }
+    // /** @private */ public function _internal_update_heading (value:Float):Void
+    // {
+    //     if (compassHeading == null)
+    //     {
+    //         compassHeading = new AccelerometerFloat();
+    //     }
 
-        compassHeading._internal_set_value(value);
-    }
+    //     compassHeading._internal_set_value(value);
+    // }
 
-    /** @private */ public function _internal_update_accuracy (value:Float):Void
-    {
-        if (compassAccuracy == null)
-        {
-            compassAccuracy = new AccelerometerFloat();
-        }
+    // /** @private */ public function _internal_update_accuracy (value:Float):Void
+    // {
+    //     if (compassAccuracy == null)
+    //     {
+    //         compassAccuracy = new AccelerometerFloat();
+    //     }
 
-        compassAccuracy._internal_set_value(value);
-    }
+    //     compassAccuracy._internal_set_value(value);
+    // }
 
     /** @private */ public function _internal_update (pitch :Float, roll :Float, azimuth :Float):Void
     {

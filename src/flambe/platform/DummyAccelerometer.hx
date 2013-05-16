@@ -5,8 +5,8 @@
 package flambe.platform;
 
 import flambe.input.Accelerometer;
-import flambe.input.AccelerometerOrientation;
-import flambe.input.AccelerometerMotion;
+import flambe.input.AccelerometerOrientationEvent;
+import flambe.input.AccelerometerMotionEvent;
 import flambe.util.Signal1;
 
 class DummyAccelerometer
@@ -20,7 +20,7 @@ class DummyAccelerometer
     /*
      * <p>Emitted upon detected changes in device motion.</p>
      */
-    public var motionChange (default, null) :Signal1<AccelerometerMotion>;
+    public var motionChange (default, null) :Signal1<AccelerometerMotionEvent>;
 
     /**
      * <p>Whether device orientation events are supported.</p>
@@ -30,7 +30,7 @@ class DummyAccelerometer
     /**
      * <p>Emitted on regular interval with the current device orientation.</p>
      */
-    public var orientationUpdate (default, null) :Signal1<AccelerometerOrientation>;
+    public var orientationUpdate (default, null) :Signal1<AccelerometerOrientationEvent>;
 
     public function new ()
     {

@@ -8,8 +8,8 @@ import js.Lib;
 
 import flambe.util.Signal1;
 import flambe.input.Accelerometer;
-import flambe.input.AccelerometerMotion;
-import flambe.input.AccelerometerOrientation;
+import flambe.input.AccelerometerMotionEvent;
+import flambe.input.AccelerometerOrientationEvent;
 import flambe.platform.EventGroup;
 import Type;
 
@@ -24,7 +24,7 @@ class HtmlAccelerometer
     /*
      * <p>Emitted upon detected changes in device motion.</p>
      */
-    public var motionChange (default, null) :Signal1<AccelerometerMotion>;
+    public var motionChange (default, null) :Signal1<AccelerometerMotionEvent>;
 
     /**
      * <p>Whether device orientation events are supported.</p>
@@ -34,20 +34,20 @@ class HtmlAccelerometer
     /**
      * <p>Emitted on regular interval with the current device orientation.</p>
      */
-    public var orientationUpdate (default, null) :Signal1<AccelerometerOrientation>;
+    public var orientationUpdate (default, null) :Signal1<AccelerometerOrientationEvent>;
 
     public function new ()
     {
         orientationUpdate = _orientationUpdate = new HeavySignal1();
 
         if (orientationSupported) {
-            _orientation = new AccelerometerOrientation();
+            _orientation = new AccelerometerOrientationEvent();
 
             _orientationUpdate.hasListenersValue.changed.connect(function (hasListeners,_) {
                 if (hasListeners) {
                     _orientationEventGroup = new EventGroup();
                     _orientationEventGroup.addListener(Lib.window,
-                        "deviceorientation", handleAccelerometerOrientation);
+                        "deviceorientation", handleAccelerometerOrientationEvent);
                 } else {
                     _orientationEventGroup.dispose();
                     _orientationEventGroup = null;
@@ -58,13 +58,13 @@ class HtmlAccelerometer
         motionChange = _motionChange = new HeavySignal1();
 
         if (motionSupported) {
-            _motion = new AccelerometerMotion();
+            _motion = new AccelerometerMotionEvent();
 
             _motionChange.hasListenersValue.changed.connect(function (hasListeners,_) {
                 if (hasListeners) {
                     _motionEventGroup = new EventGroup();
                     _motionEventGroup.addListener(Lib.window,
-                        "devicemotion", handleAccelerometerMotion);
+                        "devicemotion", handleAccelerometerMotionEvent);
                 } else {
                     _motionEventGroup.dispose();
                     _motionEventGroup = null;
@@ -83,20 +83,20 @@ class HtmlAccelerometer
         return (untyped Lib.window).DeviceMotionEvent != null;
     }
 
-    private function handleAccelerometerOrientation (event :Dynamic):Void
+    private function handleAccelerometerOrientationEvent (event :Dynamic):Void
     {
-        var compassAccuracy:Dynamic = (event.compassAccuracy != null) ? event.compassAccuracy : event.webkitCompassAccuracy;
-        var compassHeading:Dynamic = (event.compassHeading != null) ? event.compassHeading : event.webkitCompassHeading;
+        // var compassAccuracy:Dynamic = (event.compassAccuracy != null) ? event.compassAccuracy : event.webkitCompassAccuracy;
+        // var compassHeading:Dynamic = (event.compassHeading != null) ? event.compassHeading : event.webkitCompassHeading;
 
-        if (compassAccuracy != null)
-        {
-            _orientation._internal_update_accuracy(compassAccuracy);
-        }
+        // if (compassAccuracy != null)
+        // {
+        //     _orientation._internal_update_accuracy(compassAccuracy);
+        // }
 
-        if (event.compassHeading != null)
-        {
-            _orientation._internal_update_heading(compassHeading);
-        }
+        // if (event.compassHeading != null)
+        // {
+        //     _orientation._internal_update_heading(compassHeading);
+        // }
 
         switch ((untyped Lib.window).orientation) {
         case -90:
@@ -112,15 +112,15 @@ class HtmlAccelerometer
         orientationUpdate.emit(_orientation);
     }
 	
-	private function handleAccelerometerMotion (event :Dynamic):Void
+	private function handleAccelerometerMotionEvent (event :Dynamic):Void
     {
         var a:Dynamic = event.acceleration;
         var aic:Dynamic = event.accelerationIncludingGravity;
-        var interval:Dynamic = event.interval;
-        var rotationRate:Dynamic = event.rotationRate;
+        // var interval:Dynamic = event.interval;
+        // var rotationRate:Dynamic = event.rotationRate;
         
-        _motion._internal_update_interval(interval);
-        _motion._internal_update_rotation_rate(rotationRate);
+        // _motion._internal_update_interval(interval);
+        // _motion._internal_update_rotation_rate(rotationRate);
 
         switch ((untyped Lib.window).orientation) {
         case -90:
@@ -136,11 +136,11 @@ class HtmlAccelerometer
         motionChange.emit(_motion);
     }
 
-    private var _orientationUpdate :HeavySignal1<AccelerometerOrientation>;
+    private var _orientationUpdate :HeavySignal1<AccelerometerOrientationEvent>;
     private var _orientationEventGroup :EventGroup;
-    private var _orientation :AccelerometerOrientation;
+    private var _orientation :AccelerometerOrientationEvent;
 
-    private var _motionChange :HeavySignal1<AccelerometerMotion>;
+    private var _motionChange :HeavySignal1<AccelerometerMotionEvent>;
     private var _motionEventGroup :EventGroup;
-    private var _motion :AccelerometerMotion;
+    private var _motion :AccelerometerMotionEvent;
 }

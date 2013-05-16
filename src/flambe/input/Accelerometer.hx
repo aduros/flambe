@@ -21,7 +21,7 @@ interface Accelerometer
     /*
      * <p>Emitted upon detected changes in device motion.</p>
      */
-    public var motionChange (default, null) :Signal1<AccelerometerMotion>;
+    public var motionChange (default, null) :Signal1<AccelerometerMotionEvent>;
 
     /**
      * <p>Whether device orientation events are supported.</p>
@@ -31,22 +31,22 @@ interface Accelerometer
     /**
      * <p>Emitted on regular interval with the current device orientation.</p>
      */
-    public var orientationUpdate (default, null) :Signal1<AccelerometerOrientation>;
+    public var orientationUpdate (default, null) :Signal1<AccelerometerOrientationEvent>;
 }
 
-class AccelerometerFloat
-{   
-    public var _ (default, null):Float;
+// class AccelerometerFloat
+// {   
+//     public var _ (default, null):Float;
 
-    /** @private */ public function new () {}
+//     /** @private */ public function new () {}
 
-    /** @private */ public function _internal_set_value(value:Float):Void
-    {
-        _ = value;
-    }
-}
+//     /** @private */ public function _internal_set_value(value:Float):Void
+//     {
+//         _ = value;
+//     }
+// }
 
-class AccelerometerDelta
+class AccelerometerDeltaXYZ
 {   
     public var x (default, null):Float;
     public var y (default, null):Float;

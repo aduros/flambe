@@ -13,16 +13,16 @@ class AccelerometerOrientationEvent
 {
 
     /**
-     * <p>Rotation, in degrees, of the window frame around its y-axis (left/right).</p>
+     * <p>Rotation, in degrees, of the window frame <i>around</i> its y-axis (left/right).
      */
     public var roll (default, null) :Float;
 
     /**
-     * <p>Rotation, in degrees, of the window frame around its z-axis (forward/back).</p>
+     * <p>Rotation, in degrees, of the window frame <i>around</i> its x-axis (forward/back).
      */
     public var pitch(default, null) :Float;
     /**
-     * <p>The rotation, in degrees, of the device frame around its y-axis.</p>
+     * <p>The rotation, in degrees, of the device frame around its z-axis.</p>
      * <p>Relative to the heading of the device at page load, NOT magnetic or true north.</p>
      */
     public var azimuth(default, null):Float;
@@ -63,10 +63,10 @@ class AccelerometerOrientationEvent
     //     compassAccuracy._internal_set_value(value);
     // }
 
-    /** @private */ public function _internal_update (pitch :Float, roll :Float, azimuth :Float):Void
+    /** @private */ public function _internal_update (roll :Float, pitch :Float,  azimuth :Float):Void
     {
-        this.pitch = pitch;
         this.roll = roll;
+        this.pitch = pitch;
         this.azimuth = azimuth;
     }
 }

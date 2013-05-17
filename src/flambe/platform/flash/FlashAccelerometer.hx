@@ -161,7 +161,7 @@ class FlashAccelerometer implements Accelerometer
     {
         //_windowOrientation = _win.orientation;
 
-        //alpha = z = azimuth, beta = x = pitch, gamma = y = roll
+        //alpha = z(spin) = azimuth, beta = y(z-axis) = pitch, gamma = x(y-axis) = roll
         if (_windowOrientation == -90)
         {
             orientation._internal_update(event.gamma, -event.beta, event.alpha);

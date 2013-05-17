@@ -98,15 +98,19 @@ class HtmlAccelerometer
         //     _orientation._internal_update_heading(compassHeading);
         // }
 
+        // alpha = z(spin) = azimuth
+        // beta = y (around z-axis) = pitch
+        // gamma = x (around y-axis) = roll
+
         switch ((untyped Lib.window).orientation) {
         case -90:
-            _orientation._internal_update( event.gamma, -event.beta , event.alpha);
+            _orientation._internal_update(-event.beta ,  event.gamma, event.alpha);
         case 0:
-            _orientation._internal_update( event.beta ,  event.gamma, event.alpha);
+            _orientation._internal_update( event.gamma,  event.beta , event.alpha);
         case 90:
-            _orientation._internal_update(-event.gamma,  event.beta , event.alpha);
+            _orientation._internal_update( event.beta , -event.gamma, event.alpha);
         case 180:
-            _orientation._internal_update(-event.beta , -event.gamma, event.alpha);
+            _orientation._internal_update(-event.gamma, -event.beta , event.alpha);
         }
 
         orientationUpdate.emit(_orientation);

@@ -67,13 +67,14 @@ class HtmlPlatform
         _stage = new HtmlStage(canvas);
         _pointer = new BasicPointer();
         _mouse = new HtmlMouse(_pointer, canvas);
+        _keyboard = new BasicKeyboard();
+        _accelerometer = new HtmlAccelerometer();
 
         _renderer = createRenderer(canvas);
         System.hasGPU._ = true;
 
         mainLoop = new MainLoop();
 
-        _canvas = canvas;
         _container = canvas.parentNode;
         _container.style.overflow = "hidden";
         _container.style.position = "relative";
@@ -191,6 +192,19 @@ class HtmlPlatform
             _touch = new DummyTouch();
         }
 
+        var onKey = function (event) {
+            switch (event.type) {
+            case "keydown":
+                if (_keyboard.submitDown(event.keyCode)) {
+                    event.preventDefault();
+                }
+            case "keyup":
+                _keyboard.submitUp(event.keyCode);
+            }
+        };
+        canvas.addEventListener("keydown", onKey, false);
+        canvas.addEventListener("keyup", onKey, false);
+
         // Handle uncaught errors
         var oldErrorHandler = (untyped Lib.window).onerror;
         (untyped Lib.window).onerror = function (message, url, line) {
@@ -208,26 +222,15 @@ class HtmlPlatform
             onVisibilityChanged(); // Update now
             (untyped Lib.document).addEventListener(hiddenApi.prefix + "visibilitychange",
                 onVisibilityChanged, false);
-        } else {
-            // Adds some lock screen support for iOS, possibly other devices that don't support the
-            // page visibility api.
-            var onPageTransitionChange = function (event) {
-                System.hidden._ = (event.type == "pagehide");
-            };
-            (untyped Lib.window).addEventListener("pageshow", onPageTransitionChange, false);
-            (untyped Lib.window).addEventListener("pagehide", onPageTransitionChange, false);
+            System.hidden.changed.connect(function (hidden,_) {
+                if (!hidden) {
+                    _skipFrame = true;
+                }
+            });
         }
 
-        // Skip the next frame when coming back from being hidden
-        System.hidden.changed.connect(function (hidden,_) {
-            trace("Hidden changed: " + hidden);
-            if (!hidden) {
-                _skipFrame = true;
-            }
-        });
-        _skipFrame = false;
-
         _lastUpdate = HtmlUtil.now();
+        _skipFrame = false;
 
         // Use requestAnimationFrame if available, otherwise a 60 FPS setInterval
         // https://developer.mozilla.org/en/DOM/window.mozRequestAnimationFrame
@@ -322,9 +325,6 @@ class HtmlPlatform
         var dt = (now-_lastUpdate) / 1000;
         _lastUpdate = now;
 
-        if (System.hidden._) {
-            return; // Prevent updates while hidden
-        }
         if (_skipFrame) {
             _skipFrame = false;
             return;
@@ -351,21 +351,6 @@ class HtmlPlatform
 
     public function getKeyboard () :Keyboard
     {
-        if (_keyboard == null) {
-            _keyboard = new BasicKeyboard();
-            var onKey = function (event) {
-                switch (event.type) {
-                case "keydown":
-                    if (_keyboard.submitDown(event.keyCode)) {
-                        event.preventDefault();
-                    }
-                case "keyup":
-                    _keyboard.submitUp(event.keyCode);
-                }
-            };
-            _canvas.addEventListener("keydown", onKey, false);
-            _canvas.addEventListener("keyup", onKey, false);
-        }
         return _keyboard;
     }
 
@@ -385,11 +370,8 @@ class HtmlPlatform
         return _external;
     }
 
-    public function getAccelerometer() :Accelerometer
+    public function getAccelerometer(): Accelerometer
     {
-        if (_accelerometer == null) {
-            _accelerometer = new HtmlAccelerometer();
-        }
         return _accelerometer;
     }
 
@@ -422,21 +404,17 @@ class HtmlPlatform
         return new CanvasRenderer(canvas);
     }
 
-    // Statically initialized subsystems
-    private var _mouse :HtmlMouse;
-    private var _pointer :BasicPointer;
-    private var _renderer :Renderer;
     private var _stage :HtmlStage;
+    private var _pointer :BasicPointer;
+    private var _mouse :HtmlMouse;
     private var _touch :Touch;
-
-    // Lazily initialized subsystems
-    private var _accelerometer :Accelerometer;
-    private var _external :External;
     private var _keyboard :BasicKeyboard;
     private var _storage :Storage;
     private var _web :Web;
+    private var _external :External;
+    private var _renderer :Renderer;
+    private var _accelerometer :Accelerometer;
 
-    private var _canvas :Dynamic;
     private var _container :Dynamic;
 
     private var _lastUpdate :Float;

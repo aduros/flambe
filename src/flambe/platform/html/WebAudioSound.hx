@@ -8,7 +8,6 @@ import flambe.animation.AnimatedFloat;
 import flambe.platform.Tickable;
 import flambe.sound.Playback;
 import flambe.sound.Sound;
-import flambe.util.Disposable;
 
 class WebAudioSound
     implements Sound
@@ -152,10 +151,6 @@ private class WebAudioPlayback
         if (ended || paused) {
             // Allow ended or paused sounds to be garbage collected
             _tickableAdded = false;
-
-            // Release System references
-            _hideBinding.dispose();
-
             return true;
         }
         return false;
@@ -192,18 +187,8 @@ private class WebAudioPlayback
         _pausedAt = -1;
 
         if (!_tickableAdded) {
-            HtmlPlatform.instance.mainLoop.addTickable(this);
             _tickableAdded = true;
-
-            // Claim System references
-            _hideBinding = System.hidden.changed.connect(function(hidden,_) {
-                if (hidden) {
-                    _wasPaused = get_paused();
-                    this.paused = true;
-                } else {
-                    this.paused = _wasPaused;
-                }
-            });
+            HtmlPlatform.instance.mainLoop.addTickable(this);
         }
     }
 
@@ -211,7 +196,6 @@ private class WebAudioPlayback
 
     private var _pausedAt :Float;
     private var _startedAt :Float;
-    private var _wasPaused :Bool;
 
     private var _sourceNode :Dynamic;
     private var _gainNode :Dynamic;
@@ -219,6 +203,5 @@ private class WebAudioPlayback
     // The first node of the output chain, not including the source node
     private var _head :Dynamic;
 
-    private var _hideBinding :Disposable;
     private var _tickableAdded :Bool;
 }

@@ -7,8 +7,8 @@ package flambe.platform.flash;
 import flambe.util.Signal0;
 import flambe.util.Signal1;
 import flambe.input.Accelerometer;
-import flambe.input.AccelerometerMotion;
-import flambe.input.AccelerometerOrientation;
+import flambe.input.AccelerometerMotionEvent;
+import flambe.input.AccelerometerOrientationEvent;
 import flambe.platform.EventGroup;
 import Type;
 
@@ -25,21 +25,24 @@ import flash.system.Capabilities;
 class FlashAccelerometer implements Accelerometer
 {
     /**
-     * 
+     * <p>Whether device motion events are supported.</p>
      */
-    //public var motionSupported (default, null) :Bool;//TODO
+    public var motionSupported (get_motionSupported, null) :Bool;
+
+    /*
+     * <p>Emitted upon detected changes in device motion.</p>
+     */
+    public var motionChange (default, null) :Signal1<AccelerometerMotionEvent>;
+
     /**
-     * 
+     * <p>Whether device orientation events are supported.</p>
      */
     public var orientationSupported (get_orientationSupported, null) :Bool;
-    /** 
-    * <code>null</code> if not supported.
-    */
-    //public var motionChange(default, null): Signal1<AccelerometerMotion>;//TODO
-    /** 
-    * <code>null</code> if not supported.
-    */
-    public var orientationUpdate(default, null): Signal1<AccelerometerOrientation>;
+
+    /**
+     * <p>Emitted on regular interval with the current device orientation.</p>
+     */
+    public var orientationUpdate (default, null) :Signal1<AccelerometerOrientationEvent>;
 
     /**
      *
@@ -69,11 +72,11 @@ class FlashAccelerometer implements Accelerometer
 
             //     var ret:Dynamic = ExternalInterface.call(literal);
 
-            //     ExternalInterface.addCallback('handleOrientation', handleAccelerometerOrientation);
+            //     ExternalInterface.addCallback('handleOrientation', handleAccelerometerOrientationEvent);
 
             //     if (ExternalInterface.call('function() {return Boolean(window.DeviceOrientationEvent)}') != false)
             //     {
-            //         _orientation = new AccelerometerOrientation();
+            //         _orientation = new AccelerometerOrientationEvent();
             //         orientation = new Signal1();
 
             //         var func:String = '
@@ -93,7 +96,7 @@ class FlashAccelerometer implements Accelerometer
 
             //     if (ExternalInterface.call('function() {return Boolean(window.DeviceMotionEvent)}') != false)
             //     {
-            //         _motion = new AccelerometerMotion();
+            //         _motion = new AccelerometerMotionEvent();
             //         motion = new Signal1();
             //     }
 
@@ -109,7 +112,12 @@ class FlashAccelerometer implements Accelerometer
 
     private function get_orientationSupported () :Bool
     {
-        return true;
+        return false;
+    }
+
+    private function get_motionSupported () :Bool
+    {
+        return false;
     }
 
     /**
@@ -149,11 +157,11 @@ class FlashAccelerometer implements Accelerometer
     /**
      *
      */
-    private function handleAccelerometerOrientation(alpha:Float, beta:Float, gamma:Float):Void
+    private function handleAccelerometerOrientationEvent(alpha:Float, beta:Float, gamma:Float):Void
     {
         //_windowOrientation = _win.orientation;
 
-        //alpha = z = azimuth, beta = x = pitch, gamma = y = roll
+        //alpha = z(spin) = azimuth, beta = y(z-axis) = pitch, gamma = x(y-axis) = roll
         if (_windowOrientation == -90)
         {
             orientation._internal_update(event.gamma, -event.beta, event.alpha);
@@ -170,20 +178,16 @@ class FlashAccelerometer implements Accelerometer
         {
             orientation._internal_update(-event.beta, -event.gamma, event.alpha);
         }
-        // else
-        // {
-        //     trace("Window orientation " + _windowOrientation + " not valid.");
-        // }
 
         orientationUpdate.emit(orientation);
 
     }
 
-    //private var _motionUpdate:HeavySignal1<AccelerometerOrientation>;
-    private var _orientationUpdate:HeavySignal1<AccelerometerOrientation>;
+    private var _motionUpdate:HeavySignal1<AccelerometerOrientationEvent>;
+    private var _orientationUpdate:HeavySignal1<AccelerometerOrientationEvent>;
     private var _windowOrientation:Float;
     private var _orientationEventGroup:EventGroup;
     private var _motionEventGroup:EventGroup;
-    //private var _motion:AccelerometerMotion;
-    private var _orientation:AccelerometerOrientation;
+    private var _motion:AccelerometerMotionEvent;
+    private var _orientation:AccelerometerOrientationEvent;
 }

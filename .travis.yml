@@ -20,6 +20,6 @@ before_script:
     - mkdir -p ~/.haxe/lib
     - echo ~/.haxe/lib | haxelib setup
     - until haxelib install format 1.26; do sleep 1; done
-    - until haxelib install nape 2.0.8; do sleep 1; done
+    - until haxelib install nape; do sleep 1; done
 
 script: bin/run-travis

@@ -4,7 +4,6 @@
 
 package flambe.input;
 
-import flambe.util.Signal0;
 import flambe.util.Signal1;
 
 /**
@@ -14,26 +13,51 @@ import flambe.util.Signal1;
  */
 interface Accelerometer
 {
-    // /**
-    //  * Whether device motion events are supported.
-    //  */
-    //public var motionSupported (default, null) :Bool;//TODO
-
-    // /*
-    //  * Device motions updates.
-    //  */
-    //public var motionChange(default, null): Signal1<AccelerometerMotion>;//TODO
-    /*
-     * Device orientation updates, not to be confused with window orientation.
+    /**
+     * <p>Whether device motion events are supported.</p>
      */
+    public var motionSupported (get_motionSupported, null) :Bool;
+
+    /*
+     * <p>Emitted upon detected changes in device motion.</p>
+     */
+    public var motionChange (default, null) :Signal1<AccelerometerMotionEvent>;
 
     /**
-     * Whether device orientation events are supported.
+     * <p>Whether device orientation events are supported.</p>
      */
     public var orientationSupported (get_orientationSupported, null) :Bool;
 
     /**
-     * Emitted periodically with the current device orientation.
+     * <p>Emitted on regular interval with the current device orientation.</p>
      */
-    public var orientationUpdate (default, null) :Signal1<AccelerometerOrientation>;
+    public var orientationUpdate (default, null) :Signal1<AccelerometerOrientationEvent>;
+}
+
+// class AccelerometerFloat
+// {   
+//     public var _ (default, null):Float;
+
+//     /** @private */ public function new () {}
+
+//     /** @private */ public function _internal_set_value(value:Float):Void
+//     {
+//         _ = value;
+//     }
+// }
+
+class AccelerometerDeltaXYZ
+{   
+    public var x (default, null):Float;
+    public var y (default, null):Float;
+    public var z (default, null):Float;
+
+    /** @private */ public function new () {}
+
+    /** @private */ public function _internal_set_xyz (x:Float, y:Float, z:Float):Void
+    {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
 }

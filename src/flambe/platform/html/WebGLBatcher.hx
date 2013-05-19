@@ -197,7 +197,8 @@ class WebGLBatcher
             _drawPatternShader.setMaxUV(_lastTexture.maxU, _lastTexture.maxV);
         }
 
-        _gl.bufferSubData(GL.ARRAY_BUFFER, 0, data.subarray(0, _dataOffset));
+        // _gl.bufferSubData(GL.ARRAY_BUFFER, 0, data.subarray(0, _dataOffset));
+        _gl.bufferData(GL.ARRAY_BUFFER, data.subarray(0, _dataOffset), GL.STREAM_DRAW);
         _gl.drawElements(GL.TRIANGLES, 6*_quads, GL.UNSIGNED_SHORT, 0);
 
         _quads = 0;

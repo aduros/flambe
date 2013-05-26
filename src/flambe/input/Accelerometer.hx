@@ -14,26 +14,15 @@ import flambe.util.Signal1;
  */
 interface Accelerometer
 {
-    // /**
-    //  * Whether device motion events are supported.
-    //  */
-    //public var motionSupported (default, null) :Bool;//TODO
+    /** Whether device acceleration events are supported. */
+    public var accelerationSupported (get_accelerationSupported, null) :Bool;
 
-    // /*
-    //  * Device motions updates.
-    //  */
-    //public var motionChange(default, null): Signal1<AccelerometerMotion>;//TODO
-    /*
-     * Device orientation updates, not to be confused with window orientation.
-     */
+    /** Periodically emits the device's current linear acceleration. */
+    public var acceleration (default, null) :Signal1<Acceleration>;
 
-    /**
-     * Whether device orientation events are supported.
-     */
-    public var orientationSupported (get_orientationSupported, null) :Bool;
+    /** Whether device orientation (attitude) events are supported. */
+    public var attitudeSupported (get_attitudeSupported, null) :Bool;
 
-    /**
-     * Emitted periodically with the current device orientation.
-     */
-    public var orientationUpdate (default, null) :Signal1<AccelerometerOrientation>;
+    /** Periodically emits the device's current attitude. */
+    public var attitude (default, null) :Signal1<Attitude>;
 }

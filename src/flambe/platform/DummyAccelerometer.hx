@@ -5,21 +5,31 @@
 package flambe.platform;
 
 import flambe.input.Accelerometer;
-import flambe.input.AccelerometerOrientation;
+import flambe.input.Acceleration;
+import flambe.input.Attitude;
 import flambe.util.Signal1;
 
 class DummyAccelerometer
     implements Accelerometer
 {
-    public var orientationSupported (get_orientationSupported, null) :Bool;
-    public var orientationUpdate (default, null) :Signal1<AccelerometerOrientation>;
+    public var accelerationSupported (get_accelerationSupported, null) :Bool;
+    public var acceleration (default, null) :Signal1<Acceleration>;
+
+    public var attitudeSupported (get_attitudeSupported, null) :Bool;
+    public var attitude (default, null) :Signal1<Attitude>;
 
     public function new ()
     {
-        orientationUpdate = new Signal1();
+        acceleration = new Signal1();
+        attitude = new Signal1();
     }
 
-    private function get_orientationSupported () :Bool
+    private function get_accelerationSupported () :Bool
+    {
+        return false;
+    }
+
+    private function get_attitudeSupported () :Bool
     {
         return false;
     }

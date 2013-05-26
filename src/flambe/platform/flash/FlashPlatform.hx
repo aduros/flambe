@@ -171,7 +171,7 @@ class FlashPlatform
         return _external;
     }
 
-    public function getAccelerometer(): Accelerometer
+    public function getAccelerometer () :Accelerometer
     {
         if (_accelerometer == null) {
             _accelerometer = new DummyAccelerometer();

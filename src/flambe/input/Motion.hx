@@ -4,7 +4,6 @@
 
 package flambe.input;
 
-import flambe.util.Signal0;
 import flambe.util.Signal1;
 
 /**

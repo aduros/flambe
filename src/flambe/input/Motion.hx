@@ -8,11 +8,11 @@ import flambe.util.Signal0;
 import flambe.util.Signal1;
 
 /**
- * <p>Functions related to the device's accelerometer.</p>
+ * <p>Functions related to the device's motion sensors.</p>
  *
  * <p>NOTE: Not yet supported in Flash/AIR.</p>
  */
-interface Accelerometer
+interface Motion
 {
     /** Whether device acceleration events are supported. */
     public var accelerationSupported (get_accelerationSupported, null) :Bool;

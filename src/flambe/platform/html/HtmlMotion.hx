@@ -6,14 +6,13 @@ package flambe.platform.html;
 
 import js.Lib;
 
-import flambe.input.Accelerometer;
 import flambe.input.Acceleration;
 import flambe.input.Attitude;
-import flambe.platform.EventGroup;
+import flambe.input.Motion;
 import flambe.util.Signal1;
 
-class HtmlAccelerometer
-    implements Accelerometer
+class HtmlMotion
+    implements Motion
 {
     public var accelerationSupported (get_accelerationSupported, null) :Bool;
     public var acceleration (default, null) :Signal1<Acceleration>;

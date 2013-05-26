@@ -14,7 +14,7 @@ import flambe.input.Keyboard;
 import flambe.input.Mouse;
 import flambe.input.Pointer;
 import flambe.input.Touch;
-import flambe.input.Accelerometer;
+import flambe.input.Motion;
 import flambe.platform.Platform;
 import flambe.storage.Storage;
 import flambe.util.Assert;
@@ -50,12 +50,12 @@ class System
     public static var pointer (get_pointer, null) :Pointer;
 
     /**
-     * The Mouse subsystem, for direct access to the mouse. Test blah blah
+     * The Mouse subsystem, for direct access to the mouse.
      */
     public static var mouse (get_mouse, null) :Mouse;
 
     /**
-     * The Touch subsystem, for direct access to the multi-touch. Some other thing
+     * The Touch subsystem, for direct access to the multi-touch.
      */
     public static var touch (get_touch, null) :Touch;
 
@@ -75,11 +75,11 @@ class System
     public static var external (get_external, null) :External;
 
     /**
-     * 
+     * The Motion subsystem, for events from the device's motion sensors.
      */
-    public static var accelerometer (get_accelerometer, null) :Accelerometer;
+    public static var motion (get_motion, null) :Motion;
 
-    // TODO(bruno): Subsystems for accelerometer, gamepads, haptic, geolocation, video, textInput
+    // TODO(bruno): Subsystems for gamepads, haptic, geolocation, video, textInput
 
     /**
      * Gets the RFC 4646 language tag of the environment. For example, "en-US", "pt", or null if the
@@ -228,10 +228,10 @@ class System
         return _platform.getLocale();
     }
 
-    inline static function get_accelerometer () :Accelerometer
+    inline static function get_motion () :Motion
     {
         #if debug assertCalledInit(); #end
-        return _platform.getAccelerometer();
+        return _platform.getMotion();
     }
 
     private static function assertCalledInit ()

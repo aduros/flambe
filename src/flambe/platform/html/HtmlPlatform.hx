@@ -6,7 +6,6 @@ package flambe.platform.html;
 
 import js.Lib;
 
-import flambe.animation.AnimatedFloat;
 import flambe.Entity;
 import flambe.System;
 import flambe.asset.AssetPack;
@@ -15,10 +14,10 @@ import flambe.display.Stage;
 import flambe.display.Texture;
 import flambe.external.External;
 import flambe.input.Keyboard;
+import flambe.input.Motion;
 import flambe.input.Mouse;
 import flambe.input.Pointer;
 import flambe.input.Touch;
-import flambe.input.Accelerometer;
 import flambe.platform.BasicKeyboard;
 import flambe.platform.BasicPointer;
 import flambe.platform.MainLoop;
@@ -385,12 +384,12 @@ class HtmlPlatform
         return _external;
     }
 
-    public function getAccelerometer () :Accelerometer
+    public function getMotion () :Motion
     {
-        if (_accelerometer == null) {
-            _accelerometer = new HtmlAccelerometer();
+        if (_motion == null) {
+            _motion = new HtmlMotion();
         }
-        return _accelerometer;
+        return _motion;
     }
 
     public function getRenderer () :Renderer
@@ -430,9 +429,9 @@ class HtmlPlatform
     private var _touch :Touch;
 
     // Lazily initialized subsystems
-    private var _accelerometer :Accelerometer;
     private var _external :External;
     private var _keyboard :BasicKeyboard;
+    private var _motion :Motion;
     private var _storage :Storage;
     private var _web :Web;
 

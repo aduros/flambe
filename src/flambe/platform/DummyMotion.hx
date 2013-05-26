@@ -4,13 +4,13 @@
 
 package flambe.platform;
 
-import flambe.input.Accelerometer;
 import flambe.input.Acceleration;
 import flambe.input.Attitude;
+import flambe.input.Motion;
 import flambe.util.Signal1;
 
-class DummyAccelerometer
-    implements Accelerometer
+class DummyMotion
+    implements Motion
 {
     public var accelerationSupported (get_accelerationSupported, null) :Bool;
     public var acceleration (default, null) :Signal1<Acceleration>;

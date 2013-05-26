@@ -14,7 +14,7 @@ import flambe.input.Keyboard;
 import flambe.input.Mouse;
 import flambe.input.Pointer;
 import flambe.input.Touch;
-import flambe.input.Accelerometer;
+import flambe.input.Motion;
 import flambe.storage.Storage;
 import flambe.util.Logger;
 import flambe.util.Promise;
@@ -33,7 +33,7 @@ interface Platform
     function getWeb () :Web;
     function getExternal () :External;
 
-    function getAccelerometer(): Accelerometer;
+    function getMotion(): Motion;
 
     function getRenderer () :Renderer;
 

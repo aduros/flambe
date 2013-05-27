@@ -26,6 +26,7 @@ import flambe.input.Keyboard;
 import flambe.input.Mouse;
 import flambe.input.Pointer;
 import flambe.input.Touch;
+import flambe.input.Motion;
 import flambe.platform.BasicPointer;
 import flambe.platform.MainLoop;
 import flambe.platform.Platform;
@@ -59,7 +60,6 @@ class FlashPlatform
 #else
         _touch = new DummyTouch();
 #end
-        _keyboard = FlashKeyboard.shouldUse() ? new FlashKeyboard(stage) : new DummyKeyboard();
 
         _renderer = new Stage3DRenderer();
         mainLoop = new MainLoop();
@@ -139,6 +139,10 @@ class FlashPlatform
 
     public function getKeyboard () :Keyboard
     {
+        if (_keyboard == null) {
+            _keyboard = FlashKeyboard.shouldUse() ?
+                new FlashKeyboard(_stage.nativeStage) : new DummyKeyboard();
+        }
         return _keyboard;
     }
 
@@ -165,6 +169,14 @@ class FlashPlatform
             _external = FlashExternal.shouldUse() ? new FlashExternal() : new DummyExternal();
         }
         return _external;
+    }
+
+    public function getMotion () :Motion
+    {
+        if (_motion == null) {
+            _motion = new DummyMotion();
+        }
+        return _motion;
     }
 
     public function getRenderer () :Renderer
@@ -197,6 +209,9 @@ class FlashPlatform
         var dt = (now-_lastUpdate) / 1000;
         _lastUpdate = now;
 
+        if (System.hidden._) {
+            return; // Prevent updates while hidden
+        }
         if (_skipFrame) {
             _skipFrame = false;
             return;
@@ -223,15 +238,19 @@ class FlashPlatform
     }
 #end
 
-    private var _stage :FlashStage;
-    private var _pointer :BasicPointer;
+    // Statically initialized subsystems
     private var _mouse :Mouse;
+    private var _pointer :BasicPointer;
+    private var _renderer :Renderer;
+    private var _stage :FlashStage;
     private var _touch :Touch;
+
+    // Lazily initialized subsystems
+    private var _external :External;
     private var _keyboard :Keyboard;
+    private var _motion :Motion;
     private var _storage :Storage;
     private var _web :Web;
-    private var _external :External;
-    private var _renderer :Renderer;
 
     private var _lastUpdate :Int;
     private var _skipFrame :Bool;

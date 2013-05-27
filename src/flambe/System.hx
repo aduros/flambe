@@ -14,6 +14,7 @@ import flambe.input.Keyboard;
 import flambe.input.Mouse;
 import flambe.input.Pointer;
 import flambe.input.Touch;
+import flambe.input.Motion;
 import flambe.platform.Platform;
 import flambe.storage.Storage;
 import flambe.util.Assert;
@@ -73,7 +74,12 @@ class System
      */
     public static var external (get, null) :External;
 
-    // TODO(bruno): Subsystems for accelerometer, gamepads, haptic, geolocation, video, textInput
+    /**
+     * The Motion subsystem, for events from the device's motion sensors.
+     */
+    public static var motion (get_motion, null) :Motion;
+
+    // TODO(bruno): Subsystems for gamepads, haptic, geolocation, video, textInput
 
     /**
      * Gets the RFC 4646 language tag of the environment. For example, "en-US", "pt", or null if the
@@ -220,6 +226,12 @@ class System
     {
         #if debug assertCalledInit(); #end
         return _platform.getLocale();
+    }
+
+    inline static function get_motion () :Motion
+    {
+        #if debug assertCalledInit(); #end
+        return _platform.getMotion();
     }
 
     private static function assertCalledInit ()

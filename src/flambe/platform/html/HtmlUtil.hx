@@ -11,7 +11,7 @@ import flambe.display.Orientation;
 
 class HtmlUtil
 {
-    public static var VENDOR_PREFIXES = [ "webkit", "moz", "ms", "o", "khtml" ];
+    public static var VENDOR_PREFIXES = ["webkit", "moz", "ms", "o", "khtml"];
 
     /**
      * Whether the annoying scrolling address bar in some iOS and Android browsers may be hidden.
@@ -41,7 +41,7 @@ class HtmlUtil
         // Try to load it as is
         var extension = Reflect.field(obj, name);
         if (extension != null) {
-            return {prefix: null, field: name, value: extension};
+            return {prefix: "", field: name, value: extension};
         }
 
         // Look through common vendor prefixes

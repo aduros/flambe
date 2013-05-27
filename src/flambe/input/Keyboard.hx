@@ -13,7 +13,7 @@ import flambe.util.Signal1;
 interface Keyboard
 {
     /**
-     * True if the environment has a physical keyboard. Phones and tablets will generally return
+     * Whether the environment has a physical keyboard. Phones and tablets will generally return
      * false here.
      */
     var supported (get, null) :Bool;

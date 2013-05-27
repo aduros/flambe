@@ -45,8 +45,7 @@ class MouseEvent
         return event;
     }
 
-    @:allow(flambe) function init (
-        id :Int, viewX :Float, viewY :Float, button :MouseButton)
+    @:allow(flambe) function init (id :Int, viewX :Float, viewY :Float, button :MouseButton)
     {
         this.id = id;
         this.viewX = viewX;

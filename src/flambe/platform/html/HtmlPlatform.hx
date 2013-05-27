@@ -7,7 +7,6 @@ package flambe.platform.html;
 import js.Browser;
 import js.html.*;
 
-import flambe.animation.AnimatedFloat;
 import flambe.Entity;
 import flambe.System;
 import flambe.asset.AssetPack;
@@ -16,6 +15,7 @@ import flambe.display.Stage;
 import flambe.display.Texture;
 import flambe.external.External;
 import flambe.input.Keyboard;
+import flambe.input.Motion;
 import flambe.input.Mouse;
 import flambe.input.Pointer;
 import flambe.input.Touch;
@@ -67,12 +67,12 @@ class HtmlPlatform
         _stage = new HtmlStage(canvas);
         _pointer = new BasicPointer();
         _mouse = new HtmlMouse(_pointer, canvas);
-        _keyboard = new BasicKeyboard();
 
         _renderer = createRenderer(canvas);
 
         mainLoop = new MainLoop();
 
+        _canvas = canvas;
         _container = canvas.parentElement;
         _container.style.overflow = "hidden";
         _container.style.position = "relative";
@@ -190,21 +190,6 @@ class HtmlPlatform
             _touch = new DummyTouch();
         }
 
-        // canvas.onkeydown = function (event :KeyboardEvent) {};
-
-        var onKey = function (event :KeyboardEvent) {
-            switch (event.type) {
-            case "keydown":
-                if (_keyboard.submitDown(event.keyCode)) {
-                    event.preventDefault();
-                }
-            case "keyup":
-                _keyboard.submitUp(event.keyCode);
-            }
-        };
-        canvas.addEventListener("keydown", onKey, false);
-        canvas.addEventListener("keyup", onKey, false);
-
         // Handle uncaught errors
         var oldErrorHandler = (untyped Browser.window).onerror;
         (untyped Browser.window).onerror = function (message :String, url :String, line :Int) {
@@ -222,15 +207,26 @@ class HtmlPlatform
             onVisibilityChanged(null); // Update now
             Browser.document.addEventListener(hiddenApi.prefix + "visibilitychange",
                 onVisibilityChanged, false);
-            System.hidden.changed.connect(function (hidden,_) {
-                if (!hidden) {
-                    _skipFrame = true;
-                }
-            });
+        } else {
+            // Adds some lock screen support for iOS, possibly other devices that don't support the
+            // page visibility api.
+            var onPageTransitionChange = function (event) {
+                System.hidden._ = (event.type == "pagehide");
+            };
+            (untyped Lib.window).addEventListener("pageshow", onPageTransitionChange, false);
+            (untyped Lib.window).addEventListener("pagehide", onPageTransitionChange, false);
         }
 
-        _lastUpdate = HtmlUtil.now();
+        // Skip the next frame when coming back from being hidden
+        System.hidden.changed.connect(function (hidden,_) {
+            trace("Hidden changed: " + hidden);
+            if (!hidden) {
+                _skipFrame = true;
+            }
+        });
         _skipFrame = false;
+
+        _lastUpdate = HtmlUtil.now();
 
         // Use requestAnimationFrame if available, otherwise a 60 FPS setInterval
         // https://developer.mozilla.org/en/DOM/window.mozRequestAnimationFrame
@@ -321,6 +317,9 @@ class HtmlPlatform
         var dt = (now-_lastUpdate) / 1000;
         _lastUpdate = now;
 
+        if (System.hidden._) {
+            return; // Prevent updates while hidden
+        }
         if (_skipFrame) {
             _skipFrame = false;
             return;
@@ -347,6 +346,21 @@ class HtmlPlatform
 
     public function getKeyboard () :Keyboard
     {
+        if (_keyboard == null) {
+            _keyboard = new BasicKeyboard();
+            var onKey = function (event :KeyboardEvent) {
+                switch (event.type) {
+                case "keydown":
+                    if (_keyboard.submitDown(event.keyCode)) {
+                        event.preventDefault();
+                    }
+                case "keyup":
+                    _keyboard.submitUp(event.keyCode);
+                }
+            };
+            _canvas.addEventListener("keydown", onKey, false);
+            _canvas.addEventListener("keyup", onKey, false);
+        }
         return _keyboard;
     }
 
@@ -364,6 +378,14 @@ class HtmlPlatform
             _external = new HtmlExternal();
         }
         return _external;
+    }
+
+    public function getMotion () :Motion
+    {
+        if (_motion == null) {
+            _motion = new HtmlMotion();
+        }
+        return _motion;
     }
 
     public function getRenderer () :Renderer
@@ -393,16 +415,21 @@ class HtmlPlatform
         return new CanvasRenderer(canvas);
     }
 
-    private var _stage :HtmlStage;
-    private var _pointer :BasicPointer;
+    // Statically initialized subsystems
     private var _mouse :HtmlMouse;
+    private var _pointer :BasicPointer;
+    private var _renderer :Renderer;
+    private var _stage :HtmlStage;
     private var _touch :Touch;
+
+    // Lazily initialized subsystems
+    private var _external :External;
     private var _keyboard :BasicKeyboard;
+    private var _motion :Motion;
     private var _storage :Storage;
     private var _web :Web;
-    private var _external :External;
-    private var _renderer :Renderer;
 
+    private var _canvas :CanvasElement;
     private var _container :Element;
 
     private var _lastUpdate :Float;

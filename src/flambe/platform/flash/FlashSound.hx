@@ -13,6 +13,7 @@ import flambe.math.FMath;
 import flambe.platform.Tickable;
 import flambe.sound.Playback;
 import flambe.sound.Sound;
+import flambe.util.Disposable;
 
 class FlashSound
     implements Sound
@@ -112,6 +113,10 @@ private class FlashPlayback
         if (ended || paused) {
             // Allow ended or paused sounds to be garbage collected
             _tickableAdded = false;
+
+            // Release System references
+            _hideBinding.dispose();
+
             return true;
         }
         return false;
@@ -138,6 +143,16 @@ private class FlashPlayback
         if (!_tickableAdded) {
             FlashPlatform.instance.mainLoop.addTickable(this);
             _tickableAdded = true;
+
+            // Claim System references
+            _hideBinding = System.hidden.changed.connect(function(hidden,_) {
+                if (hidden) {
+                    _wasPaused = get_paused();
+                    this.paused = true;
+                } else {
+                    this.paused = _wasPaused;
+                }
+            });
         }
     }
 
@@ -146,6 +161,8 @@ private class FlashPlayback
     private var _loops :Int;
 
     private var _pausePosition :Float;
+    private var _wasPaused :Bool;
     private var _ended :Bool;
     private var _tickableAdded :Bool;
+    private var _hideBinding :Disposable;
 }

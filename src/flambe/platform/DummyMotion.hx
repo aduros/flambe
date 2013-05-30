@@ -14,6 +14,7 @@ class DummyMotion
 {
     public var accelerationSupported (get_accelerationSupported, null) :Bool;
     public var acceleration (default, null) :Signal1<Acceleration>;
+    public var accelerationIncludingGravity (default, null) :Signal1<Acceleration>;
 
     public var attitudeSupported (get_attitudeSupported, null) :Bool;
     public var attitude (default, null) :Signal1<Attitude>;
@@ -21,6 +22,7 @@ class DummyMotion
     public function new ()
     {
         acceleration = new Signal1();
+        accelerationIncludingGravity = new Signal1();
         attitude = new Signal1();
     }
 

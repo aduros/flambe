@@ -20,23 +20,15 @@ class Acceleration
     /** The acceleration on the Z-axis, in m/s^2. */
     public var z (default, null) :Float;
 
-    /**
-     * Whether this acceleration vector includes the pull of gravity. Gravity is normally excluded,
-     * but some devices may be forced to include it due to lack of gyroscope.
-     */
-    public var includesGravity (default, null) :Bool;
-
     /** @private */ public function new ()
     {
-        _internal_init(0, 0, 0, false);
+        _internal_init(0, 0, 0);
     }
 
-    /** @private */ public function _internal_init (
-        x :Float, y :Float, z :Float, includesGravity :Bool)
+    /** @private */ public function _internal_init (x :Float, y :Float, z :Float)
     {
         this.x = x;
         this.y = y;
         this.z = z;
-        this.includesGravity = includesGravity;
     }
 }

@@ -16,42 +16,57 @@ class HtmlMotion
 {
     public var accelerationSupported (get_accelerationSupported, null) :Bool;
     public var acceleration (default, null) :Signal1<Acceleration>;
+    public var accelerationIncludingGravity (default, null) :Signal1<Acceleration>;
 
     public var attitudeSupported (get_attitudeSupported, null) :Bool;
     public var attitude (default, null) :Signal1<Attitude>;
 
     public function new ()
     {
-        var accelerationHeavy = new HeavySignal1();
-        this.acceleration = accelerationHeavy;
+        var acceleration = new HeavySignal1();
+        this.acceleration = acceleration;
+
+        var accelerationIncludingGravity = new HeavySignal1();
+        this.accelerationIncludingGravity = accelerationIncludingGravity;
+
+        var attitude = new HeavySignal1();
+        this.attitude = attitude;
+
         if (accelerationSupported) {
             _sharedAcceleration = new Acceleration();
+            _sharedAccelerationIncludingGravity = new Acceleration();
 
-            var events :EventGroup = null;
-            accelerationHeavy.hasListenersValue.changed.connect(function (hasListeners,_) {
-                if (hasListeners) {
-                    events = new EventGroup();
-                    events.addListener(Lib.window, "devicemotion", onDeviceMotion);
+            var motionEvents :EventGroup = null;
+            var onListenersChanged = function (_,_) {
+                if (acceleration.hasListeners() || accelerationIncludingGravity.hasListeners()) {
+                    if (motionEvents == null) {
+                        // Connected the first listener, add the native event listener
+                        motionEvents = new EventGroup();
+                        motionEvents.addListener(Lib.window, "devicemotion", onDeviceMotion);
+                    }
                 } else {
-                    events.dispose();
-                    events = null;
+                    if (motionEvents != null) {
+                        // Disconnected the last listener, remove the native event listener
+                        motionEvents.dispose();
+                        motionEvents = null;
+                    }
                 }
-            });
+            };
+            acceleration.hasListenersValue.changed.connect(onListenersChanged);
+            accelerationIncludingGravity.hasListenersValue.changed.connect(onListenersChanged);
         }
 
-        var attitudeHeavy = new HeavySignal1();
-        this.attitude = attitudeHeavy;
         if (attitudeSupported) {
             _sharedAttitude = new Attitude();
 
-            var events :EventGroup = null;
-            attitudeHeavy.hasListenersValue.changed.connect(function (hasListeners,_) {
+            var orientationEvents :EventGroup = null;
+            attitude.hasListenersValue.changed.connect(function (hasListeners,_) {
                 if (hasListeners) {
-                    events = new EventGroup();
-                    events.addListener(Lib.window, "deviceorientation", onDeviceOrientation);
+                    orientationEvents = new EventGroup();
+                    orientationEvents.addListener(Lib.window, "deviceorientation", onDeviceOrientation);
                 } else {
-                    events.dispose();
-                    events = null;
+                    orientationEvents.dispose();
+                    orientationEvents = null;
                 }
             });
         }
@@ -65,27 +80,16 @@ class HtmlMotion
     // http://dev.w3.org/geo/api/spec-source-orientation.html#devicemotion
     private function onDeviceMotion (event :Dynamic)
     {
-        var acc :Dynamic = event.acceleration;
-        var includesGravity = false;
-
-        // Fall back to accelerationIncludingGravity if acceleration isn't available
-        if (acc == null) {
-            acc = event.accelerationIncludingGravity;
-            includesGravity = true;
+        if (event.acceleration != null) {
+            initAcceleration(_sharedAcceleration, event.acceleration);
+            acceleration.emit(_sharedAcceleration);
         }
 
-        switch ((untyped Lib.window).orientation) {
-        case -90:
-            _sharedAcceleration._internal_init( acc.y, -acc.x, acc.z, includesGravity);
-        case 0:
-            _sharedAcceleration._internal_init( acc.x,  acc.y, acc.z, includesGravity);
-        case 90:
-            _sharedAcceleration._internal_init(-acc.y,  acc.x, acc.z, includesGravity);
-        case 180:
-            _sharedAcceleration._internal_init(-acc.x, -acc.y, acc.z, includesGravity);
+        if (event.accelerationIncludingGravity != null) {
+            initAcceleration(_sharedAccelerationIncludingGravity,
+                event.accelerationIncludingGravity);
+            accelerationIncludingGravity.emit(_sharedAccelerationIncludingGravity);
         }
-
-        acceleration.emit(_sharedAcceleration);
     }
 
     private function get_attitudeSupported () :Bool
@@ -110,6 +114,21 @@ class HtmlMotion
         attitude.emit(_sharedAttitude);
     }
 
+    private static function initAcceleration (acceleration :Acceleration, input :Dynamic)
+    {
+        switch ((untyped Lib.window).orientation) {
+        case -90:
+            acceleration._internal_init( input.y, -input.x, input.z);
+        case 0:
+            acceleration._internal_init( input.x,  input.y, input.z);
+        case 90:
+            acceleration._internal_init(-input.y,  input.x, input.z);
+        case 180:
+            acceleration._internal_init(-input.x, -input.y, input.z);
+        }
+    }
+
     private var _sharedAcceleration :Acceleration;
+    private var _sharedAccelerationIncludingGravity :Acceleration;
     private var _sharedAttitude :Attitude;
 }

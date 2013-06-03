@@ -17,7 +17,7 @@ interface Motion
      * Whether device acceleration events are supported. If true, the acceleration and/or
      * accelerationIncludingGravity signals will be emitted.
      */
-    public var accelerationSupported (get_accelerationSupported, null) :Bool;
+    public var accelerationSupported (get, null) :Bool;
 
     /**
      * Periodically emits the device's current linear acceleration, excluding the pull of gravity.
@@ -31,7 +31,7 @@ interface Motion
     public var accelerationIncludingGravity (default, null) :Signal1<Acceleration>;
 
     /** Whether device orientation (attitude) events are supported. */
-    public var attitudeSupported (get_attitudeSupported, null) :Bool;
+    public var attitudeSupported (get, null) :Bool;
 
     /** Periodically emits the device's current attitude. */
     public var attitude (default, null) :Signal1<Attitude>;

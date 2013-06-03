@@ -77,7 +77,7 @@ class System
     /**
      * The Motion subsystem, for events from the device's motion sensors.
      */
-    public static var motion (get_motion, null) :Motion;
+    public static var motion (get, null) :Motion;
 
     // TODO(bruno): Subsystems for gamepads, haptic, geolocation, video, textInput
 

@@ -13,11 +13,22 @@ import flambe.util.Signal1;
  */
 interface Motion
 {
-    /** Whether device acceleration events are supported. */
+    /**
+     * Whether device acceleration events are supported. If true, the acceleration and/or
+     * accelerationIncludingGravity signals will be emitted.
+     */
     public var accelerationSupported (get_accelerationSupported, null) :Bool;
 
-    /** Periodically emits the device's current linear acceleration. */
+    /**
+     * Periodically emits the device's current linear acceleration, excluding the pull of gravity.
+     * This will only be emitted if the device has a gyroscope.
+     */
     public var acceleration (default, null) :Signal1<Acceleration>;
+
+    /**
+     * Periodically emits the devices's current linear acceleration, including the pull of gravity.
+     */
+    public var accelerationIncludingGravity (default, null) :Signal1<Acceleration>;
 
     /** Whether device orientation (attitude) events are supported. */
     public var attitudeSupported (get_attitudeSupported, null) :Bool;

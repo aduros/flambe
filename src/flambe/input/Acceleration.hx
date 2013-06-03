@@ -22,10 +22,10 @@ class Acceleration
 
     @:allow(flambe) function new ()
     {
-        _internal_init(0, 0, 0);
+        init(0, 0, 0);
     }
 
-    @:allow(flambe) function _internal_init (x :Float, y :Float, z :Float)
+    @:allow(flambe) function init (x :Float, y :Float, z :Float)
     {
         this.x = x;
         this.y = y;

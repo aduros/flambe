@@ -119,13 +119,13 @@ class HtmlMotion
     {
         switch ((untyped Browser.window).orientation) {
         case -90:
-            acceleration._internal_init( input.y, -input.x, input.z);
+            acceleration.init( input.y, -input.x, input.z);
         case 0:
-            acceleration._internal_init( input.x,  input.y, input.z);
+            acceleration.init( input.x,  input.y, input.z);
         case 90:
-            acceleration._internal_init(-input.y,  input.x, input.z);
+            acceleration.init(-input.y,  input.x, input.z);
         case 180:
-            acceleration._internal_init(-input.x, -input.y, input.z);
+            acceleration.init(-input.x, -input.y, input.z);
         }
     }
 

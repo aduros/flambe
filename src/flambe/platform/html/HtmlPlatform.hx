@@ -213,8 +213,8 @@ class HtmlPlatform
             var onPageTransitionChange = function (event) {
                 System.hidden._ = (event.type == "pagehide");
             };
-            (untyped Lib.window).addEventListener("pageshow", onPageTransitionChange, false);
-            (untyped Lib.window).addEventListener("pagehide", onPageTransitionChange, false);
+            Browser.window.addEventListener("pageshow", onPageTransitionChange, false);
+            Browser.window.addEventListener("pagehide", onPageTransitionChange, false);
         }
 
         // Skip the next frame when coming back from being hidden

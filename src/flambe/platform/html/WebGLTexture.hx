@@ -61,9 +61,7 @@ class WebGLTexture
 
         _renderer.batcher.bindTexture(nativeTexture);
         var gl = _renderer.gl;
-        gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
         gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, image);
-        gl.generateMipmap(GL.TEXTURE_2D);
     }
 
     public function clear ()

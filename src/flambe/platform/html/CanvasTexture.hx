@@ -91,7 +91,8 @@ class CanvasTexture
         if (!Std.is(image, CanvasElement)) {
             image = HtmlUtil.createCanvas(image);
         }
-        return image.getContext2d();
+        var canvas :CanvasElement = cast image;
+        return canvas.getContext2d();
     }
 
     private var _graphics :CanvasGraphics = null;

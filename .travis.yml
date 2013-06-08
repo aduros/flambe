@@ -19,7 +19,7 @@ before_script:
     - sudo apt-get install haxe -y
     - mkdir -p ~/.haxe/lib
     - haxelib setup ~/.haxe/lib
-    - until haxelib git hxsl git://github.com/ncannasse/hxsl.git; do sleep 1; done
+    - until haxelib install hxsl; do sleep 1; done
     - until haxelib install nape; do sleep 1; done
 
 script: bin/run-travis

@@ -1,6 +1,6 @@
 {
   "name": "flambe",
-  "license": "BSD",
+  "license": "MIT",
   "tags": ["android","cross","flash","game","html5","ios","javascript","js","nodejs"],
   "description": "Flambe is a fast, expressive, and cross-platform engine for HTML5 and Flash games.",
   "contributors": ["Aduros"],

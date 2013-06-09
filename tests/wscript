@@ -15,7 +15,7 @@ def configure(ctx):
 def build(ctx):
     ctx(features="haxe",
         classpath = [ ctx.path.find_dir("src"), ctx.path.find_dir("../src") ],
-        target="runner.js",
-        flags="-main TestMain -D server -debug")
+        target="runner.js", libs="flambe-server",
+        flags="-main TestMain -debug")
 
     ctx(rule="${NODE} ${SRC}", source="runner.js", always=True)

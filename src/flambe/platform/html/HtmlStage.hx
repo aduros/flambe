@@ -8,12 +8,12 @@ import js.Browser;
 import js.html.*;
 
 import flambe.display.Orientation;
-import flambe.display.Stage;
+import flambe.subsystem.StageSystem;
 import flambe.util.Signal0;
 import flambe.util.Value;
 
 class HtmlStage
-    implements Stage
+    implements StageSystem
 {
     public var width (get, null) :Int;
     public var height (get, null) :Int;

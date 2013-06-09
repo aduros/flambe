@@ -7,10 +7,10 @@ package flambe.platform.html;
 import haxe.Serializer;
 import haxe.Unserializer;
 
-import flambe.storage.Storage;
+import flambe.subsystem.StorageSystem;
 
 class HtmlStorage
-    implements Storage
+    implements StorageSystem
 {
     public var supported (get, null) :Bool;
 

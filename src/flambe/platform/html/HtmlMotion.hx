@@ -9,11 +9,11 @@ import js.html.*;
 
 import flambe.input.Acceleration;
 import flambe.input.Attitude;
-import flambe.input.Motion;
+import flambe.subsystem.MotionSystem;
 import flambe.util.Signal1;
 
 class HtmlMotion
-    implements Motion
+    implements MotionSystem
 {
     public var accelerationSupported (get, null) :Bool;
     public var acceleration (default, null) :Signal1<Acceleration>;

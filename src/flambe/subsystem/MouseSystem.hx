@@ -2,14 +2,17 @@
 // Flambe - Rapid game development
 // https://github.com/aduros/flambe/blob/master/LICENSE.txt
 
-package flambe.input;
+package flambe.subsystem;
 
+import flambe.input.MouseButton;
+import flambe.input.MouseCursor;
+import flambe.input.MouseEvent;
 import flambe.util.Signal1;
 
 /**
  * Functions related to the environment's mouse.
  */
-interface Mouse
+interface MouseSystem
 {
     /**
      * True if the environment has a mouse.

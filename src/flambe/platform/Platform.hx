@@ -7,33 +7,32 @@ package flambe.platform;
 import flambe.Entity;
 import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
-import flambe.display.Stage;
+import flambe.subsystem.StageSystem;
 import flambe.display.Texture;
-import flambe.external.External;
-import flambe.input.Keyboard;
-import flambe.input.Mouse;
-import flambe.input.Pointer;
-import flambe.input.Touch;
-import flambe.input.Motion;
-import flambe.storage.Storage;
+import flambe.subsystem.ExternalSystem;
+import flambe.subsystem.KeyboardSystem;
+import flambe.subsystem.MouseSystem;
+import flambe.subsystem.PointerSystem;
+import flambe.subsystem.TouchSystem;
+import flambe.subsystem.MotionSystem;
+import flambe.subsystem.StorageSystem;
 import flambe.util.Logger;
 import flambe.util.Promise;
-import flambe.web.Web;
+import flambe.subsystem.WebSystem;
 
 interface Platform
 {
     function init () :Void;
 
-    function getKeyboard () :Keyboard;
-    function getMouse () :Mouse;
-    function getPointer () :Pointer;
-    function getStage () :Stage;
-    function getStorage () :Storage;
-    function getTouch () :Touch;
-    function getWeb () :Web;
-    function getExternal () :External;
-
-    function getMotion(): Motion;
+    function getExternal () :ExternalSystem;
+    function getKeyboard () :KeyboardSystem;
+    function getMotion() :MotionSystem;
+    function getMouse () :MouseSystem;
+    function getPointer () :PointerSystem;
+    function getStage () :StageSystem;
+    function getStorage () :StorageSystem;
+    function getTouch () :TouchSystem;
+    function getWeb () :WebSystem;
 
     function getRenderer () :Renderer;
 

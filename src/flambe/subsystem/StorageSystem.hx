@@ -2,12 +2,12 @@
 // Flambe - Rapid game development
 // https://github.com/aduros/flambe/blob/master/LICENSE.txt
 
-package flambe.storage;
+package flambe.subsystem;
 
 /**
  * A simple key/value store that persists between sessions.
  */
-interface Storage
+interface StorageSystem
 {
     /**
      * True if the environment supports persisted storage. Otherwise, the storage is backed by a

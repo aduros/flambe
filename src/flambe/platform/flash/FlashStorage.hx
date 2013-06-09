@@ -9,10 +9,10 @@ import flash.net.SharedObject;
 import haxe.Serializer;
 import haxe.Unserializer;
 
-import flambe.storage.Storage;
+import flambe.subsystem.StorageSystem;
 
 class FlashStorage
-    implements Storage
+    implements StorageSystem
 {
     public var supported (get, null) :Bool;
 

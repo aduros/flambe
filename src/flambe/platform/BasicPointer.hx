@@ -6,7 +6,7 @@ package flambe.platform;
 
 import flambe.Entity;
 import flambe.display.Sprite;
-import flambe.input.Pointer;
+import flambe.subsystem.PointerSystem;
 import flambe.input.PointerEvent;
 import flambe.math.Point;
 import flambe.scene.Director;
@@ -15,7 +15,7 @@ import flambe.util.Signal1;
 using Lambda;
 
 class BasicPointer
-    implements Pointer
+    implements PointerSystem
 {
     public var supported (get, null) :Bool;
 

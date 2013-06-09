@@ -6,10 +6,10 @@ package flambe.platform.html;
 
 import js.Browser;
 
-import flambe.external.External;
+import flambe.subsystem.ExternalSystem;
 
 class HtmlExternal
-    implements External
+    implements ExternalSystem
 {
     public var supported (get, null) :Bool;
 

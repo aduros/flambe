@@ -4,12 +4,12 @@
 
 package flambe.platform;
 
-import flambe.input.Touch;
+import flambe.subsystem.TouchSystem;
 import flambe.input.TouchPoint;
 import flambe.util.Signal1;
 
 class BasicTouch
-    implements Touch
+    implements TouchSystem
 {
     public var supported (get, null) :Bool;
     public var maxPoints (get, null) :Int;

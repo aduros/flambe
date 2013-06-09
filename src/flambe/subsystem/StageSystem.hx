@@ -2,15 +2,16 @@
 // Flambe - Rapid game development
 // https://github.com/aduros/flambe/blob/master/LICENSE.txt
 
-package flambe.display;
+package flambe.subsystem;
 
+import flambe.display.Orientation;
 import flambe.util.Signal0;
 import flambe.util.Value;
 
 /**
  * Functions related to the environment's display viewport.
  */
-interface Stage
+interface StageSystem
 {
     /**
      * The width of the stage viewport, in pixels.

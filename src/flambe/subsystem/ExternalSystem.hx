@@ -2,7 +2,7 @@
 // Flambe - Rapid game development
 // https://github.com/aduros/flambe/blob/master/LICENSE.txt
 
-package flambe.external;
+package flambe.subsystem;
 
 import flambe.util.Disposable;
 
@@ -10,7 +10,7 @@ import flambe.util.Disposable;
  * Functions for interacting with external code. When running in a web browser, this means
  * Javascript running on the page.
  */
-interface External
+interface ExternalSystem
 {
     /**
      * Whether the environment supports interaction with external code.

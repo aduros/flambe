@@ -2,12 +2,14 @@
 // Flambe - Rapid game development
 // https://github.com/aduros/flambe/blob/master/LICENSE.txt
 
-package flambe.web;
+package flambe.subsystem;
+
+import flambe.web.WebView;
 
 /**
  * Functions related to the environment's web browser.
  */
-interface Web
+interface WebSystem
 {
     /**
      * True if the environment supports WebViews. Note that this will always be false on the browser

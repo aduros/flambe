@@ -2,8 +2,10 @@
 // Flambe - Rapid game development
 // https://github.com/aduros/flambe/blob/master/LICENSE.txt
 
-package flambe.input;
+package flambe.subsystem;
 
+import flambe.input.Acceleration;
+import flambe.input.Attitude;
 import flambe.util.Signal1;
 
 /**
@@ -11,7 +13,7 @@ import flambe.util.Signal1;
  *
  * <p>NOTE: Not yet supported in Flash/AIR.</p>
  */
-interface Motion
+interface MotionSystem
 {
     /**
      * Whether device acceleration events are supported. If true, the acceleration and/or

@@ -5,11 +5,11 @@
 package flambe.platform;
 
 import flambe.util.Assert;
-import flambe.web.Web;
+import flambe.subsystem.WebSystem;
 import flambe.web.WebView;
 
 class DummyWeb
-    implements Web
+    implements WebSystem
 {
     public var supported (get, null) :Bool;
 

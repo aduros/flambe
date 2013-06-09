@@ -5,7 +5,7 @@
 package flambe.platform;
 
 import flambe.input.Key;
-import flambe.input.Keyboard;
+import flambe.subsystem.KeyboardSystem;
 import flambe.input.KeyboardEvent;
 import flambe.util.Signal0;
 import flambe.util.Signal1;
@@ -13,7 +13,7 @@ import flambe.util.Signal1;
 using flambe.platform.KeyCodes;
 
 class DummyKeyboard
-    implements Keyboard
+    implements KeyboardSystem
 {
     public var supported (get, null) :Bool;
 

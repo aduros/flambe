@@ -2,14 +2,15 @@
 // Flambe - Rapid game development
 // https://github.com/aduros/flambe/blob/master/LICENSE.txt
 
-package flambe.input;
+package flambe.subsystem;
 
+import flambe.input.TouchPoint;
 import flambe.util.Signal1;
 
 /**
  * Functions related to the environment's touch screen.
  */
-interface Touch
+interface TouchSystem
 {
     /**
      * True if the environment has a touch screen.

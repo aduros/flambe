@@ -7,22 +7,22 @@ package flambe;
 import flambe.animation.AnimatedFloat;
 import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
-import flambe.display.Stage;
+import flambe.subsystem.StageSystem;
 import flambe.display.Texture;
-import flambe.external.External;
-import flambe.input.Keyboard;
-import flambe.input.Mouse;
-import flambe.input.Pointer;
-import flambe.input.Touch;
-import flambe.input.Motion;
+import flambe.subsystem.ExternalSystem;
+import flambe.subsystem.KeyboardSystem;
+import flambe.subsystem.MouseSystem;
+import flambe.subsystem.PointerSystem;
+import flambe.subsystem.TouchSystem;
+import flambe.subsystem.MotionSystem;
 import flambe.platform.Platform;
-import flambe.storage.Storage;
+import flambe.subsystem.StorageSystem;
 import flambe.util.Assert;
 import flambe.util.Logger;
 import flambe.util.Promise;
 import flambe.util.Signal1;
 import flambe.util.Value;
-import flambe.web.Web;
+import flambe.subsystem.WebSystem;
 
 /**
  * Provides access to all the different subsystems implemented on each platform.
@@ -37,47 +37,47 @@ class System
     /**
      * The Stage subsystem, for controlling the display viewport.
      */
-    public static var stage (get, null) :Stage;
+    public static var stage (get, null) :StageSystem;
 
     /**
      * The Storage subsystem, for persisting values.
      */
-    public static var storage (get, null) :Storage;
+    public static var storage (get, null) :StorageSystem;
 
     /**
      * The Pointer subsystem, for unified mouse/touch events.
      */
-    public static var pointer (get, null) :Pointer;
+    public static var pointer (get, null) :PointerSystem;
 
     /**
      * The Mouse subsystem, for direct access to the mouse.
      */
-    public static var mouse (get, null) :Mouse;
+    public static var mouse (get, null) :MouseSystem;
 
     /**
      * The Touch subsystem, for direct access to the multi-touch.
      */
-    public static var touch (get, null) :Touch;
+    public static var touch (get, null) :TouchSystem;
 
     /**
      * The Keyboard subsystem, for keyboard events.
      */
-    public static var keyboard (get, null) :Keyboard;
+    public static var keyboard (get, null) :KeyboardSystem;
 
     /**
      * The Web subsystem, for using the device's web browser.
      */
-    public static var web (get, null) :Web;
+    public static var web (get, null) :WebSystem;
 
     /**
      * The External subsystem, for interaction with external code.
      */
-    public static var external (get, null) :External;
+    public static var external (get, null) :ExternalSystem;
 
     /**
      * The Motion subsystem, for events from the device's motion sensors.
      */
-    public static var motion (get, null) :Motion;
+    public static var motion (get, null) :MotionSystem;
 
     // TODO(bruno): Subsystems for gamepads, haptic, geolocation, video, textInput
 
@@ -174,49 +174,49 @@ class System
         return _platform.getTime();
     }
 
-    inline private static function get_stage () :Stage
+    inline private static function get_stage () :StageSystem
     {
         #if debug assertCalledInit(); #end
         return _platform.getStage();
     }
 
-    inline private static function get_storage () :Storage
+    inline private static function get_storage () :StorageSystem
     {
         #if debug assertCalledInit(); #end
         return _platform.getStorage();
     }
 
-    inline private static function get_pointer () :Pointer
+    inline private static function get_pointer () :PointerSystem
     {
         #if debug assertCalledInit(); #end
         return _platform.getPointer();
     }
 
-    inline private static function get_mouse () :Mouse
+    inline private static function get_mouse () :MouseSystem
     {
         #if debug assertCalledInit(); #end
         return _platform.getMouse();
     }
 
-    inline private static function get_touch () :Touch
+    inline private static function get_touch () :TouchSystem
     {
         #if debug assertCalledInit(); #end
         return _platform.getTouch();
     }
 
-    inline private static function get_keyboard () :Keyboard
+    inline private static function get_keyboard () :KeyboardSystem
     {
         #if debug assertCalledInit(); #end
         return _platform.getKeyboard();
     }
 
-    inline private static function get_web () :Web
+    inline private static function get_web () :WebSystem
     {
         #if debug assertCalledInit(); #end
         return _platform.getWeb();
     }
 
-    inline private static function get_external () :External
+    inline private static function get_external () :ExternalSystem
     {
         #if debug assertCalledInit(); #end
         return _platform.getExternal();
@@ -228,7 +228,7 @@ class System
         return _platform.getLocale();
     }
 
-    inline static function get_motion () :Motion
+    inline static function get_motion () :MotionSystem
     {
         #if debug assertCalledInit(); #end
         return _platform.getMotion();

@@ -4,10 +4,10 @@
 
 package flambe.platform;
 
-import flambe.storage.Storage;
+import flambe.subsystem.StorageSystem;
 
 class DummyStorage
-    implements Storage
+    implements StorageSystem
 {
     public var supported (get, null) :Bool;
 

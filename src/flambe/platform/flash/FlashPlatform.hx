@@ -20,20 +20,20 @@ import flash.system.Capabilities;
 import flambe.Entity;
 import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
-import flambe.display.Stage;
-import flambe.external.External;
-import flambe.input.Keyboard;
-import flambe.input.Mouse;
-import flambe.input.Pointer;
-import flambe.input.Touch;
-import flambe.input.Motion;
+import flambe.subsystem.StageSystem;
+import flambe.subsystem.ExternalSystem;
+import flambe.subsystem.KeyboardSystem;
+import flambe.subsystem.MouseSystem;
+import flambe.subsystem.PointerSystem;
+import flambe.subsystem.TouchSystem;
+import flambe.subsystem.MotionSystem;
 import flambe.platform.BasicPointer;
 import flambe.platform.MainLoop;
 import flambe.platform.Platform;
-import flambe.storage.Storage;
+import flambe.subsystem.StorageSystem;
 import flambe.util.Logger;
 import flambe.util.Promise;
-import flambe.web.Web;
+import flambe.subsystem.WebSystem;
 
 class FlashPlatform
     implements Platform
@@ -103,12 +103,12 @@ class FlashPlatform
         return new FlashAssetPackLoader(this, manifest).promise;
     }
 
-    public function getStage () :Stage
+    public function getStage () :StageSystem
     {
         return _stage;
     }
 
-    public function getStorage () :Storage
+    public function getStorage () :StorageSystem
     {
         if (_storage == null) {
             try {
@@ -122,22 +122,22 @@ class FlashPlatform
         return _storage;
     }
 
-    public function getPointer () :Pointer
+    public function getPointer () :PointerSystem
     {
         return _pointer;
     }
 
-    public function getMouse () :Mouse
+    public function getMouse () :MouseSystem
     {
         return _mouse;
     }
 
-    public function getTouch () :Touch
+    public function getTouch () :TouchSystem
     {
         return _touch;
     }
 
-    public function getKeyboard () :Keyboard
+    public function getKeyboard () :KeyboardSystem
     {
         if (_keyboard == null) {
             _keyboard = FlashKeyboard.shouldUse() ?
@@ -146,7 +146,7 @@ class FlashPlatform
         return _keyboard;
     }
 
-    public function getWeb () :Web
+    public function getWeb () :WebSystem
     {
         if (_web == null) {
 #if flambe_air
@@ -163,7 +163,7 @@ class FlashPlatform
         return _web;
     }
 
-    public function getExternal () :External
+    public function getExternal () :ExternalSystem
     {
         if (_external == null) {
             _external = FlashExternal.shouldUse() ? new FlashExternal() : new DummyExternal();
@@ -171,7 +171,7 @@ class FlashPlatform
         return _external;
     }
 
-    public function getMotion () :Motion
+    public function getMotion () :MotionSystem
     {
         if (_motion == null) {
             _motion = new DummyMotion();
@@ -239,18 +239,18 @@ class FlashPlatform
 #end
 
     // Statically initialized subsystems
-    private var _mouse :Mouse;
+    private var _mouse :MouseSystem;
     private var _pointer :BasicPointer;
     private var _renderer :Renderer;
     private var _stage :FlashStage;
-    private var _touch :Touch;
+    private var _touch :TouchSystem;
 
     // Lazily initialized subsystems
-    private var _external :External;
-    private var _keyboard :Keyboard;
-    private var _motion :Motion;
-    private var _storage :Storage;
-    private var _web :Web;
+    private var _external :ExternalSystem;
+    private var _keyboard :KeyboardSystem;
+    private var _motion :MotionSystem;
+    private var _storage :StorageSystem;
+    private var _web :WebSystem;
 
     private var _lastUpdate :Int;
     private var _skipFrame :Bool;

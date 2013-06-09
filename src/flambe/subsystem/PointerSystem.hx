@@ -2,15 +2,16 @@
 // Flambe - Rapid game development
 // https://github.com/aduros/flambe/blob/master/LICENSE.txt
 
-package flambe.input;
+package flambe.subsystem;
 
+import flambe.input.PointerEvent;
 import flambe.util.Signal1;
 
 /**
  * Functions related to the environment's pointing device. On desktop computers, this is a mouse. On
  * touch screens, it's a finger.
  */
-interface Pointer
+interface PointerSystem
 {
     /**
      * True if the environment has a pointing device.

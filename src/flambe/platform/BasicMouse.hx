@@ -4,7 +4,7 @@
 
 package flambe.platform;
 
-import flambe.input.Mouse;
+import flambe.subsystem.MouseSystem;
 import flambe.input.MouseButton;
 import flambe.input.MouseCursor;
 import flambe.input.MouseEvent;
@@ -14,7 +14,7 @@ import flambe.util.Signal1;
 using flambe.platform.MouseCodes;
 
 class BasicMouse
-    implements Mouse
+    implements MouseSystem
 {
     public var supported (get, null) :Bool;
 

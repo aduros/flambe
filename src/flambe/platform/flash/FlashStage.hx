@@ -7,6 +7,7 @@ package flambe.platform.flash;
 #if flambe_air
 import flash.events.StageOrientationEvent;
 #end
+import flash.display.Stage;
 import flash.display.StageDisplayState;
 import flash.events.Event;
 import flash.events.FullScreenEvent;
@@ -15,12 +16,12 @@ import flash.media.Video;
 import flash.system.Capabilities;
 
 import flambe.display.Orientation;
-import flambe.display.Stage;
+import flambe.subsystem.StageSystem;
 import flambe.util.Signal0;
 import flambe.util.Value;
 
 class FlashStage
-    implements Stage
+    implements StageSystem
 {
     public var width (get, null) :Int;
     public var height (get, null) :Int;
@@ -30,9 +31,9 @@ class FlashStage
 
     public var resize (default, null) :Signal0;
 
-    public var nativeStage (default, null) :flash.display.Stage;
+    public var nativeStage (default, null) :Stage;
 
-    public function new (nativeStage :flash.display.Stage)
+    public function new (nativeStage :Stage)
     {
         this.nativeStage = nativeStage;
         resize = new Signal0();

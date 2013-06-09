@@ -13,7 +13,7 @@ import flash.media.StageWebView;
 import flambe.animation.AnimatedFloat;
 import flambe.util.Signal1;
 import flambe.util.Value;
-import flambe.web.Web;
+import flambe.subsystem.WebSystem;
 import flambe.web.WebView;
 
 class AirWeb extends FlashWeb

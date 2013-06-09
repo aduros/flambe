@@ -4,8 +4,8 @@
 
 package flambe.platform;
 
-import flambe.subsystem.TouchSystem;
 import flambe.input.TouchPoint;
+import flambe.subsystem.TouchSystem;
 import flambe.util.Signal1;
 
 class BasicTouch

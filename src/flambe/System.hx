@@ -7,22 +7,14 @@ package flambe;
 import flambe.animation.AnimatedFloat;
 import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
-import flambe.subsystem.StageSystem;
 import flambe.display.Texture;
-import flambe.subsystem.ExternalSystem;
-import flambe.subsystem.KeyboardSystem;
-import flambe.subsystem.MouseSystem;
-import flambe.subsystem.PointerSystem;
-import flambe.subsystem.TouchSystem;
-import flambe.subsystem.MotionSystem;
 import flambe.platform.Platform;
-import flambe.subsystem.StorageSystem;
+import flambe.subsystem.*;
 import flambe.util.Assert;
 import flambe.util.Logger;
 import flambe.util.Promise;
 import flambe.util.Signal1;
 import flambe.util.Value;
-import flambe.subsystem.WebSystem;
 
 /**
  * Provides access to all the different subsystems implemented on each platform.

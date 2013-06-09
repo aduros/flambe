@@ -11,9 +11,9 @@ import flash.geom.Rectangle;
 import flash.media.StageWebView;
 
 import flambe.animation.AnimatedFloat;
+import flambe.subsystem.WebSystem;
 import flambe.util.Signal1;
 import flambe.util.Value;
-import flambe.subsystem.WebSystem;
 import flambe.web.WebView;
 
 class AirWeb extends FlashWeb

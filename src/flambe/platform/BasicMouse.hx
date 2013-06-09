@@ -4,11 +4,11 @@
 
 package flambe.platform;
 
-import flambe.subsystem.MouseSystem;
 import flambe.input.MouseButton;
 import flambe.input.MouseCursor;
 import flambe.input.MouseEvent;
 import flambe.input.PointerEvent;
+import flambe.subsystem.MouseSystem;
 import flambe.util.Signal1;
 
 using flambe.platform.MouseCodes;

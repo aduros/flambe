@@ -4,8 +4,8 @@
 
 package flambe.platform;
 
-import flambe.util.Assert;
 import flambe.subsystem.WebSystem;
+import flambe.util.Assert;
 import flambe.web.WebView;
 
 class DummyWeb

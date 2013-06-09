@@ -5,8 +5,8 @@
 package flambe.platform;
 
 import flambe.input.Key;
-import flambe.subsystem.KeyboardSystem;
 import flambe.input.KeyboardEvent;
+import flambe.subsystem.KeyboardSystem;
 import flambe.util.Signal0;
 import flambe.util.Signal1;
 

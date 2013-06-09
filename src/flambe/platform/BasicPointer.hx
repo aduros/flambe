@@ -4,12 +4,11 @@
 
 package flambe.platform;
 
-import flambe.Entity;
 import flambe.display.Sprite;
-import flambe.subsystem.PointerSystem;
 import flambe.input.PointerEvent;
 import flambe.math.Point;
 import flambe.scene.Director;
+import flambe.subsystem.PointerSystem;
 import flambe.util.Signal1;
 
 using Lambda;

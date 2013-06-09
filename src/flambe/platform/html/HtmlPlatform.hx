@@ -7,28 +7,14 @@ package flambe.platform.html;
 import js.Browser;
 import js.html.*;
 
-import flambe.Entity;
-import flambe.System;
 import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
-import flambe.subsystem.StageSystem;
 import flambe.display.Texture;
-import flambe.subsystem.ExternalSystem;
-import flambe.subsystem.KeyboardSystem;
-import flambe.subsystem.MotionSystem;
-import flambe.subsystem.MouseSystem;
-import flambe.subsystem.PointerSystem;
-import flambe.subsystem.TouchSystem;
-import flambe.platform.BasicKeyboard;
-import flambe.platform.BasicPointer;
-import flambe.platform.MainLoop;
-import flambe.platform.Platform;
-import flambe.subsystem.StorageSystem;
+import flambe.subsystem.*;
 import flambe.util.Assert;
 import flambe.util.Logger;
 import flambe.util.Promise;
 import flambe.util.Signal1;
-import flambe.subsystem.WebSystem;
 
 class HtmlPlatform
     implements Platform

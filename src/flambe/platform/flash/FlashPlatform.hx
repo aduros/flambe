@@ -36,8 +36,6 @@ class FlashPlatform
 
     public function init ()
     {
-        Log.info("Initializing Flash platform");
-
         var stage = Lib.current.stage;
 
         _stage = new FlashStage(stage);
@@ -84,6 +82,8 @@ class FlashPlatform
         _lastUpdate = Lib.getTimer();
         _skipFrame = false;
         _timeOffset = Date.now().getTime() - Lib.getTimer();
+
+        Log.info("Initialized Flash platform", ["renderer", _renderer.getName()]);
     }
 
     public function loadAssetPack (manifest :Manifest) :Promise<AssetPack>

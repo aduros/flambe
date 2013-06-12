@@ -29,8 +29,6 @@ class HtmlPlatform
 
     public function init ()
     {
-        Log.info("Initializing HTML platform");
-
         var canvas :CanvasElement = null;
         try {
             // Use the canvas assigned to us by the flambe.js embedder
@@ -243,6 +241,8 @@ class HtmlPlatform
                 update(HtmlUtil.now());
             }, 16); // ~60 FPS
         }
+
+        Log.info("Initialized HTML platform", ["renderer", _renderer.getName()]);
     }
 
     public function loadAssetPack (manifest :Manifest) :Promise<AssetPack>
@@ -391,13 +391,11 @@ class HtmlPlatform
 
     private function createRenderer (canvas :CanvasElement) :Renderer
     {
-#if flambe_enable_webgl
         var gl = canvas.getContextWebGL({alpha: false, depth: false});
         if (gl != null) {
             return new WebGLRenderer(_stage, gl);
         }
-        Log.info("WebGL not available, falling back to canvas");
-#end
+        // No WebGL, fall back to canvas
         return new CanvasRenderer(canvas);
     }
 

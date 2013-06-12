@@ -107,6 +107,11 @@ class Stage3DRenderer
 #end
     }
 
+    public function getName () :String
+    {
+        return "Stage3D";
+    }
+
     private function onContext3DCreate (event :Event)
     {
         var stage3D :Stage3D = event.target;

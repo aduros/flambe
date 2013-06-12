@@ -54,6 +54,11 @@ class CanvasRenderer
     {
     }
 
+    public function getName () :String
+    {
+        return "Canvas";
+    }
+
     /** If true, blit loaded images to a canvas and use that as the texture. */
     private static var CANVAS_TEXTURES :Bool = (function () {
         // On iOS, canvas textures are way faster

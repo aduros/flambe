@@ -39,4 +39,9 @@ interface Renderer
      * Notifies the renderer that drawing the frame is complete.
      */
     function didRender () :Void;
+
+    /**
+     * Get the name of the renderer, for debug logging.
+     */
+    function getName () :String;
 }

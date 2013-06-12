@@ -21,8 +21,6 @@ class WebGLRenderer
 
     public function new (stage :HtmlStage, gl :RenderingContext)
     {
-        Log.info("Using experimental WebGL renderer", ["version", gl.getParameter(GL.VERSION)]);
-
         this.gl = gl;
 
         // Handle GL context loss
@@ -84,6 +82,11 @@ class WebGLRenderer
     public function didRender ()
     {
         batcher.didRender();
+    }
+
+    public function getName () :String
+    {
+        return "WebGL";
     }
 
     private function onResize ()

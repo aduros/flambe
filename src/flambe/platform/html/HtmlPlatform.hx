@@ -391,12 +391,21 @@ class HtmlPlatform
 
     private function createRenderer (canvas :CanvasElement) :Renderer
     {
+#if !flambe_disable_webgl
         var gl = canvas.getContextWebGL({alpha: false, depth: false});
         if (gl != null) {
             return new WebGLRenderer(_stage, gl);
         }
+#end
+#if !flambe_disable_canvas
         // No WebGL, fall back to canvas
         return new CanvasRenderer(canvas);
+#end
+#if (flambe_disable_webgl && flambe_disable_canvas)
+#error "Build with either flambe_disable_webgl or flambe_disable_canvas, not both!"
+#end
+        Log.error("No renderer available!");
+        return null;
     }
 
     // Statically initialized subsystems

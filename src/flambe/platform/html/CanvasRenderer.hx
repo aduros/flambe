@@ -38,7 +38,7 @@ class CanvasRenderer
         return [];
     }
 
-    public function createCompressedTexture (format :AssetFormat, data :Bytes) :WebGLTexture
+    public function createCompressedTexture (format :AssetFormat, data :Bytes) :Texture
     {
         Assert.fail(); // Unsupported
         return null;

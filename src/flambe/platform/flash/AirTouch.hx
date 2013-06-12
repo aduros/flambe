@@ -10,7 +10,7 @@ import flash.ui.Multitouch;
 
 class AirTouch extends BasicTouch
 {
-    public function new (pointer :BasicPointer, stage :StageSystem)
+    public function new (pointer :BasicPointer, stage :Stage)
     {
         super(pointer, Multitouch.maxTouchPoints);
 

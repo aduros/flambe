@@ -392,9 +392,13 @@ class HtmlPlatform
     private function createRenderer (canvas :CanvasElement) :Renderer
     {
 #if !flambe_disable_webgl
-        var gl = canvas.getContextWebGL({alpha: false, depth: false});
-        if (gl != null) {
-            return new WebGLRenderer(_stage, gl);
+        try {
+            var gl = canvas.getContextWebGL({alpha: false, depth: false});
+            if (gl != null) {
+                return new WebGLRenderer(_stage, gl);
+            }
+        } catch (_ :Dynamic) {
+            // Getting the WebGL context blows up on some (headless?) systems
         }
 #end
 #if !flambe_disable_canvas

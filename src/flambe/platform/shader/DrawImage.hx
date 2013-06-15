@@ -28,7 +28,7 @@ class DrawImage extends Shader
         }
 
         function fragment (texture :Texture) {
-            out = texture.get(_uv) * _alpha;
+            out = texture.get(_uv, clamp) * _alpha;
         }
     }
 }

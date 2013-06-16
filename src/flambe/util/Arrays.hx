@@ -42,7 +42,7 @@ class Arrays
     }
 
     /** Resizes an array in-place. */
-    inline public static function resize (arr :Array<Dynamic>, length :Int)
+    inline public static function resize<A> (arr :Array<A>, length :Int)
     {
 #if (flash || js)
         // This trick only works in Flash and JS

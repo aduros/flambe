@@ -7,6 +7,7 @@ package flambe.script;
 import flambe.Entity;
 
 using Lambda;
+using flambe.util.Arrays;
 
 /**
  * An action that manages a list of other actions, running them one-by-one sequentially until they

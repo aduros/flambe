@@ -12,6 +12,7 @@ import flambe.display.Sprite;
 import flambe.scene.Director;
 
 using Lambda;
+using flambe.util.Arrays;
 
 /**
  * Updates all components and renders.

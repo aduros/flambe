@@ -51,4 +51,22 @@ class Arrays
         #error "Arrays.resize unimplemented on this target"
 #end
     }
+
+    inline public static function indexOf<A> (arr :Array<A>, element :A, ?fromIndex :Int) :Int
+    {
+#if (flash || js)
+        return (untyped arr).indexOf(element, fromIndex);
+#else
+        #error "Arrays.indexOf unimplemented on this target"
+#end
+    }
+
+    inline public static function lastIndexOf<A> (arr :Array<A>, element :A, ?fromIndex :Int) :Int
+    {
+#if (flash || js)
+        return (untyped arr).lastIndexOf(element, fromIndex);
+#else
+        #error "Arrays.lastIndexOf unimplemented on this target"
+#end
+    }
 }

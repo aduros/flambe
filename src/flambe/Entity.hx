@@ -53,7 +53,7 @@ using Lambda;
     }
 
     /**
-     * Add a component to this entity.
+     * Add a component to this entity. Any previous component of this type will be replaced.
      * @returns This instance, for chaining.
      */
     public function add (component :Component) :Entity
@@ -127,7 +127,7 @@ using Lambda;
     }
 
     /**
-     * Gets a component of a given class from this entity.
+     * Gets a component of a given type from this entity.
      */
     macro public function get<A> (self :Expr, componentClass :ExprOf<Class<A>>) :ExprOf<A>
     {
@@ -135,7 +135,7 @@ using Lambda;
     }
 
     /**
-     * Checks if this entity has a component of the given class.
+     * Checks if this entity has a component of the given type.
      */
     macro public function has<A> (self :Expr, componentClass :ExprOf<Class<A>>) :ExprOf<Bool>
     {

@@ -73,6 +73,12 @@ class FlashPlatform
 //         SoundMixer.audioPlaybackMode = "ambient";
 // #end
 
+#if !flambe_air
+        // Hack to fix SharedObject in Chrome Flash:
+        // https://groups.google.com/forum/#!topic/flambe/aD6KUvORWks
+        getStorage();
+#end
+
         System.volume.watch(function (volume, _) {
             var s = SoundMixer.soundTransform;
             s.volume = volume;

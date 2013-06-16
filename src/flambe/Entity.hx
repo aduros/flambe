@@ -93,8 +93,9 @@ using Lambda;
 
     /**
      * Remove a component from this entity.
+     * @return Whether the component was removed.
      */
-    public function remove (component :Component)
+    public function remove (component :Component) :Bool
     {
         var prev :Component = null, p = firstComponent;
         while (p != null) {
@@ -117,11 +118,12 @@ using Lambda;
                 // Notify the component it was removed
                 p.onRemoved();
                 p.init(null, null);
-                return;
+                return true;
             }
             prev = p;
             p = next;
         }
+        return false;
     }
 
     /**

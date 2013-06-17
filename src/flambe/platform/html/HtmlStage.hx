@@ -214,7 +214,7 @@ class HtmlStage
         var scale = devicePixelRatio / backingStorePixelRatio;
         var screenWidth = Browser.window.screen.width;
         var screenHeight = Browser.window.screen.height;
-        if (scale*screenWidth > 1024 || scale*screenHeight > 1024) {
+        if (scale*screenWidth > 1136 || scale*screenHeight > 1136) {
             return 1;
         }
         return scale;

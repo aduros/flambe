@@ -6,6 +6,7 @@ package flambe.platform.html;
 
 import js.Browser;
 import js.html.*;
+import js.html.webgl.RenderingContext;
 
 import flambe.display.Orientation;
 
@@ -142,5 +143,28 @@ class HtmlUtil
         ctx.restore();
 
         return canvas;
+    }
+
+    public static function detectSlowDriver (gl :RenderingContext) :Bool
+    {
+        // Try to detect SwiftShader. There will be some false positives here, but falling back to
+        // canvas in those cases is better than using WebGL on a software driver.
+        // http://stackoverflow.com/questions/10456491/detect-swiftshader-webgl-renderer-in-chrome-18
+        //
+        // TODO(bruno): Use http://www.khronos.org/registry/webgl/extensions/WEBGL_debug_renderer_info/
+
+        var windows = (Browser.navigator.platform.indexOf("Win") >= 0);
+        if (windows) {
+            var chrome = ((untyped Browser.window).chrome != null);
+            if (chrome) {
+                for (ext in gl.getSupportedExtensions()) {
+                    if (ext.indexOf("WEBGL_compressed_texture") >= 0) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
     }
 }

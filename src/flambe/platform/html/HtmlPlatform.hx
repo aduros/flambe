@@ -395,16 +395,23 @@ class HtmlPlatform
         try {
             var gl = canvas.getContextWebGL({alpha: false, depth: false});
             if (gl != null) {
+#if !flambe_disable_canvas
+                if (HtmlUtil.detectSlowDriver(gl)) {
+                    Log.warn("Detected a slow WebGL driver, falling back to canvas");
+                } else
+#end
                 return new WebGLRenderer(_stage, gl);
             }
         } catch (_ :Dynamic) {
             // Getting the WebGL context blows up on some (headless?) systems
         }
 #end
+
 #if !flambe_disable_canvas
         // No WebGL, fall back to canvas
         return new CanvasRenderer(canvas);
 #end
+
 #if (flambe_disable_webgl && flambe_disable_canvas)
 #error "Build with either flambe_disable_webgl or flambe_disable_canvas, not both!"
 #end

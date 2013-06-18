@@ -34,6 +34,17 @@ renamed_types = {
     "haxe.Stack": "haxe.CallStack",
     "haxe.FastList": "haxe.ds.GenericStack",
 
+    # Flambe-specific renames
+    "flambe.external.External": "flambe.subsystem.ExternalSystem",
+    "flambe.display.Stage": "flambe.subsystem.StageSystem",
+    "flambe.input.Keyboard": "flambe.subsystem.KeyboardSystem",
+    "flambe.input.Motion": "flambe.subsystem.MotionSystem",
+    "flambe.input.Mouse": "flambe.subsystem.MouseSystem",
+    "flambe.input.Pointer": "flambe.subsystem.PointerSystem",
+    "flambe.input.Touch": "flambe.subsystem.TouchSystem",
+    "flambe.storage.Storage": "flambe.subsystem.StorageSystem",
+    "flambe.web.Web": "flambe.subsystem.WebSystem",
+
     # This list is not complete
     "neko.zip.Reader": "haxe.zip.Reader",
     "neko.zip.Writer": "haxe.zip.Writer",

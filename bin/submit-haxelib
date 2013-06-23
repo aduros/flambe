@@ -53,7 +53,7 @@ tools/flashdevelop/build-fdz
 zip -j $ARCHIVE tools/flashdevelop/flambe-FlashDevelop.fdz
 
 # Now would be a good time to double-check everything works
-haxelib test $ARCHIVE
+haxelib local $ARCHIVE
 
 read -p "Submit Flambe $VERSION to haxelib [Y/n]? " CONFIRM
 case "$CONFIRM" in

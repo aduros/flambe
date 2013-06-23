@@ -57,8 +57,9 @@ class MainLoop
 
     public function render (renderer :Renderer)
     {
-        var graphics = renderer.willRender();
+        var graphics = renderer.graphics;
         if (graphics != null) {
+            renderer.willRender();
             Sprite.render(System.root, graphics);
             renderer.didRender();
         }

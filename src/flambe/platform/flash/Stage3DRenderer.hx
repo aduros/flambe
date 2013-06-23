@@ -21,6 +21,8 @@ import flambe.util.Assert;
 class Stage3DRenderer
     implements Renderer
 {
+    public var graphics :InternalGraphics = null;
+
     public var batcher (default, null) :Stage3DBatcher;
 
     public function new ()
@@ -87,21 +89,17 @@ class Stage3DRenderer
         return new Stage3DGraphics(batcher, renderTarget);
     }
 
-    public function willRender () :Graphics
+    public function willRender ()
     {
 #if flambe_debug_renderer
         trace(">>> begin");
 #end
-        if (_graphics == null) {
-            return null;
-        }
-        batcher.willRender();
-        return _graphics;
+        graphics.willRender();
     }
 
     public function didRender ()
     {
-        batcher.didRender();
+        graphics.didRender();
 #if flambe_debug_renderer
         trace("<<< end");
 #end
@@ -123,7 +121,7 @@ class Stage3DRenderer
 #end
 
         batcher = new Stage3DBatcher(_context3D);
-        _graphics = createGraphics(null);
+        graphics = createGraphics(null);
         onResize(null);
 
         // Signal that the GPU context was (re)created
@@ -138,13 +136,12 @@ class Stage3DRenderer
 
     private function onResize (_)
     {
-        if (_context3D != null) {
+        if (graphics != null) {
             var stage = Lib.current.stage;
-            _context3D.configureBackBuffer(stage.stageWidth, stage.stageHeight, 2, false);
-            _graphics.reset(stage.stageWidth, stage.stageHeight);
+            batcher.resizeBackbuffer(stage.stageWidth, stage.stageHeight);
+            graphics.onResize(stage.stageWidth, stage.stageHeight);
         }
     }
 
     private var _context3D :Context3D;
-    private var _graphics :Stage3DGraphics;
 }

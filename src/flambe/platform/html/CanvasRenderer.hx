@@ -17,9 +17,11 @@ import flambe.util.Assert;
 class CanvasRenderer
     implements Renderer
 {
+    public var graphics :InternalGraphics;
+
     public function new (canvas :CanvasElement)
     {
-        _graphics = new CanvasGraphics(canvas);
+        graphics = new CanvasGraphics(canvas);
         System.hasGPU._ = true;
     }
 
@@ -44,14 +46,14 @@ class CanvasRenderer
         return null;
     }
 
-    public function willRender () :Graphics
+    public function willRender ()
     {
-        _graphics.willRender();
-        return _graphics;
+        graphics.willRender();
     }
 
     public function didRender ()
     {
+        graphics.didRender();
     }
 
     public function getName () :String
@@ -66,6 +68,4 @@ class CanvasRenderer
         var pattern = ~/(iPhone|iPod|iPad)/;
         return pattern.match(Browser.window.navigator.userAgent);
     })();
-
-    private var _graphics :CanvasGraphics;
 }

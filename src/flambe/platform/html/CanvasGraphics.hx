@@ -14,7 +14,7 @@ import flambe.math.FMath;
 
 // TODO(bruno): Remove pixel snapping once most browsers get canvas acceleration.
 class CanvasGraphics
-    implements Graphics
+    implements InternalGraphics
 {
     public function new (canvas :CanvasElement)
     {
@@ -149,6 +149,16 @@ class CanvasGraphics
         // Disable blending for the first draw call. This squeezes a bit of performance out of games
         // that have a single large background sprite, especially on older devices
         _firstDraw = true;
+    }
+
+    public function didRender ()
+    {
+        // Nothing at all
+    }
+
+    public function onResize (width :Int, height :Int)
+    {
+        // Nothing at all
     }
 
     private var _canvasCtx :CanvasRenderingContext2D;

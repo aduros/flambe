@@ -89,6 +89,9 @@ class FlashPlatform
         _skipFrame = false;
         _timeOffset = Date.now().getTime() - Lib.getTimer();
 
+#if debug
+        new DebugLogic(this);
+#end
         Log.info("Initialized Flash platform", ["renderer", _renderer.getName()]);
     }
 

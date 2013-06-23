@@ -126,7 +126,7 @@ class Stage3DTexture
     {
         if (_graphics == null) {
             _graphics = _renderer.createGraphics(this);
-            _graphics.reset(_widthPow2, _heightPow2);
+            _graphics.onResize(_widthPow2, _heightPow2);
         }
         return _graphics;
     }

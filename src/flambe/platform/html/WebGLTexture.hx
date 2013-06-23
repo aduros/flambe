@@ -123,7 +123,7 @@ class WebGLTexture
     {
         if (_graphics == null) {
             _graphics = new WebGLGraphics(_renderer.batcher, this);
-            _graphics.reset(width, height);
+            _graphics.onResize(width, height);
 
             var gl = _renderer.gl;
             framebuffer = gl.createFramebuffer();

@@ -242,6 +242,9 @@ class HtmlPlatform
             }, 16); // ~60 FPS
         }
 
+#if debug
+        new DebugLogic(this);
+#end
         Log.info("Initialized HTML platform", ["renderer", _renderer.getName()]);
     }
 

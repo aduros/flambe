@@ -44,7 +44,7 @@ class WebGLBatcher
         resize(16);
     }
 
-    public function reset (width :Int, height :Int)
+    public function resizeBackbuffer (width :Int, height :Int)
     {
         _gl.viewport(0, 0, width, height);
         _backbufferWidth = width;

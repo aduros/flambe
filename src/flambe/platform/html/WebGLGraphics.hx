@@ -16,7 +16,7 @@ import flambe.math.Rectangle;
 import flambe.util.Assert;
 
 class WebGLGraphics
-    implements Graphics
+    implements InternalGraphics
 {
     public function new (batcher :WebGLBatcher, renderTarget :WebGLTexture)
     {
@@ -268,7 +268,17 @@ class WebGLGraphics
         state.applyScissor(x, y, width, height);
     }
 
-    public function reset (width :Int, height :Int)
+    public function willRender ()
+    {
+        _batcher.willRender();
+    }
+
+    public function didRender ()
+    {
+        _batcher.didRender();
+    }
+
+    public function onResize (width :Int, height :Int)
     {
         _stateList = new DrawingState();
 

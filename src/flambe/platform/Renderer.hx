@@ -12,6 +12,8 @@ import flambe.display.Texture;
 
 interface Renderer
 {
+    public var graphics :InternalGraphics;
+
     /**
      * Creates a texture from some data source.
      */
@@ -30,10 +32,9 @@ interface Renderer
     function createCompressedTexture (format :AssetFormat, data :Bytes) :Texture;
 
     /**
-     * Notifies the renderer that things are about to be drawn. Returns the drawing context that
-     * should be used, or null if no context is currently available.
+     * Notifies the renderer that things are about to be drawn.
      */
-    function willRender () :Graphics;
+    function willRender () :Void;
 
     /**
      * Notifies the renderer that drawing the frame is complete.

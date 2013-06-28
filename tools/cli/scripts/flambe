@@ -1,0 +1,50 @@
+#!/usr/bin/env python
+
+import argparse
+import flambe
+import logging
+import sys
+import yaml
+
+PLATFORMS = ["html", "flash"]
+
+logging.basicConfig(format="%(message)s")
+logger = logging.getLogger("flambe")
+logger.setLevel(logging.DEBUG)
+
+def on_serve (config, args):
+    print("Handle flambe serve")
+
+def on_build (config, args):
+    flambe.build(config, platforms=args.platforms, debug=args.debug)
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--config", default="flambe.yaml")
+
+subcommands = parser.add_subparsers(title="subcommands")
+
+serve_cmd = subcommands.add_parser("serve")
+serve_cmd.set_defaults(func=on_serve)
+
+build_cmd = subcommands.add_parser("build")
+build_cmd.add_argument("platforms", choices=PLATFORMS, nargs="+")
+build_cmd.add_argument("--debug", action="store_true")
+build_cmd.set_defaults(func=on_build)
+
+args = parser.parse_args()
+try:
+    with open(args.config) as f:
+        config = yaml.load(f)
+
+        # Cope with empty config files
+        if not config: config = {}
+
+        args.func(config, args)
+
+except (IOError, OSError) as e:
+    logger.error("Could not open %s: %s" % (e.filename, e.strerror))
+    sys.exit(1)
+
+except flambe.FlambeException as e:
+    if len(e.args) > 0: logger.error(e)
+    sys.exit(1)

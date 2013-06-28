@@ -1,0 +1,8 @@
+#!/usr/bin/env python
+
+import flambe
+
+data_dir = "src/flambe/data"
+
+# Build the flambe.js embedder
+flambe.minify_js(["embedder/flambe.js", "embedder/swfobject.js"], data_dir+"/flambe.js")

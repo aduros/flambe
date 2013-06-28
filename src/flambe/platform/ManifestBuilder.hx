@@ -30,10 +30,10 @@ class ManifestBuilder
             return toExpr(EBlock([]));
         }
 
-#if nme_install_tool
-        var assetPrefix = "assets/";
-#else
+#if flambe_legacy_build
         var assetPrefix = "../assets/";
+#else
+        var assetPrefix = "assets/";
 #end
         var exprs :Array<Expr> = [];
         var hash_set = toExpr(EField(hash, "set"));

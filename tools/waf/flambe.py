@@ -49,7 +49,7 @@ def apply_flambe(ctx):
         # If no hxproj, assume a src directory
         classpath.append(ctx.path.find_dir("src"))
 
-    flags = []
+    flags = ["-D", "flambe_legacy_build"]
 
     main = ctx.main
     if not main:

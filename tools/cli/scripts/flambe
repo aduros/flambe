@@ -13,7 +13,8 @@ logger = logging.getLogger("flambe")
 logger.setLevel(logging.DEBUG)
 
 def on_serve (config, args):
-    print("Handle flambe serve")
+    server = flambe.Server()
+    server.run()
 
 def on_build (config, args):
     flambe.build(config, platforms=args.platforms, debug=args.debug)

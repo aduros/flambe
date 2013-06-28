@@ -1,0 +1,5 @@
+# The main class name
+main: urgame.Main
+
+# Additional flags to pass to the Haxe compiler
+# haxe_flags: -lib nape -cp another_dir

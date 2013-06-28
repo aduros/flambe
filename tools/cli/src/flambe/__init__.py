@@ -11,6 +11,9 @@ cache_dir = ".flambe-cache"
 
 class FlambeException (Exception): pass
 
+def new (path):
+    shutil.copytree(data_dir+"/scaffold", path)
+
 def build (config, platforms=[], debug=False):
     common_flags = ["-lib", "flambe", "-cp", "src"]
 

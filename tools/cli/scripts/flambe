@@ -3,6 +3,7 @@
 import argparse
 import flambe
 import logging
+import os
 import sys
 import yaml
 
@@ -12,14 +13,25 @@ logging.basicConfig(format="%(message)s")
 logger = logging.getLogger("flambe")
 logger.setLevel(logging.DEBUG)
 
-def on_serve (config, args):
+def load_config (args):
+    with open(args.config) as f:
+        config = yaml.load(f)
+        # Cope with empty config files
+        if not config: config = {}
+        return config
+
+def on_new (args):
+    flambe.new(args.path)
+    logger.info("New Flambe app created in %s" % os.path.abspath(args.path))
+
+def on_serve (args):
     server = flambe.Server()
     server.run()
 
-def on_build (config, args):
-    flambe.build(config, platforms=args.platforms, debug=args.debug)
+def on_build (args):
+    flambe.build(load_config(args), platforms=args.platforms, debug=args.debug)
 
-def on_clean (config, args):
+def on_clean (args):
     flambe.clean()
 
 parser = argparse.ArgumentParser()
@@ -27,26 +39,24 @@ parser.add_argument("--config", default="flambe.yaml")
 
 subcommands = parser.add_subparsers(title="subcommands")
 
-serve_cmd = subcommands.add_parser("serve")
-serve_cmd.set_defaults(func=on_serve)
+cmd = subcommands.add_parser("new")
+cmd.add_argument("path")
+cmd.set_defaults(func=on_new)
 
-build_cmd = subcommands.add_parser("build")
-build_cmd.add_argument("platforms", choices=PLATFORMS, nargs="+")
-build_cmd.add_argument("--debug", action="store_true")
-build_cmd.set_defaults(func=on_build)
+cmd = subcommands.add_parser("serve")
+cmd.set_defaults(func=on_serve)
 
-clean_cmd = subcommands.add_parser("clean")
-clean_cmd.set_defaults(func=on_clean)
+cmd = subcommands.add_parser("build")
+cmd.add_argument("platforms", choices=PLATFORMS, nargs="+")
+cmd.add_argument("--debug", action="store_true")
+cmd.set_defaults(func=on_build)
+
+cmd = subcommands.add_parser("clean")
+cmd.set_defaults(func=on_clean)
 
 args = parser.parse_args()
 try:
-    with open(args.config) as f:
-        config = yaml.load(f)
-
-        # Cope with empty config files
-        if not config: config = {}
-
-        args.func(config, args)
+    args.func(args)
 
 except (IOError, OSError) as e:
     logger.error("Could not open %s: %s" % (e.filename, e.strerror))

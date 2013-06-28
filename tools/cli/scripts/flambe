@@ -18,6 +18,9 @@ def on_serve (config, args):
 def on_build (config, args):
     flambe.build(config, platforms=args.platforms, debug=args.debug)
 
+def on_clean (config, args):
+    flambe.clean()
+
 parser = argparse.ArgumentParser()
 parser.add_argument("--config", default="flambe.yaml")
 
@@ -30,6 +33,9 @@ build_cmd = subcommands.add_parser("build")
 build_cmd.add_argument("platforms", choices=PLATFORMS, nargs="+")
 build_cmd.add_argument("--debug", action="store_true")
 build_cmd.set_defaults(func=on_build)
+
+clean_cmd = subcommands.add_parser("clean")
+clean_cmd.set_defaults(func=on_clean)
 
 args = parser.parse_args()
 try:

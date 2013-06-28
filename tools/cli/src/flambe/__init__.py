@@ -53,6 +53,10 @@ def build (config, platforms=[], debug=False):
     for platform in platforms:
         builders[platform]()
 
+def clean ():
+    shutil.rmtree("build", ignore_errors=True)
+    shutil.rmtree(cache_dir, ignore_errors=True)
+
 def haxe (flags):
     run_command(["haxe"] + flags)
 

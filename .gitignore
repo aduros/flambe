@@ -3,3 +3,5 @@ chxdoc
 .lock-waf*
 bin/.waf*
 *.fdz
+*.pyc
+*.egg-info

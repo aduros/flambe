@@ -1,3 +1,4 @@
+import distutils.core
 import errno
 import logging
 import os
@@ -25,11 +26,12 @@ def build (config, platforms=[], debug=False):
     common_flags += to_list(get(config, "haxe_flags", []))
 
     mkdir_p(cache_dir)
-    shutil.rmtree("build", ignore_errors=True)
-    shutil.copytree("web", "build/web")
-    shutil.copytree("assets", "build/web/assets")
     mkdir_p("build/web/targets")
+    distutils.dir_util.copy_tree("web", "build/web")
     shutil.copy(data_dir+"/flambe.js", "build/web")
+
+    shutil.rmtree("build/web/assets", ignore_errors=True)
+    shutil.copytree("assets", "build/web/assets")
 
     def build_html ():
         html_flags = ["-D", "html"]

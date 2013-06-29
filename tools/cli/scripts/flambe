@@ -58,6 +58,9 @@ args = parser.parse_args()
 try:
     args.func(args)
 
+except KeyboardInterrupt as e:
+    pass
+
 except (IOError, OSError) as e:
     logger.error("Could not open %s: %s" % (e.filename, e.strerror))
     sys.exit(1)

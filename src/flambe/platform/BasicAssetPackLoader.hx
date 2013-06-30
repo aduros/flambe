@@ -13,6 +13,7 @@ import flambe.util.Assert;
 import flambe.util.Promise;
 
 using Lambda;
+using flambe.util.Arrays;
 using flambe.util.Strings;
 
 class BasicAssetPackLoader
@@ -89,13 +90,17 @@ class BasicAssetPackLoader
                 break;
             }
         }
-        if (foundEntry == null) {
-            return; // Nope, it's not in this pack
-        }
 
-        // Dummy up a new AssetEntry based on the previous one, and reload it
-        var entry = new AssetEntry(foundEntry.name, url, foundEntry.format, 0);
-        loadEntry(manifest.getFullURL(entry), entry);
+        // If the entry was found in this manifest, and is a supported format
+        if (foundEntry != null) {
+            getAssetFormats(function (formats :Array<AssetFormat>) {
+                if (formats.indexOf(foundEntry.format) >= 0) {
+                    // Dummy up a new AssetEntry based on the previous one, and reload it
+                    var entry = new AssetEntry(foundEntry.name, url, foundEntry.format, 0);
+                    loadEntry(manifest.getFullURL(entry), entry);
+                }
+            });
+        }
     }
 
     private static function removeUrlParams (url :String) :String

@@ -24,12 +24,15 @@ def on_new (args):
     flambe.new(args.path)
     logger.info("New Flambe app created in %s" % os.path.abspath(args.path))
 
-def on_serve (args):
-    server = flambe.Server()
-    server.run()
+def on_run (args):
+    flambe.run(load_config(args), platform=args.platform, debug=args.debug)
 
 def on_build (args):
     flambe.build(load_config(args), platforms=args.platforms, debug=args.debug)
+
+def on_serve (args):
+    server = flambe.Server()
+    server.run()
 
 def on_clean (args):
     flambe.clean()
@@ -43,13 +46,18 @@ cmd = subcommands.add_parser("new")
 cmd.add_argument("path")
 cmd.set_defaults(func=on_new)
 
-cmd = subcommands.add_parser("serve")
-cmd.set_defaults(func=on_serve)
+cmd = subcommands.add_parser("run")
+cmd.add_argument("platform", choices=PLATFORMS)
+cmd.add_argument("--debug", action="store_true")
+cmd.set_defaults(func=on_run)
 
 cmd = subcommands.add_parser("build")
 cmd.add_argument("platforms", choices=PLATFORMS, nargs="+")
 cmd.add_argument("--debug", action="store_true")
 cmd.set_defaults(func=on_build)
+
+cmd = subcommands.add_parser("serve")
+cmd.set_defaults(func=on_serve)
 
 cmd = subcommands.add_parser("clean")
 cmd.set_defaults(func=on_clean)

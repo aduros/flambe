@@ -15,6 +15,18 @@ class FlambeException (Exception): pass
 def new (path):
     shutil.copytree(data_dir+"/scaffold", path)
 
+def run (config, platform, debug=False):
+    build(config, [platform], debug)
+    id = get(config, "id")
+    if platform == "android":
+        adt(["-uninstallApp", "-platform", "android", "-appid", id], output=False, check=False)
+        adt(["-installApp", "-platform", "android", "-package", "build/main-android.apk"])
+        adt(["-launchApp", "-platform", "android", "-appid", id])
+        if debug:
+            # Clear the log, then start tailing it
+            adb(["logcat", "-c"], verbose=False)
+            adb(["logcat", "-v", "raw", "-s", "air.%s:V" % id], verbose=False)
+
 def build (config, platforms=[], debug=False):
     common_flags = ["-lib", "flambe", "-cp", "src"]
 
@@ -93,7 +105,7 @@ def build (config, platforms=[], debug=False):
         except IOError:
             adt(["-certificate", "-cn", "SelfSign", "-validityPeriod", "25", "2048-RSA", cert, "password"])
 
-        xml = cache_dir+"/air/app-android.xml"
+        xml = cache_dir+"/air/config-android.xml"
         generate_air_xml(swf, xml)
 
         adt(["-package", "-target", apk_type, "-storetype", "pkcs12", "-keystore", cert,
@@ -112,11 +124,14 @@ def clean ():
     shutil.rmtree("build", ignore_errors=True)
     shutil.rmtree(cache_dir, ignore_errors=True)
 
-def haxe (flags):
-    run_command(["haxe"] + flags)
+def haxe (flags, **kwargs):
+    run_command(["haxe"] + flags, **kwargs)
 
-def adt (flags):
-    run_command(["adt"] + flags)
+def adt (flags, **kwargs):
+    run_command(["adt"] + flags, **kwargs)
+
+def adb (flags, **kwargs):
+    run_command(["adb"] + flags, **kwargs)
 
 def minify_js (inputs, output, strict=False):
     from textwrap import dedent
@@ -133,9 +148,11 @@ def minify_js (inputs, output, strict=False):
     if strict: command += ["--language_in", "ES5_STRICT"]
     run_command(command, verbose=False)
 
-def run_command (command, verbose=True):
+def run_command (command, verbose=True, output=True, check=True):
     if verbose: logger.info(" ".join(command))
-    if subprocess.call(command) != 0: raise FlambeException()
+    stream = None if output else subprocess.PIPE
+    code = subprocess.call(command, stdout=stream, stderr=stream)
+    if check and code != 0: raise FlambeException()
 
 def to_list (o):
     if isinstance(o, list): return o

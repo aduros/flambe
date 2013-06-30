@@ -37,6 +37,7 @@ flambe-demos/bin/build-all --debug
 
 echo "Testing new build tool..."
 cd tools/cli
+scripts/generate-data
 python setup.py install
 cd -
 

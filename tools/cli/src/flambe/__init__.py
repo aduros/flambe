@@ -5,7 +5,7 @@ import os
 import shutil
 import subprocess
 
-logger = logging.getLogger("flambe")
+log = logging.getLogger("flambe")
 
 data_dir = os.path.join(os.path.dirname(__file__), "data")
 cache_dir = ".flambe-cache"
@@ -19,11 +19,15 @@ def run (config, platform, debug=False):
     build(config, [platform], debug)
     id = get(config, "id")
     if platform == "android":
-        adt(["-uninstallApp", "-platform", "android", "-appid", id], output=False, check=False)
-        adt(["-installApp", "-platform", "android", "-package", "build/main-android.apk"])
-        adt(["-launchApp", "-platform", "android", "-appid", id])
+        apk = "build/main-android.apk"
+        log.info("")
+        log.info("Installing: " + apk)
+        adt(["-uninstallApp", "-platform", "android", "-appid", id], verbose=False, output=False, check=False)
+        adt(["-installApp", "-platform", "android", "-package", "build/main-android.apk"], verbose=False)
+        adt(["-launchApp", "-platform", "android", "-appid", id], verbose=False)
         if debug:
             # Clear the log, then start tailing it
+            log.info("")
             adb(["logcat", "-c"], verbose=False)
             adb(["logcat", "-v", "raw", "-s", "air.%s:V" % id], verbose=False)
 
@@ -53,16 +57,19 @@ def build (config, platforms=[], debug=False):
     def build_html ():
         html_flags = ["-D", "html"]
         unminified = cache_dir+"/main-html.unminified.js"
-        minified = "build/web/targets/main-html.js"
+        js = "build/web/targets/main-html.js"
+        log.info("Building: " + js)
         if debug:
-            haxe(common_flags + html_flags + ["-js", minified])
+            haxe(common_flags + html_flags + ["-js", js])
         else:
             # Minify release builds
             haxe(common_flags + html_flags + ["-js", unminified])
-            minify_js([unminified], minified, strict=True)
+            minify_js([unminified], js, strict=True)
 
     def build_flash ():
-        flash_flags = swf_flags + ["-swf-version", "11"]
+        swf = "build/web/targets/main-flash.swf"
+        flash_flags = swf_flags + ["-swf-version", "11", "-swf", swf]
+        log.info("Building: " + swf)
         haxe(common_flags + flash_flags)
 
     def build_air (flags):
@@ -93,6 +100,9 @@ def build (config, platforms=[], debug=False):
             xml.writexml(file)
 
     def build_android ():
+        apk = "build/main-android.apk"
+        log.info("Building: " + apk)
+
         apk_type = "apk-debug" if debug else "apk-captive-runtime"
 
         swf = "main-android.swf"
@@ -109,7 +119,7 @@ def build (config, platforms=[], debug=False):
         generate_air_xml(swf, xml)
 
         adt(["-package", "-target", apk_type, "-storetype", "pkcs12", "-keystore", cert,
-            "-storepass", "password", "build/main-android.apk",
+            "-storepass", "password", apk,
             xml, "-C", cache_dir+"/air", swf, "-C", cache_dir+"/air", "assets"])
 
     builders = {
@@ -117,7 +127,8 @@ def build (config, platforms=[], debug=False):
         "flash": build_flash,
         "android": build_android,
     }
-    for platform in platforms:
+    for ii, platform in enumerate(platforms):
+        if ii != 0: log.info("")
         builders[platform]()
 
 def clean ():
@@ -149,7 +160,7 @@ def minify_js (inputs, output, strict=False):
     run_command(command, verbose=False)
 
 def run_command (command, verbose=True, output=True, check=True):
-    if verbose: logger.info(" ".join(command))
+    if verbose: log.info(" ".join(command))
     stream = None if output else subprocess.PIPE
     code = subprocess.call(command, stdout=stream, stderr=stream)
     if check and code != 0: raise FlambeException()
@@ -182,7 +193,7 @@ class Server ():
     http_port = 5000
 
     def run (self):
-        logger.info("Serving on http://localhost:%s" % self.http_port)
+        log.info("Serving on http://localhost:%s" % self.http_port)
 
         class CacheableFile(static.File):
             def render (self, request):

@@ -90,7 +90,7 @@ def build (config, platforms=[], debug=False):
         doc = parseString(dedent("""
             <application xmlns="http://ns.adobe.com/air/application/3.7">
               <id>"""+get(config, "id")+"""</id>
-              <versionNumber>"""+get(config, "version")+"""</versionNumber>
+              <versionNumber>"""+str(get(config, "version"))+"""</versionNumber>
               <filename>"""+get(config, "name")+"""</filename>
               <initialWindow>
                 <content>"""+swf+"""</content>

@@ -1,2 +1,2 @@
-./build/
-./.flambe-cache/
+build/
+.flambe-cache/

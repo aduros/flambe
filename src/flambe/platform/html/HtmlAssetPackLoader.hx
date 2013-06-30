@@ -21,6 +21,9 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
     public function new (platform :HtmlPlatform, manifest :Manifest)
     {
         super(platform, manifest);
+        #if enable_catapult_reloading
+            flambe.asset.CatapultTools.listenForManifestChanges(loadEntry, manifest);
+        #end
     }
 
     override private function loadEntry (url :String, entry :AssetEntry)

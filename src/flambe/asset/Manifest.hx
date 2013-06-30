@@ -21,6 +21,11 @@ using flambe.util.Strings;
 class Manifest
 {
     /**
+     * Reloaded assets reference the manifest name
+     */
+    public var name (default, null) :String;
+    
+    /**
      * A relative path to load this manifest's assets from, or null.
      */
     public var relativeBasePath (get, set) :String;
@@ -31,9 +36,10 @@ class Manifest
      */
     public var externalBasePath (get, set) :String;
 
-    public function new ()
+    public function new (?name :String)
     {
         _entries = [];
+        this.name = name;
     }
 
     /**
@@ -179,7 +185,7 @@ class Manifest
         return basePath;
     }
 
-    private static function inferFormat (url :String) :AssetFormat
+    public static function inferFormat (url :String) :AssetFormat
     {
         var extension = url.getUrlExtension();
         if (extension != null) {

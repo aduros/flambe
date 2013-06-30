@@ -9,8 +9,8 @@ import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
 import flambe.display.Texture;
 import flambe.sound.Sound;
-import flambe.util.Assert;
 import flambe.util.Promise;
+import flambe.util.Value;
 
 using Lambda;
 using flambe.util.Strings;
@@ -32,6 +32,7 @@ class BasicAssetPackLoader
             handleSuccess();
 
         } else {
+            var bytesTotal = 0;
             var groups = new Map<String,Array<AssetEntry>>();
 
             // Group assets by name
@@ -95,13 +96,13 @@ class BasicAssetPackLoader
 
     private function loadEntry (url :String, entry :AssetEntry)
     {
-        Assert.fail(); // See subclasses
+        // Assert.fail(); // See subclasses
     }
 
     /** Gets the list of asset formats the environment supports, ordered by preference. */
     private function getAssetFormats (fn :Array<AssetFormat> -> Void)
     {
-        Assert.fail(); // See subclasses
+        // Assert.fail(); // See subclasses
     }
 
     private function handleLoad (entry :AssetEntry, asset :Dynamic)
@@ -112,21 +113,26 @@ class BasicAssetPackLoader
         var name = entry.name;
         switch (entry.format) {
         case WEBP, JXR, PNG, JPG, GIF, DDS, PVR, PKM:
-            _pack.textures.set(name, asset);
+            _pack.textures.exists(name) ? _pack.textures.get(name)._ = asset : _pack.textures.set(name, new Value<Texture>(asset));
         case MP3, M4A, OGG, WAV:
-            _pack.sounds.set(name, asset);
-        case Data:
-            _pack.files.set(name, asset);
+            _pack.sounds.exists(name) ? _pack.sounds.get(name)._ = asset : _pack.sounds.set(name, new Value<Sound>(asset));
+        case Data: 
+            _pack.files.exists(name) ? _pack.files.get(name)._ = asset : _pack.files.set(name, new Value<String>(asset));
         }
 
-        _assetsRemaining -= 1;
-        if (_assetsRemaining <= 0) {
-            handleSuccess();
+        if (!promise.hasResult) {
+            _assetsRemaining -= 1;
+            if (_assetsRemaining <= 0) {
+                handleSuccess();
+            }
         }
     }
 
     private function handleProgress (entry :AssetEntry, bytesLoaded :Int)
     {
+    	if (promise.hasResult) {
+    		return;
+    	}
         _bytesLoaded.set(entry.name, bytesLoaded);
 
         var bytesTotal = 0;
@@ -177,9 +183,9 @@ private class BasicAssetPack
 {
     public var manifest (get, null) :Manifest;
 
-    public var textures :Map<String,Texture>;
-    public var sounds :Map<String,Sound>;
-    public var files :Map<String,String>;
+    public var textures :Map<String, Value<Texture>>;
+    public var sounds :Map<String, Value<Sound>>;
+    public var files :Map<String, Value<String>>;
 
     public function new (manifest :Manifest)
     {
@@ -189,7 +195,7 @@ private class BasicAssetPack
         files = new Map();
     }
 
-    public function getTexture (name :String, required :Bool = true) :Texture
+    public function getTexture (name :String, required :Bool = true) :Value<Texture>
     {
 #if debug
         warnOnExtension(name);
@@ -201,7 +207,7 @@ private class BasicAssetPack
         return texture;
     }
 
-    public function getSound (name :String, required :Bool = true) :Sound
+    public function getSound (name :String, required :Bool = true) :Value<Sound>
     {
 #if debug
         warnOnExtension(name);
@@ -213,7 +219,7 @@ private class BasicAssetPack
         return sound;
     }
 
-    public function getFile (name :String, required :Bool = true) :String
+    public function getFile (name :String, required :Bool = true) :Value<String>
     {
         var file = files.get(name);
         if (file == null && required) {

@@ -19,15 +19,14 @@ def run (config, platform, debug=False):
     build(config, [platform], debug)
     id = get(config, "id")
     if platform == "android":
-        apk = "build/main-android.apk"
         log.info("")
+        apk = "build/main-android.apk"
         log.info("Installing: " + apk)
-        adt(["-uninstallApp", "-platform", "android", "-appid", id], verbose=False, output=False, check=False)
-        adt(["-installApp", "-platform", "android", "-package", "build/main-android.apk"], verbose=False)
+        adb(["install", "-r", apk], verbose=False)
         adt(["-launchApp", "-platform", "android", "-appid", id], verbose=False)
         if debug:
-            # Clear the log, then start tailing it
             log.info("")
+            # Clear the log, then start tailing it
             adb(["logcat", "-c"], verbose=False)
             adb(["logcat", "-v", "raw", "-s", "air.%s:V" % id], verbose=False)
 
@@ -103,7 +102,7 @@ def build (config, platforms=[], debug=False):
         apk = "build/main-android.apk"
         log.info("Building: " + apk)
 
-        apk_type = "apk-debug" if debug else "apk-captive-runtime"
+        apk_type = "apk-captive-debug" if debug else "apk-captive-runtime"
 
         swf = "main-android.swf"
         build_air(["-swf", cache_dir+"/air/"+swf])
@@ -118,9 +117,9 @@ def build (config, platforms=[], debug=False):
         xml = cache_dir+"/air/config-android.xml"
         generate_air_xml(swf, xml)
 
-        adt(["-package", "-target", apk_type, "-storetype", "pkcs12", "-keystore", cert,
-            "-storepass", "password", apk,
-            xml, "-C", cache_dir+"/air", swf, "-C", cache_dir+"/air", "assets"])
+        adt(["-package", "-target", apk_type, "-storetype", "pkcs12",
+            "-keystore", cert, "-storepass", "password", apk, xml,
+            "-C", cache_dir+"/air", swf, "assets"])
 
     builders = {
         "html": build_html,

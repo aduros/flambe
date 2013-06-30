@@ -37,7 +37,7 @@ class Font
         _glyphs = new Map();
         _glyphs.set(NEWLINE.charCode, NEWLINE);
 
-        var parser = new ConfigParser(pack.getFile(name + ".fnt"));
+        var parser = new ConfigParser(pack.getFile(name + ".fnt").toString());
         var pages = new Map<Int,Texture>();
 
         // The basename of the font's path, where we'll find the textures

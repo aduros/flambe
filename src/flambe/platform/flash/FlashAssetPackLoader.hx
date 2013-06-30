@@ -63,7 +63,7 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
         case Data:
             var urlLoader = new URLLoader(req);
             dispatcher = urlLoader;
-            create = function () return urlLoader.data;
+            create = function () return new BasicFile(urlLoader.data);
 
         default:
             // Should never happen

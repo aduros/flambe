@@ -6,6 +6,7 @@ package flambe.platform;
 
 import flambe.asset.AssetEntry;
 import flambe.asset.AssetPack;
+import flambe.asset.File;
 import flambe.asset.Manifest;
 import flambe.display.Texture;
 import flambe.sound.Sound;
@@ -141,7 +142,7 @@ class BasicAssetPackLoader
         Assert.fail(); // See subclasses
     }
 
-    private function handleLoad<A> (entry :AssetEntry, asset :A)
+    private function handleLoad<A/*:BasicReloadable<A>*/> (entry :AssetEntry, asset :A)
     {
         // Ensure this asset has been fully progressed
         handleProgress(entry, entry.bytes);
@@ -157,7 +158,6 @@ class BasicAssetPackLoader
         }
 
 #if debug // Allow some methods to get stripped in release builds, which don't allow reloading
-        // TODO(bruno): Remove unsafe cast
         var oldAsset :BasicReloadable<A> = cast map.get(entry.name);
         if (oldAsset != null) {
             Log.info("Reloaded asset", ["url", entry.url]);
@@ -230,7 +230,7 @@ private class BasicAssetPack
 
     public var textures :Map<String,Texture>;
     public var sounds :Map<String,Sound>;
-    public var files :Map<String,String>;
+    public var files :Map<String,File>;
 
     public function new (manifest :Manifest)
     {
@@ -264,7 +264,7 @@ private class BasicAssetPack
         return sound;
     }
 
-    public function getFile (name :String, required :Bool = true) :String
+    public function getFile (name :String, required :Bool = true) :File
     {
         var file = files.get(name);
         if (file == null && required) {

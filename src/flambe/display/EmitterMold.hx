@@ -88,7 +88,7 @@ class EmitterMold
         var blendFuncSource = 0;
         var blendFuncDestination = 0;
 
-        var xml = Xml.parse(pack.getFile(name+".pex"));
+        var xml = Xml.parse(pack.getFile(name+".pex").toString());
         for (element in xml.firstElement().elements()) {
             switch (element.nodeName.toLowerCase()) {
             case "texture":

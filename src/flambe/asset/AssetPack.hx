@@ -33,9 +33,9 @@ interface AssetPack
     function getSound (name :String, required :Bool = true) :Sound;
 
     /**
-     * Gets a file by name from the asset pack, returning its contents as a string. Files are
-     * cached, so it's safe to get the same file multiple times.
+     * Gets a file by name from the asset pack, returning its raw content. Files are cached, so it's
+     * safe to get the same file multiple times.
      * @param required If true and the asset was not found, an error is thrown.
      */
-    function getFile (name :String, required :Bool = true) :String;
+    function getFile (name :String, required :Bool = true) :File;
 }

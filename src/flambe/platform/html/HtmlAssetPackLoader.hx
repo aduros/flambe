@@ -135,7 +135,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
 
         case Data:
             sendRequest(url, entry, "text", function (text) {
-                handleLoad(entry, text);
+                handleLoad(entry, new BasicFile(text));
             });
         }
     }

@@ -4,10 +4,12 @@
 
 package flambe.sound;
 
+import flambe.asset.Reloadable;
+
 /**
  * A loaded sound file.
  */
-interface Sound
+interface Sound extends Reloadable
 {
     /**
      * The length of the sound in seconds.

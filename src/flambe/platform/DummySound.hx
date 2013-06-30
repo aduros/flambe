@@ -11,7 +11,7 @@ import flambe.sound.Sound;
 /**
  * An empty sound used in environments that don't support audio.
  */
-class DummySound
+class DummySound extends BasicReloadable<DummySound>
     implements Sound
 {
     public var duration (get, null) :Float;

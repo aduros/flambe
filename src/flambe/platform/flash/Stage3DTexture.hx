@@ -16,7 +16,7 @@ import haxe.io.Bytes;
 import flambe.display.Graphics;
 import flambe.display.Texture;
 
-class Stage3DTexture
+class Stage3DTexture extends BasicReloadable<Stage3DTexture>
     implements Texture
 {
     public var width (get, null) :Int;

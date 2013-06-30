@@ -72,6 +72,38 @@ class BasicAssetPackLoader
         }
     }
 
+    /** Reload any asset that matches this URL (ignoring the ?v= query param). */
+    public function reload (url :String)
+    {
+        var manifest = _pack.manifest;
+        if (manifest.relativeBasePath != "assets") {
+            return; // Forget it, it wasn't loaded from the assets directory
+        }
+
+        // Find the AssetEntry that matches this url
+        var baseUrl = removeUrlParams(url);
+        var foundEntry = null;
+        for (entry in manifest) {
+            if (baseUrl == removeUrlParams(entry.url)) {
+                foundEntry = entry;
+                break;
+            }
+        }
+        if (foundEntry == null) {
+            return; // Nope, it's not in this pack
+        }
+
+        // Dummy up a new AssetEntry based on the previous one, and reload it
+        var entry = new AssetEntry(foundEntry.name, url, foundEntry.format, 0);
+        loadEntry(manifest.getFullURL(entry), entry);
+    }
+
+    private static function removeUrlParams (url :String) :String
+    {
+        var query = url.indexOf("?");
+        return (query > 0) ? url.substr(0, query) : url;
+    }
+
     /**
      * Out of a list of asset entries with the same name, select the one best supported by this
      * environment, or null if none of them are supported.
@@ -104,24 +136,34 @@ class BasicAssetPackLoader
         Assert.fail(); // See subclasses
     }
 
-    private function handleLoad (entry :AssetEntry, asset :Dynamic)
+    private function handleLoad<A> (entry :AssetEntry, asset :A)
     {
         // Ensure this asset has been fully progressed
         handleProgress(entry, entry.bytes);
 
-        var name = entry.name;
+        var map :Map<String,Dynamic>;
         switch (entry.format) {
         case WEBP, JXR, PNG, JPG, GIF, DDS, PVR, PKM:
-            _pack.textures.set(name, asset);
+            map = _pack.textures;
         case MP3, M4A, OGG, WAV:
-            _pack.sounds.set(name, asset);
+            map = _pack.sounds;
         case Data:
-            _pack.files.set(name, asset);
+            map = _pack.files;
         }
 
-        _assetsRemaining -= 1;
-        if (_assetsRemaining <= 0) {
-            handleSuccess();
+        // TODO(bruno): Remove unsafe cast
+        var oldAsset :BasicReloadable<A> = cast map.get(entry.name);
+        if (oldAsset != null) {
+            Log.info("Reloaded asset", ["url", entry.url]);
+            oldAsset.copyFrom(asset);
+            oldAsset.emitReload();
+
+        } else {
+            map.set(entry.name, asset);
+            _assetsRemaining -= 1;
+            if (_assetsRemaining == 0) {
+                handleSuccess();
+            }
         }
     }
 

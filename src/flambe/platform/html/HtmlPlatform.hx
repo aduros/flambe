@@ -244,13 +244,20 @@ class HtmlPlatform
 
 #if debug
         new DebugLogic(this);
+        _catapult = HtmlCatapultClient.canUse() ? new HtmlCatapultClient() : null;
 #end
         Log.info("Initialized HTML platform", ["renderer", _renderer.getName()]);
     }
 
     public function loadAssetPack (manifest :Manifest) :Promise<AssetPack>
     {
-        return new HtmlAssetPackLoader(this, manifest).promise;
+        var loader = new HtmlAssetPackLoader(this, manifest);
+#if debug
+        if (_catapult != null) {
+            _catapult.add(loader);
+        }
+#end
+        return loader.promise;
     }
 
     public function getStage () :StageSystem
@@ -441,4 +448,8 @@ class HtmlPlatform
 
     private var _lastUpdate :Float;
     private var _skipFrame :Bool;
+
+#if debug
+    private var _catapult :HtmlCatapultClient;
+#end
 }

@@ -12,7 +12,7 @@ import haxe.io.Bytes;
 import flambe.display.Graphics;
 import flambe.display.Texture;
 
-class CanvasTexture
+class CanvasTexture extends BasicReloadable<CanvasTexture>
     implements Texture
 {
     public var width (get, null) :Int;
@@ -55,6 +55,13 @@ class CanvasTexture
         // Draw the pixels, and invalidate our contents
         ctx2d.putImageData(imageData, x, y);
         dirtyContents();
+    }
+
+    override public function copyFrom (that :CanvasTexture)
+    {
+        this.image = that.image;
+        this.pattern = that.pattern;
+        this._graphics = that._graphics;
     }
 
     inline public function dirtyContents ()

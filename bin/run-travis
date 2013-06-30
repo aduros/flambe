@@ -35,6 +35,17 @@ echo "Building demos..."
 git clone git://github.com/aduros/flambe-demos.git
 flambe-demos/bin/build-all --debug
 
+echo "Testing new build tool..."
+cd tools/cli
+python setup.py install
+cd -
+
+flambe new testgame
+cd testgame
+flambe build html flash
+flambe clean
+cd -
+
 # Run the Selenium tests if the Sauce auth key is available (not in pull requests), and only run on
 # one of the Python build workers
 if [ "$TRAVIS_SECURE_ENV_VARS" == "true" -a "$TRAVIS_PYTHON_VERSION" == "2.7" ]; then

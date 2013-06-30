@@ -171,7 +171,16 @@ class FlashPlatform
     public function getMotion () :MotionSystem
     {
         if (_motion == null) {
+#if flambe_air
+            if (AirMotion.shouldUse()) {
+                _motion = new AirMotion();
+            } else {
+                Log.warn("Accelerometer is unavailable");
+                _motion = new DummyMotion();
+            }
+#else
             _motion = new DummyMotion();
+#end
         }
         return _motion;
     }

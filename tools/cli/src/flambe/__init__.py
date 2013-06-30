@@ -33,27 +33,77 @@ def build (config, platforms=[], debug=False):
     shutil.rmtree("build/web/assets", ignore_errors=True)
     shutil.copytree("assets", "build/web/assets")
 
+    # Flags common to all swf-based targets (flash, android, ios)
+    swf_flags = ["--flash-strict", "-D", "native_trace",
+        "-swf-header", "640:480:60:000000", "-lib", "hxsl"]
+    if debug: swf_flags += ["-D", "fdb", "-D", "advanced-telemetry"]
+
     def build_html ():
         html_flags = ["-D", "html"]
         unminified = cache_dir+"/main-html.unminified.js"
         minified = "build/web/targets/main-html.js"
-
         if debug:
             haxe(common_flags + html_flags + ["-js", minified])
         else:
+            # Minify release builds
             haxe(common_flags + html_flags + ["-js", unminified])
             minify_js([unminified], minified, strict=True)
 
     def build_flash ():
-        flash_flags = ["-swf", "build/web/targets/main-flash.swf",
-            "--flash-strict", "-D", "native_trace",
-            "-swf-header", "640:480:60:000000", "-swf-version", "11", "-lib", "hxsl"]
-        if debug: flash_flags += ["-D", "fdb", "-D", "advanced-telemetry"]
+        flash_flags = swf_flags + ["-swf-version", "11"]
         haxe(common_flags + flash_flags)
+
+    def build_air (flags):
+        # Prepare the assets directory
+        mkdir_p(cache_dir+"/air")
+        shutil.rmtree(cache_dir+"/air/assets", ignore_errors=True)
+        shutil.copytree("assets", cache_dir+"/air/assets",
+            ignore=shutil.ignore_patterns("*.ogg", "*.wav", "*.m4a"))
+
+        # Build the swf
+        air_flags = swf_flags + ["-lib", "air3", "-swf-version", "11.2", "-D", "flambe_air"]
+        haxe(common_flags + air_flags + flags)
+
+    def generate_air_xml (swf, output):
+        from xml.dom.minidom import parseString
+        from textwrap import dedent
+        xml = parseString(dedent("""
+            <application xmlns="http://ns.adobe.com/air/application/3.7">
+              <id>"""+get(config, "id")+"""</id>
+              <versionNumber>"""+get(config, "version")+"""</versionNumber>
+              <filename>"""+get(config, "name")+"""</filename>
+              <initialWindow>
+                <content>"""+swf+"""</content>
+                <renderMode>direct</renderMode>
+              </initialWindow>
+            </application>"""))
+        with open(output, "w") as file:
+            xml.writexml(file)
+
+    def build_android ():
+        apk_type = "apk-debug" if debug else "apk-captive-runtime"
+
+        swf = "main-android.swf"
+        build_air(["-swf", cache_dir+"/air/"+swf])
+
+        # Generate a dummy certificate if it doesn't exist
+        cert = cache_dir+"/air/certificate-android.p12"
+        try:
+            with open(cert): pass
+        except IOError:
+            adt(["-certificate", "-cn", "SelfSign", "-validityPeriod", "25", "2048-RSA", cert, "password"])
+
+        xml = cache_dir+"/air/app-android.xml"
+        generate_air_xml(swf, xml)
+
+        adt(["-package", "-target", apk_type, "-storetype", "pkcs12", "-keystore", cert,
+            "-storepass", "password", "build/main-android.apk",
+            xml, "-C", cache_dir+"/air", swf, "-C", cache_dir+"/air", "assets"])
 
     builders = {
         "html": build_html,
         "flash": build_flash,
+        "android": build_android,
     }
     for platform in platforms:
         builders[platform]()
@@ -64,6 +114,9 @@ def clean ():
 
 def haxe (flags):
     run_command(["haxe"] + flags)
+
+def adt (flags):
+    run_command(["adt"] + flags)
 
 def minify_js (inputs, output, strict=False):
     from textwrap import dedent

@@ -37,12 +37,13 @@ flambe-demos/bin/build-all --debug
 
 echo "Testing new build tool..."
 cd tools/cli
-scripts/generate-data
 python setup.py install
 cd -
 
 flambe new testgame
 cd testgame
+flambe build html flash --debug
+flambe clean
 flambe build html flash
 flambe clean
 cd -

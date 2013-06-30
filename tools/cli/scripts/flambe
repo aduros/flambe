@@ -7,7 +7,7 @@ import os
 import sys
 import yaml
 
-PLATFORMS = ["html", "flash", "android"]
+PLATFORMS = ["html", "flash", "ios", "android"]
 
 logging.basicConfig(format="%(message)s")
 logger = logging.getLogger("flambe")
@@ -56,11 +56,11 @@ cmd.add_argument("platforms", choices=PLATFORMS, nargs="+")
 cmd.add_argument("--debug", action="store_true")
 cmd.set_defaults(func=on_build)
 
-cmd = subcommands.add_parser("serve")
-cmd.set_defaults(func=on_serve)
-
 cmd = subcommands.add_parser("clean")
 cmd.set_defaults(func=on_clean)
+
+cmd = subcommands.add_parser("serve")
+cmd.set_defaults(func=on_serve)
 
 args = parser.parse_args()
 try:

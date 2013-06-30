@@ -102,8 +102,6 @@ def build (config, platforms=[], debug=False):
         apk = "build/main-android.apk"
         log.info("Building: " + apk)
 
-        apk_type = "apk-captive-debug" if debug else "apk-captive-runtime"
-
         swf = "main-android.swf"
         build_air(["-swf", cache_dir+"/air/"+swf])
 
@@ -117,13 +115,31 @@ def build (config, platforms=[], debug=False):
         xml = cache_dir+"/air/config-android.xml"
         generate_air_xml(swf, xml)
 
+        apk_type = "apk-debug" if debug else "apk-captive-runtime"
         adt(["-package", "-target", apk_type, "-storetype", "pkcs12",
             "-keystore", cert, "-storepass", "password", apk, xml,
             "-C", cache_dir+"/air", swf, "assets"])
 
+    def build_ios ():
+        ipa = "build/main-ios.ipa"
+        log.info("Building: " + ipa)
+
+        swf = "main-ios.swf"
+        build_air(["-swf", cache_dir+"/air/"+swf])
+
+        xml = cache_dir+"/air/config-ios.xml"
+        generate_air_xml(swf, xml)
+
+        ipa_type = "ipa-debug" if debug else "ipa-ad-hoc" # or maybe ipa-test?
+        adt(["-package", "-target", ipa_type,
+            "-provisioning-profile", "ios/development.mobileprovision",
+            "-storetype", "pkcs12", "-keystore", "ios/development.p12", "-storepass", "password",
+            ipa, xml, "-C", cache_dir+"/air", swf, "assets"])
+
     builders = {
         "html": build_html,
         "flash": build_flash,
+        "ios": build_ios,
         "android": build_android,
     }
     for ii, platform in enumerate(platforms):

@@ -151,6 +151,7 @@ class BasicAssetPackLoader
             map = _pack.files;
         }
 
+#if debug // Allow some methods to get stripped in release builds, which don't allow reloading
         // TODO(bruno): Remove unsafe cast
         var oldAsset :BasicReloadable<A> = cast map.get(entry.name);
         if (oldAsset != null) {
@@ -159,12 +160,15 @@ class BasicAssetPackLoader
             oldAsset.emitReload();
 
         } else {
+#end
             map.set(entry.name, asset);
             _assetsRemaining -= 1;
             if (_assetsRemaining == 0) {
                 handleSuccess();
             }
+#if debug
         }
+#end
     }
 
     private function handleProgress (entry :AssetEntry, bytesLoaded :Int)

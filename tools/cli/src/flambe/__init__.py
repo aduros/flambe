@@ -23,7 +23,8 @@ def run (config, platform, debug=False):
         log.info("")
         apk = "build/main-android.apk"
         log.info("Installing: " + apk)
-        adb(["install", "-r", apk], verbose=False)
+        adt(["-uninstallApp", "-platform", "android", "-appid", id], verbose=False, output=False, check=False)
+        adt(["-installApp", "-platform", "android", "-package", apk], verbose=False)
         adt(["-launchApp", "-platform", "android", "-appid", id], verbose=False)
         if debug:
             log.info("")

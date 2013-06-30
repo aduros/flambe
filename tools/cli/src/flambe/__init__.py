@@ -2,6 +2,7 @@ import distutils.core
 import errno
 import logging
 import os
+import re
 import shutil
 import subprocess
 
@@ -85,7 +86,7 @@ def build (config, platforms=[], debug=False):
     def generate_air_xml (swf, output):
         from xml.dom.minidom import parseString
         from textwrap import dedent
-        xml = parseString(dedent("""
+        doc = parseString(dedent("""
             <application xmlns="http://ns.adobe.com/air/application/3.7">
               <id>"""+get(config, "id")+"""</id>
               <versionNumber>"""+get(config, "version")+"""</versionNumber>
@@ -95,8 +96,17 @@ def build (config, platforms=[], debug=False):
                 <renderMode>direct</renderMode>
               </initialWindow>
             </application>"""))
+        icons = doc.createElement("icon")
+        for icon in os.listdir("icons"):
+            # Only include properly named square icons
+            if re.match("(\d+)x\\1.png", icon):
+                size = os.path.splitext(icon)[0]
+                image = doc.createElement("image"+size)
+                image.appendChild(doc.createTextNode("icons/"+icon))
+                icons.appendChild(image)
+        doc.firstChild.appendChild(icons)
         with open(output, "w") as file:
-            xml.writexml(file)
+            doc.writexml(file)
 
     def build_android ():
         apk = "build/main-android.apk"
@@ -117,7 +127,7 @@ def build (config, platforms=[], debug=False):
 
         apk_type = "apk-debug" if debug else "apk-captive-runtime"
         adt(["-package", "-target", apk_type, "-storetype", "pkcs12",
-            "-keystore", cert, "-storepass", "password", apk, xml,
+            "-keystore", cert, "-storepass", "password", apk, xml, "icons",
             "-C", cache_dir+"/air", swf, "assets"])
 
     def build_ios ():
@@ -134,7 +144,7 @@ def build (config, platforms=[], debug=False):
         adt(["-package", "-target", ipa_type,
             "-provisioning-profile", "ios/development.mobileprovision",
             "-storetype", "pkcs12", "-keystore", "ios/development.p12", "-storepass", "password",
-            ipa, xml, "-C", cache_dir+"/air", swf, "assets"])
+            ipa, xml, "icons", "-C", cache_dir+"/air", swf, "assets"])
 
     builders = {
         "html": build_html,

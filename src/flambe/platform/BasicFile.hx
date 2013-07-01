@@ -6,7 +6,7 @@ package flambe.platform;
 
 import flambe.asset.File;
 
-class BasicFile extends BasicReloadable<BasicFile>
+class BasicFile extends InternalReloadable<BasicFile>
     implements File
 {
     public function new (content :String)
@@ -19,7 +19,7 @@ class BasicFile extends BasicReloadable<BasicFile>
         return _content;
     }
 
-    override public function copyFrom (that :BasicFile)
+    override private function copyFrom (that :BasicFile)
     {
         this._content = that._content;
     }

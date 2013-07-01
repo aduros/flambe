@@ -2,27 +2,23 @@
 // Flambe - Rapid game development
 // https://github.com/aduros/flambe/blob/master/LICENSE.txt
 
-package flambe.platform;
+package flambe.asset;
 
-import flambe.asset.Reloadable;
-import flambe.util.Assert;
 import flambe.util.Value;
 
-class BasicReloadable<A>
+/**
+ * A handy implementation of Reloadable, designed to be subclassed.
+ */
+class BasicReloadable
     implements Reloadable
 {
     public var reloadCount (get, null) :Value<Int>;
 
-    public function emitReload ()
+    private function emitReload ()
     {
         if (_reloadCount != null) {
             ++_reloadCount._;
         }
-    }
-
-    public function copyFrom (asset :A)
-    {
-        Assert.fail(); // See subclasses
     }
 
     private function get_reloadCount () :Value<Int>

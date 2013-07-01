@@ -12,7 +12,7 @@ import flambe.sound.Playback;
 import flambe.sound.Sound;
 import flambe.util.Disposable;
 
-class HtmlSound extends BasicReloadable<HtmlSound>
+class HtmlSound extends InternalReloadable<HtmlSound>
     implements Sound
 {
     public var duration (get, null) :Float;
@@ -38,7 +38,7 @@ class HtmlSound extends BasicReloadable<HtmlSound>
         return audioElement.duration;
     }
 
-    override public function copyFrom (that :HtmlSound)
+    override private function copyFrom (that :HtmlSound)
     {
         this.audioElement = that.audioElement;
     }

@@ -10,7 +10,7 @@ import flambe.sound.Playback;
 import flambe.sound.Sound;
 import flambe.util.Disposable;
 
-class WebAudioSound extends BasicReloadable<WebAudioSound>
+class WebAudioSound extends InternalReloadable<WebAudioSound>
     implements Sound
 {
     public static var supported (get, null) :Bool;
@@ -49,7 +49,7 @@ class WebAudioSound extends BasicReloadable<WebAudioSound>
         return buffer.duration;
     }
 
-    override public function copyFrom (that :WebAudioSound)
+    override private function copyFrom (that :WebAudioSound)
     {
         this.buffer = that.buffer;
     }

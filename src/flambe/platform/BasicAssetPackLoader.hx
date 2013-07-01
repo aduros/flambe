@@ -142,7 +142,7 @@ class BasicAssetPackLoader
         Assert.fail(); // See subclasses
     }
 
-    private function handleLoad<A/*:BasicReloadable<A>*/> (entry :AssetEntry, asset :A)
+    private function handleLoad<A/*:InternalReloadable<A>*/> (entry :AssetEntry, asset :A)
     {
         // Ensure this asset has been fully progressed
         handleProgress(entry, entry.bytes);
@@ -158,11 +158,10 @@ class BasicAssetPackLoader
         }
 
 #if debug // Allow some methods to get stripped in release builds, which don't allow reloading
-        var oldAsset :BasicReloadable<A> = cast map.get(entry.name);
+        var oldAsset :InternalReloadable<A> = cast map.get(entry.name);
         if (oldAsset != null) {
             Log.info("Reloaded asset", ["url", entry.url]);
-            oldAsset.copyFrom(asset);
-            oldAsset.emitReload();
+            oldAsset.reload(asset);
 
         } else {
 #end

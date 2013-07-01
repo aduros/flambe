@@ -12,7 +12,7 @@ import haxe.io.Bytes;
 import flambe.display.Graphics;
 import flambe.display.Texture;
 
-class CanvasTexture extends BasicReloadable<CanvasTexture>
+class CanvasTexture extends InternalReloadable<CanvasTexture>
     implements Texture
 {
     public var width (get, null) :Int;
@@ -57,13 +57,6 @@ class CanvasTexture extends BasicReloadable<CanvasTexture>
         dirtyContents();
     }
 
-    override public function copyFrom (that :CanvasTexture)
-    {
-        this.image = that.image;
-        this.pattern = that.pattern;
-        this._graphics = that._graphics;
-    }
-
     inline public function dirtyContents ()
     {
         pattern = null;
@@ -100,6 +93,13 @@ class CanvasTexture extends BasicReloadable<CanvasTexture>
         }
         var canvas :CanvasElement = cast image;
         return canvas.getContext2d();
+    }
+
+    override private function copyFrom (that :CanvasTexture)
+    {
+        this.image = that.image;
+        this.pattern = that.pattern;
+        this._graphics = that._graphics;
     }
 
     private var _graphics :CanvasGraphics = null;

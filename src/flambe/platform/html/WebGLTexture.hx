@@ -13,7 +13,7 @@ import haxe.io.Bytes;
 import flambe.display.Graphics;
 import flambe.display.Texture;
 
-class WebGLTexture extends BasicReloadable<WebGLTexture>
+class WebGLTexture extends InternalReloadable<WebGLTexture>
     implements Texture
 {
     public var width (get, null) :Int;
@@ -109,7 +109,7 @@ class WebGLTexture extends BasicReloadable<WebGLTexture>
             GL.RGBA, GL.UNSIGNED_BYTE, new Uint8Array(pixels.getData()));
     }
 
-    override public function copyFrom (that :WebGLTexture)
+    override private function copyFrom (that :WebGLTexture)
     {
         this.nativeTexture = that.nativeTexture;
         this.framebuffer = that.framebuffer;

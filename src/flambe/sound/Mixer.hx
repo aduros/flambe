@@ -7,6 +7,7 @@ package flambe.sound;
 import flambe.math.FMath;
 import flambe.platform.DummySound;
 import flambe.util.Disposable;
+import flambe.util.Value;
 
 /**
  * An easy way to manage the lifecycle of multiple sounds. A handle is created from a source sound
@@ -56,6 +57,8 @@ private class MixerSound
     implements Sound
     implements Disposable
 {
+    public var reloadCount (get, null) :Value<Int>;
+
     public var duration (get, null) :Float;
 
     public function new (source :Sound, channels :Int)
@@ -102,6 +105,11 @@ private class MixerSound
     public function get_duration () :Float
     {
         return _source.duration;
+    }
+
+    public function get_reloadCount () :Value<Int>
+    {
+        return _source.reloadCount;
     }
 
     public function dispose ()

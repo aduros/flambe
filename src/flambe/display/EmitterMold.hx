@@ -183,7 +183,7 @@ class EmitterMold
         if (blendFuncSource == 1 && blendFuncDestination == 1) {
             blendMode = Add;
         } else if (blendFuncSource == 1 && blendFuncDestination == 771) {
-            // blendMode = Normal;
+            blendMode = null; // Normal
         } else if (blendFuncSource != 0 || blendFuncDestination != 0) {
             Log.warn("Unsupported particle blend functions", [
                 "emitter", name, "source", blendFuncSource, "dest", blendFuncDestination ]);

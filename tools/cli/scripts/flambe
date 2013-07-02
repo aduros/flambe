@@ -31,6 +31,7 @@ def on_build (args):
     flambe.build(load_config(args), platforms=args.platforms, debug=args.debug)
 
 def on_serve (args):
+    load_config(args) # Just to make sure you're in a valid project directory
     server = flambe.Server()
     server.run()
 

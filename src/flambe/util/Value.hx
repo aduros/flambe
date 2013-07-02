@@ -9,7 +9,9 @@ import flambe.util.Signal2;
 /**
  * Wraps a single value, notifying listeners when the value changes.
  */
+#if !js
 @:generic // Generate typed templates on static targets
+#end
 class Value<A>
 {
     /**

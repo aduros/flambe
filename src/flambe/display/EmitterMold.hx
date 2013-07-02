@@ -8,6 +8,11 @@ import flambe.asset.AssetPack;
 
 using flambe.util.Strings;
 
+enum EmitterType
+{
+    Gravity; Radial;
+}
+
 /**
  * <p>A particle system configuration, that can be used to create emitter sprites. The configuration
  * is loaded from a .pex file, authored in a tool such as Particle Designer.</p>
@@ -16,7 +21,6 @@ using flambe.util.Strings;
  * Flambe:
  * <ul>
  * <li>Particle coloring is not supported.</li>
- * <li>Radial emitters are not (yet) supported.</li>
  * <li>Only normal and additive blend modes are supported.</li>
  * </ul>
  * </p>
@@ -30,6 +34,8 @@ class EmitterMold
     public var texture :Texture;
 
     public var maxParticles :Int;
+
+    public var type :EmitterType;
 
     // public var emitX :Float;
     public var emitXVariance :Float;
@@ -51,14 +57,16 @@ class EmitterMold
     public var gravityX :Float;
     public var gravityY :Float;
 
-    // public var maxRadius :Float;
-    // public var maxRadiusVariance :Float;
+    public var maxRadius :Float;
+    public var maxRadiusVariance :Float;
+
+    public var minRadius :Float;
 
     public var lifespanVariance :Float;
     public var lifespan :Float;
 
-    // public var rotatePerSecond :Float;
-    // public var rotatePerSecondVariance :Float;
+    public var rotatePerSecond :Float;
+    public var rotatePerSecondVariance :Float;
 
     public var rotationStart :Float;
     public var rotationStartVariance :Float;
@@ -104,10 +112,7 @@ class EmitterMold
             case "duration":
                 duration = getValue(element);
             case "emittertype":
-                if (getValue(element) != 0) {
-                    // TODO(bruno): Implement radial emitters
-                    Log.warn("Radial emitters are not yet supported", ["emitter", name]);
-                }
+                type = (Std.int(getValue(element)) == 0) ? Gravity : Radial;
             case "finishcolor":
                 alphaEnd = getFloat(element, "alpha");
             case "finishcolorvariance":
@@ -121,12 +126,12 @@ class EmitterMold
                 gravityY = getY(element);
             case "maxparticles":
                 maxParticles = Std.int(getValue(element));
-            // case "maxradius":
-            //     maxRadius = getValue(element);
-            // case "maxradiusvariance":
-            //     maxRadiusVariance = getValue(element);
-            // case "minradius":
-            //     minRadius = getValue(element);
+            case "maxradius":
+                maxRadius = getValue(element);
+            case "maxradiusvariance":
+                maxRadiusVariance = getValue(element);
+            case "minradius":
+                minRadius = getValue(element);
             case "particlelifespan":
                 lifespan = getValue(element);
             case "particlelifespanvariance":
@@ -135,8 +140,10 @@ class EmitterMold
                 radialAccelVariance = getValue(element);
             case "radialacceleration":
                 radialAccel = getValue(element);
-            // case "rotatepersecond":
-            // case "rotatepersecondvariance":
+            case "rotatepersecond":
+                rotatePerSecond = getValue(element);
+            case "rotatepersecondvariance":
+                rotatePerSecondVariance = getValue(element);
             case "rotationend":
                 rotationEnd = getValue(element);
             case "rotationendvariance":

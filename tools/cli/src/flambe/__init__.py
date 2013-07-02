@@ -10,6 +10,7 @@ log = logging.getLogger("flambe")
 
 data_dir = os.path.join(os.path.dirname(__file__), "data")
 cache_dir = ".flambe-cache"
+haxe_compiler_port = "6000"
 
 class FlambeException (Exception): pass
 
@@ -33,7 +34,14 @@ def run (config, platform, debug=False):
             adb(["logcat", "-v", "raw", "-s", "air.%s:V" % id], verbose=False)
 
 def build (config, platforms=[], debug=False):
-    common_flags = ["-lib", "flambe", "-cp", "src"]
+    common_flags = []
+
+    # Use a Haxe compilation server if available
+    connect_flags = ["--connect", haxe_compiler_port]
+    if haxe(connect_flags, check=False, verbose=False, output=False) == 0:
+        common_flags += connect_flags
+
+    common_flags += ["-lib", "flambe", "-cp", "src"]
 
     common_flags += ["-main", get(config, "main")]
     common_flags += ["-dce", "full"]
@@ -162,13 +170,13 @@ def clean ():
     shutil.rmtree(cache_dir, ignore_errors=True)
 
 def haxe (flags, **kwargs):
-    run_command(["haxe"] + flags, **kwargs)
+    return run_command(["haxe"] + flags, **kwargs)
 
 def adt (flags, **kwargs):
-    run_command(["adt"] + flags, **kwargs)
+    return run_command(["adt"] + flags, **kwargs)
 
 def adb (flags, **kwargs):
-    run_command(["adb"] + flags, **kwargs)
+    return run_command(["adb"] + flags, **kwargs)
 
 def minify_js (inputs, output, strict=False):
     from textwrap import dedent
@@ -183,13 +191,14 @@ def minify_js (inputs, output, strict=False):
             %output%""")]
     for input in inputs: command += ["--js", input]
     if strict: command += ["--language_in", "ES5_STRICT"]
-    run_command(command, verbose=False)
+    return run_command(command, verbose=False)
 
 def run_command (command, verbose=True, output=True, check=True):
     if verbose: log.info(" ".join(command))
     stream = None if output else subprocess.PIPE
     code = subprocess.call(command, stdout=stream, stderr=stream)
     if check and code != 0: raise FlambeException()
+    return code
 
 def to_list (o):
     if isinstance(o, list): return o
@@ -220,6 +229,11 @@ class Server ():
 
     def run (self):
         log.info("Serving on http://localhost:%s" % self.http_port)
+
+        # Fire up a Haxe compiler server, ignoring all output. It's fine if this command fails, the
+        # build will fallback to not using a compiler server
+        subprocess.Popen(["haxe", "--wait", haxe_compiler_port],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         class CacheableFile(static.File):
             def render (self, request):

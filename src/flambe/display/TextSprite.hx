@@ -113,6 +113,14 @@ class TextSprite extends Sprite
 
     private function updateLayout ()
     {
+#if debug
+        var reloadCount = _font.checkReload();
+        if (reloadCount != _lastReloadCount) {
+            _lastReloadCount = reloadCount;
+            _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
+        }
+#end
+
         if (_flags.contains(Sprite.TEXTSPRITE_DIRTY)) {
             _flags = _flags.remove(Sprite.TEXTSPRITE_DIRTY);
             _layout = font.layoutText(_text, _align, wrapWidth._);
@@ -130,4 +138,8 @@ class TextSprite extends Sprite
     private var _align :TextAlign;
 
     private var _layout :TextLayout = null;
+
+#if debug
+    private var _lastReloadCount :Int = -1;
+#end
 }

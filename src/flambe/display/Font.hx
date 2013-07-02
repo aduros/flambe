@@ -7,6 +7,7 @@ package flambe.display;
 import flambe.asset.AssetPack;
 import flambe.math.FMath;
 import flambe.math.Rectangle;
+import flambe.util.Value;
 
 using StringTools;
 using flambe.util.Strings;
@@ -34,80 +35,13 @@ class Font
     public function new (pack :AssetPack, name :String)
     {
         this.name = name;
-        _glyphs = new Map();
-        _glyphs.set(NEWLINE.charCode, NEWLINE);
+        _pack = pack;
 
-        var parser = new ConfigParser(pack.getFile(name + ".fnt").toString());
-        var pages = new Map<Int,Texture>();
-
-        // The basename of the font's path, where we'll find the textures
-        var idx = name.lastIndexOf("/");
-        var basePath = (idx >= 0) ? name.substr(0, idx+1) : "";
-
-        for (keyword in parser.keywords()) {
-            switch (keyword) {
-            case "info":
-                for (pair in parser.pairs()) {
-                    switch (pair.key) {
-                    case "size":
-                        size = pair.getInt();
-                    }
-                }
-
-            case "page":
-                var pageId :Int = 0;
-                var file :String = null;
-                for (pair in parser.pairs()) {
-                    switch (pair.key) {
-                    case "id":
-                        pageId = pair.getInt();
-                    case "file":
-                        file = pair.getString();
-                    }
-                }
-                pages.set(pageId, pack.getTexture(basePath + file.removeFileExtension()));
-
-            case "char":
-                var glyph = null;
-                for (pair in parser.pairs()) {
-                    switch (pair.key) {
-                    case "id":
-                        glyph = new Glyph(pair.getInt());
-                    case "x":
-                        glyph.x = pair.getInt();
-                    case "y":
-                        glyph.y = pair.getInt();
-                    case "width":
-                        glyph.width = pair.getInt();
-                    case "height":
-                        glyph.height = pair.getInt();
-                    case "page":
-                        glyph.page = pages.get(pair.getInt());
-                    case "xoffset":
-                        glyph.xOffset = pair.getInt();
-                    case "yoffset":
-                        glyph.yOffset = pair.getInt();
-                    case "xadvance":
-                        glyph.xAdvance = pair.getInt();
-                    }
-                }
-                _glyphs.set(glyph.charCode, glyph);
-
-            case "kerning":
-                var first :Glyph = null;
-                var second = -1;
-                for (pair in parser.pairs()) {
-                    switch (pair.key) {
-                    case "first":
-                        first = _glyphs.get(pair.getInt());
-                    case "second":
-                        second = pair.getInt();
-                    case "amount":
-                        first.setKerning(second, pair.getInt());
-                    }
-                }
-            }
-        }
+        reload();
+#if debug
+        _reloadCount = pack.getFile(name + ".fnt").reloadCount;
+        _lastReloadCount = _reloadCount._;
+#end
     }
 
     /**
@@ -192,10 +126,108 @@ class Font
         return _glyphs.get(charCode);
     }
 
+#if debug
+    @:allow(flambe) function checkReload () :Int
+    {
+        // If the .fnt file was reloaded since the last check, reload the font
+        if (_lastReloadCount != _reloadCount._) {
+            _lastReloadCount = _reloadCount._;
+            reload();
+        }
+        return _lastReloadCount;
+    }
+#end
+
+    private function reload ()
+    {
+        _glyphs = new Map();
+        _glyphs.set(NEWLINE.charCode, NEWLINE);
+
+        var parser = new ConfigParser(_pack.getFile(name + ".fnt").toString());
+        var pages = new Map<Int,Texture>();
+
+        // The basename of the font's path, where we'll find the textures
+        var idx = name.lastIndexOf("/");
+        var basePath = (idx >= 0) ? name.substr(0, idx+1) : "";
+
+        for (keyword in parser.keywords()) {
+            switch (keyword) {
+            case "info":
+                for (pair in parser.pairs()) {
+                    switch (pair.key) {
+                    case "size":
+                        size = pair.getInt();
+                    }
+                }
+
+            case "page":
+                var pageId :Int = 0;
+                var file :String = null;
+                for (pair in parser.pairs()) {
+                    switch (pair.key) {
+                    case "id":
+                        pageId = pair.getInt();
+                    case "file":
+                        file = pair.getString();
+                    }
+                }
+                pages.set(pageId, _pack.getTexture(basePath + file.removeFileExtension()));
+
+            case "char":
+                var glyph = null;
+                for (pair in parser.pairs()) {
+                    switch (pair.key) {
+                    case "id":
+                        glyph = new Glyph(pair.getInt());
+                    case "x":
+                        glyph.x = pair.getInt();
+                    case "y":
+                        glyph.y = pair.getInt();
+                    case "width":
+                        glyph.width = pair.getInt();
+                    case "height":
+                        glyph.height = pair.getInt();
+                    case "page":
+                        glyph.page = pages.get(pair.getInt());
+                    case "xoffset":
+                        glyph.xOffset = pair.getInt();
+                    case "yoffset":
+                        glyph.yOffset = pair.getInt();
+                    case "xadvance":
+                        glyph.xAdvance = pair.getInt();
+                    }
+                }
+                _glyphs.set(glyph.charCode, glyph);
+
+            case "kerning":
+                var first :Glyph = null;
+                var second = -1;
+                for (pair in parser.pairs()) {
+                    switch (pair.key) {
+                    case "first":
+                        first = _glyphs.get(pair.getInt());
+                    case "second":
+                        second = pair.getInt();
+                    case "amount":
+                        first.setKerning(second, pair.getInt());
+                    }
+                }
+            }
+        }
+    }
+
     // A special glyph to handle the newline character, which is not included in most fonts
     private static var NEWLINE = new Glyph('\n'.code);
 
+    private var _pack :AssetPack;
     private var _glyphs :Map<Int,Glyph>;
+
+#if debug
+    // Used to track live-reloading updates. A signal listener can't be used here, because we can't
+    // guarantee it'll be properly disposed
+    private var _lastReloadCount :Int;
+    private var _reloadCount :Value<Int>;
+#end
 }
 
 /**

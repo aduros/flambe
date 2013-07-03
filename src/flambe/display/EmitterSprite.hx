@@ -20,6 +20,14 @@ class EmitterSprite extends Sprite
 
     public var maxParticles (get, set) :Int;
 
+    public var type :EmitterType;
+
+    /** How long the emitter should remain enabled, or <= 0 to never expire. */
+    public var duration :Float;
+
+    /** Whether new particles are being actively emitted. */
+    public var enabled :Bool = true;
+
     public var emitX (default, null) :AnimatedFloat;
     public var emitXVariance (default, null) :AnimatedFloat;
 
@@ -34,14 +42,6 @@ class EmitterSprite extends Sprite
 
     public var angle (default, null) :AnimatedFloat;
     public var angleVariance (default, null) :AnimatedFloat;
-
-    public var type :EmitterType;
-
-    /** How long the emitter should remain enabled, or <= 0 to never expire. */
-    public var duration :Float;
-
-    /** Whether new particles are being actively emitted. */
-    public var enabled :Bool = true;
 
     public var gravityX (default, null) :AnimatedFloat;
     public var gravityY (default, null) :AnimatedFloat;

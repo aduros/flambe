@@ -18,6 +18,9 @@ class EmitterSprite extends Sprite
     /** The particle texture, must be square. */
     public var texture :Texture;
 
+    /** The current number of particles being shown. */
+    public var numParticles (default, null) :Int = 0;
+
     public var maxParticles (get, set) :Int;
 
     public var type :EmitterType;
@@ -177,7 +180,7 @@ class EmitterSprite extends Sprite
         // Update existing particles
         var gravityType = (type == Gravity);
         var ii = 0;
-        while (ii < _numParticles) {
+        while (ii < numParticles) {
             var particle = _particles[ii];
             if (particle.life > dt) {
                 if (gravityType) {
@@ -231,10 +234,10 @@ class EmitterSprite extends Sprite
             } else {
                 // Kill it, and swap it with the last living particle, so that alive particles are
                 // packed to the front of the pool
-                --_numParticles;
-                if (ii != _numParticles) {
-                    _particles[ii] = _particles[_numParticles];
-                    _particles[_numParticles] = particle;
+                --numParticles;
+                if (ii != numParticles) {
+                    _particles[ii] = _particles[numParticles];
+                    _particles[numParticles] = particle;
                 }
             }
         }
@@ -255,10 +258,10 @@ class EmitterSprite extends Sprite
         var emitDelay = lifespan._ / _particles.length;
         _emitElapsed += dt;
         while (_emitElapsed >= emitDelay) {
-            if (_numParticles < _particles.length) {
-                var particle = _particles[_numParticles];
+            if (numParticles < _particles.length) {
+                var particle = _particles[numParticles];
                 if (initParticle(particle)) {
-                    ++_numParticles;
+                    ++numParticles;
                 }
             }
             _emitElapsed -= emitDelay;
@@ -270,7 +273,7 @@ class EmitterSprite extends Sprite
         // Assumes that the texture is always square
         var offset = -texture.width/2;
 
-        var ii = 0, ll = _numParticles;
+        var ii = 0, ll = numParticles;
         while (ii < ll) {
             var particle = _particles[ii];
             g.save();
@@ -360,8 +363,8 @@ class EmitterSprite extends Sprite
             ++oldLength;
         }
 
-        if (_numParticles > maxParticles) {
-            _numParticles = maxParticles;
+        if (numParticles > maxParticles) {
+            numParticles = maxParticles;
         }
 
         return maxParticles;
@@ -377,9 +380,6 @@ class EmitterSprite extends Sprite
 
     // The particle pool
     private var _particles :Array<Particle>;
-
-    // Number of currently alive particles
-    private var _numParticles :Int = 0;
 
     // Time passed since the last emission
     private var _emitElapsed :Float = 0;

@@ -1,3 +1,4 @@
+"use strict";
 //
 // Flambe - Rapid game development
 // https://github.com/aduros/flambe/blob/master/LICENSE.txt
@@ -66,7 +67,7 @@ exports.build = function (config, platforms, opts) {
     var commonFlags = [];
 
     // Flags common to all swf-based targets (flash, android, ios)
-    swfFlags = ["--flash-strict", "-D", "native_trace",
+    var swfFlags = ["--flash-strict", "-D", "native_trace",
         "-swf-header", "640:480:60:000000", "-lib", "hxsl"];
     if (debug) swfFlags.push("-D", "fdb", "-D", "advanced-telemetry");
 
@@ -284,7 +285,7 @@ Server.prototype.start = function () {
         .use(function (req, res, next) {
             // Forever-cache assets
             if (url.parse(req.url, true).query.v) {
-                expires = new Date(Date.now() + 1000*60*60*24*365*25);
+                var expires = new Date(Date.now() + 1000*60*60*24*365*25);
                 res.setHeader("Expires", expires.toUTCString());
                 res.setHeader("Cache-Control", "max-age=315360000");
             }

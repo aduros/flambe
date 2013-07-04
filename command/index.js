@@ -273,6 +273,10 @@ Server.prototype.start = function () {
     var connect = require("connect");
     var url = require("url");
 
+    // Fire up a Haxe compiler server, ignoring all output. It's fine if this command fails, the
+    // build will fallback to not using a compiler server
+    spawn("haxe", ["--wait", HAXE_COMPILER_PORT], {stdio: "ignore"});
+
     // Start a static HTTP server
     var host = "0.0.0.0";
     var port = 5000;

@@ -54,7 +54,8 @@ cmd.setDefaults({action: function () {
 var cmd = commands.addParser("serve");
 cmd.setDefaults({action: function (args) {
     flambe.loadConfig(args.config);
-    console.log("TODO");
+    var server = new flambe.Server();
+    server.start();
 }});
 
 var args = parser.parseArgs();

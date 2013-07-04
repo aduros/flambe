@@ -2,12 +2,12 @@
 // Flambe - Rapid game development
 // https://github.com/aduros/flambe/blob/master/LICENSE.txt
 
-var xmldom = require("xmldom");
 var Q = require("q");
 var fs = require("fs");
 var path = require("path");
 var spawn = require("child_process").spawn;
 var wrench = require("wrench");
+var xmldom = require("xmldom");
 
 var DATA_DIR = __dirname + "/data";
 var CACHE_DIR = ".flambe-cache";
@@ -22,8 +22,41 @@ exports.newProject = function (output) {
     wrench.copyDirSyncRecursive(DATA_DIR+"/scaffold", output);
 };
 
-exports.run = function (config, platform) {
-    console.log(config);
+exports.run = function (config, platform, opts) {
+    opts = opts || {};
+    var debug = opts.debug;
+
+    var promise =
+    exports.build(config, [platform], opts)
+    .then(function () {
+        var id = get(config, "id");
+        switch (platform) {
+        case "android":
+            console.log();
+            var apk = "build/main-android.apk";
+            console.log("Installing: " + apk);
+            adt(["-uninstallApp", "-platform", "android", "-appid", id],
+                {verbose: false, output: false, check: false})
+            .then(function () {
+                return adt(["-installApp", "-platform", "android", "-package", apk],
+                    {verbose: false});
+            })
+            .then(function () {
+                return adt(["-launchApp", "-platform", "android", "-appid", id], {verbose: false});
+            })
+            .then(function () {
+                if (debug) {
+                    console.log();
+                    // Clear the log, then start tailing it
+                    return adb(["logcat", "-c"], {verbose: false}).then(function () {
+                        return adb(["logcat", "-v", "raw", "-s", "air.%s:V" % id], {verbose: false});
+                    });
+                }
+            })
+            break;
+        }
+    });
+    return promise;
 };
 
 exports.build = function (config, platforms, opts) {
@@ -112,6 +145,7 @@ exports.build = function (config, platforms, opts) {
         var promise =
         buildAir(["-swf", CACHE_DIR+"/air/"+swf])
         .then(function () {
+            // Generate a dummy certificate if it doesn't exist
             if (!fs.existsSync(cert)) {
                 return adt(["-certificate", "-cn", "SelfSign", "-validityPeriod", "25", "2048-RSA",
                     cert, "password"]);
@@ -230,6 +264,36 @@ var minify = function (inputs, output, opts) {
     return exec("java", flags, {verbose: false});
 };
 exports.minify = minify;
+
+var Server = function () {
+};
+exports.Server = Server;
+
+Server.prototype.start = function () {
+    var connect = require("connect");
+    var url = require("url");
+
+    // Start a static HTTP server
+    var host = "0.0.0.0";
+    var port = 5000;
+    var staticServer = connect()
+        .use(function (req, res, next) {
+            // Forever-cache assets
+            if (url.parse(req.url, true).query.v) {
+                expires = new Date(Date.now() + 1000*60*60*24*365*25);
+                res.setHeader("Expires", expires.toUTCString());
+                res.setHeader("Cache-Control", "max-age=315360000");
+            }
+            next();
+        })
+        .use(connect.logger("tiny"))
+        .use(connect.compress())
+        .use(connect.static("build/web"))
+        .listen(port, host);
+    console.log("Serving on %s:%s", host, port);
+};
+
+// TODO(bruno): Server.prototype.stop
 
 /** Convert an "array-like" value to a real array. */
 var toArray = function (o) {

@@ -168,6 +168,7 @@ exports.build = function (config, platforms, opts) {
     copyDirContents("web", "build/web");
     copyFile(DATA_DIR+"/flambe.js", "build/web/flambe.js");
     wrench.copyDirSyncRecursive("assets", "build/web/assets", {forceDelete: true});
+    wrench.copyDirSyncRecursive("icons", "build/web/icons", {forceDelete: true});
 
     var connectFlags = ["--connect", HAXE_COMPILER_PORT];
     var promise =

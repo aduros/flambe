@@ -27,7 +27,11 @@ cmd.addArgument(["platform"], {choices: PLATFORMS});
 cmd.addArgument(["--debug"], {action: "storeTrue", help: "Build in debug mode"});
 cmd.setDefaults({action: function (args) {
     var config = flambe.loadConfig(args.config);
-    flambe.run(config, args.platform, {debug: args.debug});
+    flambe.run(config, args.platform, {debug: args.debug})
+    .catch(function (error) {
+        if (error) console.error(error);
+        process.exit(1);
+    });
 }});
 
 var cmd = commands.addParser("build", {help: "Build multiple platforms"});
@@ -36,11 +40,8 @@ cmd.addArgument(["--debug"], {action: "storeTrue", help: "Build in debug mode"})
 cmd.setDefaults({action: function (args) {
     var config = flambe.loadConfig(args.config);
     flambe.build(config, args.platforms, {debug: args.debug})
-    .then(function () {
-        console.log("Build OK!");
-
-    }, function (error) {
-        console.log("Build error: " + error);
+    .catch (function (error) {
+        if (error) console.error(error);
         process.exit(1);
     });
 }});

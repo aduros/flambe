@@ -12,7 +12,8 @@
     "argparse": "~0.1.15",
     "js-yaml": "~2.1.0",
     "q": "~0.9.6",
-    "wrench": "~1.5.0"
+    "wrench": "~1.5.1",
+    "xmldom": "~0.1.16"
   },
 
   "bin": "flambe.js",

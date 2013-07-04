@@ -2,6 +2,7 @@
 // Flambe - Rapid game development
 // https://github.com/aduros/flambe/blob/master/LICENSE.txt
 
+var xmldom = require("xmldom");
 var Q = require("q");
 var fs = require("fs");
 var path = require("path");
@@ -12,13 +13,13 @@ var DATA_DIR = __dirname + "/data";
 var CACHE_DIR = ".flambe-cache";
 var HAXE_COMPILER_PORT = "6000";
 
-exports.loadConfig = function (path) {
+exports.loadConfig = function (output) {
     var yaml = require("js-yaml");
-    return yaml.safeLoad(fs.readFileSync(path).toString());
+    return yaml.safeLoad(fs.readFileSync(output).toString());
 };
 
-exports.newProject = function (path) {
-    wrench.copyDirSyncRecursive(DATA_DIR+"/scaffold", path);
+exports.newProject = function (output) {
+    wrench.copyDirSyncRecursive(DATA_DIR+"/scaffold", output);
 };
 
 exports.run = function (config, platform) {
@@ -59,6 +60,74 @@ exports.build = function (config, platforms, opts) {
         return haxe(commonFlags.concat(flashFlags));
     };
 
+    var buildAir = function (flags) {
+        wrench.mkdirSyncRecursive(CACHE_DIR+"/air");
+        wrench.copyDirSyncRecursive("assets", CACHE_DIR+"/air/assets", {
+            excludeHiddenUnix: true,
+            filter: /\.(ogg|wav|m4a)$/,
+        });
+        var airFlags = swfFlags.concat(["-lib", "air3", "-swf-version", "11.2", "-D", "flambe_air"]);
+        return haxe(commonFlags.concat(airFlags).concat(flags))
+    };
+
+    var generateAirXml = function (swf, output) {
+        var xml =
+            "<application xmlns=\"http://ns.adobe.com/air/application/3.7\">\n" +
+            "  <id>"+get(config, "id")+"</id>\n" +
+            "  <versionNumber>"+get(config, "version")+"</versionNumber>\n" +
+            "  <filename>"+get(config, "name")+"</filename>\n" +
+            "  <initialWindow>\n" +
+            "    <content>"+swf+"</content>\n" +
+            "    <renderMode>direct</renderMode>\n" +
+            "  </initialWindow>\n" +
+            "</application>";
+        var doc = new xmldom.DOMParser().parseFromString(xml);
+
+        var icons = doc.createElement("icon");
+        fs.readdirSync("icons").forEach(function (file) {
+            // Only include properly named square icons
+            var match = file.match(/^(\d+)x\1\.png$/);
+            if (match) {
+                var size = match[1];
+                var image = doc.createElement("image"+size+"x"+size);
+                image.appendChild(doc.createTextNode("icons/"+file));
+                icons.appendChild(image);
+            } else {
+                console.warn("Invalid icon: icons/"+file);
+            }
+        });
+        doc.documentElement.appendChild(icons);
+
+        fs.writeFileSync(output, new xmldom.XMLSerializer().serializeToString(doc));
+    };
+
+    var buildAndroid = function () {
+        var apk = "build/main-android.apk";
+        console.log("Building: " + apk);
+
+        var swf = "main-android.swf";
+        var cert = CACHE_DIR+"/air/certificate-android.p12"
+        var xml = CACHE_DIR+"/air/config-android.xml"
+
+        var promise =
+        buildAir(["-swf", CACHE_DIR+"/air/"+swf])
+        .then(function () {
+            if (!fs.existsSync(cert)) {
+                return adt(["-certificate", "-cn", "SelfSign", "-validityPeriod", "25", "2048-RSA",
+                    cert, "password"]);
+            }
+        })
+        .then(function () {
+            generateAirXml(swf, xml);
+
+            var apkType = debug ? "apk-debug" : "apk-captive-runtime";
+            return adt(["-package", "-target", apkType, "-storetype", "pkcs12",
+                "-keystore", cert, "-storepass", "password", apk, xml, "icons",
+                "-C", CACHE_DIR+"/air", swf, "assets"]);
+        })
+        return promise;
+    }
+
     wrench.mkdirSyncRecursive(CACHE_DIR);
     wrench.mkdirSyncRecursive("build/web/targets");
     copyDirContents("web", "build/web");
@@ -88,6 +157,7 @@ exports.build = function (config, platforms, opts) {
         var builders = {
             html: buildHtml,
             flash: buildFlash,
+            android: buildAndroid,
         };
         var promise = Q();
         platforms.forEach(function (platform, idx) {

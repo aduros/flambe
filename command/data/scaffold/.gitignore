@@ -1,0 +1,7 @@
+/build/
+.flambe-cache/
+
+.*.swp
+._*
+.DS_Store
+RECOVER_*

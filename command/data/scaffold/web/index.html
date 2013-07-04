@@ -1,0 +1,78 @@
+<!doctype html>
+<!--
+    Default Flambe webapp launcher.
+    You can copy this to into your project at /web/index.html to customize.
+ -->
+<html>
+<head>
+  <title>Flambe App</title>
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="apple-touch-icon-precomposed" href="logo.png">
+  <link rel="shortcut icon" href="logo.png">
+  <style>
+    body {
+      text-align: center;
+      margin: 0;
+      background: black;
+      color: #404040;
+      font-family: sans-serif;
+      font-size: 10pt;
+    }
+    a {
+      color: #F88113;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+
+    #content {
+      width: 640px;
+      height: 480px;
+      margin: 60px auto 20px auto;
+      box-shadow: 0px 4px 16px -4px #333;
+    }
+
+    /* On small devices, fill the entire screen and hide the rest of the page. */
+    @media (max-device-width: 8in), (max-device-height: 8in) {
+      html {
+        /* Prevent scrollbars from causing a resize feedback loop. */
+        overflow: hidden;
+      }
+      html, body {
+        height: 100%;
+      }
+      #content {
+        height: 100%;
+        width: 100%;
+        margin: inherit;
+        box-shadow: none;
+      }
+      .no-mobile {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div id="content"></div>
+<script src="flambe.js"></script>
+<script>
+  flambe.embed(["targets/main-flash.swf", "targets/main-html.js"], "content");
+</script>
+
+<footer class="no-mobile">
+<p>
+  <a href="?">Default</a> |
+  <a href="?flambe=flash">Flash</a> |
+  <a href="?flambe=html">HTML5</a>
+</p>
+<p>Cooked with <a href="https://github.com/aduros/flambe">Flambe</a></p>
+</footer>
+
+</body>
+</html>

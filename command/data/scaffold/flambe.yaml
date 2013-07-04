@@ -1,0 +1,10 @@
+# The name, version and identifier, for mobile app packaging
+name: Your Game
+version: 1.0.0
+id: com.urdomain.urgame
+
+# The main class name
+main: urgame.Main
+
+# Optional flags to pass to the Haxe compiler
+# haxe_flags: -lib nape -cp another_dir

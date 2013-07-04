@@ -5,3 +5,4 @@ bin/.waf*
 *.fdz
 *.pyc
 *.egg-info
+node_modules/

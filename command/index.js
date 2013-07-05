@@ -271,6 +271,7 @@ exports.Server = Server;
 Server.prototype.start = function () {
     var connect = require("connect");
     var url = require("url");
+    var websocket = require("websocket");
 
     // Fire up a Haxe compiler server, ignoring all output. It's fine if this command fails, the
     // build will fallback to not using a compiler server
@@ -294,6 +295,31 @@ Server.prototype.start = function () {
         .use(connect.static("build/web"))
         .listen(port, host);
     console.log("Serving on %s:%s", host, port);
+
+    this._wsServer = new websocket.server({
+        httpServer: staticServer,
+        autoAcceptConnections: true,
+    });
+
+    var watch = require("watch");
+    var crypto = require("crypto");
+    var self = this;
+    watch.createMonitor("assets", {interval: 200}, function (monitor) {
+        monitor.on("changed", function (file) {
+            var contents = fs.readFileSync(file);
+            fs.writeFileSync("build/web/"+file, contents);
+            self.broadcast({
+                type: "file_changed",
+                name: path.relative("assets", file),
+                md5: crypto.createHash("md5").update(contents).digest("hex"),
+            });
+        });
+    });
+};
+
+/** Broadcast an event to all clients. */
+Server.prototype.broadcast = function (event) {
+    this._wsServer.broadcast(JSON.stringify(event));
 };
 
 // TODO(bruno): Server.prototype.stop

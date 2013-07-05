@@ -52,6 +52,8 @@ class HtmlCatapultClient // extends CatapultClient
             for (loader in _loaders) {
                 loader.reload(url);
             }
+        case "restart":
+            Browser.window.top.location.reload();
         }
     }
 

@@ -12,7 +12,8 @@ var xmldom = require("xmldom");
 
 var DATA_DIR = __dirname + "/data";
 var CACHE_DIR = ".flambe-cache";
-var HAXE_COMPILER_PORT = "6000";
+var HAXE_COMPILER_PORT = 6000;
+var FLAMBE_SERVE_PORT = 5000;
 
 exports.loadConfig = function (output) {
     var yaml = require("js-yaml");
@@ -54,6 +55,10 @@ exports.run = function (config, platform, opts) {
                     });
                 }
             })
+            break;
+
+        case "html":
+            exports.restart();
             break;
         }
     });
@@ -212,6 +217,17 @@ exports.clean = function () {
     wrench.rmdirSyncRecursive(CACHE_DIR, true);
 };
 
+/** Restart all connected clients. */
+exports.restart = function () {
+    var websocket = require("websocket");
+    var client = new websocket.client();
+    client.on("connect", function (connection) {
+        connection.sendUTF(JSON.stringify({type: "restart"}));
+        connection.close();
+    });
+    client.connect("ws://127.0.0.1:" + FLAMBE_SERVE_PORT);
+};
+
 var haxe = function (flags, opts) {
     return exec("haxe", flags, opts);
 };
@@ -279,7 +295,6 @@ Server.prototype.start = function () {
 
     // Start a static HTTP server
     var host = "0.0.0.0";
-    var port = 5000;
     var staticServer = connect()
         .use(function (req, res, next) {
             // Forever-cache assets
@@ -293,23 +308,34 @@ Server.prototype.start = function () {
         .use(connect.logger("tiny"))
         .use(connect.compress())
         .use(connect.static("build/web"))
-        .listen(port, host);
-    console.log("Serving on %s:%s", host, port);
+        .listen(FLAMBE_SERVE_PORT, host);
+    console.log("Serving on %s:%s", host, FLAMBE_SERVE_PORT);
 
+    var self = this;
     this._wsServer = new websocket.server({
         httpServer: staticServer,
         autoAcceptConnections: true,
     });
 
+    this._wsServer.on("connect", function (connection) {
+        connection.on("message", function (message) {
+            if (message.type == "utf8") {
+                var event = JSON.parse(message.utf8Data);
+                switch (event.type) {
+                case "restart":
+                    self.broadcast("restart");
+                }
+            }
+        });
+    });
+
     var watch = require("watch");
     var crypto = require("crypto");
-    var self = this;
     watch.createMonitor("assets", {interval: 200}, function (monitor) {
         monitor.on("changed", function (file) {
             var contents = fs.readFileSync(file);
             fs.writeFileSync("build/web/"+file, contents);
-            self.broadcast({
-                type: "file_changed",
+            self.broadcast("file_changed", {
                 name: path.relative("assets", file),
                 md5: crypto.createHash("md5").update(contents).digest("hex"),
             });
@@ -318,7 +344,14 @@ Server.prototype.start = function () {
 };
 
 /** Broadcast an event to all clients. */
-Server.prototype.broadcast = function (event) {
+Server.prototype.broadcast = function (type, params) {
+    var event = {type: type};
+    if (params) {
+        for (k in params) {
+            event[k] = params[k];
+        }
+    }
+    console.log("Broadcasting event: " + type);
     this._wsServer.broadcast(JSON.stringify(event));
 };
 

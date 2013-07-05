@@ -196,6 +196,18 @@ class Stage3DTexture extends InternalReloadable<Stage3DTexture>
         data[++offset] = 1;
     }
 
+    override private function copyFrom (that :Stage3DTexture)
+    {
+        this.nativeTexture = that.nativeTexture;
+        this.maxU = that.maxU;
+        this.maxV = that.maxV;
+        this._width = that._width;
+        this._height = that._height;
+        this._widthPow2 = that._widthPow2;
+        this._heightPow2 = that._heightPow2;
+        this._graphics = that._graphics;
+    }
+
     private static function nextPowerOfTwo (n :Int) :Int
     {
         var p = 1;

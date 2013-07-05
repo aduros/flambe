@@ -7,9 +7,7 @@ package flambe.platform.html;
 import js.Browser;
 import js.html.*;
 
-import haxe.Json;
-
-class HtmlCatapultClient // extends CatapultClient
+class HtmlCatapultClient extends CatapultClient
 {
     public static function canUse ()
     {
@@ -23,39 +21,24 @@ class HtmlCatapultClient // extends CatapultClient
 
     public function new ()
     {
+        super();
+
         _socket = new WebSocket("ws://" + Browser.location.host);
         _socket.onerror = function (event) {
-            Log.warn("Catapult error");
+            onError("unknown");
         };
         _socket.onopen = function (event) {
             Log.info("Catapult connected");
         };
         _socket.onmessage = function (event :MessageEvent) {
-            trace("Got message!");
-            trace(event.data);
-            onMessage(Json.parse(event.data));
+            onMessage(event.data);
         };
-        _loaders = [];
     }
 
-    public function add (loader :BasicAssetPackLoader)
+    override private function onRestart ()
     {
-        _loaders.push(loader);
-    }
-
-    private function onMessage (message :Dynamic)
-    {
-        switch (message.type) {
-        case "file_changed":
-            var url = message.name + "?v=" + message.md5;
-            for (loader in _loaders) {
-                loader.reload(url);
-            }
-        case "restart":
-            Browser.window.top.location.reload();
-        }
+        Browser.window.top.location.reload();
     }
 
     private var _socket :WebSocket;
-    private var _loaders :Array<BasicAssetPackLoader>;
 }

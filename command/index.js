@@ -12,8 +12,10 @@ var xmldom = require("xmldom");
 
 var DATA_DIR = __dirname + "/data";
 var CACHE_DIR = ".flambe-cache";
+
 var HAXE_COMPILER_PORT = 6000;
-var FLAMBE_SERVE_PORT = 5000;
+var HTTP_PORT = 5000;
+var SOCKET_PORT = HTTP_PORT+1;
 
 exports.loadConfig = function (output) {
     var yaml = require("js-yaml");
@@ -57,7 +59,7 @@ exports.run = function (config, platform, opts) {
             })
             break;
 
-        case "html":
+        case "html": case "flash":
             exports.restart();
             break;
         }
@@ -219,13 +221,14 @@ exports.clean = function () {
 
 /** Restart all connected clients. */
 exports.restart = function () {
-    var websocket = require("websocket");
-    var client = new websocket.client();
-    client.on("connect", function (connection) {
-        connection.sendUTF(JSON.stringify({type: "restart"}));
-        connection.close();
+    var net = require("net");
+    var client = net.connect({host: "127.0.0.1", port: SOCKET_PORT}, function () {
+        var message = JSON.stringify({type: "restart"});
+        client.end(message);
     });
-    client.connect("ws://127.0.0.1:" + FLAMBE_SERVE_PORT);
+    client.on("error", function () {
+        // Prevent thrown errors
+    });
 };
 
 var haxe = function (flags, opts) {
@@ -308,8 +311,8 @@ Server.prototype.start = function () {
         .use(connect.logger("tiny"))
         .use(connect.compress())
         .use(connect.static("build/web"))
-        .listen(FLAMBE_SERVE_PORT, host);
-    console.log("Serving on %s:%s", host, FLAMBE_SERVE_PORT);
+        .listen(HTTP_PORT, host);
+    console.log("Serving on %s:%s", host, HTTP_PORT);
 
     var self = this;
     this._wsServer = new websocket.server({
@@ -320,19 +323,40 @@ Server.prototype.start = function () {
     this._wsServer.on("connect", function (connection) {
         connection.on("message", function (message) {
             if (message.type == "utf8") {
-                var event = JSON.parse(message.utf8Data);
-                switch (event.type) {
-                case "restart":
-                    self.broadcast("restart");
-                }
+                self._onMessage(message.utf8Data);
             }
         });
     });
+
+    var net = require("net");
+    this._connections = [];
+    this._socketServer = net.createServer(function (connection) {
+        self._connections.push(connection);
+        connection.on("end", function () {
+            self._connections.splice(self._connections.indexOf(connection, 1));
+        });
+        connection.on("data", function (data) {
+            data = data.toString();
+            if (data == "<policy-file-request/>\0") {
+                // Handle Flash socket policy requests
+                connection.end(
+                    '<?xml version="1.0"?>' +
+                    '<!DOCTYPE cross-domain-policy SYSTEM "http://www.adobe.com/xml/dtds/cross-domain-policy.dtd">' +
+                    '<cross-domain-policy>' +
+                        '<allow-access-from domain="*" to-ports="'+SOCKET_PORT+'" />' +
+                    '</cross-domain-policy>');
+            } else {
+                self._onMessage(data);
+            }
+        });
+    });
+    this._socketServer.listen(SOCKET_PORT, host);
 
     var watch = require("watch");
     var crypto = require("crypto");
     watch.createMonitor("assets", {interval: 200}, function (monitor) {
         monitor.on("changed", function (file) {
+            console.log("Asset changed: " + file);
             var output = "build/web/"+file;
             if (fs.existsSync(output)) {
                 var contents = fs.readFileSync(file);
@@ -354,8 +378,23 @@ Server.prototype.broadcast = function (type, params) {
             event[k] = params[k];
         }
     }
-    console.log("Broadcasting event: " + type);
-    this._wsServer.broadcast(JSON.stringify(event));
+    var message = JSON.stringify(event);
+    this._wsServer.broadcast(message);
+    this._connections.forEach(function (connection) {
+        connection.write(message);
+    });
+};
+
+Server.prototype._onMessage = function (message) {
+    try {
+        var event = JSON.parse(message);
+        switch (event.type) {
+        case "restart":
+            this.broadcast("restart");
+        }
+    } catch (error) {
+        console.warn("Received badly formed message", error);
+    }
 };
 
 // TODO(bruno): Server.prototype.stop

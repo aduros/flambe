@@ -91,13 +91,22 @@ class FlashPlatform
 
 #if debug
         new DebugLogic(this);
+#if !flambe_air
+        _catapult = new FlashCatapultClient();
+#end
 #end
         Log.info("Initialized Flash platform", ["renderer", _renderer.getName()]);
     }
 
     public function loadAssetPack (manifest :Manifest) :Promise<AssetPack>
     {
-        return new FlashAssetPackLoader(this, manifest).promise;
+        var loader = new FlashAssetPackLoader(this, manifest);
+#if debug
+        if (_catapult != null) {
+            _catapult.add(loader);
+        }
+#end
+        return loader.promise;
     }
 
     public function getStage () :StageSystem
@@ -261,4 +270,8 @@ class FlashPlatform
     private var _lastUpdate :Int;
     private var _skipFrame :Bool;
     private var _timeOffset :Float;
+
+#if debug
+    private var _catapult :FlashCatapultClient;
+#end
 }

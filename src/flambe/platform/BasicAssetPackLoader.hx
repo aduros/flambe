@@ -20,9 +20,11 @@ using flambe.util.Strings;
 class BasicAssetPackLoader
 {
     public var promise (default, null) :Promise<AssetPack>;
+    public var manifest (default, null) :Manifest;
 
     public function new (platform :Platform, manifest :Manifest)
     {
+        this.manifest = manifest;
         _platform = platform;
         promise = new Promise();
         _bytesLoaded = new Map();
@@ -77,11 +79,6 @@ class BasicAssetPackLoader
     /** Reload any asset that matches this URL (ignoring the ?v= query param). */
     public function reload (url :String)
     {
-        var manifest = _pack.manifest;
-        if (manifest.relativeBasePath != "assets") {
-            return; // Forget it, it wasn't loaded from the assets directory
-        }
-
         // Find the AssetEntry that matches this url
         var baseUrl = removeUrlParams(url);
         var foundEntry = null;

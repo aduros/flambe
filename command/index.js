@@ -301,7 +301,7 @@ Server.prototype.start = function () {
 /** Convert an "array-like" value to a real array. */
 var toArray = function (o) {
     if (Array.isArray(o)) return o;
-    if (a instanceof String) return o.split(" ");
+    if (typeof o == "string") return o.split(" ");
     return [o];
 };
 

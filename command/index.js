@@ -254,10 +254,7 @@ var minify = function (inputs, output, opts) {
         "--warning_level", "QUIET",
         "--js_output_file", output,
         "--output_wrapper",
-            "/**\n" +
-            " * Cooked with Flambe\n" +
-            " * https://github.com/aduros/flambe\n" +
-            " */\n" +
+            "/** Cooked with Flambe, https://getflambe.com */\n" +
             "%output%"];
     inputs.forEach(function (input) {
         flags.push("--js", input);

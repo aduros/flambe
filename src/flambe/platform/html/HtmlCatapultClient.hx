@@ -15,8 +15,7 @@ class HtmlCatapultClient // extends CatapultClient
     {
         // Eventually this will be enabled in debug builds by default
 #if flambe_enable_catapult
-        // TODO(bruno): Detect websocket support
-        return true;
+        return Reflect.hasField(Browser.window, "WebSocket");
 #else
         return false;
 #end

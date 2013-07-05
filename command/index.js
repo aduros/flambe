@@ -333,12 +333,15 @@ Server.prototype.start = function () {
     var crypto = require("crypto");
     watch.createMonitor("assets", {interval: 200}, function (monitor) {
         monitor.on("changed", function (file) {
-            var contents = fs.readFileSync(file);
-            fs.writeFileSync("build/web/"+file, contents);
-            self.broadcast("file_changed", {
-                name: path.relative("assets", file),
-                md5: crypto.createHash("md5").update(contents).digest("hex"),
-            });
+            var output = "build/web/"+file;
+            if (fs.existsSync(output)) {
+                var contents = fs.readFileSync(file);
+                fs.writeFileSync(output, contents);
+                self.broadcast("file_changed", {
+                    name: path.relative("assets", file),
+                    md5: crypto.createHash("md5").update(contents).digest("hex"),
+                });
+            }
         });
     });
 };
@@ -347,7 +350,7 @@ Server.prototype.start = function () {
 Server.prototype.broadcast = function (type, params) {
     var event = {type: type};
     if (params) {
-        for (k in params) {
+        for (var k in params) {
             event[k] = params[k];
         }
     }

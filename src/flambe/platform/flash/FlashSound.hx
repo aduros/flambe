@@ -40,6 +40,11 @@ class FlashSound extends InternalReloadable<FlashSound>
     {
         return nativeSound.length/1000;
     }
+
+    override private function copyFrom (that :FlashSound)
+    {
+        this.nativeSound = that.nativeSound;
+    }
 }
 
 private class FlashPlayback

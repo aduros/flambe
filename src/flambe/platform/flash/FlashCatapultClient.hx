@@ -23,7 +23,7 @@ class FlashCatapultClient extends CatapultClient
             var host = re.matched(2);
             var port = re.matched(4);
             if (port == null) {
-                port = re.matched(4);
+                port = "80";
             }
 
             _socket = new Socket();

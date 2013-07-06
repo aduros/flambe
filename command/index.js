@@ -292,9 +292,10 @@ Server.prototype.start = function () {
     var url = require("url");
     var websocket = require("websocket");
 
-    // Fire up a Haxe compiler server, ignoring all output. It's fine if this command fails, the
-    // build will fallback to not using a compiler server
-    spawn("haxe", ["--wait", HAXE_COMPILER_PORT], {stdio: "ignore"});
+    // Disabled due to haxe bug...?
+    // // Fire up a Haxe compiler server, ignoring all output. It's fine if this command fails, the
+    // // build will fallback to not using a compiler server
+    // spawn("haxe", ["--wait", HAXE_COMPILER_PORT], {stdio: "ignore"});
 
     // Start a static HTTP server
     var host = "0.0.0.0";

@@ -203,7 +203,6 @@ class HtmlPlatform
 
         // Skip the next frame when coming back from being hidden
         System.hidden.changed.connect(function (hidden,_) {
-            trace("Hidden changed: " + hidden);
             if (!hidden) {
                 _skipFrame = true;
             }

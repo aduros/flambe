@@ -82,8 +82,10 @@ class TextSprite extends Sprite
 
     private function set_text (text :String) :String
     {
-        _text = text;
-        _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
+        if (text != _text) {
+            _text = text;
+            _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
+        }
         return text;
     }
 
@@ -94,8 +96,10 @@ class TextSprite extends Sprite
 
     private function set_font (font :Font) :Font
     {
-        _font = font;
-        _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
+        if (font != _font) {
+            _font = font;
+            _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
+        }
         return font;
     }
 
@@ -106,8 +110,10 @@ class TextSprite extends Sprite
 
     private function set_align (align :TextAlign) :TextAlign
     {
-        _align = align;
-        _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
+        if (align != _align) {
+            _align = align;
+            _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
+        }
         return align;
     }
 
@@ -121,6 +127,7 @@ class TextSprite extends Sprite
         }
 #end
 
+        // Recreate the layout if necessary
         if (_flags.contains(Sprite.TEXTSPRITE_DIRTY)) {
             _flags = _flags.remove(Sprite.TEXTSPRITE_DIRTY);
             _layout = font.layoutText(_text, _align, wrapWidth._);

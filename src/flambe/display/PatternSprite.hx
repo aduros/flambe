@@ -47,7 +47,7 @@ class PatternSprite extends Sprite
     }
 
     /**
-     * Convenience method to set the width and height.
+     * Chainable convenience method to set the width and height.
      * @returns This instance, for chaining.
      */
     public function setSize (width :Float, height :Float) :PatternSprite

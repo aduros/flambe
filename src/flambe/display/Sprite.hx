@@ -77,7 +77,7 @@ class Sprite extends Component
     public var scissor :Rectangle = null;
 
     /**
-     * Whether this sprite should be drawn.
+     * Whether this sprite should be drawn. Invisible sprites do not receive pointer events.
      */
     public var visible (get, set) :Bool;
 
@@ -315,7 +315,7 @@ class Sprite extends Component
     }
 
     /**
-     * Convenience method to set the anchor position.
+     * Chainable convenience method to set the anchor position.
      * @returns This instance, for chaining.
      */
     public function setAnchor (x :Float, y :Float) :Sprite
@@ -326,7 +326,7 @@ class Sprite extends Component
     }
 
     /**
-     * Convenience method to center the anchor using the natural width and height.
+     * Chainable convenience method to center the anchor using the natural width and height.
      * @returns This instance, for chaining.
      */
     public function centerAnchor () :Sprite
@@ -337,7 +337,7 @@ class Sprite extends Component
     }
 
     /**
-     * Convenience method to set the position.
+     * Chainable convenience method to set the position.
      * @returns This instance, for chaining.
      */
     public function setXY (x :Float, y :Float) :Sprite
@@ -348,7 +348,7 @@ class Sprite extends Component
     }
 
     /**
-     * Convenience method to uniformly set the scale.
+     * Chainable convenience method to uniformly set the scale.
      * @returns This instance, for chaining.
      */
     public function setScale (scale :Float) :Sprite
@@ -359,7 +359,7 @@ class Sprite extends Component
     }
 
     /**
-     * Convenience method to set the scale.
+     * Chainable convenience method to set the scale.
      * @returns This instance, for chaining.
      */
     public function setScaleXY (scaleX :Float, scaleY :Float) :Sprite
@@ -370,7 +370,7 @@ class Sprite extends Component
     }
 
     /**
-     * Convenience method to set pointerEnabled to false.
+     * Chainable convenience method to set pointerEnabled to false.
      * @returns This instance, for chaining.
      */
     public function disablePointer () :Sprite
@@ -380,7 +380,7 @@ class Sprite extends Component
     }
 
     /**
-     * Convenience method to set pixelSnapping to false.
+     * Chainable convenience method to set pixelSnapping to false.
      * @returns This instance, for chaining.
      */
     public function disablePixelSnapping () :Sprite

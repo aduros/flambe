@@ -40,8 +40,8 @@ class Disposer extends Component
     }
 
     /**
-     * Convenience method for connecting a signal listener and adding its SignalConnection to this
-     * disposer.
+     * Chainable convenience method for connecting a signal listener and adding its SignalConnection
+     * to this disposer.
      * @returns This instance, for chaining.
      */
     public function connect0 (signal :Signal0, listener :Listener0) :Disposer
@@ -51,8 +51,8 @@ class Disposer extends Component
     }
 
     /**
-     * Convenience method for connecting a signal listener and adding its SignalConnection to this
-     * disposer.
+     * Chainable convenience method for connecting a signal listener and adding its SignalConnection
+     * to this disposer.
      * @returns This instance, for chaining.
      */
     public function connect1<A> (signal :Signal1<A>, listener :Listener1<A>) :Disposer
@@ -62,8 +62,8 @@ class Disposer extends Component
     }
 
     /**
-     * Convenience method for connecting a signal listener and adding its SignalConnection to this
-     * disposer.
+     * Chainable convenience method for connecting a signal listener and adding its SignalConnection
+     * to this disposer.
      * @returns This instance, for chaining.
      */
     public function connect2<A,B> (signal :Signal2<A,B>, listener :Listener2<A,B>) :Disposer

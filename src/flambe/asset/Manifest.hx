@@ -186,7 +186,7 @@ class Manifest
             switch (extension.toLowerCase()) {
                 case "gif": return GIF;
                 case "jpg", "jpeg": return JPG;
-                case "jxr": return JXR;
+                case "jxr", "wdp": return JXR;
                 case "png": return PNG;
                 case "webp": return WEBP;
 

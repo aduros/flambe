@@ -82,6 +82,13 @@ class Sprite extends Component
     public var visible (get, set) :Bool;
 
     /**
+     * Whether this sprite's position will be rounded to the nearest whole pixel when rendering, for
+     * crisper images. Defaults to true. This can be disabled for smoother animation, at the risk of
+     * fuzziness when an image lies on a subpixel.
+     */
+    public var pixelSnapping (get, set) :Bool;
+
+    /**
      * Emitted when the pointer is pressed down over this sprite.
      */
     public var pointerDown (get, null) :Signal1<PointerEvent>;
@@ -103,7 +110,7 @@ class Sprite extends Component
 
     public function new ()
     {
-        _flags = VISIBLE | POINTER_ENABLED | VIEW_MATRIX_DIRTY;
+        _flags = VISIBLE | POINTER_ENABLED | VIEW_MATRIX_DIRTY | PIXEL_SNAPPING;
         _localMatrix = new Matrix();
 
         var dirtyMatrix = function (_,_) {
@@ -194,7 +201,15 @@ class Sprite extends Component
                 g.setBlendMode(sprite.blendMode);
             }
             var matrix = sprite.getLocalMatrix();
-            g.transform(matrix.m00, matrix.m10, matrix.m01, matrix.m11, matrix.m02, matrix.m12);
+
+            var m02 = matrix.m02;
+            var m12 = matrix.m12;
+            if (sprite.pixelSnapping) {
+                // Snap the translation to the nearest whole pixel
+                m02 = Math.round(m02);
+                m12 = Math.round(m12);
+            }
+            g.transform(matrix.m00, matrix.m10, matrix.m01, matrix.m11, m02, m12);
 
             var scissor = sprite.scissor;
             if (scissor != null) {
@@ -364,6 +379,16 @@ class Sprite extends Component
         return this;
     }
 
+    /**
+     * Convenience method to set pixelSnapping to false.
+     * @returns This instance, for chaining.
+     */
+    public function disablePixelSnapping () :Sprite
+    {
+        pixelSnapping = false;
+        return this;
+    }
+
     override public function onUpdate (dt :Float)
     {
         x.update(dt);
@@ -459,6 +484,17 @@ class Sprite extends Component
         return pointerEnabled;
     }
 
+    inline private function get_pixelSnapping () :Bool
+    {
+        return _flags.contains(PIXEL_SNAPPING);
+    }
+
+    private function set_pixelSnapping (pixelSnapping :Bool) :Bool
+    {
+        _flags = _flags.set(PIXEL_SNAPPING, pixelSnapping);
+        return pixelSnapping;
+    }
+
     private static function hitTestBackwards (entity :Entity, x :Float, y :Float)
     {
         if (entity != null) {
@@ -541,6 +577,7 @@ class Sprite extends Component
     private static inline var VIEW_MATRIX_DIRTY = 1 << 3;
     private static inline var MOVIESPRITE_PAUSED = 1 << 4;
     private static inline var TEXTSPRITE_DIRTY = 1 << 5;
+    private static inline var PIXEL_SNAPPING = 1 << 6;
 
     private var _flags :Int;
 

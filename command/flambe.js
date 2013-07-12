@@ -26,9 +26,11 @@ cmd.setDefaults({action: function (args) {
 var cmd = commands.addParser("run", {help: "Build and run on given platform"});
 cmd.addArgument(["platform"], {choices: PLATFORMS});
 cmd.addArgument(["--debug"], {action: "storeTrue", help: "Build in debug mode"});
+cmd.addArgument(["--fdb-host"], {help: "The address AIR apps should connect to for debugging"});
+cmd.addArgument(["--no-fdb"], {action: "storeTrue", help: "Don't run fdb after starting AIR apps"})
 cmd.setDefaults({action: function (args) {
     var config = flambe.loadConfig(args.config);
-    flambe.run(config, args.platform, {debug: args.debug})
+    flambe.run(config, args.platform, {debug: args.debug, fdbHost: args.fdb_host, noFdb: args.no_fdb})
     .catch(function (error) {
         if (error) console.error(error);
         process.exit(1);
@@ -38,9 +40,10 @@ cmd.setDefaults({action: function (args) {
 var cmd = commands.addParser("build", {help: "Build multiple platforms"});
 cmd.addArgument(["platforms"], {choices: PLATFORMS, nargs: "+"});
 cmd.addArgument(["--debug"], {action: "storeTrue", help: "Build in debug mode"});
+cmd.addArgument(["--fdb-host"], {help: "The address AIR apps should connect to for debugging"});
 cmd.setDefaults({action: function (args) {
     var config = flambe.loadConfig(args.config);
-    flambe.build(config, args.platforms, {debug: args.debug})
+    flambe.build(config, args.platforms, {debug: args.debug, fdbHost: args.fdb_host})
     .catch(function (error) {
         if (error) console.error(error);
         process.exit(1);

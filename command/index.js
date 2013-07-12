@@ -5,6 +5,7 @@
 
 var Q = require("q");
 var fs = require("fs");
+var os = require("os");
 var path = require("path");
 var spawn = require("child_process").spawn;
 var wrench = require("wrench");
@@ -36,8 +37,8 @@ exports.run = function (config, platform, opts) {
         var id = get(config, "id");
         switch (platform) {
         case "android":
-            console.log();
             var apk = "build/main-android.apk";
+            console.log();
             console.log("Installing: " + apk);
             adt(["-uninstallApp", "-platform", "android", "-appid", id],
                 {verbose: false, output: false, check: false})
@@ -46,16 +47,11 @@ exports.run = function (config, platform, opts) {
                     {verbose: false});
             })
             .then(function () {
-                return adt(["-launchApp", "-platform", "android", "-appid", id], {verbose: false});
-            })
-            .then(function () {
-                if (debug) {
+                if (debug && !opts.noFdb) {
                     console.log();
-                    // Clear the log, then start tailing it
-                    return adb(["logcat", "-c"], {verbose: false}).then(function () {
-                        return adb(["logcat", "-v", "raw", "-s", "air.%s:V" % id], {verbose: false});
-                    });
+                    fdb(["run", "continue"]);
                 }
+                return adt(["-launchApp", "-platform", "android", "-appid", id], {verbose: false});
             })
             break;
 
@@ -162,10 +158,16 @@ exports.build = function (config, platforms, opts) {
         .then(function () {
             generateAirXml(swf, xml);
 
-            var apkType = debug ? "apk-debug" : "apk-captive-runtime";
-            return adt(["-package", "-target", apkType, "-storetype", "pkcs12",
-                "-keystore", cert, "-storepass", "password", apk, xml, "icons",
-                "-C", CACHE_DIR+"/air", swf, "assets"]);
+            var androidFlags = ["-package"];
+            if (debug) {
+                var fdbHost = opts.fdbHost || getIP();
+                androidFlags.push("-target", "apk-debug", "-connect", fdbHost);
+            } else {
+                androidFlags.push("-target", "apk-captive-runtime");
+            }
+            androidFlags.push("-storetype", "pkcs12", "-keystore", cert, "-storepass", "password",
+                apk, xml, "icons", "-C", CACHE_DIR+"/air", swf, "assets");
+            return adt(androidFlags);
         })
         return promise;
     }
@@ -285,6 +287,15 @@ var minify = function (inputs, output, opts) {
     return exec("java", flags, {verbose: false});
 };
 exports.minify = minify;
+
+var fdb = function (commands) {
+    var child = spawn("fdb", [], {stdio: ["pipe", process.stdout, process.stderr]});
+    commands.forEach(function (command) {
+        child.stdin.write(command + "\n");
+    });
+    process.stdin.pipe(child.stdin);
+};
+exports.fdb = fdb;
 
 var Server = function () {
 };
@@ -437,4 +448,17 @@ var copyDirContents = function (from, to) {
 var copyFile = function (from, to) {
     var content = fs.readFileSync(from);
     fs.writeFileSync(to, content);
+};
+
+var getIP = function () {
+    var ip = null;
+    var ifaces = os.networkInterfaces();
+    for (var device in ifaces) {
+        ifaces[device].forEach(function (iface) {
+            if (!iface.internal && iface.family == "IPv4") {
+                ip = iface.address;
+            }
+        });
+    }
+    return ip;
 };

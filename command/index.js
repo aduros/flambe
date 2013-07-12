@@ -41,17 +41,17 @@ exports.run = function (config, platform, opts) {
             console.log();
             console.log("Installing: " + apk);
             adt(["-uninstallApp", "-platform", "android", "-appid", id],
-                {verbose: false, output: false, check: false})
+                {output: false, check: false})
             .then(function () {
-                return adt(["-installApp", "-platform", "android", "-package", apk],
-                    {verbose: false});
+                return adt(["-installApp", "-platform", "android", "-package", apk]);
             })
             .then(function () {
+                var p = adt(["-launchApp", "-platform", "android", "-appid", id]);
                 if (debug && !opts.noFdb) {
                     console.log();
                     fdb(["run", "continue"]);
                 }
-                return adt(["-launchApp", "-platform", "android", "-appid", id], {verbose: false});
+                return p;
             })
             break;
 

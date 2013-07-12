@@ -181,9 +181,12 @@ exports.build = function (config, platforms, opts) {
     var promise =
     haxe(connectFlags, {check: false, verbose: false, output: false})
     .then(function (code) {
-        // Use a Haxe compilation server if available
-        if (code == 0) {
-            commonFlags = commonFlags.concat(connectFlags);
+        // Hide the compilation server behind an environment variable for now until stable
+        if ("FLAMBE_HAXE_SERVER" in process.env) {
+            // Use a Haxe compilation server if available
+            if (code == 0) {
+                commonFlags = commonFlags.concat(connectFlags);
+            }
         }
 
         commonFlags.push("-main", get(config, "main"));
@@ -292,10 +295,12 @@ Server.prototype.start = function () {
     var url = require("url");
     var websocket = require("websocket");
 
-    // Disabled due to haxe bug...?
-    // // Fire up a Haxe compiler server, ignoring all output. It's fine if this command fails, the
-    // // build will fallback to not using a compiler server
-    // spawn("haxe", ["--wait", HAXE_COMPILER_PORT], {stdio: "ignore"});
+    // Hide the compilation server behind an environment variable for now until stable
+    if ("FLAMBE_HAXE_SERVER" in process.env) {
+        // Fire up a Haxe compiler server, ignoring all output. It's fine if this command fails, the
+        // build will fallback to not using a compiler server
+        spawn("haxe", ["--wait", HAXE_COMPILER_PORT], {stdio: "ignore"});
+    }
 
     // Start a static HTTP server
     var host = "0.0.0.0";

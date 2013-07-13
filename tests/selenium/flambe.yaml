@@ -1,0 +1,7 @@
+# The name, version and identifier, for mobile app packaging
+name: Selenium Test
+version: 1.0.0
+id: flambe.selenium
+
+# The main class name
+main: SeleniumMain

@@ -60,7 +60,7 @@ if [[ "$TRAVIS_SECURE_ENV_VARS" == "true" && "$TRAVIS_JOB_NUMBER" == *.1 ]]; the
 
     echo "Running integration tests..."
     pushd tests/selenium
-    pip install selenium nose --use-mirrors
+    sudo pip install selenium nose --use-mirrors
     nosetests --processes=3 --process-timeout=600 -v driver.py
     popd
 fi

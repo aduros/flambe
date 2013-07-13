@@ -8,13 +8,30 @@ var argparse = require("argparse");
 var flambe = require("flambe");
 var fs = require("fs");
 var path = require("path");
+var util = require("util");
+
+var FlambeHelpFormatter = function (opts) {
+    argparse.HelpFormatter.call(this, opts);
+};
+util.inherits(FlambeHelpFormatter, argparse.HelpFormatter);
+
+// http://stackoverflow.com/questions/13423540/argparse-subparser-hide-metavar-in-command-listing
+FlambeHelpFormatter.prototype._formatAction = function (action) {
+    var parts = argparse.HelpFormatter.prototype._formatAction.call(this, action);
+    if (action.nargs == argparse.Const.PARSER) {
+        var lines = parts.split("\n");
+        lines.shift();
+        parts = lines.join("\n");
+    }
+    return parts;
+};
 
 var PLATFORMS = ["html", "flash", "ios", "android"];
 
-var parser = new argparse.ArgumentParser();
+var parser = new argparse.ArgumentParser({formatterClass: FlambeHelpFormatter});
 parser.addArgument(["--config"], {defaultValue: "flambe.yaml"});
 
-var commands = parser.addSubparsers({title: "Commands"});
+var commands = parser.addSubparsers({title: "Commands", metavar: "<command>"});
 
 var cmd = commands.addParser("new", {help: "Create a new project scaffold"});
 cmd.addArgument(["path"]);

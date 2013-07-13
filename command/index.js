@@ -42,7 +42,7 @@ exports.run = function (config, platform, opts) {
             var apk = "build/main-android.apk";
             console.log();
             console.log("Installing: " + apk);
-            adt(["-uninstallApp", "-platform", "android", "-appid", id],
+            return adt(["-uninstallApp", "-platform", "android", "-appid", id],
                 {output: false, check: false})
             .then(function () {
                 return adt(["-installApp", "-platform", "android", "-package", apk]);
@@ -58,7 +58,25 @@ exports.run = function (config, platform, opts) {
             break;
 
         case "html": case "flash":
-            exports.restart();
+            var url = "http://localhost:" + HTTP_PORT + "/?flambe=" + platform;
+            console.log();
+            console.log("Launching: " + url);
+
+            return exports.sendMessage("restart")
+            .then(function (result) {
+                var clients = (platform == "html") ? result.htmlClients : result.flashClients;
+                if (clients < 1) {
+                    // Open a new browser window if no connected clients, or this is a release build
+                    var open = require("open");
+                    open(url);
+                    console.log("Opened in a new browser window.");
+                } else {
+                    console.log("Reloaded an existing browser window.");
+                }
+            })
+            .catch(function (error) {
+                return Q.reject("Server not found. Run `flambe serve` in a another terminal and try again.");
+            });
             break;
         }
     });
@@ -226,16 +244,28 @@ exports.clean = function () {
     wrench.rmdirSyncRecursive(CACHE_DIR, true);
 };
 
-/** Restart all connected clients. */
-exports.restart = function () {
-    var net = require("net");
-    var client = net.connect({host: "127.0.0.1", port: SOCKET_PORT}, function () {
-        var message = JSON.stringify({type: "restart"});
-        client.end(message);
+/** Sends a message to the Flambe Serve API. */
+exports.sendMessage = function (method) {
+    var http = require("http");
+    var deferred = Q.defer();
+    var options = {hostname: "localhost", port: HTTP_PORT, path: "/_api", method: "POST"};
+    var req = http.request(options, function (res) {
+        res.setEncoding("utf8");
+        res.on("data", function (chunk) {
+            var message = JSON.parse(chunk);
+            if (message.error != null) {
+                deferred.reject(message.error);
+            } else {
+                deferred.resolve(message.result);
+            }
+            // res.end();
+        });
     });
-    client.on("error", function () {
-        // Prevent thrown errors
+    req.on("error", function (error) {
+        deferred.reject(error);
     });
+    req.end(JSON.stringify({method: method}));
+    return deferred.promise;
 };
 
 var haxe = function (flags, opts) {
@@ -304,6 +334,7 @@ var Server = function () {
 exports.Server = Server;
 
 Server.prototype.start = function () {
+    var self = this;
     var connect = require("connect");
     var url = require("url");
     var websocket = require("websocket");
@@ -319,13 +350,29 @@ Server.prototype.start = function () {
     var host = "0.0.0.0";
     var staticServer = connect()
         .use(function (req, res, next) {
-            // Forever-cache assets
-            if (url.parse(req.url, true).query.v) {
-                var expires = new Date(Date.now() + 1000*60*60*24*365*25);
-                res.setHeader("Expires", expires.toUTCString());
-                res.setHeader("Cache-Control", "max-age=315360000");
+            var parsed = url.parse(req.url, true);
+            if (parsed.pathname == "/_api") {
+                // Handle API requests
+                req.setEncoding("utf8");
+                req.on("data", function (chunk) {
+                    self._onAPIMessage(chunk)
+                    .then(function (result) {
+                        res.end(JSON.stringify({result: result}));
+                    })
+                    .catch(function (error) {
+                        res.end(JSON.stringify({error: error}));
+                    });
+                });
+
+            } else {
+                if (parsed.query.v) {
+                    // Forever-cache assets
+                    var expires = new Date(Date.now() + 1000*60*60*24*365*25);
+                    res.setHeader("Expires", expires.toUTCString());
+                    res.setHeader("Cache-Control", "max-age=315360000");
+                }
+                next();
             }
-            next();
         })
         .use(connect.logger("tiny"))
         .use(connect.compress())
@@ -333,7 +380,6 @@ Server.prototype.start = function () {
         .listen(HTTP_PORT, host);
     console.log("Serving on %s:%s", host, HTTP_PORT);
 
-    var self = this;
     this._wsServer = new websocket.server({
         httpServer: staticServer,
         autoAcceptConnections: true,
@@ -404,15 +450,36 @@ Server.prototype.broadcast = function (type, params) {
     });
 };
 
+/** Handle messages from connected game clients. */
 Server.prototype._onMessage = function (message) {
     try {
         var event = JSON.parse(message);
-        switch (event.type) {
-        case "restart":
-            this.broadcast("restart");
-        }
+        // switch (event.type) {
+        // case "restart":
+        //     this.broadcast("restart");
+        // }
     } catch (error) {
         console.warn("Received badly formed message", error);
+    }
+};
+
+/** Handle web API messages. */
+Server.prototype._onAPIMessage = function (message) {
+    try {
+        message = JSON.parse(message);
+    } catch (error) {
+        return Q.reject("Badly formed JSON");
+    }
+
+    switch (message.method) {
+    case "restart":
+        this.broadcast("restart");
+        return Q.resolve({
+            htmlClients: this._wsServer.connections.length,
+            flashClients: this._connections.length,
+        });
+    default:
+        return Q.reject("Unknown method: " + message.method);
     }
 };
 

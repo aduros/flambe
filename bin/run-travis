@@ -14,7 +14,7 @@ cd "$FLAMBE_SPACE"
 
 # Install the flambe command and library
 haxelib dev flambe "$FLAMBE_SPACE/src"
-npm install ./command
+npm install -g ./command
 
 echo "Validating compilation..."
 haxe -js out.js --no-output --macro 'include("flambe", true, ["flambe.platform"])' \

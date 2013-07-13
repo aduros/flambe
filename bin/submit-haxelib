@@ -23,13 +23,6 @@ cd ..
 
 rm -f $ARCHIVE
 
-# Build the run.n that's executed by `haxelib run flambe`
-cd haxelib
-../bin/wafl configure build
-zip -j $ARCHIVE build/run.n
-git ls-files template | zip $ARCHIVE -@
-cd ..
-
 git ls-files \
     bin/wafl bin/wafl.bat bin/waf \
     tools/embedder tools/waf \

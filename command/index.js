@@ -18,13 +18,15 @@ var HAXE_COMPILER_PORT = 6000;
 var HTTP_PORT = 5000;
 var SOCKET_PORT = HTTP_PORT+1;
 
+exports.PLATFORMS = ["html", "flash", "ios", "android"];
+
 exports.loadConfig = function (output) {
     var yaml = require("js-yaml");
     return yaml.safeLoad(fs.readFileSync(output).toString());
 };
 
 exports.newProject = function (output) {
-    wrench.copyDirSyncRecursive(DATA_DIR+"/scaffold", output);
+    return Q.nfcall(wrench.copyDirRecursive, DATA_DIR+"/scaffold", output, {});
 };
 
 exports.run = function (config, platform, opts) {

@@ -1,7 +1,4 @@
-/**
- * Cooked with Flambe
- * https://github.com/aduros/flambe
- */
+/** Cooked with Flambe, https://getflambe.com */
 var flambe={FLASH_VERSION:"11"};
 flambe.embed=function(k,w){"string"==typeof k&&(k=[k+"-flash.swf",k+"-html.js"]);var x=document.getElementById(w);if(null==x)throw Error("Could not find element [id="+w+"]");for(var r={},p=window.location.search.substr(1).split("&"),h=0;h<p.length;++h){var n=p[h].split("=");r[unescape(n[0])]=1<n.length?unescape(n[1]):null}p=r.flambe;for(h=0;h<k.length;++h)switch(r=k[h],(n=r.match(/\.(\w+)(\?|$)/))&&(n=n[1].toLowerCase()),n){case "swf":if((null==p||"flash"==p)&&swfobject.hasFlashPlayerVersion(flambe.FLASH_VERSION))return h=document.createElement("div"),
 h.id=w+"-swf",x.appendChild(h),"undefined"==typeof $flambe_expose&&(window.$flambe_expose=function(h,n){window[h]=null!=n?function(){var k=document.getElementById(n);k[h].apply(k,arguments)}:null}),swfobject.embedSWF(r,h.id,"100%","100%",flambe.FLASH_VERSION,null,{},{allowScriptAccess:"always",allowFullScreen:"true",fullscreenOnSelection:"true",wmode:"direct"},{id:h.id,name:h.id}),!0;break;case "js":if(null==p||"html"==p)if(n=document.createElement("canvas"),"getContext"in n)return n.id=w+"-canvas",

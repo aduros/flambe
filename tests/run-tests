@@ -1,0 +1,10 @@
+#!/bin/sh -e
+#
+# Builds and runs the unit tests
+
+root=`readlink -f $(dirname $0)`
+cd $root
+
+mkdir -p build
+haxe -js build/tests.js -dce full -lib flambe -lib flambe-server -debug -cp src -main TestMain
+node build/tests.js

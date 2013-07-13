@@ -1,9 +1,8 @@
-#!/bin/bash
+#!/bin/bash -e
 #
 # Runs continuous integration tests, used by travis-ci.org
 
-# Fail on error, and kill child processes on exit
-set -e
+# Kill child processes on exit
 trap "kill 0" SIGINT SIGTERM EXIT
 
 FLAMBE_ROOT=`readlink -f $(dirname $0)/..`
@@ -13,44 +12,24 @@ FLAMBE_SPACE="/tmp/flambe space"
 ln -sfT "$FLAMBE_ROOT" "$FLAMBE_SPACE"
 cd "$FLAMBE_SPACE"
 
-# Set up Flambe development paths
+# Install the flambe command and library
 haxelib dev flambe "$FLAMBE_SPACE/src"
-export PATH="$FLAMBE_SPACE/bin:$PATH"
+npm install ./command
 
 echo "Validating compilation..."
 haxe -js out.js --no-output --macro 'include("flambe", true, ["flambe.platform"])' \
     -lib hxsl -cp "$FLAMBE_SPACE/src"
 
 echo "Running unit tests..."
-cd tests
-wafl configure build
-cd ..
-
-echo "Building haxelib runner..."
-cd haxelib
-wafl configure build
-cd ..
+tests/run-tests
 
 echo "Building demos..."
 git clone git://github.com/aduros/flambe-demos.git
 flambe-demos/bin/build-all --debug
 
-echo "Testing new build tool..."
-cd tools/cli
-python setup.py install
-cd -
-
-flambe new testgame
-cd testgame
-flambe build html flash --debug
-flambe clean
-flambe build html flash
-flambe clean
-cd -
-
 # Run the Selenium tests if the Sauce auth key is available (not in pull requests), and only run on
-# one of the Python build workers
-if [ "$TRAVIS_SECURE_ENV_VARS" == "true" -a "$TRAVIS_PYTHON_VERSION" == "2.7" ]; then
+# one of the build workers
+if [[ "$TRAVIS_SECURE_ENV_VARS" == "true" && "$TRAVIS_JOB_NUMBER" == *.1 ]]; then
     # Download and start Sauce Connect
     mkdir -p /tmp/sauce
     pushd /tmp/sauce

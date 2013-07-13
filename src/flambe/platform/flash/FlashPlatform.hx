@@ -91,9 +91,7 @@ class FlashPlatform
 
 #if debug
         new DebugLogic(this);
-#if !flambe_air
-        _catapult = new FlashCatapultClient();
-#end
+        _catapult = FlashCatapultClient.canUse() ? new FlashCatapultClient() : null;
 #end
         Log.info("Initialized Flash platform", ["renderer", _renderer.getName()]);
     }

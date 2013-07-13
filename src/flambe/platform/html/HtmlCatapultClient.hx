@@ -9,14 +9,9 @@ import js.html.*;
 
 class HtmlCatapultClient extends CatapultClient
 {
-    public static function canUse ()
+    public static function canUse () :Bool
     {
-        // Eventually this will be enabled in debug builds by default
-#if flambe_enable_catapult
         return Reflect.hasField(Browser.window, "WebSocket");
-#else
-        return false;
-#end
     }
 
     public function new ()

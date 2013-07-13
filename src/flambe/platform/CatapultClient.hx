@@ -18,10 +18,12 @@ class CatapultClient
 
     public function add (loader :BasicAssetPackLoader)
     {
+#if flambe_enable_catapult
         // Only care about packs loaded from the assets directory
         if (loader.manifest.relativeBasePath == "assets") {
             _loaders.push(loader);
         }
+#end
     }
 
     private function onError (cause :String)

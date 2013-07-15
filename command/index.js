@@ -12,7 +12,7 @@ var wrench = require("wrench");
 var xmldom = require("xmldom");
 
 var DATA_DIR = __dirname + "/data";
-var CACHE_DIR = ".flambe-cache";
+var CACHE_DIR = "build/.cache";
 
 var HAXE_COMPILER_PORT = 6000;
 var HTTP_PORT = 5000;

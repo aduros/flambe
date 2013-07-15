@@ -105,7 +105,7 @@ cmd.setDefaults({action: function (args) {
 }});
 
 var cmd = commands.addParser("clean", {help: "Delete build and cache files.",
-    description: "Deletes the build and .flambe-cache directories."});
+    description: "Deletes the build directory."});
 cmd.setDefaults({action: function () {
     catchErrors(
         flambe.loadConfig(args.config)

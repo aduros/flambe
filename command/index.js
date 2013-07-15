@@ -36,7 +36,13 @@ exports.loadConfig = function (file) {
 };
 
 exports.newProject = function (output) {
-    return Q.nfcall(wrench.copyDirRecursive, DATA_DIR+"/scaffold", output, {});
+    var promise =
+    Q.nfcall(wrench.copyDirRecursive, DATA_DIR+"/scaffold", output, {})
+    .then(function () {
+        // Packaging it straight as .gitignore seems to create problems with NPM/Windows
+        return Q.nfcall(fs.rename, output+"/_.gitignore", output+"/.gitignore");
+    });
+    return promise;
 };
 
 exports.run = function (config, platform, opts) {

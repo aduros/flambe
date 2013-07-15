@@ -18,7 +18,7 @@ var HAXE_COMPILER_PORT = 6000;
 var HTTP_PORT = 5000;
 var SOCKET_PORT = HTTP_PORT+1;
 
-exports.PLATFORMS = ["html", "flash", "ios", "android"];
+exports.PLATFORMS = ["html", "flash", "android"];
 
 exports.VERSION = JSON.parse(fs.readFileSync(__dirname + "/package.json")).version;
 
@@ -43,14 +43,16 @@ exports.run = function (config, platform, opts) {
     opts = opts || {};
     var debug = opts.debug;
 
-    var promise =
-    exports.build(config, [platform], opts)
-    .then(function () {
+    if (platform == null) {
+        platform = get(config, "default_platform", "flash");
+    }
+    checkPlatforms([platform]);
+
+    var run = function () {
         var id = get(config, "id");
         switch (platform) {
         case "android":
             var apk = "build/main-android.apk";
-            console.log();
             console.log("Installing: " + apk);
             return adt(["-uninstallApp", "-platform", "android", "-appid", id],
                 {output: false, check: false})
@@ -69,7 +71,6 @@ exports.run = function (config, platform, opts) {
 
         case "html": case "flash":
             var url = "http://localhost:" + HTTP_PORT + "/?flambe=" + platform;
-            console.log();
             console.log("Launching: " + url);
 
             return exports.sendMessage("restart")
@@ -85,17 +86,26 @@ exports.run = function (config, platform, opts) {
                 }
             })
             .catch(function (error) {
-                return Q.reject("Server not found. Run `flambe serve` in a another terminal and try again.");
+                return Q.reject("Development server not found. Run `flambe serve` in a another terminal and try again.");
             });
             break;
         }
+    };
+
+    return opts.noBuild ? run() : exports.build(config, [platform], opts).then(function () {
+        console.log();
+        return run();
     });
-    return promise;
 };
 
 exports.build = function (config, platforms, opts) {
     opts = opts || {};
     var debug = opts.debug;
+
+    if (platforms == null || platforms.length < 1) {
+        platforms = [get(config, "default_platform", "flash")];
+    }
+    checkPlatforms(platforms);
 
     var commonFlags = [];
 
@@ -537,6 +547,15 @@ var get = function (config, name, defaultValue) {
     if (name in config) return config[name];
     if (typeof defaultValue != "undefined") return defaultValue;
     throw new Error("Missing required entry in config file: " + name);
+};
+
+var checkPlatforms = function (platforms) {
+    for (var ii = 0; ii < platforms.length; ++ii) {
+        var platform = platforms[ii];
+        if (exports.PLATFORMS.indexOf(platform) < 0) {
+            throw new Error("Invalid platform: '" + platform + "'. Choose from " + exports.PLATFORMS.join(", ") + ".");
+        }
+    }
 };
 
 /**

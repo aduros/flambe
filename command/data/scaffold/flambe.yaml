@@ -6,5 +6,8 @@ id: com.urdomain.urgame
 # The main class name
 main: urgame.Main
 
+# The platform to use when invoking `run` or `build` with no arguments
+default_platform: flash
+
 # Optional flags to pass to the Haxe compiler
 # haxe_flags: -lib nape -cp another_dir

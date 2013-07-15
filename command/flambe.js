@@ -59,24 +59,30 @@ cmd.setDefaults({action: function (args) {
 var addCommonArguments = function (parser) {
     parser.addArgument(["--debug"], {action: "storeTrue", help: "Build in debug mode."});
     parser.addArgument(["--fdb-host"], {help: "The address AIR apps should connect to for debugging."});
+
+    // For FlashDevelop, does absolutely nothing
+    parser.addArgument(["--release"], {action: "storeTrue", help: argparse.Const.SUPPRESS});
 };
 
 var cmd = commands.addParser("run", {help: "Build and run on a given platform.",
     description: "Builds and runs the game on a single given platform."});
-cmd.addArgument(["platform"], {choices: flambe.PLATFORMS});
+cmd.addArgument(["platform"], {metavar: "platform", nargs: "?",
+    help: "A platform to target. Choose from " + flambe.PLATFORMS.join(", ") + ". If omitted, 'default_platform' from flambe.yaml will be used."});
 addCommonArguments(cmd);
+cmd.addArgument(["--no-build"], {action: "storeTrue", help: "Don't rebuild before running."});
 cmd.addArgument(["--no-fdb"], {action: "storeTrue", help: "Don't run fdb after starting AIR apps."})
 cmd.setDefaults({action: function (args) {
     catchErrors(
         flambe.loadConfig(args.config)
         .then(function (config) {
-            return flambe.run(config, args.platform, {debug: args.debug, fdbHost: args.fdb_host, noFdb: args.no_fdb});
+            return flambe.run(config, args.platform, {debug: args.debug, noBuild: args.no_build, fdbHost: args.fdb_host, noFdb: args.no_fdb});
         }));
 }});
 
 var cmd = commands.addParser("build", {help: "Build for multiple platforms.",
     description: "Builds the game for one or more platforms."});
-cmd.addArgument(["platforms"], {choices: flambe.PLATFORMS, nargs: "+"});
+cmd.addArgument(["platforms"], {metavar: "platform", nargs: "*",
+    help: "A platform to target. Choose from " + flambe.PLATFORMS.join(", ") + ". If omitted, 'default_platform' from flambe.yaml will be used."});
 addCommonArguments(cmd);
 cmd.setDefaults({action: function (args) {
     catchErrors(

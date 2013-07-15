@@ -20,6 +20,8 @@ var SOCKET_PORT = HTTP_PORT+1;
 
 exports.PLATFORMS = ["html", "flash", "ios", "android"];
 
+exports.VERSION = JSON.parse(fs.readFileSync(__dirname + "/package.json")).version;
+
 exports.loadConfig = function (output) {
     var yaml = require("js-yaml");
     return yaml.safeLoad(fs.readFileSync(output).toString());

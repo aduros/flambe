@@ -26,7 +26,10 @@ FlambeHelpFormatter.prototype._formatAction = function (action) {
     return parts;
 };
 
-var parser = new argparse.ArgumentParser({formatterClass: FlambeHelpFormatter});
+var parser = new argparse.ArgumentParser({formatterClass: FlambeHelpFormatter,
+    description: "Rapidly cook up games for HTML5 and Flash.", usage: "flambe <command> ..."});
+parser.addArgument(["-v", "--version"], {action: "version", help: "Print version and exit.",
+    version: flambe.VERSION});
 parser.addArgument(["--config"], {defaultValue: "flambe.yaml", help: "Alternate path to flambe.yaml."});
 
 var commands = parser.addSubparsers({title: "Commands", metavar: "<command>"});
@@ -88,12 +91,13 @@ cmd.setDefaults({action: function (args) {
 var cmd = commands.addParser("clean", {help: "Delete build and cache files.",
     description: "Deletes the build and .flambe-cache directories."});
 cmd.setDefaults({action: function () {
-    flambe.loadConfig(args.config);
+    flambe.loadConfig(args.config); // Require to be run from a project directory
     flambe.clean();
 }});
 
-var cmd = commands.addParser("help");
-cmd.addArgument(["command"], {nargs: "?"});
+var cmd = commands.addParser("help", {help: "Get more help for any of these commands.",
+    description: "Don't panic!"});
+cmd.addArgument(["command"], {nargs: "?", help: "The command to get help for."});
 cmd.setDefaults({action: function () {
     if (args.command == null) {
         parser.printHelp();
@@ -107,5 +111,9 @@ cmd.setDefaults({action: function () {
     }
 }});
 
-var args = parser.parseArgs();
-args.action(args);
+if (process.argv.length > 2) {
+    var args = parser.parseArgs();
+    args.action(args);
+} else {
+    parser.printHelp();
+}

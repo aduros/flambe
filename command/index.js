@@ -22,9 +22,17 @@ exports.PLATFORMS = ["html", "flash", "ios", "android"];
 
 exports.VERSION = JSON.parse(fs.readFileSync(__dirname + "/package.json")).version;
 
-exports.loadConfig = function (output) {
-    var yaml = require("js-yaml");
-    return yaml.safeLoad(fs.readFileSync(output).toString());
+exports.loadConfig = function (file) {
+    var promise =
+    Q.nfcall(fs.readFile, file)
+    .catch(function (error) {
+        throw new Error("Could not open '" + file + "'. Is this a valid project directory?");
+    })
+    .then(function (text) {
+        var yaml = require("js-yaml");
+        return yaml.safeLoad(text.toString());
+    });
+    return promise;
 };
 
 exports.newProject = function (output) {

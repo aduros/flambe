@@ -26,6 +26,13 @@ FlambeHelpFormatter.prototype._formatAction = function (action) {
     return parts;
 };
 
+var catchErrors = function (promise) {
+    promise.catch(function (error) {
+        if (error) console.error(error);
+        process.exit(1);
+    });
+};
+
 var parser = new argparse.ArgumentParser({formatterClass: FlambeHelpFormatter,
     description: "Rapidly cook up games for HTML5 and Flash.", usage: "flambe <command> ..."});
 parser.addArgument(["-v", "--version"], {action: "version", help: "Print version and exit.",
@@ -60,11 +67,8 @@ addCommonArguments(cmd);
 cmd.addArgument(["--no-fdb"], {action: "storeTrue", help: "Don't run fdb after starting AIR apps."})
 cmd.setDefaults({action: function (args) {
     var config = flambe.loadConfig(args.config);
-    flambe.run(config, args.platform, {debug: args.debug, fdbHost: args.fdb_host, noFdb: args.no_fdb})
-    .catch(function (error) {
-        if (error) console.error(error);
-        process.exit(1);
-    });
+    catchErrors(flambe.run(config, args.platform,
+        {debug: args.debug, fdbHost: args.fdb_host, noFdb: args.no_fdb}));
 }});
 
 var cmd = commands.addParser("build", {help: "Build multiple platforms.",
@@ -73,11 +77,8 @@ cmd.addArgument(["platforms"], {choices: flambe.PLATFORMS, nargs: "+"});
 addCommonArguments(cmd);
 cmd.setDefaults({action: function (args) {
     var config = flambe.loadConfig(args.config);
-    flambe.build(config, args.platforms, {debug: args.debug, fdbHost: args.fdb_host})
-    .catch(function (error) {
-        if (error) console.error(error);
-        process.exit(1);
-    });
+    catchErrors(flambe.build(config, args.platforms,
+        {debug: args.debug, fdbHost: args.fdb_host}));
 }});
 
 var cmd = commands.addParser("serve", {help: "Start a development server.",
@@ -93,6 +94,14 @@ var cmd = commands.addParser("clean", {help: "Delete build and cache files.",
 cmd.setDefaults({action: function () {
     flambe.loadConfig(args.config); // Require to be run from a project directory
     flambe.clean();
+}});
+
+var cmd = commands.addParser("update", {help: "Update to the latest version of Flambe.",
+    description: "Upgrade to the latest version of Flambe, or downgrade to an earlier version. This command should be run as root/Administrator."});
+cmd.addArgument(["version"], {nargs: "?", help: "The optional version to update to."});
+cmd.addArgument(["--_postInstall"], {action: "storeTrue", help: argparse.Const.SUPPRESS});
+cmd.setDefaults({action: function () {
+    catchErrors(flambe.update(args.version, args._postInstall));
 }});
 
 var cmd = commands.addParser("help", {help: "Get more help for any of these commands.",

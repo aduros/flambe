@@ -22,9 +22,5 @@
 
   "bin": "flambe.js",
   "main": "index.js",
-  "scripts": {
-    "postinstall": "node postinstall.js",
-    "postupdate": "node postinstall.js"
-  },
   "preferGlobal": true
 }

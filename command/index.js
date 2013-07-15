@@ -246,6 +246,25 @@ exports.clean = function () {
     wrench.rmdirSyncRecursive(CACHE_DIR, true);
 };
 
+exports.update = function (version, postInstall) {
+    if (!postInstall) {
+        // First update this command tool
+        var npmFlags = (version != null)
+            ? ["install", "-g", "flambe@"+version]
+            : ["update", "-g", "flambe"];
+        var promise =
+        exec("npm", npmFlags)
+        .then(function () {
+            return exec("flambe", ["update", "--_postInstall"], {verbose: false});
+        });
+        return promise;
+
+    } else {
+        // Then update the Flambe haxelib
+        return haxelib(["install", "flambe", exports.VERSION]);
+    }
+}
+
 /** Sends a message to the Flambe Serve API. */
 exports.sendMessage = function (method) {
     var http = require("http");
@@ -274,6 +293,11 @@ var haxe = function (flags, opts) {
     return exec("haxe", flags, opts);
 };
 exports.haxe = haxe;
+
+var haxelib = function (flags, opts) {
+    return exec("haxelib", flags, opts);
+};
+exports.haxelib = haxelib;
 
 var adt = function (flags, opts) {
     return exec("adt", flags, opts);

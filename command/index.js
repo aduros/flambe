@@ -323,6 +323,12 @@ var exec = function (command, flags, opts) {
         console.log([command].concat(flags).join(" "));
     }
 
+    // Run everything through cmd.exe on Windows to be able to find .bat files
+    if (process.platform == "win32") {
+        flags.unshift("/c", command);
+        command = "cmd";
+    }
+
     var deferred = Q.defer();
     var child = spawn(command, flags, {stdio: (opts.output === false) ? "ignore" : "inherit"});
     child.on("close", function (code) {

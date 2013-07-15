@@ -8,6 +8,10 @@
   "repository": "https://github.com/aduros/flambe",
   "bugs": "https://github.com/aduros/flambe/issues",
 
+  "engines": {
+    "node": ">=0.8.0"
+  },
+
   "dependencies": {
     "argparse": "~0.1.15",
     "connect": "~2.8.3",

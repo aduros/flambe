@@ -92,9 +92,9 @@ exports.build = function (config, platforms, opts) {
     var commonFlags = [];
 
     // Flags common to all swf-based targets (flash, android, ios)
-    var swfFlags = ["--flash-strict", "-D", "native_trace",
-        "-swf-header", "640:480:60:000000", "-lib", "hxsl"];
+    var swfFlags = ["--flash-strict", "-swf-header", "640:480:60:000000"];
     if (debug) swfFlags.push("-D", "fdb", "-D", "advanced-telemetry");
+    else swfFlags.push("-D", "native_trace");
 
     var buildHtml = function () {
         var htmlFlags = ["-D", "html"];
@@ -125,7 +125,7 @@ exports.build = function (config, platforms, opts) {
             excludeHiddenUnix: true,
             filter: /\.(ogg|wav|m4a)$/,
         });
-        var airFlags = swfFlags.concat(["-lib", "air3", "-swf-version", "11.2", "-D", "flambe_air"]);
+        var airFlags = swfFlags.concat(["-swf-version", "11.2", "-D", "flambe_air"]);
         return haxe(commonFlags.concat(airFlags).concat(flags))
     };
 

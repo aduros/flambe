@@ -34,7 +34,7 @@ git ls-files | zip $ARCHIVE -@
 cd ..
 
 # Process the haxelib.json template and add it to the zip
-sed -e s/{{VERSION}}/$VERSION/ etc/haxelib.json > /tmp/haxelib.json
+sed -e s/{{VERSION}}/$VERSION/ src/haxelib.json > /tmp/haxelib.json
 zip -j $ARCHIVE /tmp/haxelib.json
 
 # Include our haxedoc.xml as well

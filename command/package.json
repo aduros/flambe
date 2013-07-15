@@ -1,6 +1,14 @@
 {
+  "author": {
+    "email": "b@aduros.com",
+    "name": "Bruno Garcia",
+    "url": "https://twitter.com/b_garcia"
+  },
   "bin": "flambe.js",
-  "bugs": "https://github.com/aduros/flambe/issues",
+  "bugs": {
+    "email": "flambe@googlegroups.com",
+    "url": "https://github.com/aduros/flambe/issues"
+  },
   "dependencies": {
     "argparse": "~0.1.15",
     "connect": "~2.8.3",

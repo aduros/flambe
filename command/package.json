@@ -1,17 +1,6 @@
 {
-  "name": "flambe",
-  "version": "3.0.0",
-
-  "description": "Rapidly cook up games for HTML5 and Flash.",
-  "license": "MIT",
-  "homepage": "http://getflambe.com",
-  "repository": "https://github.com/aduros/flambe",
+  "bin": "flambe.js",
   "bugs": "https://github.com/aduros/flambe/issues",
-
-  "engines": {
-    "node": ">=0.8.0"
-  },
-
   "dependencies": {
     "argparse": "~0.1.15",
     "connect": "~2.8.3",
@@ -23,8 +12,15 @@
     "wrench": "~1.5.1",
     "xmldom": "~0.1.16"
   },
-
-  "bin": "flambe.js",
+  "description": "Rapidly cook up games for HTML5 and Flash.",
+  "engines": {
+    "node": ">=0.8.0"
+  },
+  "homepage": "http://getflambe.com",
+  "license": "MIT",
   "main": "index.js",
-  "preferGlobal": true
+  "name": "flambe",
+  "preferGlobal": true,
+  "repository": "https://github.com/aduros/flambe",
+  "version": "3.0.0"
 }

@@ -1,0 +1,15 @@
+#!/usr/bin/env python
+#
+# Resets the project version
+
+import json
+import sys
+
+version = sys.argv[1]
+
+for path in ["command/package.json", "src/haxelib.json"]:
+    with open(path) as file:
+        config = json.load(file)
+    config["version"] = version
+    with open(path, "w") as file:
+        json.dump(config, file, indent=2, separators=(",", ": "), sort_keys=True)

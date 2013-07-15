@@ -1,8 +1,6 @@
-#!/bin/bash
+#!/bin/bash -e
 #
 # Bag and tag a release to haxelib
-
-set -e
 
 if [ $# -lt 1 ]; then
     echo "Usage: $0 VERSION"
@@ -16,10 +14,11 @@ FLAMBE_ROOT=`readlink -f $(dirname $0)/..`
 DEMOS_ROOT="$FLAMBE_ROOT/../flambe-demos"
 cd $FLAMBE_ROOT
 
+# Bump the version number
+bin/set-version "$VERSION"
+
 # Make sure the unit tests pass
-cd tests
-../bin/wafl configure build
-cd ..
+tests/unit/run-tests
 
 rm -f $ARCHIVE
 
@@ -29,37 +28,43 @@ git ls-files \
     LICENSE.txt | zip $ARCHIVE -@
 
 # Include the src directory's contents at the top-level to be nice to IDEs
-cd src
+# This includes the newly version-replaced haxelib.json
+pushd src
 git ls-files | zip $ARCHIVE -@
-cd ..
+popd
 
-# Process the haxelib.json template and add it to the zip
-sed -e s/{{VERSION}}/$VERSION/ src/haxelib.json > /tmp/haxelib.json
-zip -j $ARCHIVE /tmp/haxelib.json
-
-# Include our haxedoc.xml as well
-bin/build-chxdoc
-zip -j $ARCHIVE chxdoc/haxedoc.xml
+# FIXME(bruno): chxdoc is broken in Haxe 3
+# # Include our haxedoc.xml as well
+# bin/build-chxdoc
+# zip -j $ARCHIVE chxdoc/haxedoc.xml
 
 # Include the FD plugin
 tools/flashdevelop/build-fdz
 zip -j $ARCHIVE tools/flashdevelop/flambe-FlashDevelop.fdz
 
-# Now would be a good time to double-check everything works
-haxelib local $ARCHIVE
-
 read -p "Submit Flambe $VERSION to haxelib [Y/n]? " CONFIRM
 case "$CONFIRM" in
     "Y" | "y" | "")
+        # Upload the demos
         $DEMOS_ROOT/bin/upload-all
-        rsync -avz --delete chxdoc/ catdap:web/flambe/api/
-        haxelib submit $ARCHIVE
-        git tag flambe-$VERSION
 
+        # FIXME(bruno): chxdoc is broken in Haxe 3
+        # # Upload the API docs
+        # rsync -avz --delete chxdoc/ catdap:web/flambe/api/
+
+        # Upload the NPM module
+        npm publish ./command
+
+        # Upload the haxelib
+        haxelib submit $ARCHIVE
+
+        # Tag it
+        git tag flambe-$VERSION
         pushd $DEMOS_ROOT
         git tag flambe-$VERSION
         popd
 
-        xdg-open "mailto:flambe@googlegroups.com?subject=Flambe $VERSION released"
+        # Spam it
+        xdg-open "flambe@googlegroups.com?subject=Flambe $VERSION released"
         ;;
 esac

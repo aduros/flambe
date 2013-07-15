@@ -1,14 +1,26 @@
 {
-  "name": "flambe",
-  "license": "MIT",
-  "tags": ["android","cross","flash","game","html5","ios","javascript","js","nodejs"],
-  "description": "Flambe is a fast, expressive, and cross-platform engine for HTML5 and Flash games.",
-  "contributors": ["Aduros"],
-  "releasenote": "See https://github.com/aduros/flambe/wiki/Changes",
-  "version": "{{VERSION}}",
-  "url": "https://github.com/aduros/flambe",
+  "contributors": [
+    "Aduros"
+  ],
   "dependencies": {
     "air3": "",
     "hxsl": "2.0.0"
-  }
+  },
+  "description": "Flambe is a fast, expressive, and cross-platform engine for HTML5 and Flash games.",
+  "license": "MIT",
+  "name": "flambe",
+  "releasenote": "See https://github.com/aduros/flambe/wiki/Changes",
+  "tags": [
+    "android",
+    "cross",
+    "flash",
+    "game",
+    "html5",
+    "ios",
+    "javascript",
+    "js",
+    "nodejs"
+  ],
+  "url": "https://github.com/aduros/flambe",
+  "version": "3.0.0"
 }

@@ -33,7 +33,7 @@ var catchErrors = function (promise) {
     });
 };
 
-var parser = new argparse.ArgumentParser({formatterClass: FlambeHelpFormatter,
+var parser = new argparse.ArgumentParser({prog: "flambe", formatterClass: FlambeHelpFormatter,
     description: "Rapidly cook up games for HTML5 and Flash."});
 parser.addArgument(["-v", "--version"], {action: "version", help: "Print version and exit.",
     version: flambe.VERSION});

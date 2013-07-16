@@ -12,7 +12,7 @@ import flambe.sound.Playback;
 import flambe.sound.Sound;
 import flambe.util.Disposable;
 
-class HtmlSound extends InternalReloadable<HtmlSound>
+class HtmlSound extends BasicAsset<HtmlSound>
     implements Sound
 {
     public var duration (get, null) :Float;
@@ -20,6 +20,7 @@ class HtmlSound extends InternalReloadable<HtmlSound>
 
     public function new (audioElement :Dynamic)
     {
+        super();
         this.audioElement = audioElement;
     }
 

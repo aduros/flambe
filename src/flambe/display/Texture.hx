@@ -6,12 +6,12 @@ package flambe.display;
 
 import haxe.io.Bytes;
 
-import flambe.asset.Reloadable;
+import flambe.asset.Asset;
 
 /**
  * A loaded texture image.
  */
-interface Texture extends Reloadable
+interface Texture extends Asset
 {
     /**
      * The width of this texture, in pixels.

@@ -6,11 +6,12 @@ package flambe.platform;
 
 import flambe.asset.File;
 
-class BasicFile extends InternalReloadable<BasicFile>
+class BasicFile extends BasicAsset<BasicFile>
     implements File
 {
     public function new (content :String)
     {
+        super();
         _content = content;
     }
 

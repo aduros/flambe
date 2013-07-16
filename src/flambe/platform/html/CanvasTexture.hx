@@ -12,7 +12,7 @@ import haxe.io.Bytes;
 import flambe.display.Graphics;
 import flambe.display.Texture;
 
-class CanvasTexture extends InternalReloadable<CanvasTexture>
+class CanvasTexture extends BasicAsset<CanvasTexture>
     implements Texture
 {
     public var width (get, null) :Int;
@@ -27,6 +27,7 @@ class CanvasTexture extends InternalReloadable<CanvasTexture>
 
     public function new (image :Dynamic)
     {
+        super();
         this.image = image;
     }
 

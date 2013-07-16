@@ -15,7 +15,7 @@ import flambe.sound.Playback;
 import flambe.sound.Sound;
 import flambe.util.Disposable;
 
-class FlashSound extends InternalReloadable<FlashSound>
+class FlashSound extends BasicAsset<FlashSound>
     implements Sound
 {
     public var duration (get, null) :Float;

@@ -11,13 +11,14 @@ import flambe.sound.Sound;
 /**
  * An empty sound used in environments that don't support audio.
  */
-class DummySound extends InternalReloadable<DummySound>
+class DummySound extends BasicAsset<DummySound>
     implements Sound
 {
     public var duration (get, null) :Float;
 
     public function new ()
     {
+        super();
         _playback = new DummyPlayback(this);
     }
 

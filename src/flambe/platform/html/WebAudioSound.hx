@@ -10,7 +10,7 @@ import flambe.sound.Playback;
 import flambe.sound.Sound;
 import flambe.util.Disposable;
 
-class WebAudioSound extends InternalReloadable<WebAudioSound>
+class WebAudioSound extends BasicAsset<WebAudioSound>
     implements Sound
 {
     public static var supported (get, null) :Bool;
@@ -31,6 +31,7 @@ class WebAudioSound extends InternalReloadable<WebAudioSound>
 
     public function new (buffer :Dynamic)
     {
+        super();
         this.buffer = buffer;
     }
 

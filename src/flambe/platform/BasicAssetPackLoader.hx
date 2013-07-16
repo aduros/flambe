@@ -139,7 +139,7 @@ class BasicAssetPackLoader
         Assert.fail(); // See subclasses
     }
 
-    private function handleLoad<A/*:InternalReloadable<A>*/> (entry :AssetEntry, asset :A)
+    private function handleLoad<A/*:BasicAsset<A>*/> (entry :AssetEntry, asset :A)
     {
         // Ensure this asset has been fully progressed
         handleProgress(entry, entry.bytes);
@@ -155,7 +155,7 @@ class BasicAssetPackLoader
         }
 
 #if debug // Allow some methods to get stripped in release builds, which don't allow reloading
-        var oldAsset :InternalReloadable<A> = cast map.get(entry.name);
+        var oldAsset :BasicAsset<A> = cast map.get(entry.name);
         if (oldAsset != null) {
             Log.info("Reloaded asset", ["url", entry.url]);
             oldAsset.reload(asset);
@@ -238,6 +238,7 @@ private class BasicAssetPack
 
     public function getTexture (name :String, required :Bool = true) :Texture
     {
+        assertNotDisposed();
 #if debug
         warnOnExtension(name);
 #end
@@ -250,6 +251,7 @@ private class BasicAssetPack
 
     public function getSound (name :String, required :Bool = true) :Sound
     {
+        assertNotDisposed();
 #if debug
         warnOnExtension(name);
 #end
@@ -262,6 +264,8 @@ private class BasicAssetPack
 
     public function getFile (name :String, required :Bool = true) :File
     {
+        assertNotDisposed();
+
         var file = files.get(name);
         if (file == null && required) {
             throw "Missing file".withFields(["name", name]);
@@ -269,9 +273,37 @@ private class BasicAssetPack
         return file;
     }
 
-    public function get_manifest () :Manifest
+    // Dispose all assets contained in this pack
+    public function dispose ()
+    {
+        if (!_disposed) {
+            _disposed = true;
+
+            for (texture in textures) {
+                texture.dispose();
+            }
+            textures = null;
+
+            for (sound in sounds) {
+                sound.dispose();
+            }
+            sounds = null;
+
+            for (file in files) {
+                file.dispose();
+            }
+            files = null;
+        }
+    }
+
+    inline private function get_manifest () :Manifest
     {
         return _manifest;
+    }
+
+    inline private function assertNotDisposed ()
+    {
+        Assert.that(!_disposed, "AssetPack cannot be used after being disposed.");
     }
 
     private static function warnOnExtension (path :String)
@@ -284,4 +316,5 @@ private class BasicAssetPack
     }
 
     private var _manifest :Manifest;
+    private var _disposed :Bool = false;
 }

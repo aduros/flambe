@@ -7,7 +7,7 @@ package flambe.asset;
 /**
  * A loaded file containing raw data.
  */
-interface File extends Reloadable
+interface File extends Asset
 {
     /** Return the contents of this file as a string. */
     function toString () :String;

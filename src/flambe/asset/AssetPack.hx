@@ -7,11 +7,12 @@ package flambe.asset;
 import flambe.asset.Manifest;
 import flambe.display.Texture;
 import flambe.sound.Sound;
+import flambe.util.Disposable;
 
 /**
  * Represents a collection of fully loaded assets.
  */
-interface AssetPack
+interface AssetPack extends Disposable
 {
     /**
      * The manifest that was used to load this asset pack.
@@ -38,4 +39,10 @@ interface AssetPack
      * @param required If true and the asset was not found, an error is thrown.
      */
     function getFile (name :String, required :Bool = true) :File;
+
+    /**
+     * Disposes all the assets in this AssetPack. After calling this, any calls to getTexture,
+     * getSound, or getFile will assert.
+     */
+    function dispose () :Void;
 }

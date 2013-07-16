@@ -13,7 +13,7 @@ import haxe.io.Bytes;
 import flambe.display.Graphics;
 import flambe.display.Texture;
 
-class WebGLTexture extends InternalReloadable<WebGLTexture>
+class WebGLTexture extends BasicAsset<WebGLTexture>
     implements Texture
 {
     public var width (get, null) :Int;
@@ -30,6 +30,7 @@ class WebGLTexture extends InternalReloadable<WebGLTexture>
 
     public function new (renderer :WebGLRenderer, width :Int, height :Int)
     {
+        super();
         _renderer = renderer;
         _width = width;
         _height = height;

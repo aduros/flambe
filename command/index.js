@@ -193,7 +193,7 @@ exports.build = function (config, platforms, opts) {
         var xml = CACHE_DIR+"/air/config-android.xml"
 
         var promise =
-        buildAir(["-swf", CACHE_DIR+"/air/"+swf])
+        buildAir(["-D", "android", "-swf", CACHE_DIR+"/air/"+swf])
         .then(function () {
             // Generate a dummy certificate if it doesn't exist
             if (!fs.existsSync(cert)) {

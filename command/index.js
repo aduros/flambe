@@ -149,7 +149,7 @@ exports.build = function (config, platforms, opts) {
             excludeHiddenUnix: true,
             filter: /\.(ogg|wav|m4a)$/,
         });
-        var airFlags = swfFlags.concat(["-swf-version", "11.7", "-D", "flambe_air"]);
+        var airFlags = swfFlags.concat(["-swf-version", "11.7", "-D", "air"]);
         return haxe(commonFlags.concat(airFlags).concat(flags))
     };
 

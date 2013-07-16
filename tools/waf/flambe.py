@@ -139,7 +139,7 @@ def apply_flambe(ctx):
 
     if build_android or build_ios:
         # Since the captive runtime is used for apps, we can always use the latest swf version
-        air_flags = "-D flambe_air -swf-version 11.2".split()
+        air_flags = "-D flambe_air -D air -swf-version 11.2".split()
         air_libs = "air3".split()
 
         swf = build_prefix + "air.swf"

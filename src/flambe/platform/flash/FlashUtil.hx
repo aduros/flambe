@@ -4,7 +4,7 @@
 
 package flambe.platform.flash;
 
-#if flambe_air
+#if air
 import flash.display.StageOrientation;
 import flash.display.StageAspectRatio;
 #end
@@ -35,7 +35,7 @@ class FlashUtil
         }
     }
 
-#if flambe_air
+#if air
     /** Convert an AIR stage orientation to a Flambe orientation. */
     public static function orientation (orient :StageOrientation) :Orientation
     {

@@ -16,7 +16,7 @@ class FlashCatapultClient extends CatapultClient
 {
     public static function canUse () :Bool
     {
-        return #if flambe_air false #else true #end;
+        return #if air false #else true #end;
     }
 
     public function new ()

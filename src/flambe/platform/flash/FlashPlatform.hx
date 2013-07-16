@@ -41,7 +41,7 @@ class FlashPlatform
         _stage = new FlashStage(stage);
         _pointer = new BasicPointer();
         _mouse = FlashMouse.shouldUse() ? new FlashMouse(_pointer, stage) : new DummyMouse();
-#if flambe_air
+#if air
         _touch = AirTouch.shouldUse() ? new AirTouch(_pointer, stage) : new DummyTouch();
 #else
         _touch = new DummyTouch();
@@ -68,12 +68,12 @@ class FlashPlatform
         });
 #end
 
-// #if flambe_air
+// #if air
 //         // Ensure sound stops when the app is backgrounded or hardware muted on iOS
 //         SoundMixer.audioPlaybackMode = "ambient";
 // #end
 
-#if !flambe_air
+#if !air
         // Hack to fix SharedObject in Chrome Flash:
         // https://groups.google.com/forum/#!topic/flambe/aD6KUvORWks
         getStorage();
@@ -153,7 +153,7 @@ class FlashPlatform
     public function getWeb () :WebSystem
     {
         if (_web == null) {
-#if flambe_air
+#if air
             if (AirWeb.shouldUse()) {
                 _web = new AirWeb(_stage.nativeStage);
             } else {
@@ -178,7 +178,7 @@ class FlashPlatform
     public function getMotion () :MotionSystem
     {
         if (_motion == null) {
-#if flambe_air
+#if air
             if (AirMotion.shouldUse()) {
                 _motion = new AirMotion();
             } else {

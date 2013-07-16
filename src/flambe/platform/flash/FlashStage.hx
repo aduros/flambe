@@ -4,7 +4,7 @@
 
 package flambe.platform.flash;
 
-#if flambe_air
+#if air
 import flash.events.StageOrientationEvent;
 #end
 import flash.display.Stage;
@@ -48,7 +48,7 @@ class FlashStage
         onFullscreen();
 
         orientation = new Value<Orientation>(null);
-#if flambe_air
+#if air
         nativeStage.addEventListener(StageOrientationEvent.ORIENTATION_CHANGE, onOrientationChange);
         onOrientationChange();
 #end
@@ -69,7 +69,7 @@ class FlashStage
         return nativeStage.allowsFullScreen;
     }
 
-#if flambe_air
+#if air
     public function lockOrientation (orient :Orientation)
     {
         nativeStage.autoOrients = true;

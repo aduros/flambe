@@ -8,7 +8,7 @@ import flambe.asset.Asset;
 import flambe.util.Assert;
 import flambe.util.Value;
 
-class BasicAsset<A:BasicAsset<A>>
+class BasicAsset<A>
     implements Asset
 {
     public var reloadCount (get, null) :Value<Int>;

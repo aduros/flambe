@@ -132,6 +132,13 @@ exports.build = function (config, platforms, opts) {
             return haxe(commonFlags.concat(htmlFlags).concat(["-js", unminified]))
             .then(function () {
                 return minify([unminified], js, {strict: true});
+            })
+            .then(function () {
+                // Delete the source map file produced by debug builds
+                return Q.nfcall(fs.unlink, js+".map")
+                .catch(function () {
+                    // Ignore errors
+                });
             });
         }
     };

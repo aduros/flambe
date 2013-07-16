@@ -222,8 +222,8 @@ exports.build = function (config, platforms, opts) {
     wrench.mkdirSyncRecursive("build/web/targets");
     copyDirContents("web", "build/web");
     copyFile(DATA_DIR+"/flambe.js", "build/web/flambe.js");
-    wrench.copyDirSyncRecursive("assets", "build/web/assets", {forceDelete: true});
-    wrench.copyDirSyncRecursive("icons", "build/web/icons", {forceDelete: true});
+    wrench.copyDirSyncRecursive("assets", "build/web/assets", {excludeHiddenUnix: true, forceDelete: true});
+    wrench.copyDirSyncRecursive("icons", "build/web/icons", {excludeHiddenUnix: true, forceDelete: true});
 
     var connectFlags = ["--connect", HAXE_COMPILER_PORT];
     var promise =

@@ -347,7 +347,7 @@ var exec = function (command, flags, opts) {
     }
 
     // Run everything through cmd.exe on Windows to be able to find .bat files
-    if (process.platform == "win32") {
+    if (process.platform == "win32" && opts.windowsCmd !== false) {
         flags.unshift("/c", command);
         command = "cmd";
     }
@@ -379,7 +379,7 @@ var minify = function (inputs, output, opts) {
         flags.push("--js", input);
     });
     if (opts.strict) flags.push("--language_in", "ES5_STRICT");
-    return exec("java", flags, {verbose: false});
+    return exec("java", flags, {verbose: false, windowsCmd: false});
 };
 exports.minify = minify;
 

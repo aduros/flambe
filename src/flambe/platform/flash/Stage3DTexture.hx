@@ -32,6 +32,7 @@ class Stage3DTexture extends BasicAsset<Stage3DTexture>
 
     public function new (renderer :Stage3DRenderer, width :Int, height :Int)
     {
+        super();
         _renderer = renderer;
         _width = width;
         _height = height;
@@ -206,6 +207,13 @@ class Stage3DTexture extends BasicAsset<Stage3DTexture>
         this._widthPow2 = that._widthPow2;
         this._heightPow2 = that._heightPow2;
         this._graphics = that._graphics;
+    }
+
+    override private function onDisposed ()
+    {
+        nativeTexture.dispose();
+        nativeTexture = null;
+        _graphics = null;
     }
 
     private static function nextPowerOfTwo (n :Int) :Int

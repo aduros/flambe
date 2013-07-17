@@ -123,6 +123,19 @@ class WebGLTexture extends BasicAsset<WebGLTexture>
         this._graphics = that._graphics;
     }
 
+    override private function onDisposed ()
+    {
+        var gl = _renderer.gl;
+        gl.deleteTexture(nativeTexture);
+        if (framebuffer != null) {
+            gl.deleteFramebuffer(framebuffer);
+        }
+
+        nativeTexture = null;
+        framebuffer = null;
+        _graphics = null;
+    }
+
     inline private function get_width () :Int
     {
         return _width;

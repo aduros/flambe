@@ -25,5 +25,10 @@ class BasicFile extends BasicAsset<BasicFile>
         this._content = that._content;
     }
 
+    override private function onDisposed ()
+    {
+        _content = null;
+    }
+
     private var _content :String;
 }

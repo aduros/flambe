@@ -55,6 +55,11 @@ class WebAudioSound extends BasicAsset<WebAudioSound>
         this.buffer = that.buffer;
     }
 
+    override private function onDisposed ()
+    {
+        buffer = null;
+    }
+
     private static function get_supported () :Bool
     {
         if (_detectSupport) {

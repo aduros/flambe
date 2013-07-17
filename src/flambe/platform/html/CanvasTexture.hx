@@ -23,7 +23,7 @@ class CanvasTexture extends BasicAsset<CanvasTexture>
     public var image (default, null) :Dynamic;
 
     // The CanvasPattern required for drawPattern, lazily created on demand
-    public var pattern :CanvasPattern;
+    public var pattern :CanvasPattern = null;
 
     public function new (image :Dynamic)
     {
@@ -101,6 +101,13 @@ class CanvasTexture extends BasicAsset<CanvasTexture>
         this.image = that.image;
         this.pattern = that.pattern;
         this._graphics = that._graphics;
+    }
+
+    override private function onDisposed ()
+    {
+        image = null;
+        pattern = null;
+        _graphics = null;
     }
 
     private var _graphics :CanvasGraphics = null;

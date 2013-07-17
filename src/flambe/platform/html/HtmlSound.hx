@@ -43,6 +43,11 @@ class HtmlSound extends BasicAsset<HtmlSound>
     {
         this.audioElement = that.audioElement;
     }
+
+    override private function onDisposed ()
+    {
+        audioElement = null;
+    }
 }
 
 private class HtmlPlayback

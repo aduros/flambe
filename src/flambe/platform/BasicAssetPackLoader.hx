@@ -141,6 +141,10 @@ class BasicAssetPackLoader
 
     private function handleLoad<A/*:BasicAsset<A>*/> (entry :AssetEntry, asset :A)
     {
+        if (_pack.disposed) {
+            return; // Pack was disposed earlier, forget about it
+        }
+
         // Ensure this asset has been fully progressed
         handleProgress(entry, entry.bytes);
 
@@ -228,6 +232,8 @@ private class BasicAssetPack
     public var sounds :Map<String,Sound>;
     public var files :Map<String,File>;
 
+    public var disposed :Bool = false;
+
     public function new (manifest :Manifest)
     {
         _manifest = manifest;
@@ -276,8 +282,8 @@ private class BasicAssetPack
     // Dispose all assets contained in this pack
     public function dispose ()
     {
-        if (!_disposed) {
-            _disposed = true;
+        if (!disposed) {
+            disposed = true;
 
             for (texture in textures) {
                 texture.dispose();
@@ -303,7 +309,7 @@ private class BasicAssetPack
 
     inline private function assertNotDisposed ()
     {
-        Assert.that(!_disposed, "AssetPack cannot be used after being disposed.");
+        Assert.that(!disposed, "AssetPack cannot be used after being disposed");
     }
 
     private static function warnOnExtension (path :String)
@@ -316,5 +322,4 @@ private class BasicAssetPack
     }
 
     private var _manifest :Manifest;
-    private var _disposed :Bool = false;
 }

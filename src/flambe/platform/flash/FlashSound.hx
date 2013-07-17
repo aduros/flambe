@@ -23,6 +23,7 @@ class FlashSound extends BasicAsset<FlashSound>
 
     public function new (nativeSound :flash.media.Sound)
     {
+        super();
         this.nativeSound = nativeSound;
     }
 
@@ -44,6 +45,11 @@ class FlashSound extends BasicAsset<FlashSound>
     override private function copyFrom (that :FlashSound)
     {
         this.nativeSound = that.nativeSound;
+    }
+
+    override private function onDisposed ()
+    {
+        nativeSound = null;
     }
 }
 

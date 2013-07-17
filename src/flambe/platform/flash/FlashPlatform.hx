@@ -98,13 +98,7 @@ class FlashPlatform
 
     public function loadAssetPack (manifest :Manifest) :Promise<AssetPack>
     {
-        var loader = new FlashAssetPackLoader(this, manifest);
-#if debug
-        if (_catapult != null) {
-            _catapult.add(loader);
-        }
-#end
-        return loader.promise;
+        return new FlashAssetPackLoader(this, manifest).promise;
     }
 
     public function getStage () :StageSystem
@@ -216,6 +210,11 @@ class FlashPlatform
         return (_timeOffset+Lib.getTimer()) / 1000;
     }
 
+    public function getCatapultClient ()
+    {
+        return _catapult;
+    }
+
     private function onEnterFrame (_)
     {
         var now = Lib.getTimer();
@@ -269,7 +268,5 @@ class FlashPlatform
     private var _skipFrame :Bool;
     private var _timeOffset :Float;
 
-#if debug
     private var _catapult :FlashCatapultClient;
-#end
 }

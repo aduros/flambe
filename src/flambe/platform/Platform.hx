@@ -29,6 +29,7 @@ interface Platform
 
     function createLogHandler (tag :String) :LogHandler;
     function loadAssetPack (manifest :Manifest) :Promise<AssetPack>;
+    function getCatapultClient () :CatapultClient;
 
     function getLocale () :String;
     function getTime () :Float;

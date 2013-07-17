@@ -28,7 +28,7 @@ class BasicAssetPackLoader
         _platform = platform;
         promise = new Promise();
         _bytesLoaded = new Map();
-        _pack = new BasicAssetPack(manifest);
+        _pack = new BasicAssetPack(manifest, this);
 
         var entries = manifest.array();
         if (entries.length == 0) {
@@ -74,6 +74,13 @@ class BasicAssetPackLoader
                 });
             }
         }
+
+#if debug
+        var catapult = _platform.getCatapultClient();
+        if (catapult != null) {
+            catapult.add(this);
+        }
+#end
     }
 
     /** Reload any asset that matches this URL (ignoring the ?v= query param). */
@@ -99,6 +106,17 @@ class BasicAssetPackLoader
                 }
             });
         }
+    }
+
+    /** Called when this loader's AssetPack is disposed. */
+    public function onDisposed ()
+    {
+#if debug
+        var catapult = _platform.getCatapultClient();
+        if (catapult != null) {
+            catapult.remove(this);
+        }
+#end
     }
 
     private static function removeUrlParams (url :String) :String
@@ -227,6 +245,7 @@ private class BasicAssetPack
     implements AssetPack
 {
     public var manifest (get, null) :Manifest;
+    public var loader (default, null) :BasicAssetPackLoader;
 
     public var textures :Map<String,Texture>;
     public var sounds :Map<String,Sound>;
@@ -234,9 +253,11 @@ private class BasicAssetPack
 
     public var disposed :Bool = false;
 
-    public function new (manifest :Manifest)
+    public function new (manifest :Manifest, loader :BasicAssetPackLoader)
     {
         _manifest = manifest;
+        this.loader = loader;
+
         textures = new Map();
         sounds = new Map();
         files = new Map();
@@ -299,6 +320,8 @@ private class BasicAssetPack
                 file.dispose();
             }
             files = null;
+
+            loader.onDisposed();
         }
     }
 

@@ -26,6 +26,11 @@ class CatapultClient
 #end
     }
 
+    public function remove (loader :BasicAssetPackLoader)
+    {
+        _loaders.remove(loader);
+    }
+
     private function onError (cause :String)
     {
         Log.warn("Unable to connect to Catapult", ["cause", cause]);

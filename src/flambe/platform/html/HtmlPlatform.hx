@@ -250,13 +250,7 @@ class HtmlPlatform
 
     public function loadAssetPack (manifest :Manifest) :Promise<AssetPack>
     {
-        var loader = new HtmlAssetPackLoader(this, manifest);
-#if debug
-        if (_catapult != null) {
-            _catapult.add(loader);
-        }
-#end
-        return loader.promise;
+        return new HtmlAssetPackLoader(this, manifest).promise;
     }
 
     public function getStage () :StageSystem
@@ -305,6 +299,11 @@ class HtmlPlatform
     public function getTime () :Float
     {
         return HtmlUtil.now() / 1000;
+    }
+
+    public function getCatapultClient ()
+    {
+        return _catapult;
     }
 
     private function update (now :Float)
@@ -448,7 +447,5 @@ class HtmlPlatform
     private var _lastUpdate :Float;
     private var _skipFrame :Bool;
 
-#if debug
     private var _catapult :HtmlCatapultClient;
-#end
 }

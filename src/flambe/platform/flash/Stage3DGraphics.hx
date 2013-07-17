@@ -105,6 +105,7 @@ class Stage3DGraphics
             return;
         }
         var texture = Lib.as(texture, Stage3DTexture);
+        texture.assertNotDisposed();
 
         var pos = transformQuad(destX, destY, sourceW, sourceH);
         var w = texture.width;
@@ -150,6 +151,7 @@ class Stage3DGraphics
             return;
         }
         var texture = Lib.as(texture, Stage3DTexture);
+        texture.assertNotDisposed();
 
         var pos = transformQuad(x, y, width, height);
         var u2 = texture.maxU * (width / texture.width);

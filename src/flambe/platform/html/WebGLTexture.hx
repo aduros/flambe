@@ -52,6 +52,8 @@ class WebGLTexture extends BasicAsset<WebGLTexture>
 
     public function uploadImageData (image :Dynamic)
     {
+        assertNotDisposed();
+
         if (_widthPow2 != image.width || _heightPow2 != image.height) {
             // Resize up to the next power of two, padding with transparent black
             var resized = HtmlUtil.createEmptyCanvas(_widthPow2, _heightPow2);
@@ -67,6 +69,8 @@ class WebGLTexture extends BasicAsset<WebGLTexture>
 
     public function clear ()
     {
+        assertNotDisposed();
+
         _renderer.batcher.bindTexture(nativeTexture);
         var gl = _renderer.gl;
         gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, _widthPow2, _heightPow2,
@@ -75,6 +79,8 @@ class WebGLTexture extends BasicAsset<WebGLTexture>
 
     public function readPixels (x :Int, y :Int, width :Int, height :Int) :Bytes
     {
+        assertNotDisposed();
+
         get_graphics(); // Ensure we have a framebuffer
         _renderer.batcher.bindFramebuffer(framebuffer);
 
@@ -99,6 +105,8 @@ class WebGLTexture extends BasicAsset<WebGLTexture>
 
     public function writePixels (pixels :Bytes, x :Int, y :Int, sourceW :Int, sourceH :Int)
     {
+        assertNotDisposed();
+
         _renderer.batcher.bindTexture(nativeTexture);
 
         // Can't update a texture used by a bound framebuffer apparently
@@ -138,16 +146,22 @@ class WebGLTexture extends BasicAsset<WebGLTexture>
 
     inline private function get_width () :Int
     {
+        assertNotDisposed();
+
         return _width;
     }
 
     inline private function get_height () :Int
     {
+        assertNotDisposed();
+
         return _height;
     }
 
     private function get_graphics () :Graphics
     {
+        assertNotDisposed();
+
         if (_graphics == null) {
             _graphics = new WebGLGraphics(_renderer.batcher, this);
             _graphics.onResize(width, height);

@@ -29,16 +29,22 @@ class FlashSound extends BasicAsset<FlashSound>
 
     public function play (volume :Float = 1.0) :Playback
     {
+        assertNotDisposed();
+
         return new FlashPlayback(this, volume, 0);
     }
 
     public function loop (volume :Float = 1.0) :Playback
     {
+        assertNotDisposed();
+
         return new FlashPlayback(this, volume, FMath.INT_MAX);
     }
 
     public function get_duration () :Float
     {
+        assertNotDisposed();
+
         return nativeSound.length/1000;
     }
 

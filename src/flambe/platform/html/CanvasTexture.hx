@@ -33,12 +33,16 @@ class CanvasTexture extends BasicAsset<CanvasTexture>
 
     public function readPixels (x :Int, y :Int, width :Int, height :Int) :Bytes
     {
+        assertNotDisposed();
+
         var data :Array<Int> = cast getContext2d().getImageData(x, y, width, height).data;
         return Bytes.ofData(data);
     }
 
     public function writePixels (pixels :Bytes, x :Int, y :Int, sourceW :Int, sourceH :Int)
     {
+        assertNotDisposed();
+
         var ctx2d = getContext2d();
         var imageData = ctx2d.createImageData(sourceW, sourceH);
         var data :Dynamic = imageData.data;
@@ -65,16 +69,22 @@ class CanvasTexture extends BasicAsset<CanvasTexture>
 
     inline private function get_width () :Int
     {
+        assertNotDisposed();
+
         return image.width;
     }
 
     inline private function get_height () :Int
     {
+        assertNotDisposed();
+
         return image.height;
     }
 
     private function get_graphics () :CanvasGraphics
     {
+        assertNotDisposed();
+
         if (_graphics == null) {
             getContext2d(); // Force conversion
             _graphics = new InternalGraphics(this);

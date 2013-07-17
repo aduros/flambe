@@ -26,16 +26,22 @@ class HtmlSound extends BasicAsset<HtmlSound>
 
     public function play (volume :Float = 1.0) :Playback
     {
+        assertNotDisposed();
+
         return new HtmlPlayback(this, volume, false);
     }
 
     public function loop (volume :Float = 1.0) :Playback
     {
+        assertNotDisposed();
+
         return new HtmlPlayback(this, volume, true);
     }
 
     public function get_duration () :Float
     {
+        assertNotDisposed();
+
         return audioElement.duration;
     }
 

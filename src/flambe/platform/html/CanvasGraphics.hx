@@ -62,6 +62,7 @@ class CanvasGraphics
         }
 
         var texture :CanvasTexture = cast texture;
+        texture.assertNotDisposed();
         _canvasCtx.drawImage(texture.image, Std.int(x), Std.int(y));
     }
 
@@ -77,6 +78,7 @@ class CanvasGraphics
         }
 
         var texture :CanvasTexture = cast texture;
+        texture.assertNotDisposed();
         _canvasCtx.drawImage(texture.image,
             Std.int(sourceX), Std.int(sourceY), Std.int(sourceW), Std.int(sourceH),
             Std.int(destX), Std.int(destY), Std.int(sourceW), Std.int(sourceH));
@@ -93,6 +95,7 @@ class CanvasGraphics
         }
 
         var texture :CanvasTexture = cast texture;
+        texture.assertNotDisposed();
         if (texture.pattern == null) {
             texture.pattern = _canvasCtx.createPattern(texture.image, "repeat");
         }

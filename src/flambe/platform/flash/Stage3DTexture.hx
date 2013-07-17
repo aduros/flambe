@@ -46,12 +46,16 @@ class Stage3DTexture extends BasicAsset<Stage3DTexture>
 
     public function init (context3D :Context3D, optimizeForRenderToTexture :Bool)
     {
+        assertNotDisposed();
+
         nativeTexture = context3D.createTexture(_widthPow2, _heightPow2,
             BGRA, optimizeForRenderToTexture);
     }
 
     public function uploadBitmapData (bitmapData :BitmapData)
     {
+        assertNotDisposed();
+
         if (_widthPow2 != bitmapData.width || _heightPow2 != bitmapData.height) {
             // Resize up to the next power of two, padding with transparent black
             var resized = new BitmapData(_widthPow2, _heightPow2, true, 0x00000000);
@@ -64,6 +68,8 @@ class Stage3DTexture extends BasicAsset<Stage3DTexture>
 
     public function readPixels (x :Int, y :Int, width :Int, height :Int) :Bytes
     {
+        assertNotDisposed();
+
         var bitmapData = _renderer.batcher.readPixels(this, x, y, width, height);
         var pixels = Bytes.ofData(bitmapData.getPixels(new Rectangle(0, 0, width, height)));
         var ii = 0, ll = pixels.length;
@@ -81,6 +87,8 @@ class Stage3DTexture extends BasicAsset<Stage3DTexture>
 
     public function writePixels (pixels :Bytes, x :Int, y :Int, sourceW :Int, sourceH :Int)
     {
+        assertNotDisposed();
+
         var sourceWPow2 = nextPowerOfTwo(sourceW);
         var sourceHPow2 = nextPowerOfTwo(sourceH);
 
@@ -115,16 +123,22 @@ class Stage3DTexture extends BasicAsset<Stage3DTexture>
 
     inline private function get_width () :Int
     {
+        assertNotDisposed();
+
         return _width;
     }
 
     inline private function get_height () :Int
     {
+        assertNotDisposed();
+
         return _height;
     }
 
     private function get_graphics () :Stage3DGraphics
     {
+        assertNotDisposed();
+
         if (_graphics == null) {
             _graphics = _renderer.createGraphics(this);
             _graphics.onResize(_widthPow2, _heightPow2);

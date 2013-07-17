@@ -105,6 +105,7 @@ class WebGLGraphics
     {
         var state = getTopState();
         var texture :WebGLTexture = cast texture;
+        texture.assertNotDisposed();
 
         var pos = transformQuad(destX, destY, sourceW, sourceH);
         var w = texture.width;
@@ -147,6 +148,7 @@ class WebGLGraphics
     {
         var state = getTopState();
         var texture :WebGLTexture = cast texture;
+        texture.assertNotDisposed();
 
         var pos = transformQuad(x, y, width, height);
         var u2 = texture.maxU * (width / texture.width);

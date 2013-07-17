@@ -17,6 +17,8 @@ class BasicFile extends BasicAsset<BasicFile>
 
     public function toString ()
     {
+        assertNotDisposed();
+
         return _content;
     }
 

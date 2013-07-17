@@ -37,16 +37,22 @@ class WebAudioSound extends BasicAsset<WebAudioSound>
 
     public function play (volume :Float = 1.0) :Playback
     {
+        assertNotDisposed();
+
         return new WebAudioPlayback(this, volume, false);
     }
 
     public function loop (volume :Float = 1.0) :Playback
     {
+        assertNotDisposed();
+
         return new WebAudioPlayback(this, volume, true);
     }
 
     public function get_duration () :Float
     {
+        assertNotDisposed();
+
         return buffer.duration;
     }
 

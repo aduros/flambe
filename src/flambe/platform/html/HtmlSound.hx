@@ -80,6 +80,11 @@ private class HtmlPlayback
         updateVolume();
 
         playAudio();
+
+        // Don't start playing until visible
+        if (System.hidden._) {
+            paused = true;
+        }
     }
 
     public function get_sound () :Sound

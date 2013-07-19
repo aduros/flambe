@@ -117,6 +117,11 @@ private class WebAudioPlayback
         if (volume != 1) {
             setVolume(volume);
         }
+
+        // Don't start playing until visible
+        if (System.hidden._) {
+            paused = true;
+        }
     }
 
     public function get_sound () :Sound

@@ -17,6 +17,10 @@ interface Playback extends Disposable
      */
     var volume (default, null) :AnimatedFloat;
 
+    /**
+     * Whether the playback is currently paused. Playbacks are automatically paused while the app is
+     * hidden, such as when minimized or placed in a background browser tab.
+     */
     var paused (get, set) :Bool;
 
     /**

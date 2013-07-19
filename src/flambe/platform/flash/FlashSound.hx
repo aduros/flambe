@@ -76,6 +76,11 @@ private class FlashPlayback
         this.volume = new AnimatedFloat(volume, onVolumeChanged);
 
         playAudio(0, new SoundTransform(volume));
+
+        // Don't start playing until visible
+        if (System.hidden._) {
+            paused = true;
+        }
     }
 
     public function onVolumeChanged (volume :Float, _)

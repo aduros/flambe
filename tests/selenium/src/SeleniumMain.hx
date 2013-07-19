@@ -45,7 +45,6 @@ class SeleniumMain
 
             // Some basic sanity checking
             assert(System.stage.width > 0 && System.stage.height > 0);
-            assert(!System.hidden._);
 
             // Test storage
             System.storage.set("$flambe_tmp", "foobar");

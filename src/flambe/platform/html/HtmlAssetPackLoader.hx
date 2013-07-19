@@ -57,7 +57,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
             // If this browser supports Blob, load the image data over XHR to benefit from progress
             // events, otherwise just set the src directly
             if (supportsBlob()) {
-                sendRequest(url, entry, "blob", function (blob) {
+                downloadBlob(url, entry, function (blob) {
                     image.src = _URL.createObjectURL(blob);
                 });
             } else {
@@ -65,8 +65,9 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
             }
 
         case DDS, PVR, PKM:
-            sendRequest(url, entry, "arraybuffer", function (buffer) {
-                var texture = _platform.getRenderer().createCompressedTexture(entry.format, buffer);
+            downloadArrayBuffer(url, entry, function (buffer) {
+                // FIXME(bruno): Convert buffer to a Bytes and pass it along
+                var texture = _platform.getRenderer().createCompressedTexture(entry.format, null);
                 if (texture != null) {
                     handleLoad(entry, texture);
                 } else {
@@ -77,7 +78,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         case MP3, M4A, OGG, WAV:
             // If we made it this far, we definitely support audio and can play this asset
             if (WebAudioSound.supported) {
-                sendRequest(url, entry, "arraybuffer", function (buffer) {
+                downloadArrayBuffer(url, entry, function (buffer) {
                     WebAudioSound.ctx.decodeAudioData(buffer, function (decoded) {
                         handleLoad(entry, new WebAudioSound(decoded));
                     }, function () {
@@ -134,7 +135,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
             }
 
         case Data:
-            sendRequest(url, entry, "text", function (text) {
+            downloadText(url, entry, function (text) {
                 handleLoad(entry, new BasicFile(text));
             });
         }
@@ -152,7 +153,22 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         _supportedFormats.get(fn);
     }
 
-    private function sendRequest (url :String, entry :AssetEntry, responseType :String, onLoad :Dynamic -> Void)
+    inline private function downloadArrayBuffer (url :String, entry :AssetEntry, onLoad :ArrayBuffer -> Void)
+    {
+        download(url, entry, "arraybuffer", onLoad);
+    }
+
+    inline private function downloadBlob (url :String, entry :AssetEntry, onLoad :Blob -> Void)
+    {
+        download(url, entry, "blob", onLoad);
+    }
+
+    inline private function downloadText (url :String, entry :AssetEntry, onLoad :String -> Void)
+    {
+        download(url, entry, "text", onLoad);
+    }
+
+    private function download (url :String, entry :AssetEntry, responseType :String, onLoad :Dynamic -> Void)
     {
         var xhr = new XMLHttpRequest();
 

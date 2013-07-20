@@ -123,6 +123,7 @@ class Stage3DTexture extends BasicAsset<Stage3DTexture>
             var temp = _renderer.createEmptyTexture(sourceW, sourceH);
             temp.nativeTexture.uploadFromBitmapData(bitmapData);
             drawTexture(temp, x, y, 0, 0, sourceW, sourceH);
+            temp.dispose();
         }
         bitmapData.dispose();
     }

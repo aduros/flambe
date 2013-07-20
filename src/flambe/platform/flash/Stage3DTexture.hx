@@ -61,9 +61,12 @@ class Stage3DTexture extends BasicAsset<Stage3DTexture>
             var resized = new BitmapData(_widthPow2, _heightPow2, true, 0x00000000);
             resized.copyPixels(bitmapData, bitmapData.rect, new Point(0, 0));
             drawBorder(resized, bitmapData.width, bitmapData.height);
-            bitmapData = resized;
+            nativeTexture.uploadFromBitmapData(resized);
+            resized.dispose();
+
+        } else {
+            nativeTexture.uploadFromBitmapData(bitmapData);
         }
-        nativeTexture.uploadFromBitmapData(bitmapData);
     }
 
     public function readPixels (x :Int, y :Int, width :Int, height :Int) :Bytes
@@ -72,6 +75,8 @@ class Stage3DTexture extends BasicAsset<Stage3DTexture>
 
         var bitmapData = _renderer.batcher.readPixels(this, x, y, width, height);
         var pixels = Bytes.ofData(bitmapData.getPixels(new Rectangle(0, 0, width, height)));
+        bitmapData.dispose();
+
         var ii = 0, ll = pixels.length;
         while (ii < ll) {
             // Convert from ARGB to RGBA
@@ -119,6 +124,7 @@ class Stage3DTexture extends BasicAsset<Stage3DTexture>
             temp.nativeTexture.uploadFromBitmapData(bitmapData);
             drawTexture(temp, x, y, 0, 0, sourceW, sourceH);
         }
+        bitmapData.dispose();
     }
 
     inline private function get_width () :Int

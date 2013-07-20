@@ -71,6 +71,19 @@ class WebGLBatcher
         _gl.bindTexture(GL.TEXTURE_2D, texture);
     }
 
+    /** Safely delete a texture. */
+    public function deleteTexture (texture :WebGLTexture)
+    {
+        // If we have unflushed quads that use this texture, flush them now
+        if (texture == _lastTexture) {
+            flush();
+            _lastTexture = null;
+            _currentTexture = null;
+        }
+
+        _gl.deleteTexture(texture.nativeTexture);
+    }
+
     /** Safely bind a framebuffer. */
     public function bindFramebuffer (framebuffer :Framebuffer)
     {
@@ -79,6 +92,19 @@ class WebGLBatcher
         _currentRenderTarget = null;
 
         _gl.bindFramebuffer(GL.FRAMEBUFFER, framebuffer);
+    }
+
+    /** Safely delete a framebuffer. */
+    public function deleteFramebuffer (texture :WebGLTexture)
+    {
+        // If we have unflushed quads that render to this texture, flush them now
+        if (texture == _lastRenderTarget) {
+            flush();
+            _lastRenderTarget = null;
+            _currentRenderTarget = null;
+        }
+
+        _gl.deleteFramebuffer(texture.framebuffer);
     }
 
     public function prepareDrawImage (renderTarget :WebGLTexture,

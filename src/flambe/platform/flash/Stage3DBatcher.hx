@@ -72,6 +72,18 @@ class Stage3DBatcher
         _currentRenderTarget = null;
     }
 
+    /** Safely delete a texture. */
+    public function deleteTexture (texture :Stage3DTexture)
+    {
+        // If we have unflushed quads that use this texture, flush them now
+        if (texture == _lastTexture) {
+            flush();
+            _lastTexture = null;
+        }
+
+        texture.nativeTexture.dispose();
+    }
+
     /** Reads the pixels out from a texture. May return a BitmapData larger than requested. */
     public function readPixels (texture :Stage3DTexture, x :Int, y :Int,
         width :Int, height :Int) :BitmapData

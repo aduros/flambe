@@ -133,10 +133,10 @@ class WebGLTexture extends BasicAsset<WebGLTexture>
 
     override private function onDisposed ()
     {
-        var gl = _renderer.gl;
-        gl.deleteTexture(nativeTexture);
+        var batcher = _renderer.batcher;
+        batcher.deleteTexture(this);
         if (framebuffer != null) {
-            gl.deleteFramebuffer(framebuffer);
+            batcher.deleteFramebuffer(this);
         }
 
         nativeTexture = null;

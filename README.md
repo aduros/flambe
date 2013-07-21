@@ -41,10 +41,18 @@ See the [install guide] on the wiki.
 
 ## Hacking
 
-To build and develop Flambe from source, clone this repository and run
+Patches and pull requests are welcome! To build and develop Flambe from
+source, clone this repository and run:
+
+```
+(sudo) npm link ./command
+haxelib dev flambe ./src
+```
+
+To later go back to a stable release, run `(sudo) flambe update`.
+
 `haxelib dev flambe /path/to/flambe/src` to use it. When you want to go
-back to a stable release, run `haxelib dev flambe`. Patches and pull
-requests are welcome!
+back to a stable release, run `haxelib dev flambe`.
 
 Are things not working? I'd be happy to help, open an [issue], ask on
 the [forum], [email me] privately, or talk to me in #Haxe on

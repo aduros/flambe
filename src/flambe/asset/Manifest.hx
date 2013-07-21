@@ -197,6 +197,7 @@ class Manifest
                 case "m4a": return M4A;
                 case "mp3": return MP3;
                 case "ogg": return OGG;
+                case "opus": return OPUS;
                 case "wav": return WAV;
             }
         } else {

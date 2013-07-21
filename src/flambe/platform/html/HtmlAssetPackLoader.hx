@@ -75,7 +75,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                 }
             });
 
-        case MP3, M4A, OGG, WAV:
+        case MP3, M4A, OPUS, OGG, WAV:
             // If we made it this far, we definitely support audio and can play this asset
             if (WebAudioSound.supported) {
                 downloadArrayBuffer(url, entry, function (buffer) {
@@ -288,10 +288,11 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
 
         // Select what formats the browser supports
         var types = [
-            { format: M4A, mimeType: "audio/mp4; codecs=mp4a" },
-            { format: MP3, mimeType: "audio/mpeg" },
-            { format: OGG, mimeType: "audio/ogg; codecs=vorbis" },
-            { format: WAV, mimeType: "audio/wav" },
+            { format: M4A,  mimeType: "audio/mp4; codecs=mp4a" },
+            { format: MP3,  mimeType: "audio/mpeg" },
+            { format: OPUS, mimeType: "audio/ogg; codecs=opus" },
+            { format: OGG,  mimeType: "audio/ogg; codecs=vorbis" },
+            { format: WAV,  mimeType: "audio/wav" },
         ];
         var result = [];
         for (type in types) {

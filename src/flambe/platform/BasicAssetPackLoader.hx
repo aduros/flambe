@@ -170,7 +170,7 @@ class BasicAssetPackLoader
         switch (entry.format) {
         case WEBP, JXR, PNG, JPG, GIF, DDS, PVR, PKM:
             map = _pack.textures;
-        case MP3, M4A, OGG, WAV:
+        case MP3, M4A, OPUS, OGG, WAV:
             map = _pack.sounds;
         case Data:
             map = _pack.files;
@@ -224,7 +224,7 @@ class BasicAssetPackLoader
     private static function isAudio (format :AssetFormat) :Bool
     {
         switch (format) {
-            case MP3, M4A, OGG, WAV: return true;
+            case MP3, M4A, OPUS, OGG, WAV: return true;
             default: return false;
         }
     }

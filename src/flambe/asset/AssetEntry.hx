@@ -16,7 +16,7 @@ enum AssetFormat
     DDS; PVR; PKM;
 
     // Audio
-    MP3; M4A; OGG; WAV;
+    MP3; M4A; OPUS; OGG; WAV;
 
     // Raw text/data
     Data;

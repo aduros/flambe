@@ -292,6 +292,10 @@ exports.update = function (version, postInstall) {
 
     } else {
         // Then update the Flambe haxelib
+        if ("SUDO_UID" in process.env && process.setuid) {
+            // Drop back to normal user permissions if running through sudo
+            process.setuid(parseInt(process.env["SUDO_UID"]));
+        }
         return haxelib(["install", "flambe", exports.VERSION]);
     }
 }

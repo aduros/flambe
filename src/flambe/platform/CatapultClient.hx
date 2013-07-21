@@ -8,6 +8,8 @@ import haxe.Json;
 
 import flambe.util.Assert;
 
+using StringTools;
+
 /** Handles communication with the Catapult server run by `flambe serve`, for live reloading. */
 class CatapultClient
 {
@@ -42,6 +44,7 @@ class CatapultClient
         switch (message.type) {
         case "file_changed":
             var url = message.name + "?v=" + message.md5;
+            url = url.replace("\\", "/"); // Handle backslash paths in Windows
             for (loader in _loaders) {
                 loader.reload(url);
             }

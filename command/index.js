@@ -192,6 +192,22 @@ exports.build = function (config, platforms, opts) {
 
             "</application>";
         var doc = new xmldom.DOMParser().parseFromString(xml);
+        var pathOptions = []; // Path options to pass to ADT
+
+        var extensions = doc.createElement("extensions");
+        forEachFileIn("libs", function (file) {
+            var match = file.match(/(.*)\.ane$/);
+            if (match) {
+                var basename = match[1];
+                var extensionID = doc.createElement("extensionID");
+                extensionID.appendChild(doc.createTextNode(basename));
+                extensions.appendChild(extensionID);
+            }
+        });
+        if (extensions.firstChild) {
+            doc.documentElement.appendChild(extensions);
+            pathOptions.push("-extdir", "libs");
+        }
 
         var icons = doc.createElement("icon");
         fs.readdirSync("icons").forEach(function (file) {
@@ -206,9 +222,13 @@ exports.build = function (config, platforms, opts) {
                 console.warn("Invalid icon: icons/"+file);
             }
         });
-        doc.documentElement.appendChild(icons);
+        if (icons.firstChild) {
+            doc.documentElement.appendChild(icons);
+            pathOptions.push("icons");
+        }
 
         fs.writeFileSync(output, new xmldom.XMLSerializer().serializeToString(doc));
+        return pathOptions;
     };
 
     var buildAndroid = function () {
@@ -229,7 +249,7 @@ exports.build = function (config, platforms, opts) {
             }
         })
         .then(function () {
-            generateAirXml(swf, xml);
+            var pathOptions = generateAirXml(swf, xml);
 
             var androidFlags = ["-package"];
             if (debug) {
@@ -239,7 +259,9 @@ exports.build = function (config, platforms, opts) {
                 androidFlags.push("-target", "apk-captive-runtime");
             }
             androidFlags.push("-storetype", "pkcs12", "-keystore", cert, "-storepass", "password",
-                apk, xml, "icons", "-C", CACHE_DIR+"/air", swf, "assets");
+                apk, xml);
+            androidFlags = androidFlags.concat(pathOptions);
+            androidFlags.push("-C", CACHE_DIR+"air", swf, "assets");
             return adt(androidFlags);
         })
         return promise;

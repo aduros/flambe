@@ -9,7 +9,6 @@ var os = require("os");
 var path = require("path");
 var spawn = require("child_process").spawn;
 var wrench = require("wrench");
-var xmldom = require("xmldom");
 
 var DATA_DIR = __dirname + "/data/";
 var CACHE_DIR = "build/.cache/";
@@ -174,6 +173,7 @@ exports.build = function (config, platforms, opts) {
     };
 
     var generateAirXml = function (swf, output) {
+        var xmldom = require("xmldom");
         var xml =
             "<application xmlns=\"http://ns.adobe.com/air/application/3.7\">\n" +
             "  <id>"+get(config, "id")+"</id>\n" +
@@ -196,11 +196,16 @@ exports.build = function (config, platforms, opts) {
 
         var extensions = doc.createElement("extensions");
         forEachFileIn("libs", function (file) {
-            var match = file.match(/(.*)\.ane$/);
-            if (match) {
-                var basename = match[1];
+            if (file.match(/.*\.ane$/)) {
+                // Extract the extension ID from the .ane
+                var AdmZip = require("adm-zip");
+                var zip = new AdmZip("libs/"+file);
+                var extension = new xmldom.DOMParser().parseFromString(
+                    zip.readAsText("META-INF/ANE/extension.xml"));
+                var id = extension.getElementsByTagName("id")[0].textContent;
+
                 var extensionID = doc.createElement("extensionID");
-                extensionID.appendChild(doc.createTextNode(basename));
+                extensionID.textContent = id;
                 extensions.appendChild(extensionID);
             }
         });
@@ -216,7 +221,7 @@ exports.build = function (config, platforms, opts) {
             if (match) {
                 var size = match[1];
                 var image = doc.createElement("image"+size+"x"+size);
-                image.appendChild(doc.createTextNode("icons/"+file));
+                image.textContent = "icons/"+file;
                 icons.appendChild(image);
             } else {
                 console.warn("Invalid icon: icons/"+file);

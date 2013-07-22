@@ -11,8 +11,8 @@ var spawn = require("child_process").spawn;
 var wrench = require("wrench");
 var xmldom = require("xmldom");
 
-var DATA_DIR = __dirname + "/data";
-var CACHE_DIR = "build/.cache";
+var DATA_DIR = __dirname + "/data/";
+var CACHE_DIR = "build/.cache/";
 
 var HAXE_COMPILER_PORT = 6000;
 var HTTP_PORT = 5000;
@@ -37,7 +37,7 @@ exports.loadConfig = function (file) {
 
 exports.newProject = function (output) {
     var promise =
-    Q.nfcall(wrench.copyDirRecursive, DATA_DIR+"/scaffold", output, {})
+    Q.nfcall(wrench.copyDirRecursive, DATA_DIR+"scaffold", output, {})
     .then(function () {
         // Packaging it straight as .gitignore seems to create problems with NPM/Windows
         return Q.nfcall(fs.rename, output+"/_.gitignore", output+"/.gitignore");
@@ -122,7 +122,7 @@ exports.build = function (config, platforms, opts) {
 
     var buildHtml = function () {
         var htmlFlags = ["-D", "html"];
-        var unminified = CACHE_DIR+"/main-html.unminified.js";
+        var unminified = CACHE_DIR+"main-html.unminified.js";
         var js = "build/web/targets/main-html.js";
         console.log("Building: " + js);
         if (debug) {
@@ -151,8 +151,8 @@ exports.build = function (config, platforms, opts) {
     };
 
     var buildAir = function (flags) {
-        wrench.mkdirSyncRecursive(CACHE_DIR+"/air");
-        wrench.copyDirSyncRecursive("assets", CACHE_DIR+"/air/assets", {
+        wrench.mkdirSyncRecursive(CACHE_DIR+"air");
+        wrench.copyDirSyncRecursive("assets", CACHE_DIR+"air/assets", {
             excludeHiddenUnix: true,
             filter: /\.(ogg|wav|m4a)$/,
         });
@@ -196,11 +196,11 @@ exports.build = function (config, platforms, opts) {
         console.log("Building: " + apk);
 
         var swf = "main-android.swf";
-        var cert = CACHE_DIR+"/air/certificate-android.p12"
-        var xml = CACHE_DIR+"/air/config-android.xml"
+        var cert = CACHE_DIR+"air/certificate-android.p12"
+        var xml = CACHE_DIR+"air/config-android.xml"
 
         var promise =
-        buildAir(["-D", "android", "-swf", CACHE_DIR+"/air/"+swf])
+        buildAir(["-D", "android", "-swf", CACHE_DIR+"air/"+swf])
         .then(function () {
             // Generate a dummy certificate if it doesn't exist
             if (!fs.existsSync(cert)) {
@@ -228,7 +228,7 @@ exports.build = function (config, platforms, opts) {
     wrench.mkdirSyncRecursive(CACHE_DIR);
     wrench.mkdirSyncRecursive("build/web/targets");
     copyDirContents("web", "build/web");
-    copyFile(DATA_DIR+"/flambe.js", "build/web/flambe.js");
+    copyFile(DATA_DIR+"flambe.js", "build/web/flambe.js");
     wrench.copyDirSyncRecursive("assets", "build/web/assets", {excludeHiddenUnix: true, forceDelete: true});
     wrench.copyDirSyncRecursive("icons", "build/web/icons", {excludeHiddenUnix: true, forceDelete: true});
 
@@ -373,7 +373,7 @@ exports.exec = exec;
 
 var minify = function (inputs, output, opts) {
     opts = opts || {};
-    var flags = ["-jar", DATA_DIR+"/closure.jar",
+    var flags = ["-jar", DATA_DIR+"closure.jar",
         "--warning_level", "QUIET",
         "--js_output_file", output,
         "--output_wrapper",

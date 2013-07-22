@@ -183,6 +183,13 @@ exports.build = function (config, platforms, opts) {
             "    <content>"+swf+"</content>\n" +
             "    <renderMode>direct</renderMode>\n" +
             "  </initialWindow>\n" +
+
+            "  <android>\n" +
+            "    <manifestAdditions><![CDATA[\n" +
+                   get(config, "android AndroidManifest.xml", "") +
+            "    ]]></manifestAdditions>\n" +
+            "  </android>\n" +
+
             "</application>";
         var doc = new xmldom.DOMParser().parseFromString(xml);
 
@@ -574,9 +581,16 @@ var toArray = function (o) {
 
 /** Get a field from a config file. */
 var get = function (config, name, defaultValue) {
-    if (name in config) return config[name];
+    var fields = name.split(" ");
+    for (var ii = 0, ll = fields.length; ii < ll; ++ii) {
+        var field = fields[ii];
+        if (field in config) {
+            config = config[field];
+            if (ii == ll-1) return config;
+        }
+    }
     if (typeof defaultValue != "undefined") return defaultValue;
-    throw new Error("Missing required entry in config file: " + name);
+    throw new Error("Missing required field in config file: " + name);
 };
 
 var checkPlatforms = function (platforms) {

@@ -115,10 +115,23 @@ exports.build = function (config, platforms, opts) {
 
     var commonFlags = [];
 
-    // Flags common to all swf-based targets (flash, android, ios)
-    var swfFlags = ["--flash-strict", "-swf-header", "640:480:60:000000"];
-    if (debug) swfFlags.push("-D", "fdb", "-D", "advanced-telemetry");
-    else swfFlags.push("-D", "native_trace");
+    var _swfFlags = null; // Cache
+    var swfFlags = function () {
+        if (_swfFlags == null) {
+            // Flags common to all swf-based targets (flash, android, ios)
+            _swfFlags = ["--flash-strict", "-swf-header", "640:480:60:000000"];
+            if (debug) _swfFlags.push("-D", "fdb", "-D", "advanced-telemetry");
+            else _swfFlags.push("-D", "native_trace");
+
+            // Include any swc/swf libs in the libs directory
+            forEachFileIn("libs", function (file) {
+                if (file.match(/.*\.(swc|swf)$/)) {
+                    _swfFlags.push("-swf-lib", "libs/"+file);
+                }
+            });
+        }
+        return _swfFlags;
+    };
 
     var buildHtml = function () {
         var htmlFlags = ["-D", "html"];
@@ -145,7 +158,7 @@ exports.build = function (config, platforms, opts) {
 
     var buildFlash = function () {
         var swf = "build/web/targets/main-flash.swf";
-        var flashFlags = swfFlags.concat(["-swf-version", "11", "-swf", swf]);
+        var flashFlags = swfFlags().concat(["-swf-version", "11", "-swf", swf]);
         console.log("Building: " + swf);
         return haxe(commonFlags.concat(flashFlags));
     };
@@ -156,7 +169,7 @@ exports.build = function (config, platforms, opts) {
             excludeHiddenUnix: true,
             filter: /\.(ogg|wav|m4a)$/,
         });
-        var airFlags = swfFlags.concat(["-swf-version", "11.7", "-D", "air"]);
+        var airFlags = swfFlags().concat(["-swf-version", "11.7", "-D", "air"]);
         return haxe(commonFlags.concat(airFlags).concat(flags))
     };
 
@@ -593,6 +606,15 @@ var copyDirContents = function (from, to) {
 var copyFile = function (from, to) {
     var content = fs.readFileSync(from);
     fs.writeFileSync(to, content);
+};
+
+var forEachFileIn = function (dir, callback) {
+    try {
+        var files = fs.readdirSync(dir);
+    } catch (error) {
+        return; // Ignore missing directory
+    }
+    files.forEach(callback);
 };
 
 var getIP = function () {

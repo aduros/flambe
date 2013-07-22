@@ -50,9 +50,6 @@ zip -j $ARCHIVE tools/flashdevelop/flambe-FlashDevelop.fdz
 read -p "Submit Flambe $VERSION to haxelib [Y/n]? " CONFIRM
 case "$CONFIRM" in
     "Y" | "y" | "")
-        # Commit the version bump
-        git commit -a -m "Release $VERSION"
-
         # Upload the demos
         $DEMOS_ROOT/bin/upload-all
 
@@ -65,6 +62,9 @@ case "$CONFIRM" in
 
         # Upload the haxelib
         haxelib submit $ARCHIVE
+
+        # Commit the version bump
+        git commit -a -m "Release $VERSION"
 
         # Tag it
         git tag flambe-$VERSION

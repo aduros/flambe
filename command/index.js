@@ -119,7 +119,7 @@ exports.build = function (config, platforms, opts) {
     var commonFlags = [];
 
     var _swfFlags = null; // Cache
-    var swfFlags = function () {
+    var swfFlags = function (air) {
         if (_swfFlags == null) {
             // Flags common to all swf-based targets (flash, android, ios)
             _swfFlags = ["--flash-strict", "-swf-header", "640:480:60:000000"];
@@ -130,6 +130,12 @@ exports.build = function (config, platforms, opts) {
             forEachFileIn("libs", function (file) {
                 if (file.match(/.*\.(swc|swf)$/)) {
                     _swfFlags.push("-swf-lib", "libs/"+file);
+                } else if (air && file.match(/.*\.ane$/)) {
+                    // The current version of Haxe can't deal with .ane -swf-libs, so rename it to a
+                    // swc first
+                    var swc = CACHE_DIR+"air/"+file+".swc";
+                    copyFile("libs/"+file, swc);
+                    _swfFlags.push("-swf-lib", swc);
                 }
             });
         }
@@ -173,7 +179,7 @@ exports.build = function (config, platforms, opts) {
             filter: /\.(ogg|wav|m4a)$/,
             forceDelete: true,
         });
-        var airFlags = swfFlags().concat(["-swf-version", "11.7", "-D", "air"]);
+        var airFlags = swfFlags(true).concat(["-swf-version", "11.7", "-D", "air"]);
         return haxe(commonFlags.concat(airFlags).concat(flags))
     };
 

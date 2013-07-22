@@ -40,6 +40,10 @@ exports.newProject = function (output) {
     .then(function () {
         // Packaging it straight as .gitignore seems to create problems with NPM/Windows
         return Q.nfcall(fs.rename, output+"/_.gitignore", output+"/.gitignore");
+    })
+    .then(function () {
+        // Can't include this empty directory in git, so create it manually
+        return Q.nfcall(fs.mkdir, output+"/libs");
     });
     return promise;
 };

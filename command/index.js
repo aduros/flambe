@@ -135,7 +135,7 @@ exports.build = function (config, platforms, opts) {
                     // swc first
                     var swc = CACHE_DIR+"air/"+file+".swc";
                     copyFile("libs/"+file, swc);
-                    _swfFlags.push("-swf-lib", swc);
+                    _swfFlags.push("-swf-lib-extern", swc);
                 }
             });
         }

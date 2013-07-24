@@ -197,7 +197,7 @@ exports.build = function (config, platforms, opts) {
 
             "  <android>\n" +
             "    <manifestAdditions><![CDATA[\n" +
-                   get(config, "android AndroidManifest.xml", "") +
+                   get(config, "android AndroidManifest.xml", "<manifest/>") +
             "    ]]></manifestAdditions>\n" +
             "  </android>\n" +
 

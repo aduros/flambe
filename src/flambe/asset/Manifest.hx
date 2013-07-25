@@ -7,7 +7,6 @@ package flambe.asset;
 import haxe.rtti.Meta;
 
 import flambe.asset.AssetEntry;
-import flambe.platform.ManifestBuilder;
 import flambe.util.Assert;
 
 using StringTools;
@@ -44,14 +43,32 @@ class Manifest
      */
     public static function build (packName :String, required :Bool = true) :Manifest
     {
-        var manifest = _buildManifest.get(packName);
-        if (manifest == null) {
+        var packData :Array<Dynamic> = Reflect.field(Meta.getType(Manifest).assets[0], packName);
+        if (packData == null) {
             if (required) {
                 throw "Missing asset pack".withFields(["name", packName]);
             }
             return null;
         }
-        return manifest.clone();
+
+        var manifest = new Manifest();
+        manifest.relativeBasePath = "assets";
+
+        for (asset in packData) {
+            var name = asset.name;
+            var path = packName + "/" + name + "?v=" + asset.md5;
+
+            var format = inferFormat(name);
+            if (format != Data) {
+                // If this an asset that not all platforms may support, trim the extension from
+                // the name. We'll only load one of the assets if this creates a name collision.
+                name = name.removeFileExtension();
+            }
+
+            manifest.add(name, path, asset.bytes, format);
+        }
+
+        return manifest;
     }
 
     /**
@@ -87,7 +104,7 @@ class Manifest
      */
     public static function exists (packName :String) :Bool
     {
-        return _buildManifest.exists(packName);
+        return Reflect.hasField(Meta.getType(Manifest).assets[0], packName);
     }
 
     /**
@@ -205,36 +222,6 @@ class Manifest
         }
         return Data;
     }
-
-    private static function createBuildManifests ()
-    {
-        var macroData = new Map<String,Array<Dynamic>>();
-        ManifestBuilder.populate(macroData);
-
-        var manifests = new Map();
-        for (packName in macroData.keys()) {
-            var manifest = new Manifest();
-            manifest.relativeBasePath = "assets";
-
-            for (asset in macroData.get(packName)) {
-                var name = asset.name;
-                var path = packName + "/" + name + "?v=" + asset.md5;
-
-                var format = inferFormat(name);
-                if (format != Data) {
-                    // If this an asset that not all platforms may support, trim the extension from
-                    // the name. We'll only load one of the assets if this creates a name collision.
-                    name = name.removeFileExtension();
-                }
-
-                manifest.add(name, path, asset.bytes, format);
-            }
-            manifests.set(packName, manifest);
-        }
-        return manifests;
-    }
-
-    private static var _buildManifest :Map<String,Manifest> = createBuildManifests();
 
     // Whether the environment fully supports loading assets from another domain
     private static var _supportsCrossOrigin :Bool = (function () {

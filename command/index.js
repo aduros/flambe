@@ -131,6 +131,7 @@ exports.build = function (config, platforms, opts) {
                 if (file.match(/.*\.(swc|swf)$/)) {
                     _swfFlags.push("-swf-lib", "libs/"+file);
                 } else if (air && file.match(/.*\.ane$/)) {
+                    // _swfFlags.push("-swf-lib-extern", "libs/"+file);
                     // The current version of Haxe can't deal with .ane -swf-libs, so rename it to a
                     // swc first
                     var swc = CACHE_DIR+"air/"+file+".swc";
@@ -304,7 +305,9 @@ exports.build = function (config, platforms, opts) {
 
         commonFlags.push("-main", get(config, "main"));
         commonFlags = commonFlags.concat(toArray(get(config, "haxe_flags", [])));
-        commonFlags.push("-lib", "flambe", "-cp", "src");
+        commonFlags.push("-lib", "flambe");
+        commonFlags.push("-cp", "src");
+        commonFlags.push("--macro", "flambe.platform.ManifestBuilder.use([\"assets\"])");
         commonFlags.push("-dce", "full");
         if (debug) {
             commonFlags.push("-debug", "--no-opt", "--no-inline");
@@ -383,6 +386,8 @@ exports.sendMessage = function (method) {
 };
 
 var haxe = function (flags, opts) {
+    opts = opts || {};
+    opts.windowsCmd = false;
     return exec("haxe", flags, opts);
 };
 exports.haxe = haxe;

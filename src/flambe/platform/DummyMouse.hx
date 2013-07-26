@@ -26,6 +26,11 @@ class DummyMouse
 
     public function new ()
     {
+        down = new Signal1();
+        move = new Signal1();
+        up = new Signal1();
+        scroll = new Signal1();
+
         _cursor = Default;
     }
 

@@ -141,18 +141,20 @@ exports.build = function (config, platforms, opts) {
             if (debug) _swfFlags.push("-D", "fdb", "-D", "advanced-telemetry");
             else _swfFlags.push("-D", "native_trace");
 
-            // Include any swc/swf libs in the libs directory
-            forEachFileIn("libs", function (file) {
-                if (file.match(/.*\.(swc|swf)$/)) {
-                    _swfFlags.push("-swf-lib", "libs/"+file);
-                } else if (air && file.match(/.*\.ane$/)) {
-                    // _swfFlags.push("-swf-lib-extern", "libs/"+file);
-                    // The current version of Haxe can't deal with .ane -swf-libs, so rename it to a
-                    // swc first
-                    var swc = CACHE_DIR+"air/"+file+".swc";
-                    copyFileSync("libs/"+file, swc);
-                    _swfFlags.push("-swf-lib-extern", swc);
-                }
+            // Include any swc/swf libs in the libs directories
+            libPaths.forEach(function (libPath) {
+                forEachFileIn(libPath, function (file) {
+                    if (file.match(/.*\.(swc|swf)$/)) {
+                        _swfFlags.push("-swf-lib", libPath+"/"+file);
+                    } else if (air && file.match(/.*\.ane$/)) {
+                        // _swfFlags.push("-swf-lib-extern", libPath+"/"+file);
+                        // The current version of Haxe can't deal with .ane -swf-libs, so rename it to a
+                        // swc first
+                        var swc = CACHE_DIR+"air/"+file+".swc";
+                        copyFileSync(libPath+"/"+file, swc);
+                        _swfFlags.push("-swf-lib-extern", swc);
+                    }
+                });
             });
         }
         return _swfFlags;
@@ -231,23 +233,33 @@ exports.build = function (config, platforms, opts) {
         var pathOptions = []; // Path options to pass to ADT
 
         var extensions = doc.createElement("extensions");
-        forEachFileIn("libs", function (file) {
-            if (file.match(/.*\.ane$/)) {
-                // Extract the extension ID from the .ane
-                var AdmZip = require("adm-zip");
-                var zip = new AdmZip("libs/"+file);
-                var extension = new xmldom.DOMParser().parseFromString(
-                    zip.readAsText("META-INF/ANE/extension.xml"));
-                var id = extension.getElementsByTagName("id")[0].textContent;
+        libPaths.forEach(function (libPath) {
+            if (!fs.existsSync(libPath)) {
+                return;
+            }
 
-                var extensionID = doc.createElement("extensionID");
-                extensionID.textContent = id;
-                extensions.appendChild(extensionID);
+            var hasANE = false;
+            forEachFileIn(libPath, function (file) {
+                if (file.match(/.*\.ane$/)) {
+                    // Extract the extension ID from the .ane
+                    var AdmZip = require("adm-zip");
+                    var zip = new AdmZip(libPath+"/"+file);
+                    var extension = new xmldom.DOMParser().parseFromString(
+                        zip.readAsText("META-INF/ANE/extension.xml"));
+                    var id = extension.getElementsByTagName("id")[0].textContent;
+
+                    var extensionID = doc.createElement("extensionID");
+                    extensionID.textContent = id;
+                    extensions.appendChild(extensionID);
+                    hasANE = true;
+                }
+            });
+            if (hasANE) {
+                pathOptions.push("-extdir", libPath);
             }
         });
         if (extensions.firstChild) {
             doc.documentElement.appendChild(extensions);
-            pathOptions.push("-extdir", "libs");
         }
 
         var icons = doc.createElement("icon");
@@ -327,7 +339,9 @@ exports.build = function (config, platforms, opts) {
         commonFlags.push("-main", get(config, "main"));
         commonFlags = commonFlags.concat(toArray(get(config, "haxe_flags", [])));
         commonFlags.push("-lib", "flambe");
-        commonFlags.push("-cp", "src");
+        srcPaths.forEach(function (srcDir) {
+            commonFlags.push("-cp", srcDir);
+        });
         commonFlags.push("-dce", "full");
         if (debug) {
             commonFlags.push("-debug", "--no-opt", "--no-inline");

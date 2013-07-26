@@ -28,6 +28,7 @@ FlambeHelpFormatter.prototype._formatAction = function (action) {
 
 var catchErrors = function (promise) {
     promise.catch(function (error) {
+        if (Array.isArray(error)) error = error[0]; // NCP throws an array of errors...?
         if (error) console.error(error.message || error);
         process.exit(1);
     });

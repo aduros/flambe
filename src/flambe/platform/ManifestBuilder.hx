@@ -16,33 +16,31 @@ using StringTools;
  */
 class ManifestBuilder
 {
-    macro public static function use (dirs :Array<String>)
+    macro public static function use (assetsDir :String)
     {
         switch (Context.getType("flambe.asset.Manifest")) {
         case TInst(cl,_):
             var cl = cl.get();
             var meta = cl.meta;
 
-            var data = {};
-            for (assetsDir in dirs) {
-                if (!assetsDir.endsWith("/")) {
-                    assetsDir += "/";
-                }
+            if (!assetsDir.endsWith("/")) {
+                assetsDir += "/";
+            }
 
-                for (packName in readDirectoryNoHidden(assetsDir)) {
-                    var entries = [];
-                    if (FileSystem.isDirectory(assetsDir + packName)) {
-                        for (file in readRecursive(assetsDir + packName)) {
-                            var path = assetsDir + packName + "/" + file;
-                            entries.push({
-                                name: file,
-                                md5: Context.signature(File.getBytes(path)),
-                                bytes: FileSystem.stat(path).size,
-                            });
-                        }
+            var data = {};
+            for (packName in FileSystem.readDirectory(assetsDir)) {
+                var entries = [];
+                if (FileSystem.isDirectory(assetsDir + packName)) {
+                    for (file in readRecursive(assetsDir + packName)) {
+                        var path = assetsDir + packName + "/" + file;
+                        entries.push({
+                            name: file,
+                            md5: Context.signature(File.getBytes(path)),
+                            bytes: FileSystem.stat(path).size,
+                        });
                     }
-                    Reflect.setField(data, packName, entries);
                 }
+                Reflect.setField(data, packName, entries);
             }
 
             meta.remove("assets");

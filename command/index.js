@@ -5,6 +5,7 @@
 
 var Q = require("q");
 var fs = require("fs");
+var ncp = require("ncp").ncp;
 var os = require("os");
 var path = require("path");
 var spawn = require("child_process").spawn;
@@ -118,6 +119,20 @@ exports.build = function (config, platforms, opts) {
 
     var commonFlags = [];
 
+    var assetPaths = getAllPaths(config, "assets");
+    var libPaths = getAllPaths(config, "libs");
+    var srcPaths = getAllPaths(config, "src");
+    var webPaths = getAllPaths(config, "web");
+
+    var prepareAssets = function (dest) {
+        wrench.rmdirSyncRecursive(dest, true);
+        // TODO(bruno): Filter out certain formats based on the platform
+        return copyDirs(assetPaths, dest)
+        .then(function () {
+            return ["--macro", "flambe.platform.ManifestBuilder.use(\""+dest+"\")"];
+        });
+    };
+
     var _swfFlags = null; // Cache
     var swfFlags = function (air) {
         if (_swfFlags == null) {
@@ -135,7 +150,7 @@ exports.build = function (config, platforms, opts) {
                     // The current version of Haxe can't deal with .ane -swf-libs, so rename it to a
                     // swc first
                     var swc = CACHE_DIR+"air/"+file+".swc";
-                    copyFile("libs/"+file, swc);
+                    copyFileSync("libs/"+file, swc);
                     _swfFlags.push("-swf-lib-extern", swc);
                 }
             });
@@ -147,41 +162,50 @@ exports.build = function (config, platforms, opts) {
         var htmlFlags = ["-D", "html"];
         var unminified = CACHE_DIR+"main-html.unminified.js";
         var js = "build/web/targets/main-html.js";
-        console.log("Building: " + js);
-        if (debug) {
-            return haxe(commonFlags.concat(htmlFlags).concat(["-js", js]));
-        } else {
-            // Minify release builds
-            return haxe(commonFlags.concat(htmlFlags).concat(["-js", unminified]))
-            .then(function () {
-                return minify([unminified], js, {strict: true});
-            })
-            .then(function () {
-                // Delete the source map file produced by debug builds
-                return Q.nfcall(fs.unlink, js+".map")
-                .catch(function () {
-                    // Ignore errors
+
+        return prepareAssets("build/web/assets")
+        .then(function (assetFlags) {
+            console.log("Building: " + js);
+            var flags = commonFlags.concat(assetFlags).concat(htmlFlags);
+            if (debug) {
+                return haxe(flags.concat(["-js", js]));
+            } else {
+                // Minify release builds
+                return haxe(flags.concat(["-js", unminified]))
+                .then(function () {
+                    return minify([unminified], js, {strict: true});
+                })
+                .then(function () {
+                    // Delete the source map file produced by debug builds
+                    return Q.nfcall(fs.unlink, js+".map")
+                    .catch(function () {
+                        // Ignore errors
+                    });
                 });
-            });
-        }
+            }
+        });
     };
 
     var buildFlash = function () {
         var swf = "build/web/targets/main-flash.swf";
-        var flashFlags = swfFlags().concat(["-swf-version", "11", "-swf", swf]);
-        console.log("Building: " + swf);
-        return haxe(commonFlags.concat(flashFlags));
+        var flashFlags = swfFlags(false).concat([
+            "-swf-version", "11", "-swf", swf]);
+
+        return prepareAssets("build/web/assets")
+        .then(function (assetFlags) {
+            console.log("Building: " + swf);
+            return haxe(commonFlags.concat(assetFlags).concat(flashFlags));
+        });
     };
 
     var buildAir = function (flags) {
-        wrench.mkdirSyncRecursive(CACHE_DIR+"air");
-        wrench.copyDirSyncRecursive("assets", CACHE_DIR+"air/assets", {
-            excludeHiddenUnix: true,
-            filter: /\.(ogg|wav|m4a)$/,
-            forceDelete: true,
-        });
         var airFlags = swfFlags(true).concat(["-swf-version", "11.7", "-D", "air"]);
-        return haxe(commonFlags.concat(airFlags).concat(flags))
+
+        wrench.mkdirSyncRecursive(CACHE_DIR+"air");
+        return prepareAssets(CACHE_DIR+"air/assets")
+        .then(function (assetFlags) {
+            return haxe(commonFlags.concat(assetFlags).concat(airFlags).concat(flags));
+        });
     };
 
     var generateAirXml = function (swf, output) {
@@ -256,8 +280,7 @@ exports.build = function (config, platforms, opts) {
         var cert = CACHE_DIR+"air/certificate-android.p12"
         var xml = CACHE_DIR+"air/config-android.xml"
 
-        var promise =
-        buildAir(["-D", "android", "-swf", CACHE_DIR+"air/"+swf])
+        return buildAir(["-D", "android", "-swf", CACHE_DIR+"air/"+swf])
         .then(function () {
             // Generate a dummy certificate if it doesn't exist
             if (!fs.existsSync(cert)) {
@@ -280,20 +303,18 @@ exports.build = function (config, platforms, opts) {
             androidFlags = androidFlags.concat(pathOptions);
             androidFlags.push("-C", CACHE_DIR+"air", swf, "assets");
             return adt(androidFlags);
-        })
-        return promise;
+        });
     }
 
     wrench.mkdirSyncRecursive(CACHE_DIR);
     wrench.mkdirSyncRecursive("build/web/targets");
-    copyDirContents("web", "build/web");
-    copyFile(DATA_DIR+"flambe.js", "build/web/flambe.js");
-    wrench.copyDirSyncRecursive("assets", "build/web/assets", {excludeHiddenUnix: true, forceDelete: true});
-    wrench.copyDirSyncRecursive("icons", "build/web/icons", {excludeHiddenUnix: true, forceDelete: true});
+    copyFileSync(DATA_DIR+"flambe.js", "build/web/flambe.js");
 
     var connectFlags = ["--connect", HAXE_COMPILER_PORT];
-    var promise =
-    haxe(connectFlags, {check: false, verbose: false, output: false})
+    var promise = Q()
+    .then(function () { return copyDirs(webPaths, "build/web", {includeHidden: true}) })
+    .then(function () { return copyDirs("icons", "build/web/icons") })
+    .then(function () { return haxe(connectFlags, {check: false, verbose: false, output: false}) })
     .then(function (code) {
         // Hide the compilation server behind an environment variable for now until stable
         if ("FLAMBE_HAXE_SERVER" in process.env) {
@@ -307,7 +328,6 @@ exports.build = function (config, platforms, opts) {
         commonFlags = commonFlags.concat(toArray(get(config, "haxe_flags", [])));
         commonFlags.push("-lib", "flambe");
         commonFlags.push("-cp", "src");
-        commonFlags.push("--macro", "flambe.platform.ManifestBuilder.use([\"assets\"])");
         commonFlags.push("-dce", "full");
         if (debug) {
             commonFlags.push("-debug", "--no-opt", "--no-inline");
@@ -636,6 +656,10 @@ var get = function (config, name, defaultValue) {
     throw new Error("Missing required field in config file: " + name);
 };
 
+var getAllPaths = function (config, name) {
+    return [name].concat(toArray(get(config, "extra_paths "+name, [])));
+};
+
 var checkPlatforms = function (platforms) {
     for (var ii = 0; ii < platforms.length; ++ii) {
         var platform = platforms[ii];
@@ -645,22 +669,26 @@ var checkPlatforms = function (platforms) {
     }
 };
 
-/**
- * Copy all the files in a directory into another directory. Not a true merge, only one level deep.
- */
-var copyDirContents = function (from, to) {
-    fs.readdirSync(from).forEach(function (file) {
-        var src = path.join(from, file);
-        var dest = path.join(to, file);
-        if (fs.statSync(src).isDirectory()) {
-            wrench.copyDirSyncRecursive(src, dest, {forceDelete: true});
-        } else {
-            copyFile(src, dest);
-        }
-    });
+var copyDirs = function (dirs, dest, opts) {
+    opts = opts || {};
+
+    // Reverse it so files in earlier dirs have higher override priority
+    dirs = toArray(dirs).reverse();
+
+    var ncpOptions = {
+        stopOnErr: true,
+        filter: function (file) {
+            return opts.includeHidden || path.basename(file).charAt(0) != ".";
+        },
+    };
+    return dirs.reduce(function (prev, dir) {
+        return prev.then(function () {
+            return Q.nfcall(ncp, dir, dest, ncpOptions);
+        });
+    }, Q.nfcall(fs.mkdir, dest).catch(function (){}));
 };
 
-var copyFile = function (from, to) {
+var copyFileSync = function (from, to) {
     var content = fs.readFileSync(from);
     fs.writeFileSync(to, content);
 };

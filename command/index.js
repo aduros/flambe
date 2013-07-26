@@ -15,7 +15,7 @@ var DATA_DIR = __dirname + "/data/";
 var CACHE_DIR = "build/.cache/";
 
 var HAXE_COMPILER_PORT = 6000;
-var HTTP_PORT = 5000;
+var HTTP_PORT = 7000;
 var SOCKET_PORT = HTTP_PORT+1;
 
 exports.PLATFORMS = ["html", "flash", "android"];

@@ -671,7 +671,12 @@ var get = function (config, name, defaultValue) {
 };
 
 var getAllPaths = function (config, name) {
-    return [name].concat(toArray(get(config, "extra_paths "+name, [])));
+    var paths = toArray(get(config, "extra_paths "+name, []));
+    if (paths.length == 0 || fs.existsSync(name)) {
+        // Make the standard path in the project directory optional if you've defined extras
+        paths.unshift(name);
+    }
+    return paths;
 };
 
 var checkPlatforms = function (platforms) {

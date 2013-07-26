@@ -12,6 +12,10 @@ default_platform: flash
 # Additional flags to pass to the Haxe compiler
 # haxe_flags: -lib nape -D foobar
 
+# The initial orientation and fullscreen state
+# orientation = landscape
+# fullscreen = false
+
 # Additional paths to include in the build
 # extra_paths:
 #   assets: dir1 dir2

@@ -239,6 +239,8 @@ exports.build = function (config, platforms, opts) {
             "  <filename>"+get(config, "name")+"</filename>\n" +
             "  <initialWindow>\n" +
             "    <content>"+swf+"</content>\n" +
+            "    <aspectRatio>"+get(config, "orientation", "portrait")+"</aspectRatio>\n" +
+            "    <fullScreen>"+get(config, "fullscreen", "true")+"</fullScreen>\n" +
             "    <renderMode>direct</renderMode>\n" +
             "  </initialWindow>\n" +
 

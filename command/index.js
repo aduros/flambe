@@ -124,6 +124,24 @@ exports.build = function (config, platforms, opts) {
     var srcPaths = getAllPaths(config, "src");
     var webPaths = getAllPaths(config, "web");
 
+    var _preparedWeb = false;
+    var prepareWeb = function () {
+        if (!_preparedWeb) {
+            _preparedWeb = true;
+
+            wrench.mkdirSyncRecursive("build/web/targets");
+            copyFileSync(DATA_DIR+"flambe.js", "build/web/flambe.js");
+
+            return copyDirs(webPaths, "build/web", {includeHidden: true})
+            .then(function () {
+                if (fs.existsSync("icons")) {
+                    return copyDirs("icons", "build/web/icons");
+                }
+            });
+        }
+        return Q();
+    };
+
     var prepareAssets = function (dest) {
         wrench.rmdirSyncRecursive(dest, true);
         // TODO(bruno): Filter out certain formats based on the platform
@@ -165,7 +183,8 @@ exports.build = function (config, platforms, opts) {
         var unminified = CACHE_DIR+"main-html.unminified.js";
         var js = "build/web/targets/main-html.js";
 
-        return prepareAssets("build/web/assets")
+        return prepareWeb()
+        .then(function () { return prepareAssets("build/web/assets") })
         .then(function (assetFlags) {
             console.log("Building: " + js);
             var flags = commonFlags.concat(assetFlags).concat(htmlFlags);
@@ -193,7 +212,8 @@ exports.build = function (config, platforms, opts) {
         var flashFlags = swfFlags(false).concat([
             "-swf-version", "11", "-swf", swf]);
 
-        return prepareAssets("build/web/assets")
+        return prepareWeb()
+        .then(function () { return prepareAssets("build/web/assets") })
         .then(function (assetFlags) {
             console.log("Building: " + swf);
             return haxe(commonFlags.concat(assetFlags).concat(flashFlags));
@@ -319,14 +339,9 @@ exports.build = function (config, platforms, opts) {
     }
 
     wrench.mkdirSyncRecursive(CACHE_DIR);
-    wrench.mkdirSyncRecursive("build/web/targets");
-    copyFileSync(DATA_DIR+"flambe.js", "build/web/flambe.js");
 
     var connectFlags = ["--connect", HAXE_COMPILER_PORT];
-    var promise = Q()
-    .then(function () { return copyDirs(webPaths, "build/web", {includeHidden: true}) })
-    .then(function () { return copyDirs("icons", "build/web/icons") })
-    .then(function () { return haxe(connectFlags, {check: false, verbose: false, output: false}) })
+    return haxe(connectFlags, {check: false, verbose: false, output: false})
     .then(function (code) {
         // Hide the compilation server behind an environment variable for now until stable
         if ("FLAMBE_HAXE_SERVER" in process.env) {
@@ -364,7 +379,6 @@ exports.build = function (config, platforms, opts) {
         });
         return promise;
     });
-    return promise;
 };
 
 exports.clean = function () {

@@ -241,12 +241,13 @@ exports.build = function (config, platforms, opts) {
             "    <content>"+swf+"</content>\n" +
             "    <aspectRatio>"+get(config, "orientation", "portrait")+"</aspectRatio>\n" +
             "    <fullScreen>"+get(config, "fullscreen", "true")+"</fullScreen>\n" +
+            "    <autoOrients>true</autoOrients>\n" + // Enables 180 degree rotation
             "    <renderMode>direct</renderMode>\n" +
             "  </initialWindow>\n" +
 
             "  <android>\n" +
             "    <manifestAdditions><![CDATA[\n" +
-                   get(config, "android AndroidManifest.xml", "<manifest/>") +
+                   get(config, "android AndroidManifest.xml", "<manifest android:installLocation=\"auto\"/>") +
             "    ]]></manifestAdditions>\n" +
             "  </android>\n" +
 

@@ -13,8 +13,8 @@ default_platform: flash
 # haxe_flags: -lib nape -D foobar
 
 # The initial orientation and fullscreen state
-# orientation = landscape
-# fullscreen = false
+orientation: portrait
+fullscreen: true
 
 # Additional paths to include in the build
 # extra_paths:

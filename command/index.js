@@ -18,7 +18,7 @@ var HAXE_COMPILER_PORT = 6000;
 var HTTP_PORT = 7000;
 var SOCKET_PORT = HTTP_PORT+1;
 
-exports.PLATFORMS = ["html", "flash", "android"];
+exports.PLATFORMS = ["html", "flash", "android", "ios"];
 
 exports.VERSION = JSON.parse(fs.readFileSync(__dirname + "/package.json")).version;
 
@@ -61,24 +61,6 @@ exports.run = function (config, platform, opts) {
     var run = function () {
         var id = get(config, "id");
         switch (platform) {
-        case "android":
-            var apk = "build/main-android.apk";
-            console.log("Installing: " + apk);
-            return adt(["-uninstallApp", "-platform", "android", "-appid", id],
-                {output: false, check: false})
-            .then(function () {
-                return adt(["-installApp", "-platform", "android", "-package", apk]);
-            })
-            .then(function () {
-                var p = adt(["-launchApp", "-platform", "android", "-appid", id]);
-                if (debug && !opts.noFdb) {
-                    console.log();
-                    fdb(["run", "continue"]);
-                }
-                return p;
-            })
-            break;
-
         case "html": case "flash":
             var url = "http://localhost:" + HTTP_PORT + "/?flambe=" + platform;
             console.log("Launching: " + url);
@@ -98,6 +80,24 @@ exports.run = function (config, platform, opts) {
             .catch(function (error) {
                 return Q.reject("Development server not found. Run `flambe serve` in a another terminal and try again.");
             });
+            break;
+
+        case "android": case "ios":
+            var app = (platform == "android") ? "build/main-android.apk" : "build/main-ios.ipa";
+            console.log("Installing: " + app);
+            return adt(["-uninstallApp", "-platform", platform, "-appid", id],
+                {output: false, check: false})
+            .then(function () {
+                return adt(["-installApp", "-platform", platform, "-package", app]);
+            })
+            .then(function () {
+                var p = adt(["-launchApp", "-platform", platform, "-appid", id]);
+                if (debug && !opts.noFdb) {
+                    console.log();
+                    fdb(["run", "continue"]);
+                }
+                return p;
+            })
             break;
         }
     };
@@ -244,13 +244,19 @@ exports.build = function (config, platforms, opts) {
             "    <autoOrients>true</autoOrients>\n" + // Enables 180 degree rotation
             "    <renderMode>direct</renderMode>\n" +
             "  </initialWindow>\n" +
-
             "  <android>\n" +
             "    <manifestAdditions><![CDATA[\n" +
                    get(config, "android AndroidManifest.xml", "<manifest android:installLocation=\"auto\"/>") +
             "    ]]></manifestAdditions>\n" +
             "  </android>\n" +
-
+            "  <iPhone>\n" +
+            "    <InfoAdditions><![CDATA[\n" +
+                   get(config, "ios Info.plist", "") +
+            "    ]]></InfoAdditions>\n" +
+            "    <Entitlements><![CDATA[\n" +
+                   get(config, "ios Entitlements.plist", "") +
+            "    ]]></Entitlements>\n" +
+            "  </iPhone>\n" +
             "</application>";
         var doc = new xmldom.DOMParser().parseFromString(xml);
         var pathOptions = []; // Path options to pass to ADT
@@ -312,8 +318,8 @@ exports.build = function (config, platforms, opts) {
         console.log("Building: " + apk);
 
         var swf = "main-android.swf";
-        var cert = CACHE_DIR+"air/certificate-android.p12"
-        var xml = CACHE_DIR+"air/config-android.xml"
+        var cert = CACHE_DIR+"air/certificate-android.p12";
+        var xml = CACHE_DIR+"air/config-android.xml";
 
         return buildAir(["-D", "android", "-swf", CACHE_DIR+"air/"+swf])
         .then(function () {
@@ -339,7 +345,36 @@ exports.build = function (config, platforms, opts) {
             androidFlags.push("-C", CACHE_DIR+"air", swf, "assets");
             return adt(androidFlags);
         });
-    }
+    };
+
+    var buildIos = function () {
+        var ipa = "build/main-ios.ipa";
+        console.log("Building: " + ipa);
+
+        var swf = "main-ios.swf";
+        var cert = "certs/ios-development.p12";
+        var mobileProvision = "certs/ios.mobileprovision";
+        var xml = CACHE_DIR+"air/config-ios.xml";
+
+        return buildAir(["-D", "android", "-swf", CACHE_DIR+"air/"+swf])
+        .then(function () {
+            var pathOptions = generateAirXml(swf, xml);
+
+            var iosFlags = ["-package"];
+            if (debug) {
+                var fdbHost = opts.fdbHost || getIP();
+                iosFlags.push("-target", "ipa-debug", "-connect", fdbHost);
+            } else {
+                iosFlags.push("-target", "ipa-ad-hoc");
+            }
+            // TODO(bruno): Make these cert options configurable
+            iosFlags.push("-storetype", "pkcs12", "-keystore", cert, "-storepass", "password",
+                "-provisioning-profile", mobileProvision, ipa, xml);
+            iosFlags = iosFlags.concat(pathOptions);
+            iosFlags.push("-C", CACHE_DIR+"air", swf, "assets");
+            return adt(iosFlags);
+        });
+    };
 
     wrench.mkdirSyncRecursive(CACHE_DIR);
 
@@ -372,6 +407,7 @@ exports.build = function (config, platforms, opts) {
             html: buildHtml,
             flash: buildFlash,
             android: buildAndroid,
+            ios: buildIos,
         };
         var promise = Q();
         platforms.forEach(function (platform, idx) {

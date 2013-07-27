@@ -23,9 +23,22 @@ default_platform: flash
 #   src: ../dir1 ../dir2
 #   web: ["dir1 with spaces", "dir2"]
 
-# Additional configuration for Android
-# android:
-#   AndroidManifest.xml: |
-#     <manifest android:installLocation="auto">
-#       <uses-permission android:name="android.permission.INTERNET" />
-#     </manifest>
+# Android-specific configuration
+android:
+  # https://developer.android.com/guide/topics/manifest/manifest-intro.html
+  AndroidManifest.xml: |
+    <manifest android:installLocation="auto">
+      <uses-permission android:name="android.permission.INTERNET" />
+    </manifest>
+
+# iOS-specific configuration
+ios:
+  # http://developer.apple.com/library/ios/#documentation/general/Reference/InfoPlistKeyReference
+  Info.plist: |
+    <key>UIDeviceFamily</key>
+    <array>
+      <string>1</string>
+      <string>2</string>
+    </array>
+    <key>UIPrerenderedIcon</key>
+    <true/>

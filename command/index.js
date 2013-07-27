@@ -356,7 +356,7 @@ exports.build = function (config, platforms, opts) {
         var mobileProvision = "certs/ios.mobileprovision";
         var xml = CACHE_DIR+"air/config-ios.xml";
 
-        return buildAir(["-D", "android", "-swf", CACHE_DIR+"air/"+swf])
+        return buildAir(["-D", "ios", "-D", "no-flash-override", "-swf", CACHE_DIR+"air/"+swf])
         .then(function () {
             var pathOptions = generateAirXml(swf, xml);
 

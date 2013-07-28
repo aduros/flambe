@@ -169,6 +169,7 @@ exports.build = function (config, platforms, opts) {
                         // The current version of Haxe can't deal with .ane -swf-libs, so rename it to a
                         // swc first
                         var swc = CACHE_DIR+"air/"+file+".swc";
+                        wrench.mkdirSyncRecursive(CACHE_DIR+"air");
                         copyFileSync(libPath+"/"+file, swc);
                         _swfFlags.push("-swf-lib-extern", swc);
                     }

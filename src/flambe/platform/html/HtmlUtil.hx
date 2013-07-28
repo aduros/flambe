@@ -19,7 +19,7 @@ class HtmlUtil
      */
     public static var SHOULD_HIDE_MOBILE_BROWSER =
         Browser.window.top == Browser.window &&
-        ~/Mobile(\/.*)? Safari/.match(Browser.window.navigator.userAgent);
+        ~/Mobile(\/.*)? Safari/.match(Browser.navigator.userAgent);
 
     public static function callLater (func :Void -> Void, delay :Int = 0)
     {

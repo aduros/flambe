@@ -29,6 +29,8 @@ class HtmlPlatform
 
     public function init ()
     {
+        HtmlUtil.fixAndroidMath();
+
         var canvas :CanvasElement = null;
         try {
             // Use the canvas assigned to us by the flambe.js embedder

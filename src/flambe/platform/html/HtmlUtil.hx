@@ -167,4 +167,24 @@ class HtmlUtil
         }
         return false;
     }
+
+    public static function fixAndroidMath ()
+    {
+        // Some versions of V8 on ARM (like the one in the stock Android 4 browser) are affected by
+        // this nasty bug: https://code.google.com/p/v8/issues/detail?id=2234
+        //
+        // So, hack around it. This doesn't affect Android 2. Hopefully 5 will use an updated V8
+        // with the real fix.
+
+        if (Browser.navigator.userAgent.indexOf("Linux; U; Android 4") >= 0) {
+            Log.warn("Monkey patching around Android sin/cos bug");
+            var sin = Math.sin, cos = Math.cos;
+            (untyped Math).sin = function (x) {
+                return (x == 0) ? 0 : sin(x);
+            };
+            (untyped Math).cos = function (x) {
+                return (x == 0) ? 1 : cos(x);
+            }
+        }
+    }
 }

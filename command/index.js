@@ -151,32 +151,29 @@ exports.build = function (config, platforms, opts) {
         });
     };
 
-    var _swfFlags = null; // Cache
     var swfFlags = function (air) {
-        if (_swfFlags == null) {
-            // Flags common to all swf-based targets (flash, android, ios)
-            _swfFlags = ["--flash-strict", "-swf-header", "640:480:60:000000"];
-            if (debug) _swfFlags.push("-D", "fdb", "-D", "advanced-telemetry");
-            else _swfFlags.push("-D", "native_trace");
+        // Flags common to all swf-based targets (flash, android, ios)
+        var flags = ["--flash-strict", "-swf-header", "640:480:60:000000"];
+        if (debug) flags.push("-D", "fdb", "-D", "advanced-telemetry");
+        else flags.push("-D", "native_trace");
 
-            // Include any swc/swf libs in the libs directories
-            libPaths.forEach(function (libPath) {
-                forEachFileIn(libPath, function (file) {
-                    if (file.match(/.*\.(swc|swf)$/)) {
-                        _swfFlags.push("-swf-lib", libPath+"/"+file);
-                    } else if (air && file.match(/.*\.ane$/)) {
-                        // _swfFlags.push("-swf-lib-extern", libPath+"/"+file);
-                        // The current version of Haxe can't deal with .ane -swf-libs, so rename it to a
-                        // swc first
-                        var swc = CACHE_DIR+"air/"+file+".swc";
-                        wrench.mkdirSyncRecursive(CACHE_DIR+"air");
-                        copyFileSync(libPath+"/"+file, swc);
-                        _swfFlags.push("-swf-lib-extern", swc);
-                    }
-                });
+        // Include any swc/swf libs in the libs directories
+        libPaths.forEach(function (libPath) {
+            forEachFileIn(libPath, function (file) {
+                if (file.match(/.*\.(swc|swf)$/)) {
+                    flags.push("-swf-lib", libPath+"/"+file);
+                } else if (air && file.match(/.*\.ane$/)) {
+                    // flags.push("-swf-lib-extern", libPath+"/"+file);
+                    // The current version of Haxe can't deal with .ane -swf-libs, so rename it to a
+                    // swc first
+                    var swc = CACHE_DIR+"air/"+file+".swc";
+                    wrench.mkdirSyncRecursive(CACHE_DIR+"air");
+                    copyFileSync(libPath+"/"+file, swc);
+                    flags.push("-swf-lib-extern", swc);
+                }
             });
-        }
-        return _swfFlags;
+        });
+        return flags;
     };
 
     var buildHtml = function () {

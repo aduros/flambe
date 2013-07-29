@@ -1,7 +1,3 @@
 build/
-chxdoc
-.lock-waf*
-bin/.waf*
-*.fdz
-*.pyc
+chxdoc/
 node_modules/

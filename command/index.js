@@ -593,7 +593,7 @@ Server.prototype.start = function () {
         .use(connect.compress())
         .use(connect.static("build/web"))
         .listen(HTTP_PORT, host);
-    console.log("Serving on %s:%s", host, HTTP_PORT);
+    console.log("Serving on http://localhost:%s", HTTP_PORT);
 
     this._wsServer = new websocket.server({
         httpServer: staticServer,

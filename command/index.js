@@ -177,7 +177,7 @@ exports.build = function (config, platforms, opts) {
     };
 
     var buildHtml = function () {
-        var htmlFlags = ["-D", "html"];
+        var htmlFlags = ["-D", "html", "-D", "js-flatten"];
         var unminified = CACHE_DIR+"main-html.unminified.js";
         var js = "build/web/targets/main-html.js";
 

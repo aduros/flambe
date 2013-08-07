@@ -47,8 +47,7 @@ using Lambda;
 	//Use setZOrder() to set this value instead of zOrder = x
 	public var zOrder : Int = 0;
 	public var orderOfArrival : Int = 1;
-	
-	public static var globalOrderOfArrival : Int = 1;
+
     public function new ()
     {
 #if flash
@@ -165,40 +164,12 @@ using Lambda;
      */
     public function addChild (entity :Entity, append :Bool = true, ?zOrder : Int)
     {
-		//trace("entity.addChild = " + zOrder);
         if (entity.parent != null) {
             entity.parent.removeChild(entity);
         }
         entity.parent = this;
-		//trace("append");
-        //if (append) {
-            //var tail = null, p = firstChild;
-            //while (p != null) {
-                //tail = p;
-                //p = p.next;
-            //}
-            //if (tail != null) {
-                //tail.next = entity;
-            //} else {
-                //firstChild = entity;
-            //}
-//
-        //} else {
-            //entity.next = firstChild;
-            //firstChild = entity;
-        //}
-		
-		//if (zOrder == null) {
-			//if (tailChild != null) {
-				//zOrder = tailChild.zOrder;
-			//} else {
-				//zOrder = 0;
-			//}
-		//}
-		
 		
 		if (append) {
-			
 			var tail = null, p = firstChild;
 			
 			while (p != null) {
@@ -210,19 +181,14 @@ using Lambda;
 				if (zOrder == null) {
 					zOrder = tail.zOrder;
 				}
-				//trace(tail.zOrder);
 				if (tail.zOrder <= zOrder) {
 					tail.next = entity;
-					//tailChild = entity;
-					//trace("append");
 				} else {
 					var p = firstChild;
 					var pre : Entity = null;
 					while (p != null) {
 						if (p.zOrder > zOrder) {
-							//trace("insert");
 							if (pre != null) {
-								
 								pre.next = entity;
 								entity.next = p;
 								
@@ -234,12 +200,10 @@ using Lambda;
 						} else {
 							pre = p;
 							p = p.next;
-						}
-						
+						}	
 					}
 				}
 			} else {
-				trace("init");
 				firstChild = entity;
 				if (zOrder == null) {
 					zOrder = 0;

@@ -47,6 +47,7 @@ using Lambda;
 	//Use setZOrder() to set this value instead of zOrder = x
 	public var zOrder : Int = 0;
 	public var orderOfArrival : Int = 1;
+	public var isZOrderChanged(default, null) : Bool = false;
 
     public function new ()
     {
@@ -179,7 +180,11 @@ using Lambda;
 			
 			if (tail != null) {
 				if (zOrder == null) {
-					zOrder = tail.zOrder;
+					if (entity.isZOrderChanged) {
+						zOrder = entity.zOrder;
+					} else {
+						zOrder = tail.zOrder;
+					}	
 				}
 				if (tail.zOrder <= zOrder) {
 					tail.next = entity;
@@ -204,12 +209,14 @@ using Lambda;
 					}
 				}
 			} else {
+				//Add First Child
 				firstChild = entity;
 				if (zOrder == null) {
-					zOrder = 0;
+					zOrder = this.zOrder;
 				}
 			}
 		} else {
+			//You can't assign a zOrder if append is false. 
 			if (firstChild == null) {
 				zOrder = 0;
 			} else {
@@ -229,7 +236,10 @@ using Lambda;
 			return;
 		} else {
 			this.zOrder = z;
-			this.parent.addChild(this, true, this.zOrder);
+			this.isZOrderChanged = true;
+			if (this.parent != null) {
+				this.parent.addChild(this, true, this.zOrder);
+			}
 		}
 		
 	}

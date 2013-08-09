@@ -31,7 +31,7 @@ class Arrays
     }
 
     /** Allocate an array of a predetermined length. */
-    inline public static function create<A> (length :Int) :Array<A>
+    @:noUsing inline public static function create<A> (length :Int) :Array<A>
     {
 #if (flash || js)
         // This trick only works in Flash and JS

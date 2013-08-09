@@ -5,7 +5,9 @@
 package flambe;
 
 #if macro
+import haxe.macro.Context;
 import haxe.macro.Expr;
+using haxe.macro.ExprTools;
 #end
 
 import flambe.util.Disposable;
@@ -131,7 +133,19 @@ using Lambda;
      */
     macro public function get<A> (self :Expr, componentClass :ExprOf<Class<A>>) :ExprOf<A>
     {
-        return macro $componentClass.getFrom($self);
+        switch (componentClass.expr) {
+        case EConst(CIdent(name)):
+            var type = Context.getType(name);
+            if (Context.unify(type, Context.getType("flambe.Component"))) {
+                return macro $componentClass.getFrom($self);
+            }
+        default:
+            // Pass through
+        }
+
+        Context.error("Expected a class that extends Component, got " + componentClass.toString(),
+            Context.currentPos());
+        return null;
     }
 
     /**
@@ -139,7 +153,7 @@ using Lambda;
      */
     macro public function has<A> (self :Expr, componentClass :ExprOf<Class<A>>) :ExprOf<Bool>
     {
-        return macro $componentClass.hasIn($self);
+        return macro $self.get($componentClass) != null;
     }
 
     /**

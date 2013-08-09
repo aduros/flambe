@@ -24,12 +24,9 @@ class ComponentBuilder
         var componentType = TPath({pack: cl.pack, name: cl.name, params: []});
 
         var fields = Macros.buildFields(macro {
+            var public__static__inline__NAME = $name;
             function inline__public__static__getFrom (entity :flambe.Entity) :$componentType {
                 return cast entity.getComponent($name);
-            }
-
-            function inline__public__static__hasIn (entity :flambe.Entity) :Bool {
-                return entity.getComponent($name) != null;
             }
         });
 

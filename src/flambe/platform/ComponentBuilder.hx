@@ -25,9 +25,6 @@ class ComponentBuilder
 
         var fields = Macros.buildFields(macro {
             var public__static__inline__NAME = $name;
-            function inline__public__static__getFrom (entity :flambe.Entity) :$componentType {
-                return cast entity.getComponent($name);
-            }
         });
 
         // Only override get_name if this component directly extends a @:componentBase and creates a

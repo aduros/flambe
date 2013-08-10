@@ -137,7 +137,8 @@ using Lambda;
         case EConst(CIdent(name)):
             var type = Context.getType(name);
             if (Context.unify(type, Context.getType("flambe.Component"))) {
-                return macro $componentClass.getFrom($self);
+                // Delegate through getComponentTyped to avoid a (slow) typed cast
+                return macro $self._internal_getComponentTyped($componentClass.NAME, $componentClass);
             }
         default:
             // Pass through
@@ -278,6 +279,15 @@ using Lambda;
         }
         return output;
     }
+
+    // A semi-private helper method used by Entity.get()
+#if !display
+    @:extern // Inline even in debug builds
+    inline public function _internal_getComponentTyped<A:Component> (name :String, cl :Class<A>) :A
+    {
+        return cast getComponent(name);
+    }
+#end
 
     /**
      * Maps String -> Component. Usually you would use a Haxe Map here, but I'm dropping down to plain

@@ -24,7 +24,7 @@ class Scene extends Component
      */
     public var opaque (default, null) :Bool;
 
-    public function new (opaque :Bool = true)
+    @:keep public function new (opaque :Bool = true)
     {
         this.opaque = opaque;
         shown = new Signal0();

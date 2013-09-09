@@ -35,10 +35,9 @@ pushd src
 git ls-files | zip $ARCHIVE -@
 popd
 
-# FIXME(bruno): chxdoc is broken in Haxe 3
-# # Include our haxedoc.xml as well
-# bin/build-chxdoc
-# zip -j $ARCHIVE chxdoc/haxedoc.xml
+# Include our haxedoc.xml as well
+bin/build-dox
+zip -j $ARCHIVE dox/haxedoc.xml
 
 read -p "Submit Flambe $VERSION to haxelib [Y/n]? " CONFIRM
 case "$CONFIRM" in
@@ -46,9 +45,8 @@ case "$CONFIRM" in
         # Upload the demos
         $DEMOS_ROOT/bin/upload-all
 
-        # FIXME(bruno): chxdoc is broken in Haxe 3
-        # # Upload the API docs
-        # rsync -avz --delete chxdoc/ catdap:web/flambe/api/
+        # Upload the API docs
+        rsync -avz --delete dox/ catdap:web/flambe/api/
 
         # Upload the NPM module
         npm publish ./command --force

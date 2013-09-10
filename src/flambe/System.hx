@@ -100,8 +100,7 @@ class System
     public static var locale (get, null) :String;
 
     /**
-     * Emitted when an uncaught exception occurs, if the platform supports it. You can wire this up
-     * to your telemetry reporting service of choice.
+     * Emitted when an uncaught exception occurs, if the platform supports it.
      */
     public static var uncaughtError (default, null) :Signal1<String> = new Signal1<String>();
 

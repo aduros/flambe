@@ -5,8 +5,10 @@
 package flambe.input;
 
 /**
- * Represents an event coming from a mouse. NOTE: For performance reasons, MouseEvent instances are
- * reused by Flambe. Use clone() to retain a reference to an event.
+ * Represents an event coming from a mouse.
+ *
+ * _NOTE_: For performance reasons, MouseEvent instances are reused by Flambe. Use `clone()` to
+ * retain a reference to an event.
  */
 class MouseEvent
 {

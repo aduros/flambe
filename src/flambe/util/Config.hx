@@ -11,12 +11,12 @@ typedef ConfigSection = Map<String,String>;
 /**
  * An INI-like config file parser.
  *
- * <pre>
+ * ```
  * ; This is a comment
  * foo = some value
  * [my section]
  * password = "  quotes are optional, and useful if you want to preserve surrounding spaces  "
- * </pre>
+ * ```
  */
 class Config
 {

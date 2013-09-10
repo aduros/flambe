@@ -15,12 +15,12 @@ import flambe.util.Disposable;
 using Lambda;
 
 /**
- * <p>A node in the entity hierarchy, and a collection of components.</p>
+ * A node in the entity hierarchy, and a collection of components.
  *
- * <p>To iterate over the hierarchy, use the parent, firstChild, next and firstComponent fields. For
- * example:</p>
+ * To iterate over the hierarchy, use the parent, firstChild, next and firstComponent fields. For
+ * example:
  *
- * <pre>
+ * ```haxe
  * // Iterate over entity's children
  * var child = entity.firstChild;
  * while (child != null) {
@@ -28,7 +28,7 @@ using Lambda;
  *     process(child);
  *     child = next;
  * }
- * </pre>
+ * ```
  */
 @:final class Entity
     implements Disposable

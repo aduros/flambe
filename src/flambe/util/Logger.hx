@@ -41,11 +41,12 @@ class Logger
 
 #if (debug || flambe_keep_logs)
     /**
-     * Logs a message at the Info severity level.
+     * Logs a message at the `Info` severity level.
+     *
      * @param text The message to log.
      * @param args A list of pairs that are formatted into extra information. For example,
-     *   <pre>log.info("Player logged in", ["who", playerId, "level", 24])</pre> will log something
-     *   like: <pre>INFO urgame: Player logged in [who=aduros, level=24]</pre>
+     *   `log.info("Player logged in", ["who", playerId, "level", 24])` will log something
+     *   like: `INFO urgame: Player logged in [who=aduros, level=24]`
      */
     public function info (?text :String, ?args :Array<Dynamic>)
     {
@@ -53,11 +54,12 @@ class Logger
     }
 
     /**
-     * Logs a message at the Warn severity level.
+     * Logs a message at the `Warn` severity level.
+     *
      * @param text The message to log.
      * @param args A list of pairs that are formatted into extra information. For example,
-     *   <pre>log.warn("Player disconnected abruptly", ["who", playerId, "level", 24])</pre> will log something
-     *   like: <pre>WARN urgame: Player disconnected abruptly [who=aduros, level=24]</pre>
+     *   `log.warn("Player disconnected abruptly", ["who", playerId, "level", 24])` will log
+     *   something like: `WARN urgame: Player disconnected abruptly [who=aduros, level=24]`
      */
     public function warn (?text :String, ?args :Array<Dynamic>)
     {
@@ -65,11 +67,12 @@ class Logger
     }
 
     /**
-     * Logs a message at the Error severity level.
+     * Logs a message at the `Error` severity level.
+     *
      * @param text The message to log.
      * @param args A list of pairs that are formatted into extra information. For example,
-     *   <pre>log.error("Couldn't connect to DB!", ["who", playerId, "level", 24])</pre> will log something
-     *   like: <pre>ERROR urgame: Couldn't connect to DB! [who=aduros, level=24]</pre>
+     *   `log.error("Couldn't connect to DB!", ["who", playerId, "level", 24])` will log something
+     *   like: `ERROR urgame: Couldn't connect to DB! [who=aduros, level=24]`
      */
     public function error (?text :String, ?args :Array<Dynamic>)
     {
@@ -78,11 +81,12 @@ class Logger
 
     /**
      * Logs a message.
+     *
      * @param level The severity of the log message.
      * @param text The message to log.
      * @param args A list of pairs that are formatted into extra information. For example,
-     *   <pre>log.info("Player logged in", ["who", playerId, "level", 24])</pre> will log something
-     *   like: <pre>INFO urgame: Player logged in [who=aduros, level=24]</pre>
+     *   `log.info("Player logged in", ["who", playerId, "level", 24])` will log something like:
+     *   `INFO urgame: Player logged in [who=aduros, level=24]`
      */
     public function log (level :LogLevel, ?text :String, ?args :Array<Dynamic>)
     {

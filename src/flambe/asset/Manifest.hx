@@ -14,7 +14,7 @@ using flambe.util.Strings;
 
 /**
  * An asset manifest contains all the information needed to load an asset pack. A manifest is
- * usually created with Manifest.build("directory"), but manifests can also be assembled
+ * usually created with `Manifest.build("directory")`, but manifests can also be assembled
  * programmatically.
  */
 class Manifest

@@ -5,32 +5,31 @@
 package flambe.input;
 
 /**
- * <p>Three angles that represent the device's attitude, one around each axis.</p>
+ * Three angles that represent the device's attitude, one around each axis.
  *
- * <p><img src="https://aduros.com/flambe/images/Axes.png"></p>
+ * <img src="https://aduros.com/flambe/images/Axes.png">
  */
 class Attitude
 {
     /**
-     * <p>The angle in degrees around the X-axis; that is, how far the device is pitched forward or
-     * backward.</p>
+     * The angle in degrees around the X-axis; that is, how far the device is pitched forward or
+     * backward.
      *
-     * <p><img src="https://aduros.com/flambe/images/Axes-Pitch.png"></p>
+     * <img src="https://aduros.com/flambe/images/Axes-Pitch.png">
      */
     public var pitch (default, null) :Float;
 
     /**
-     * <p>The angle in degrees around the Y-axis; that is, how far the device is rolled left or
-     * right.</p>
+     * The angle in degrees around the Y-axis; that is, how far the device is rolled left or right.
      *
-     * <p><img src="https://aduros.com/flambe/images/Axes-Roll.png"></p>
+     * <img src="https://aduros.com/flambe/images/Axes-Roll.png">
      */
     public var roll (default, null) :Float;
 
     /**
-     * <p>The angle in degrees around the Z-axis.</p>
+     * The angle in degrees around the Z-axis.
      *
-     * <p><img src="https://aduros.com/flambe/images/Axes-Azimuth.png"></p>
+     * <img src="https://aduros.com/flambe/images/Axes-Azimuth.png">
      */
     public var azimuth (default, null) :Float;
 

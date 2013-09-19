@@ -108,12 +108,12 @@ class MovieSprite extends Sprite
             }
         }
 
-        var newFrame = _position*symbol.frameRate;
-        goto(newFrame);
-
         if (looped && _looped != null) {
             _looped.emit();
         }
+
+        var newFrame = _position*symbol.frameRate;
+        goto(newFrame);
     }
 
     private function goto (newFrame :Float)

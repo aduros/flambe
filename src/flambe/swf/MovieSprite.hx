@@ -242,31 +242,34 @@ private class LayerAnimator
         var skewY = kf.skewY;
         var alpha = kf.alpha;
 
+        // Interpolate if this keyframe is tweened and has a following non-empty keyframe
         if (kf.tweened && keyframeIdx < finalFrame) {
-            var interp = (frame-kf.index) / kf.duration;
-            var ease = kf.ease;
-            if (ease != 0) {
-                var t;
-                if (ease < 0) {
-                    // Ease in
-                    var inv = 1 - interp;
-                    t = 1 - inv*inv;
-                    ease = -ease;
-                } else {
-                    // Ease out
-                    t = interp*interp;
-                }
-                interp = ease*t + (1 - ease)*interp;
-            }
-
             var nextKf = keyframes[keyframeIdx + 1];
-            x += (nextKf.x-x) * interp;
-            y += (nextKf.y-y) * interp;
-            scaleX += (nextKf.scaleX-scaleX) * interp;
-            scaleY += (nextKf.scaleY-scaleY) * interp;
-            skewX += (nextKf.skewX-skewX) * interp;
-            skewY += (nextKf.skewY-skewY) * interp;
-            alpha += (nextKf.alpha-alpha) * interp;
+            if (nextKf.symbol != null) {
+                var interp = (frame-kf.index) / kf.duration;
+                var ease = kf.ease;
+                if (ease != 0) {
+                    var t;
+                    if (ease < 0) {
+                        // Ease in
+                        var inv = 1 - interp;
+                        t = 1 - inv*inv;
+                        ease = -ease;
+                    } else {
+                        // Ease out
+                        t = interp*interp;
+                    }
+                    interp = ease*t + (1 - ease)*interp;
+                }
+
+                x += (nextKf.x-x) * interp;
+                y += (nextKf.y-y) * interp;
+                scaleX += (nextKf.scaleX-scaleX) * interp;
+                scaleY += (nextKf.scaleY-scaleY) * interp;
+                skewX += (nextKf.skewX-skewX) * interp;
+                skewY += (nextKf.skewY-skewY) * interp;
+                alpha += (nextKf.alpha-alpha) * interp;
+            }
         }
 
         // From an identity matrix, append the translation, skew, and scale

@@ -175,4 +175,9 @@ class MovieKeyframe
             ease = json.ease;
         }
     }
+
+    @:allow(flambe) inline function setVisible (visible :Bool)
+    {
+        this.visible = visible;
+    }
 }

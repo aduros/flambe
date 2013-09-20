@@ -27,6 +27,8 @@ class MovieSprite extends Sprite
 
     /**
      * The playback speed multiplier of this movie, defaults to 1.0. Higher values will play faster.
+     * This does not affect the speed of nested child movies, use `flambe.SpeedAdjuster` if you need
+     * that.
      */
     public var speed (default, null) :AnimatedFloat;
 

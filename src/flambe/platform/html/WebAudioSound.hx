@@ -147,9 +147,9 @@ private class WebAudioPlayback
         return paused;
     }
 
-    inline public function get_ended () :Bool
+    public function get_ended () :Bool
     {
-        return _sourceNode.playbackState == 3; // == FINISHED_STATE
+        return _disposed || _sourceNode.playbackState == 3; // == FINISHED_STATE
     }
 
     public function get_position () :Float
@@ -186,6 +186,7 @@ private class WebAudioPlayback
     public function dispose ()
     {
         paused = true;
+        _disposed = true;
     }
 
     private function setVolume (volume :Float)
@@ -243,4 +244,6 @@ private class WebAudioPlayback
 
     private var _hideBinding :Disposable;
     private var _tickableAdded :Bool;
+
+    private var _disposed :Bool = false;
 }

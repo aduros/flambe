@@ -11,7 +11,7 @@ class HtmlLogHandler
 {
     public static function isSupported () :Bool
     {
-        return untyped __js__("typeof console") == "object" && console.info != null;
+        return untyped __js__("typeof console") == "object" && __js__("console").info != null;
     }
 
     public function new (tag :String)
@@ -25,11 +25,11 @@ class HtmlLogHandler
 
         switch (level) {
         case Info:
-            (untyped console).info(message);
+            (untyped __js__("console")).info(message);
         case Warn:
-            (untyped console).warn(message);
+            (untyped __js__("console")).warn(message);
         case Error:
-            (untyped console).error(message);
+            (untyped __js__("console")).error(message);
         }
     }
 

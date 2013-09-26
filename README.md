@@ -9,9 +9,15 @@ mobile browsers. The HTML5 renderer uses WebGL, with fallback to canvas.
 Rendering in Flash uses Stage3D. Native Android and iOS apps are
 packaged using Adobe AIR.
 
-## Demos
+On top of being high performance and cross-platform, Flambe recognizes
+that assets and workflow are critical to game development. It includes
+battle-tested support for importing Flash animations, bitmap fonts, and
+particle systems. Live asset swapping lets you modify an asset and see
+the change in your game automatically, *with no recompile or refresh*.
+When you need to make a code change, Flambe recompiles and automatically
+refreshes your browser tab, all in under 2 seconds.
 
-Demos and more are on the [Flambe wiki].
+Check out the [Flambe wiki] for demos and more.
 
 ## Installing
 

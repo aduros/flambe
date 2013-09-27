@@ -391,12 +391,12 @@ class HtmlPlatform
 
     private function getX (event :Dynamic, bounds :Dynamic) :Float
     {
-        return _stage.scaleFactor*(event.clientX - bounds.left);
+        return (event.clientX - bounds.left)*_stage.width/bounds.width;
     }
 
     private function getY (event :Dynamic, bounds :Dynamic) :Float
     {
-        return _stage.scaleFactor*(event.clientY - bounds.top);
+        return (event.clientY - bounds.top)*_stage.height/bounds.height;
     }
 
     private function createRenderer (canvas :CanvasElement) :Renderer

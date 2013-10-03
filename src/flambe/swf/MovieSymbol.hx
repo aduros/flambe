@@ -70,11 +70,8 @@ class MovieLayer
     public var keyframes (default, null) :Array<MovieKeyframe>;
     public var frames (get, null) :Int;
 
-    /** The symbol in the last keyframe that has one, or null if there are no symbol keyframes. */
-    public var lastSymbol :Symbol = null;
-
-    /** True if this layer contains keyframes with at least two different symbols. */
-    public var multipleSymbols :Bool = false;
+    /** Whether this layer has no symbol instances. */
+    public var empty (default, null) :Bool = true;
 
     public function new (json :LayerFormat)
     {
@@ -85,11 +82,14 @@ class MovieLayer
         for (ii in 0...keyframes.length) {
             prevKf = new MovieKeyframe(json.keyframes[ii], prevKf);
             keyframes[ii] = prevKf;
+
+            empty = empty && prevKf.symbolName == null;
         }
     }
 
     private function get_frames () :Int
     {
+        // TODO(bruno): Cache this
         var lastKf = keyframes[keyframes.length - 1];
         return lastKf.index + Std.int(lastKf.duration);
     }

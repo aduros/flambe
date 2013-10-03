@@ -101,17 +101,21 @@ class MovieSprite extends Sprite
 
         speed.update(dt);
 
-        var looped = false;
-        if (!paused) {
+        if (paused) {
+            // If RESUME is set, unpause
+            if (_flags.contains(Sprite.MOVIESPRITE_RESUME)) {
+                _flags = _flags.remove(Sprite.MOVIESPRITE_RESUME | Sprite.MOVIESPRITE_PAUSED);
+            }
+
+        } else {
             _position += speed._*dt;
             if (_position > symbol.duration) {
                 _position = _position % symbol.duration;
-                looped = true;
-            }
-        }
 
-        if (looped && _looped != null) {
-            _looped.emit();
+                if (_looped != null) {
+                    _looped.emit();
+                }
+            }
         }
 
         var newFrame = _position*symbol.frameRate;
@@ -127,7 +131,7 @@ class MovieSprite extends Sprite
         var wrapped = newFrame < _frame;
         if (wrapped) {
             for (animator in _animators) {
-                animator.changedKeyframe = true;
+                animator.needsKeyframeUpdate = true;
                 animator.keyframeIdx = 0;
             }
         }
@@ -167,6 +171,17 @@ class MovieSprite extends Sprite
         return _looped;
     }
 
+    /**
+     * Internal method to set the position to 0 and skip the next update. This is required to modify
+     * the playback position of child movies during an update step, so that after the update
+     * trickles through the children, they end up at position=0 instead of position=dt.
+     */
+    @:allow(flambe) function rewind ()
+    {
+        _position = 0;
+        _flags = _flags.add(Sprite.MOVIESPRITE_PAUSED | Sprite.MOVIESPRITE_RESUME);
+    }
+
     private var _animators :Array<LayerAnimator>;
 
     private var _position :Float;
@@ -179,31 +194,33 @@ private class LayerAnimator
 {
     public var content (default, null) :Entity;
 
-    public var changedKeyframe :Bool;
-    public var keyframeIdx :Int;
+    public var needsKeyframeUpdate :Bool = false;
+    public var keyframeIdx :Int = 0;
 
     public var layer :MovieLayer;
 
     public function new (layer :MovieLayer)
     {
-        changedKeyframe = false;
-        keyframeIdx = 0;
         this.layer = layer;
 
         var sprite;
-        if (layer.multipleSymbols) {
+        if (layer.empty) {
+            sprite = new Sprite(); // TODO(bruno): Don't add a sprite at all?
+
+        } else {
+            // Populate _sprites with the Sprite at each keyframe, reusing consecutive symbols
             _sprites = Arrays.create(layer.keyframes.length);
             for (ii in 0..._sprites.length) {
                 var kf = layer.keyframes[ii];
-                _sprites[ii] = (kf.symbol != null) ? kf.symbol.createSprite() : new Sprite();
+                if (ii > 0 && layer.keyframes[ii-1].symbol == kf.symbol) {
+                    _sprites[ii] = _sprites[ii-1];
+                } else if (kf.symbol == null) {
+                    _sprites[ii] = new Sprite();
+                } else {
+                    _sprites[ii] = kf.symbol.createSprite();
+                }
             }
             sprite = _sprites[0];
-
-        } else if (layer.lastSymbol != null) {
-            sprite = layer.lastSymbol.createSprite();
-
-        } else {
-            sprite = new Sprite(); // Empty container layer
         }
 
         content = new Entity().add(sprite);
@@ -211,23 +228,44 @@ private class LayerAnimator
 
     public function composeFrame (frame :Float)
     {
+        if (_sprites == null) {
+            // TODO(bruno): Test this code path
+            // Don't animate empty layers
+            return;
+        }
+
         var keyframes = layer.keyframes;
         var finalFrame = keyframes.length - 1;
 
+        if (frame >= layer.frames) {
+            // TODO(bruno): Test this code path
+            // Not enough frames on this layer, hide it
+            content.get(Sprite).visible = false;
+            keyframeIdx = finalFrame;
+            needsKeyframeUpdate = true;
+            return;
+        }
+
         while (keyframeIdx < finalFrame && keyframes[keyframeIdx+1].index <= frame) {
             ++keyframeIdx;
-            changedKeyframe = true;
+            needsKeyframeUpdate = true;
         }
 
         var sprite;
-        if (changedKeyframe && _sprites != null) {
+        if (needsKeyframeUpdate) {
             // Switch to the next instance if this is a multi-layer symbol
             sprite = _sprites[keyframeIdx];
-            content.add(sprite); // TODO(bruno): Optimize away redundant adds
+            if (sprite != content.get(Sprite)) {
+                if (Type.getClass(sprite) == MovieSprite) {
+                    var movie :MovieSprite = cast sprite;
+                    movie.rewind();
+                }
+                content.add(sprite);
+            }
         } else {
             sprite = content.get(Sprite);
         }
-        changedKeyframe = false;
+        needsKeyframeUpdate = false;
 
         var kf = keyframes[keyframeIdx];
         var visible = kf.visible && kf.symbol != null;

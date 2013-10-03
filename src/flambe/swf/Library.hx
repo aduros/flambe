@@ -66,12 +66,6 @@ class Library
                     if (kf.symbolName != null) {
                         var symbol = _symbols.get(kf.symbolName);
                         Assert.that(symbol != null);
-
-                        if (layer.lastSymbol == null) {
-                            layer.lastSymbol = symbol;
-                        } else if (layer.lastSymbol != symbol) {
-                            layer.multipleSymbols = true;
-                        }
                         kf.symbol = symbol;
                     }
 

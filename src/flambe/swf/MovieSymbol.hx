@@ -68,7 +68,7 @@ class MovieLayer
 {
     public var name (default, null) :String;
     public var keyframes (default, null) :Array<MovieKeyframe>;
-    public var frames (get, null) :Int;
+    public var frames (default, null) :Int;
 
     /** Whether this layer has no symbol instances. */
     public var empty (default, null) :Bool = true;
@@ -85,13 +85,8 @@ class MovieLayer
 
             empty = empty && prevKf.symbolName == null;
         }
-    }
 
-    private function get_frames () :Int
-    {
-        // TODO(bruno): Cache this
-        var lastKf = keyframes[keyframes.length - 1];
-        return lastKf.index + Std.int(lastKf.duration);
+        frames = (prevKf != null) ? prevKf.index + Std.int(prevKf.duration) : 0;
     }
 }
 

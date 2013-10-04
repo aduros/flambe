@@ -101,19 +101,20 @@ class MovieSprite extends Sprite
 
         speed.update(dt);
 
-        if (!paused) {
-            if (_flags.contains(Sprite.MOVIESPRITE_SKIP_NEXT)) {
-                _flags = _flags.remove(Sprite.MOVIESPRITE_SKIP_NEXT);
-            } else {
-                _position += speed._*dt;
-                if (_position > symbol.duration) {
-                    _position = _position % symbol.duration;
+        switch (_flags & (Sprite.MOVIESPRITE_PAUSED | Sprite.MOVIESPRITE_SKIP_NEXT)) {
+        case 0:
+            // Neither paused nor skipping set, advance time
+            _position += speed._*dt;
+            if (_position > symbol.duration) {
+                _position = _position % symbol.duration;
 
-                    if (_looped != null) {
-                        _looped.emit();
-                    }
+                if (_looped != null) {
+                    _looped.emit();
                 }
             }
+        case Sprite.MOVIESPRITE_SKIP_NEXT:
+            // Not paused, but skip this time step
+            _flags = _flags.remove(Sprite.MOVIESPRITE_SKIP_NEXT);
         }
 
         var newFrame = _position*symbol.frameRate;

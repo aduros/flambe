@@ -202,9 +202,9 @@ private class LayerAnimator
     {
         this.layer = layer;
 
-        var sprite;
+        content = new Entity();
         if (layer.empty) {
-            sprite = new Sprite(); // TODO(bruno): Don't add a sprite at all?
+            _sprites = null;
 
         } else {
             // Populate _sprites with the Sprite at each keyframe, reusing consecutive symbols
@@ -219,10 +219,8 @@ private class LayerAnimator
                     _sprites[ii] = kf.symbol.createSprite();
                 }
             }
-            sprite = _sprites[0];
+            content.add(_sprites[0]);
         }
-
-        content = new Entity().add(sprite);
     }
 
     public function composeFrame (frame :Float)
@@ -320,8 +318,6 @@ private class LayerAnimator
         sprite.alpha._ = alpha;
     }
 
-    // Only created if there are multiple symbols on this layer. If it does exist, the appropriate
-    // sprite is swapped in at keyframe changes. If it doesn't, the sprite is only added to the
-    // parent on layer creation.
-    private var _sprites :Array<Sprite> = null;
+    // The sprite to show at each keyframe index, or null if this layer has no symbol instances
+    private var _sprites :Array<Sprite>;
 }

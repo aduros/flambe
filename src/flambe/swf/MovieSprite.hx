@@ -101,19 +101,17 @@ class MovieSprite extends Sprite
 
         speed.update(dt);
 
-        if (paused) {
-            // If RESUME is set, unpause
-            if (_flags.contains(Sprite.MOVIESPRITE_RESUME)) {
-                _flags = _flags.remove(Sprite.MOVIESPRITE_RESUME | Sprite.MOVIESPRITE_PAUSED);
-            }
+        if (!paused) {
+            if (_flags.contains(Sprite.MOVIESPRITE_SKIP_NEXT)) {
+                _flags = _flags.remove(Sprite.MOVIESPRITE_SKIP_NEXT);
+            } else {
+                _position += speed._*dt;
+                if (_position > symbol.duration) {
+                    _position = _position % symbol.duration;
 
-        } else {
-            _position += speed._*dt;
-            if (_position > symbol.duration) {
-                _position = _position % symbol.duration;
-
-                if (_looped != null) {
-                    _looped.emit();
+                    if (_looped != null) {
+                        _looped.emit();
+                    }
                 }
             }
         }
@@ -179,7 +177,7 @@ class MovieSprite extends Sprite
     @:allow(flambe) function rewind ()
     {
         _position = 0;
-        _flags = _flags.add(Sprite.MOVIESPRITE_PAUSED | Sprite.MOVIESPRITE_RESUME);
+        _flags = _flags.add(Sprite.MOVIESPRITE_SKIP_NEXT);
     }
 
     private var _animators :Array<LayerAnimator>;

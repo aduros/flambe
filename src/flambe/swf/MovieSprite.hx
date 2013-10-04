@@ -250,6 +250,7 @@ private class LayerAnimator
 
         var sprite;
         if (needsKeyframeUpdate) {
+            needsKeyframeUpdate = false;
             // Switch to the next instance if this is a multi-layer symbol
             sprite = _sprites[keyframeIdx];
             if (sprite != content.get(Sprite)) {
@@ -262,7 +263,6 @@ private class LayerAnimator
         } else {
             sprite = content.get(Sprite);
         }
-        needsKeyframeUpdate = false;
 
         var kf = keyframes[keyframeIdx];
         var visible = kf.visible && kf.symbol != null;

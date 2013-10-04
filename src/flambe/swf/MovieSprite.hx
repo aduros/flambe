@@ -235,7 +235,7 @@ private class LayerAnimator
         var keyframes = layer.keyframes;
         var finalFrame = keyframes.length - 1;
 
-        if (frame >= layer.frames) {
+        if (frame > layer.frames) {
             // TODO(bruno): Test this code path
             // Not enough frames on this layer, hide it
             content.get(Sprite).visible = false;

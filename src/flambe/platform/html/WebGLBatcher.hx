@@ -85,13 +85,12 @@ class WebGLBatcher
     }
 
     /** Safely bind a framebuffer. */
-    public function bindFramebuffer (framebuffer :Framebuffer)
+    public function bindFramebuffer (texture :WebGLTexture)
     {
-        flush();
-        _lastRenderTarget = null;
-        _currentRenderTarget = null;
-
-        _gl.bindFramebuffer(GL.FRAMEBUFFER, framebuffer);
+        if (texture != _lastRenderTarget) {
+            flush();
+            bindRenderTarget(texture);
+        }
     }
 
     /** Safely delete a framebuffer. */
@@ -175,15 +174,7 @@ class WebGLBatcher
         }
 
         if (_lastRenderTarget != _currentRenderTarget) {
-            // Bind the texture framebuffer, or the original backbuffer
-            if (_lastRenderTarget != null) {
-                _gl.bindFramebuffer(GL.FRAMEBUFFER, _lastRenderTarget.framebuffer);
-                _gl.viewport(0, 0, _lastRenderTarget.width, _lastRenderTarget.height);
-            } else {
-                _gl.bindFramebuffer(GL.FRAMEBUFFER, null);
-                _gl.viewport(0, 0, _backbufferWidth, _backbufferHeight);
-            }
-            _currentRenderTarget = _lastRenderTarget;
+            bindRenderTarget(_lastRenderTarget);
         }
 
         if (_lastBlendMode != _currentBlendMode) {
@@ -255,6 +246,20 @@ class WebGLBatcher
             indices[ii*6 + 5] = ii*4 + 0;
         }
         _gl.bufferData(GL.ELEMENT_ARRAY_BUFFER, indices, GL.STATIC_DRAW);
+    }
+
+    private function bindRenderTarget (texture :WebGLTexture)
+    {
+        // Bind the texture framebuffer, or the original backbuffer
+        if (texture != null) {
+            _gl.bindFramebuffer(GL.FRAMEBUFFER, texture.framebuffer);
+            _gl.viewport(0, 0, texture.width, texture.height);
+        } else {
+            _gl.bindFramebuffer(GL.FRAMEBUFFER, null);
+            _gl.viewport(0, 0, _backbufferWidth, _backbufferHeight);
+        }
+        _currentRenderTarget = texture;
+        _lastRenderTarget = texture;
     }
 
     private static inline var MAX_ELEMENTS_PER_VERTEX = 6;

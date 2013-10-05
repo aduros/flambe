@@ -82,7 +82,7 @@ class WebGLTexture extends BasicAsset<WebGLTexture>
         assertNotDisposed();
 
         get_graphics(); // Ensure we have a framebuffer
-        _renderer.batcher.bindFramebuffer(framebuffer);
+        _renderer.batcher.bindFramebuffer(this);
 
         var pixels = new Uint8Array(4*width*height);
         var gl = _renderer.gl;
@@ -168,7 +168,7 @@ class WebGLTexture extends BasicAsset<WebGLTexture>
 
             var gl = _renderer.gl;
             framebuffer = gl.createFramebuffer();
-            _renderer.batcher.bindFramebuffer(framebuffer);
+            _renderer.batcher.bindFramebuffer(this);
             gl.framebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0,
                 GL.TEXTURE_2D, nativeTexture, 0);
         }

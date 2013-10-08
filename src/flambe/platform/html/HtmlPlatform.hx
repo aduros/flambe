@@ -22,6 +22,7 @@ class HtmlPlatform
     public static var instance (default, null) :HtmlPlatform = new HtmlPlatform();
 
     public var mainLoop (default, null) :MainLoop;
+    public var musicPlaying (default, default) :Bool;
 
     private function new ()
     {
@@ -57,6 +58,9 @@ class HtmlPlatform
         _renderer = createRenderer(canvas);
 
         mainLoop = new MainLoop();
+		
+        // Used by browsers that don't support audio very well
+        musicPlaying = false;
 
         _canvas = canvas;
         _container = canvas.parentElement;

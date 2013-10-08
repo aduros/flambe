@@ -279,7 +279,11 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         }
 
         // Reject browsers that claim to support audio, but are too buggy or incomplete
+        #if flambe_html_audio_fix
+        var blacklist = ~/\b(iPhone|iPod|iPad)\b/;
+        #else
         var blacklist = ~/\b(iPhone|iPod|iPad|Android)\b/;
+        #end
         var userAgent = Browser.window.navigator.userAgent;
         if (!WebAudioSound.supported && blacklist.match(userAgent)) {
             Log.warn("HTML5 audio is blacklisted for this browser", ["userAgent", userAgent]);

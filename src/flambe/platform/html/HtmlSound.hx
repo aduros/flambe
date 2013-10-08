@@ -143,6 +143,20 @@ private class HtmlPlayback
 
     private function playAudio ()
     {
+        #if flambe_html_audio_fix
+        // Only allow looping audio to play
+        // Assumes background music loops
+        if (!_clonedElement.loop) {
+            //return;
+        }
+
+        // Only allow one background music
+        if (HtmlPlatform.instance.musicPlaying) {
+            //return;
+        }
+        HtmlPlatform.instance.musicPlaying = true;
+        #end
+
         _clonedElement.play();
 
         if (!_tickableAdded) {

@@ -22,7 +22,7 @@ class HtmlPlatform
     public static var instance (default, null) :HtmlPlatform = new HtmlPlatform();
 
     public var mainLoop (default, null) :MainLoop;
-    public var musicPlaying (default, default) :Bool;
+    public var musicPlaying :Bool;
 
     private function new ()
     {

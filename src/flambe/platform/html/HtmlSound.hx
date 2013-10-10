@@ -147,12 +147,12 @@ private class HtmlPlayback
         // Only allow looping audio to play
         // Assumes background music loops
         if (!_clonedElement.loop) {
-            //return;
+            return;
         }
 
         // Only allow one background music
         if (HtmlPlatform.instance.musicPlaying) {
-            //return;
+            return;
         }
         HtmlPlatform.instance.musicPlaying = true;
         #end

@@ -113,8 +113,13 @@ class CanvasGraphics
             return;
         }
 
-        // Use slice() here rather than Haxe's substr monkey patch
-        _canvasCtx.fillStyle = untyped "#" + ("00000" + color.toString(16)).slice(-6);
+        // Convert color into a hex string in the form of #RRGGBB
+        var hex = untyped (0xffffff & color).toString(16);
+        while (hex.length < 6) {
+            hex = "0"+hex;
+        }
+        _canvasCtx.fillStyle = "#"+hex;
+
         _canvasCtx.fillRect(Std.int(x), Std.int(y), Std.int(width), Std.int(height));
     }
 

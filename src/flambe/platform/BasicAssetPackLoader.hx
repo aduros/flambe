@@ -174,6 +174,8 @@ class BasicAssetPackLoader
             map = _pack.sounds;
         case Data:
             map = _pack.files;
+        case ZIP:
+            map = _pack.files;
         }
 
 #if debug // Allow some methods to get stripped in release builds, which don't allow reloading

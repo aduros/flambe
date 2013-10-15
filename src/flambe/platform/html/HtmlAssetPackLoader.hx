@@ -8,6 +8,8 @@ import js.Browser;
 import js.html.*;
 
 import haxe.Http;
+import haxe.io.BytesInput;
+import haxe.io.Bytes;
 
 import flambe.asset.AssetEntry;
 import flambe.asset.Manifest;
@@ -15,6 +17,9 @@ import flambe.util.Assert;
 import flambe.util.Promise;
 import flambe.util.Signal0;
 import flambe.util.Signal1;
+
+using StringTools;
+using flambe.util.Strings;
 
 class HtmlAssetPackLoader extends BasicAssetPackLoader
 {
@@ -138,6 +143,61 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
             downloadText(url, entry, function (text) {
                 handleLoad(entry, new BasicFile(text));
             });
+			
+		case ZIP:
+			if (supportsBlob()) {				
+				downloadArrayBuffer(url, entry, function (buffer) {
+					var bytes = Bytes.ofData(cast new js.html.Uint8Array(buffer));
+					var zip = new haxe.zip.Reader(new BytesInput(bytes));
+					var entries:List<haxe.zip.Entry> = zip.read();
+					
+					for (entry in entries) {
+						var extension = entry.fileName.getUrlExtension();  
+						if(entry.fileName.charAt(0)=="." || entry.fileName.indexOf("/.")>=0) {
+							extension="";
+						}
+				        if(extension=="" || extension==null) {
+							Log.warn("No extension or weird format for zipped entry, ignoring this asset", ["url", entry.fileName]);
+							continue; 
+						}						
+						
+						_assetsRemaining += 1;	
+						 promise.total += entry.dataSize;	
+						
+						var type = "";
+						var format = Manifest.inferFormat(entry.fileName);
+						var name = entry.fileName.removeFileExtension();
+						switch(format) {
+							case PNG: type = "image/png";
+							case JPG: type = "image/jpeg";
+							case JXR: type = "image/vnd.ms-photo";
+							case GIF: type = "image/gif";
+							case WEBP: type = "image/webp";
+							case M4A: type = "audio/mp4";
+							case MP3: type = "audio/mpeg";
+							case OGG, OPUS: type = "audio/ogg";
+							case WAV: type = "audio/wave";
+							case Data: name = entry.fileName;
+							case ZIP: type = "application/zip";
+							case DDS, PVR, PKM: type = "application/octet-stream";
+						}
+						
+						var buff = new js.html.Uint8Array(entry.data.getData());
+						var blob = new Blob([buff], {type:type});
+						if(format == Data) { 
+							blob = new Blob([haxe.zip.Reader.unzip(entry)], {type:type});
+						}
+						var generatedUrl = _URL.createObjectURL(blob);	
+						var entryFlambe = manifest.add(name, entry.fileName, entry.dataSize, Manifest.inferFormat(entry.fileName));
+						loadEntry(generatedUrl, entryFlambe);
+					}
+					
+					handleLoad(entry, {});
+				});
+			}
+			else {
+				Log.warn("Blob not supported, ignoring this asset", ["url", url]);
+			}
         }
     }
 
@@ -147,7 +207,8 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
             _supportedFormats = new Promise();
             detectImageFormats(function (imageFormats) {
                 _supportedFormats.result = _platform.getRenderer().getCompressedTextureFormats()
-                    .concat(imageFormats).concat(detectAudioFormats()).concat([Data]);
+                    .concat(imageFormats).concat(detectAudioFormats()).concat(detectArchiveFormats())
+					.concat([Data]);
             });
         }
         _supportedFormats.get(fn);
@@ -313,6 +374,13 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         return result;
     }
 
+	private static function detectArchiveFormats () :Array<AssetFormat>
+    {
+        var result = [ZIP];
+      
+        return result;
+    }
+	
     private static function supportsBlob () :Bool
     {
         if (_detectBlobSupport) {

@@ -24,8 +24,8 @@ class Benchmark
         Timer.delay(benchmark, 1000);
     }
 	
-	public static function results () :Float
-	{
+    public static function results () :Float
+    {
         if (!_calledStart) { 
             Log.warn("You must call Benchmark.start() first! Returning 0");
             return 0;
@@ -35,10 +35,10 @@ class Benchmark
             return 0;
         }
         return _benchmark;
-	}
+    }
 	
-	private static function benchmark ()
-	{
+    private static function benchmark ()
+    {
         for (ii in 0...250) {
             _entities.push(System.root.addChild(new Entity()));
         }
@@ -49,10 +49,10 @@ class Benchmark
         else {
             cleanup();
         }
-	}
+    }
 	
-	private static function cleanup ()
-	{
+    private static function cleanup ()
+    {
         var num = _entities.length;
         for (ii in 0..._entities.length)
         {
@@ -67,7 +67,7 @@ class Benchmark
         if (_fn != null) {
             Reflect.callMethod(null, _fn, [_benchmark]);
         }
-	}
+    }
 	
     private static var _benchmark :Float;
     private static var _calledStart = false;

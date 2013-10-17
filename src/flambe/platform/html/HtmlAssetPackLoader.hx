@@ -188,7 +188,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
 							blob = new Blob([haxe.zip.Reader.unzip(entry)], {type:type});
 						}
 						var generatedUrl = _URL.createObjectURL(blob);	
-						var entryFlambe = manifest.add(name, entry.fileName, entry.dataSize, Manifest.inferFormat(entry.fileName));
+						var entryFlambe = manifest.add(name, entry.fileName, entry.dataSize, format);
 						loadEntry(generatedUrl, entryFlambe);
 					}
 					

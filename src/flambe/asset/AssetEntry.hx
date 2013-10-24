@@ -22,7 +22,7 @@ enum AssetFormat
     Data;
 	
     // Archived file format
-    ZIP;
+    ZIP; TAR;
 }
 
 /**

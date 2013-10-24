@@ -217,6 +217,7 @@ class Manifest
                 case "opus": return OPUS;
                 case "wav": return WAV;
                 case "zip": return ZIP;
+                case "tar": return TAR;
             }
         } else {
             Log.warn("No file extension for asset, it will be loaded as data", ["url", url]);

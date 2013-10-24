@@ -172,9 +172,7 @@ class BasicAssetPackLoader
             map = _pack.textures;
         case MP3, M4A, OPUS, OGG, WAV:
             map = _pack.sounds;
-        case Data:
-            map = _pack.files;
-        case ZIP:
+        case Data, ZIP, TAR:
             map = _pack.files;
         }
 

@@ -31,14 +31,14 @@ class Component
     /**
      * Called after this component has been added to an entity.
      */
-    public function onAdded ()
+    public function onAdded () :Void
     {
     }
 
     /**
      * Called just before this component has been removed from its entity.
      */
-    public function onRemoved ()
+    public function onRemoved () :Void
     {
     }
 
@@ -46,14 +46,14 @@ class Component
      * Called when this component receives a game update.
      * @param dt The time elapsed since the last frame, in seconds.
      */
-    public function onUpdate (dt :Float)
+    public function onUpdate (dt :Float) :Void
     {
     }
 
     /**
      * Removes this component from its owning entity.
      */
-    public function dispose ()
+    public function dispose () :Void
     {
         if (owner != null) {
             owner.remove(this);

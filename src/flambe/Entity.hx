@@ -170,7 +170,7 @@ using Lambda;
      * @param append Whether to add the entity to the end or beginning of the child list.
      * @returns This instance, for chaining.
      */
-    public function addChild (entity :Entity, append :Bool=true)
+    public function addChild (entity :Entity, append :Bool=true) :Entity
     {
         if (entity.parent != null) {
             entity.parent.removeChild(entity);
@@ -199,7 +199,7 @@ using Lambda;
         return this;
     }
 
-    public function removeChild (entity :Entity)
+    public function removeChild (entity :Entity) :Void
     {
         var prev :Entity = null, p = firstChild;
         while (p != null) {
@@ -224,7 +224,7 @@ using Lambda;
      * Dispose all of this entity's children, without touching its own components or removing itself
      * from its parent.
      */
-    public function disposeChildren ()
+    public function disposeChildren () :Void
     {
         while (firstChild != null) {
             firstChild.dispose();
@@ -234,7 +234,7 @@ using Lambda;
     /**
      * Removes this entity from its parent, and disposes all its components and children.
      */
-    public function dispose ()
+    public function dispose () :Void
     {
         if (parent != null) {
             parent.removeChild(this);

@@ -4,6 +4,7 @@
 
 package flambe.debug;
 
+import flambe.display.Sprite;
 import flambe.util.Assert;
 
 import haxe.Timer;
@@ -18,9 +19,11 @@ class Benchmark
     {
         _calledStart = true;
         _calledCleanup = false;
-        _entities = new Array<Entity>();
         _fn = fn;
+        _root = new Entity();
+        _sprites = new Array<Sprite>();
         _timeStart = System.time;
+        System.root.addChild(_root);
         Timer.delay(benchmark, 1000);
     }
 	
@@ -39,11 +42,15 @@ class Benchmark
 	
     private static function benchmark ()
     {
+		var sprite;
         for (ii in 0...250) {
-            _entities.push(System.root.addChild(new Entity()));
+            sprite = new Sprite();
+            sprite.pointerEnabled = false;
+            _root.add(sprite);
+            _sprites.push(sprite);
         }
 		
-        if (_entities.length < 5000) {
+        if (_sprites.length < 5000) {
             Timer.delay(benchmark, 100);
         }
         else {
@@ -53,12 +60,13 @@ class Benchmark
 	
     private static function cleanup ()
     {
-        var num = _entities.length;
-        for (ii in 0..._entities.length)
+        var num = _sprites.length;
+        for (ii in 0..._sprites.length)
         {
-            System.root.removeChild(_entities[ii]);
+            _root.remove(_sprites[ii]);
         }
-        _entities = null;
+        System.root.removeChild(_root);
+        _sprites = null;
 		
         var timeDif = System.time - _timeStart;
         var bm = Math.round(1 / timeDif * 10000);
@@ -72,7 +80,8 @@ class Benchmark
     private static var _benchmark :Float;
     private static var _calledStart = false;
     private static var _calledCleanup = false;
-    private static var _entities :Array<Entity>;
     private static var _fn :Float -> Void;
+    private static var _root :Entity;
+    private static var _sprites :Array<Sprite>;
     private static var _timeStart :Float;
 }

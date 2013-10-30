@@ -11,9 +11,11 @@ import flambe.animation.Ease;
  */
 class TweenTransition extends Transition
 {
+    public var duration(default, null) :Float;
+	
     private function new (duration :Float, ?ease :EaseFunction)
     {
-        _duration = duration;
+        this.duration = duration;
         _ease = (ease != null) ? ease : Ease.linear;
     }
 
@@ -26,15 +28,14 @@ class TweenTransition extends Transition
     override public function update (dt :Float) :Bool
     {
         _elapsed += dt;
-        return _elapsed >= _duration;
+        return _elapsed >= this.duration;
     }
 
     private function interp (from :Float, to :Float) :Float
     {
-        return from + (to-from) * _ease(_elapsed/_duration);
+        return from + (to-from) * _ease(_elapsed/this.duration);
     }
 
     private var _ease :EaseFunction;
     private var _elapsed :Float;
-    private var _duration :Float;
 }

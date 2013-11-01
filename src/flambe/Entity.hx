@@ -5,7 +5,9 @@
 package flambe;
 
 #if macro
+import haxe.macro.Context;
 import haxe.macro.Expr;
+using haxe.macro.ExprTools;
 #end
 
 import flambe.util.Disposable;
@@ -139,7 +141,20 @@ using Lambda;
      */
     macro public function get<A> (self :Expr, componentClass :ExprOf<Class<A>>) :ExprOf<A>
     {
-        return macro $componentClass.getFrom($self);
+        switch (componentClass.expr) {
+        case EConst(CIdent(name)):
+            var type = Context.getType(name);
+            if (Context.unify(type, Context.getType("flambe.Component"))) {
+                // Delegate through getComponentTyped to avoid a (slow) typed cast
+                return macro $self._internal_getComponentTyped($componentClass.NAME, $componentClass);
+            }
+        default:
+            // Pass through
+        }
+
+        Context.error("Expected a class that extends Component, got " + componentClass.toString(),
+            Context.currentPos());
+        return null;
     }
 
     /**
@@ -147,7 +162,7 @@ using Lambda;
      */
     macro public function has<A> (self :Expr, componentClass :ExprOf<Class<A>>) :ExprOf<Bool>
     {
-        return macro $componentClass.hasIn($self);
+        return macro $self.get($componentClass) != null;
     }
 
     /**
@@ -324,6 +339,15 @@ using Lambda;
         }
         return output;
     }
+
+    // A semi-private helper method used by Entity.get()
+#if !display
+    @:extern // Inline even in debug builds
+    inline public function _internal_getComponentTyped<A:Component> (name :String, cl :Class<A>) :A
+    {
+        return cast getComponent(name);
+    }
+#end
 
     /**
      * Maps String -> Component. Usually you would use a Haxe Map here, but I'm dropping down to plain

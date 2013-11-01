@@ -44,48 +44,6 @@ class SignalBase
         }
     }
 
-    private function emit0 ()
-    {
-        var head = willEmit();
-        var p = head;
-        while (p != null) {
-            p._listener();
-            if (!p.stayInList) {
-                p.dispose();
-            }
-            p = p._next;
-        }
-        didEmit(head);
-    }
-
-    private function emit1 (arg1 :Dynamic)
-    {
-        var head = willEmit();
-        var p = head;
-        while (p != null) {
-            p._listener(arg1);
-            if (!p.stayInList) {
-                p.dispose();
-            }
-            p = p._next;
-        }
-        didEmit(head);
-    }
-
-    private function emit2 (arg1 :Dynamic, arg2 :Dynamic)
-    {
-        var head = willEmit();
-        var p = head;
-        while (p != null) {
-            p._listener(arg1, arg2);
-            if (!p.stayInList) {
-                p.dispose();
-            }
-            p = p._next;
-        }
-        didEmit(head);
-    }
-
     private function defer (fn :Void->Void)
     {
         var tail = null, p = _deferredTasks;
@@ -104,7 +62,9 @@ class SignalBase
 
     private function willEmit () :SignalConnection
     {
-        Assert.that(!dispatching(), "Cannot emit while already emitting!");
+        // Should never happen, since the public emit methods will defer, but just in case...
+        Assert.that(!dispatching());
+
         var snapshot = _head;
         _head = DISPATCHING_SENTINEL;
         return snapshot;
@@ -113,9 +73,12 @@ class SignalBase
     private function didEmit (head :SignalConnection)
     {
         _head = head;
-        while (_deferredTasks != null) {
-            _deferredTasks.fn();
-            _deferredTasks = _deferredTasks.next;
+
+        var snapshot = _deferredTasks;
+        _deferredTasks = null;
+        while (snapshot != null) {
+            snapshot.fn();
+            snapshot = snapshot.next;
         }
     }
 

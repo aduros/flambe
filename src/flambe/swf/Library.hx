@@ -59,17 +59,27 @@ class Library
         // Now that all symbols have been parsed, go through keyframes and resolve references
         for (movie in movies) {
             for (layer in movie.layers) {
-                for (kf in layer.keyframes) {
+                var keyframes = layer.keyframes;
+                var ll = keyframes.length;
+                for (ii in 0...ll) {
+                    var kf = keyframes[ii];
                     if (kf.symbolName != null) {
                         var symbol = _symbols.get(kf.symbolName);
                         Assert.that(symbol != null);
-
-                        if (layer.lastSymbol == null) {
-                            layer.lastSymbol = symbol;
-                        } else if (layer.lastSymbol != symbol) {
-                            layer.multipleSymbols = true;
-                        }
                         kf.symbol = symbol;
+                    }
+
+                    // Specially handle "stop frames". These are one-frame keyframes that preceed an
+                    // invisible or empty keyframe. They don't appear in Flash (or Starling Flump)
+                    // since movies use the authored FLA framerate there (typically 30 FPS). Flambe
+                    // animates at 60 FPS, which can cause unexpected motion/flickering as those
+                    // one-frame keyframes are interpolated. So, assume that these frames are never
+                    // meant to actually be displayed and hide them.
+                    if (kf.duration == 1 && ii+1 < ll) {
+                        var nextKf = keyframes[ii+1];
+                        if (!nextKf.visible || nextKf.symbolName == null) {
+                            kf.setVisible(false);
+                        }
                     }
                 }
             }

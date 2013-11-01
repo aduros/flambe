@@ -70,5 +70,5 @@ class AnimatedFloat extends Value<Float>
         return _behavior;
     }
 
-    private var _behavior :Behavior;
+    private var _behavior :Behavior = null;
 }

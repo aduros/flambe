@@ -35,8 +35,28 @@ class Signal0 extends SignalBase
     /**
      * Emit the signal, notifying each connected listener.
      */
-    inline public function emit ()
+    public function emit ()
     {
-        emit0();
+        if (dispatching()) {
+            defer(function () {
+                emitImpl();
+            });
+        } else {
+            emitImpl();
+        }
+    }
+
+    private function emitImpl ()
+    {
+        var head = willEmit();
+        var p = head;
+        while (p != null) {
+            p._listener();
+            if (!p.stayInList) {
+                p.dispose();
+            }
+            p = p._next;
+        }
+        didEmit(head);
     }
 }

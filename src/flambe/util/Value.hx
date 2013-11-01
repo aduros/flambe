@@ -28,9 +28,7 @@ class Value<A>
     public function new (value :A, ?listener :Listener2<A,A>)
     {
         _value = value;
-        if (listener != null) {
-            _changed = new Signal2(listener);
-        }
+        _changed = (listener != null) ? new Signal2(listener) : null;
     }
 
     /**

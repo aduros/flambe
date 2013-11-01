@@ -35,8 +35,28 @@ class Signal1<A> extends SignalBase
     /**
      * Emit the signal, notifying each connected listener.
      */
-    inline public function emit (arg1 :A)
+    public function emit (arg1 :A)
     {
-        emit1(arg1);
+        if (dispatching()) {
+            defer(function () {
+                emitImpl(arg1);
+            });
+        } else {
+            emitImpl(arg1);
+        }
+    }
+
+    private function emitImpl (arg1 :A)
+    {
+        var head = willEmit();
+        var p = head;
+        while (p != null) {
+            p._listener(arg1);
+            if (!p.stayInList) {
+                p.dispose();
+            }
+            p = p._next;
+        }
+        didEmit(head);
     }
 }

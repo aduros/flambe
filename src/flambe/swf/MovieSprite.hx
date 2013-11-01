@@ -27,6 +27,8 @@ class MovieSprite extends Sprite
 
     /**
      * The playback speed multiplier of this movie, defaults to 1.0. Higher values will play faster.
+     * This does not affect the speed of nested child movies, use `flambe.SpeedAdjuster` if you need
+     * that.
      */
     public var speed (default, null) :AnimatedFloat;
 
@@ -99,21 +101,24 @@ class MovieSprite extends Sprite
 
         speed.update(dt);
 
-        var looped = false;
-        if (!paused) {
+        switch (_flags & (Sprite.MOVIESPRITE_PAUSED | Sprite.MOVIESPRITE_SKIP_NEXT)) {
+        case 0:
+            // Neither paused nor skipping set, advance time
             _position += speed._*dt;
             if (_position > symbol.duration) {
                 _position = _position % symbol.duration;
-                looped = true;
+
+                if (_looped != null) {
+                    _looped.emit();
+                }
             }
+        case Sprite.MOVIESPRITE_SKIP_NEXT:
+            // Not paused, but skip this time step
+            _flags = _flags.remove(Sprite.MOVIESPRITE_SKIP_NEXT);
         }
 
         var newFrame = _position*symbol.frameRate;
         goto(newFrame);
-
-        if (looped && _looped != null) {
-            _looped.emit();
-        }
     }
 
     private function goto (newFrame :Float)
@@ -125,7 +130,7 @@ class MovieSprite extends Sprite
         var wrapped = newFrame < _frame;
         if (wrapped) {
             for (animator in _animators) {
-                animator.changedKeyframe = true;
+                animator.needsKeyframeUpdate = true;
                 animator.keyframeIdx = 0;
             }
         }
@@ -165,6 +170,17 @@ class MovieSprite extends Sprite
         return _looped;
     }
 
+    /**
+     * Internal method to set the position to 0 and skip the next update. This is required to modify
+     * the playback position of child movies during an update step, so that after the update
+     * trickles through the children, they end up at position=0 instead of position=dt.
+     */
+    @:allow(flambe) function rewind ()
+    {
+        _position = 0;
+        _flags = _flags.add(Sprite.MOVIESPRITE_SKIP_NEXT);
+    }
+
     private var _animators :Array<LayerAnimator>;
 
     private var _position :Float;
@@ -177,55 +193,76 @@ private class LayerAnimator
 {
     public var content (default, null) :Entity;
 
-    public var changedKeyframe :Bool;
-    public var keyframeIdx :Int;
+    public var needsKeyframeUpdate :Bool = false;
+    public var keyframeIdx :Int = 0;
 
     public var layer :MovieLayer;
 
     public function new (layer :MovieLayer)
     {
-        changedKeyframe = false;
-        keyframeIdx = 0;
         this.layer = layer;
 
-        var sprite;
-        if (layer.multipleSymbols) {
+        content = new Entity();
+        if (layer.empty) {
+            _sprites = null;
+
+        } else {
+            // Populate _sprites with the Sprite at each keyframe, reusing consecutive symbols
             _sprites = Arrays.create(layer.keyframes.length);
             for (ii in 0..._sprites.length) {
                 var kf = layer.keyframes[ii];
-                _sprites[ii] = (kf.symbol != null) ? kf.symbol.createSprite() : new Sprite();
+                if (ii > 0 && layer.keyframes[ii-1].symbol == kf.symbol) {
+                    _sprites[ii] = _sprites[ii-1];
+                } else if (kf.symbol == null) {
+                    _sprites[ii] = new Sprite();
+                } else {
+                    _sprites[ii] = kf.symbol.createSprite();
+                }
             }
-            sprite = _sprites[0];
-
-        } else if (layer.lastSymbol != null) {
-            sprite = layer.lastSymbol.createSprite();
-
-        } else {
-            sprite = new Sprite(); // Empty container layer
+            content.add(_sprites[0]);
         }
-
-        content = new Entity().add(sprite);
     }
 
     public function composeFrame (frame :Float)
     {
+        if (_sprites == null) {
+            // TODO(bruno): Test this code path
+            // Don't animate empty layers
+            return;
+        }
+
         var keyframes = layer.keyframes;
         var finalFrame = keyframes.length - 1;
 
+        if (frame > layer.frames) {
+            // TODO(bruno): Test this code path
+            // Not enough frames on this layer, hide it
+            content.get(Sprite).visible = false;
+            keyframeIdx = finalFrame;
+            needsKeyframeUpdate = true;
+            return;
+        }
+
         while (keyframeIdx < finalFrame && keyframes[keyframeIdx+1].index <= frame) {
             ++keyframeIdx;
-            changedKeyframe = true;
+            needsKeyframeUpdate = true;
         }
 
         var sprite;
-        if (changedKeyframe && _sprites != null) {
+        if (needsKeyframeUpdate) {
+            needsKeyframeUpdate = false;
             // Switch to the next instance if this is a multi-layer symbol
             sprite = _sprites[keyframeIdx];
-            content.add(sprite); // TODO(bruno): Optimize away redundant adds
+            if (sprite != content.get(Sprite)) {
+                if (Type.getClass(sprite) == MovieSprite) {
+                    var movie :MovieSprite = cast sprite;
+                    movie.rewind();
+                }
+                content.add(sprite);
+            }
         } else {
             sprite = content.get(Sprite);
         }
-        changedKeyframe = false;
 
         var kf = keyframes[keyframeIdx];
         var visible = kf.visible && kf.symbol != null;
@@ -281,8 +318,6 @@ private class LayerAnimator
         sprite.alpha._ = alpha;
     }
 
-    // Only created if there are multiple symbols on this layer. If it does exist, the appropriate
-    // sprite is swapped in at keyframe changes. If it doesn't, the sprite is only added to the
-    // parent on layer creation.
-    private var _sprites :Array<Sprite> = null;
+    // The sprite to show at each keyframe index, or null if this layer has no symbol instances
+    private var _sprites :Array<Sprite>;
 }

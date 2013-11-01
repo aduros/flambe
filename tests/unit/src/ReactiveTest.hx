@@ -60,13 +60,6 @@ class ReactiveTest extends TestCase
         fired = 0;
         signal.emit(1); // conn2 doesn't fire
         assertEquals(fired, 0);
-
-        signal = new Signal1(function (n) {
-            if (n != 1) {
-                signal.emit(1);
-            }
-        });
-        assertThrows("Assertion failed! Cannot emit while already emitting!", function () signal.emit(0));
     }
 
     public function testValues ()

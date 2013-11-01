@@ -121,6 +121,9 @@ private class FlashPlayback
     {
         paused = true;
         _ended = true;
+
+        //EDIT(Bradley): This must occur to allow garbage collection of sounds.
+        _channel.removeEventListener(Event.SOUND_COMPLETE, onSoundComplete);
     }
 
     private function onSoundComplete (_)
@@ -131,7 +134,22 @@ private class FlashPlayback
     private function playAudio (startPosition :Float, soundTransform :SoundTransform)
     {
         _channel = _sound.nativeSound.play(startPosition, _loops, soundTransform);
-        _channel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
+
+        //Prevent _channel from ever being null, since null can be returned from flash.media.Sound.play() if 
+        //Flash runs out of sound channels. This can (also) happen if many sounds fail to be released from memory.
+        if (_channel == null)
+        {
+            _channel = new SoundChannel();
+
+            //There should be a warning here to notify we have apparently run out of memory for sounds.
+            //Sound will not play when this happens.
+            #if debug
+            trace("Warning: Null sound channel after " + count + " playAudio calls!");
+            #end
+        }
+
+        //EDIT(Bradley): Use weak listener so sounds can be garbage collected if they never get disposed.
+        _channel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete, false, 0, true);
         _pausePosition = -1;
         _ended = false;
 

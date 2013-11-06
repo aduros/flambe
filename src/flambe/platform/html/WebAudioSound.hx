@@ -72,10 +72,9 @@ class WebAudioSound extends BasicAsset<WebAudioSound>
             _detectSupport = false;
 
             var AudioContext = HtmlUtil.loadExtension("AudioContext").value;
-
             if (AudioContext != null) {
                 ctx = untyped __new__(AudioContext);
-                gain = ctx.createGainNode();
+                gain = createGain();
                 gain.connect(ctx.destination);
 
                 System.volume.watch(function(volume, _) {
@@ -85,6 +84,23 @@ class WebAudioSound extends BasicAsset<WebAudioSound>
         }
 
         return ctx != null;
+    }
+
+    public static function createGain () :Dynamic
+    {
+        // Fall back to createGainNode used in iOS Safari
+        // https://developer.mozilla.org/en-US/docs/Web_Audio_API/Porting_webkitAudioContext_code_to_standards_based_AudioContext
+        return (ctx.createGain != null) ? ctx.createGain() : ctx.createGainNode();
+    }
+
+    public static function start (node :Dynamic, time :Float)
+    {
+        // Fall back to noteOn used in iOS Safari
+        if (node.start != null) {
+            node.start(time);
+        } else {
+            node.noteOn(time);
+        }
     }
 
     private static var _detectSupport = true;
@@ -108,7 +124,8 @@ private class WebAudioPlayback
         _sourceNode = WebAudioSound.ctx.createBufferSource();
         _sourceNode.buffer = sound.buffer;
         _sourceNode.loop = loop;
-        _sourceNode.noteOn(0);
+        _sourceNode.onended = function () _ended = true; // Not supported on iOS!
+        WebAudioSound.start(_sourceNode, 0);
         playAudio();
 
         this.volume = new AnimatedFloat(volume, function (v, _) {
@@ -149,7 +166,8 @@ private class WebAudioPlayback
 
     public function get_ended () :Bool
     {
-        return _disposed || _sourceNode.playbackState == 3; // == FINISHED_STATE
+        // playbackState is used in old browsers that don't support onended (iOS)
+        return _ended || _sourceNode.playbackState == 3; // == FINISHED_STATE
     }
 
     public function get_position () :Float
@@ -186,13 +204,13 @@ private class WebAudioPlayback
     public function dispose ()
     {
         paused = true;
-        _disposed = true;
+        _ended = true;
     }
 
     private function setVolume (volume :Float)
     {
         if (_gainNode == null) {
-            _gainNode = WebAudioSound.ctx.createGainNode();
+            _gainNode = WebAudioSound.createGain();
             insertNode(_gainNode);
         }
         _gainNode.gain.value = volume;
@@ -245,5 +263,5 @@ private class WebAudioPlayback
     private var _hideBinding :Disposable;
     private var _tickableAdded :Bool;
 
-    private var _disposed :Bool = false;
+    private var _ended :Bool = false;
 }

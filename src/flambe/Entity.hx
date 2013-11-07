@@ -170,7 +170,7 @@ using Lambda;
      * @param append Whether to add the entity to the end or beginning of the child list.
      * @returns This instance, for chaining.
      */
-    public function addChild (entity :Entity, append :Bool=true)
+    public function addChild (entity :Entity, append :Bool=true) :Entity
     {
         if (entity.parent != null) {
             entity.parent.removeChild(entity);

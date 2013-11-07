@@ -129,6 +129,15 @@ class HtmlStage
 
     private function onWindowResize (_)
     {
+        resetContainerSize();
+
+        if (HtmlUtil.SHOULD_HIDE_MOBILE_BROWSER) {
+            hideMobileBrowser();
+        }
+    }
+
+    private function resetContainerSize()
+    {
         // Resize the canvas to match its container's bounds
         var container = _canvas.parentElement;
         var rect = container.getBoundingClientRect();
@@ -172,7 +181,8 @@ class HtmlStage
                 // Fit the page to the new screen size
                 htmlStyle.height = Browser.window.innerHeight + "px";
 
-                onWindowResize(null);
+                resetContainerSize();
+                // onWindowResize(null);
             }, 100);
         });
     }

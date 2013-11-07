@@ -21,8 +21,8 @@ haxelib run dox -r /flambe/api/ -i "$TMP_DIR" -o "$DOX_DIR" \
     --exclude js --exclude flambe.platform \
     --title "Flambe API Reference"
 
-# Pluck out the haxelib.xml for possible haxelib packaging
-mv "$TMP_DIR/flambe.xml" "$DOX_DIR/haxelib.xml"
+# Pluck out the haxedoc.xml for possible haxelib packaging
+mv "$TMP_DIR/flambe.xml" "$DOX_DIR/haxedoc.xml"
 
 rm -rf "$TMP_DIR"
 

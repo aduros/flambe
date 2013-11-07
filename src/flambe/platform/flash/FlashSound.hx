@@ -85,9 +85,11 @@ private class FlashPlayback
 
     public function onVolumeChanged (volume :Float, _)
     {
-        var soundTransform = _channel.soundTransform;
-        soundTransform.volume = volume;
-        _channel.soundTransform = soundTransform; // Magic setter
+        if (_channel != null) {
+            var soundTransform = _channel.soundTransform;
+            soundTransform.volume = volume;
+            _channel.soundTransform = soundTransform; // Magic setter
+        }
     }
 
     public function get_sound () :Sound
@@ -102,7 +104,7 @@ private class FlashPlayback
 
     public function set_paused (paused :Bool) :Bool
     {
-        if (paused != get_paused()) {
+        if (_channel != null && paused != get_paused()) {
             if (paused) {
                 _pausePosition = _channel.position;
                 _channel.stop();
@@ -125,7 +127,7 @@ private class FlashPlayback
 
     public function get_position () :Float
     {
-        return _channel.position/1000;
+        return (_channel != null) ? _channel.position/1000 : 0;
     }
 
     public function update (dt :Float) :Bool
@@ -136,8 +138,9 @@ private class FlashPlayback
             // Allow ended or paused sounds to be garbage collected
             _tickableAdded = false;
 
-            // Release System references
+            // Release references
             _hideBinding.dispose();
+            _channel.removeEventListener(Event.SOUND_COMPLETE, onSoundComplete);
 
             return true;
         }
@@ -158,7 +161,17 @@ private class FlashPlayback
     private function playAudio (startPosition :Float, soundTransform :SoundTransform)
     {
         _channel = _sound.nativeSound.play(startPosition, _loops, soundTransform);
-        _channel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
+        if (_channel == null) {
+            // Sound.play may return null if the playback couldn't be started for some reason:
+            // http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/media/Sound.html#play()
+#if debug
+            var url = _sound.nativeSound.url;
+            Log.warn("Sound could not be played. No available channels?", ["url", url]);
+#end
+            dispose();
+            return;
+        }
+
         _pausePosition = -1;
         _ended = false;
 
@@ -166,7 +179,7 @@ private class FlashPlayback
             FlashPlatform.instance.mainLoop.addTickable(this);
             _tickableAdded = true;
 
-            // Claim System references
+            // Claim references
             _hideBinding = System.hidden.changed.connect(function(hidden,_) {
                 if (hidden) {
                     _wasPaused = get_paused();
@@ -175,6 +188,7 @@ private class FlashPlayback
                     this.paused = _wasPaused;
                 }
             });
+            _channel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
         }
     }
 

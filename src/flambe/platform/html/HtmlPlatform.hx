@@ -135,7 +135,9 @@ class HtmlPlatform
 
                 switch (event.type) {
                 case "touchstart", "MSPointerDown":
-                    event.preventDefault();
+                    #if !flambe_allow_touch_default
+                        event.preventDefault();
+                    #end
                     if (HtmlUtil.SHOULD_HIDE_MOBILE_BROWSER) {
                         HtmlUtil.hideMobileBrowser();
                     }
@@ -147,7 +149,9 @@ class HtmlPlatform
                     }
 
                 case "touchmove", "MSPointerMove":
-                    event.preventDefault();
+                    #if !flambe_allow_touch_default
+                        event.preventDefault();
+                    #end
                     for (touch in changedTouches) {
                         var x = getX(touch, bounds);
                         var y = getY(touch, bounds);
@@ -156,6 +160,9 @@ class HtmlPlatform
                     }
 
                 case "touchend", "touchcancel", "MSPointerUp":
+                    #if !flambe_allow_touch_default
+                        event.preventDefault();
+                    #end
                     for (touch in changedTouches) {
                         var x = getX(touch, bounds);
                         var y = getY(touch, bounds);

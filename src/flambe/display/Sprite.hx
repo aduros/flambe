@@ -346,6 +346,16 @@ class Sprite extends Component
         this.y._ = y;
         return this;
     }
+    
+    /**
+     * Chainable convenience method to set the alpha.
+     * @returns This instance, for chaining.
+     */
+    public function setAlpha (alpha :Float) :Sprite
+    {
+        this.alpha._ = alpha;
+        return this;
+    }
 
     /**
      * Chainable convenience method to uniformly set the scale.

@@ -356,6 +356,16 @@ class Sprite extends Component
         this.alpha._ = alpha;
         return this;
     }
+	
+    /**
+     * Chainable convenience method to set the rotation.
+     * @returns This instance, for chaining.
+     */
+    public function setRotation (rotation :Float) :Sprite
+    {
+        this.rotation._ = rotation;
+        return this;
+    }
 
     /**
      * Chainable convenience method to uniformly set the scale.

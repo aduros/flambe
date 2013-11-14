@@ -196,6 +196,12 @@ using Lambda;
             firstChild = entity;
         }
 
+		var child = entity.firstComponent;
+		while (child != null) {
+			var next = child.next;
+			child.onStart();
+			child = next;
+		}
         return this;
     }
 

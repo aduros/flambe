@@ -36,6 +36,13 @@ class Component
     }
 
     /**
+     * Called after the owner entity has been added to an another entity.
+     */
+    public function onStart ()
+    {
+    }
+    
+    /**
      * Called just before this component has been removed from its entity.
      */
     public function onRemoved ()

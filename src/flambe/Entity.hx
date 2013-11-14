@@ -195,13 +195,16 @@ using Lambda;
             entity.next = firstChild;
             firstChild = entity;
         }
-
-		var child = entity.firstComponent;
-		while (child != null) {
-			var next = child.next;
-			child.onStart();
-			child = next;
-		}
+		
+        if (!_started)
+        {
+            var child = entity.firstComponent;
+            while (child != null) {
+                var next = child.next;
+                child.onStart();
+                child = next;
+            }
+        }
         return this;
     }
 
@@ -249,6 +252,7 @@ using Lambda;
         while (firstComponent != null) {
             firstComponent.dispose();
         }
+		_started = false;
         disposeChildren();
     }
 
@@ -300,4 +304,9 @@ using Lambda;
      * Object/Dictionary for the quickest possible lookups in this critical part of Flambe.
      */
     private var _compMap :Dynamic<Component>;
+	
+	/**
+	 * 
+	 */
+    private var _started :Bool;
 }

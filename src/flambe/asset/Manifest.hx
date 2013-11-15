@@ -177,9 +177,14 @@ class Manifest
      */
     private function sameDomain(unrestricted :String, restricted :String) :String
     {
+        if (unrestricted == null) {
+            return restricted;
+        }
+
         if (!(unrestricted.startsWith("http://") || unrestricted.startsWith("https://"))) {
             return unrestricted;
         }
+        
         var host = unrestricted.replace("http://","").replace("https://","").split("/")[0];
         return (host == js.Browser.window.location.host) ? unrestricted : restricted;
     }

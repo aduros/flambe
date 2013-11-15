@@ -160,11 +160,30 @@ class Manifest
         if (entry.format == Data) {
             // Without CORS, readable data must be loaded from the same origin
             // TODO(bruno): Do this for Images too, required for readPixels.
-            base = restricted;
+            base = sameDomain(unrestricted, restricted);
         }
 #end
         return (base != null) ? base.joinPath(entry.url) : entry.url;
     }
+
+#if html
+    /**
+     * Check to see if data is in the same domain or not.
+     * @param  unrestricted :String       The unrestricted domain. This could be from the same domain or a different domain.
+     * @param  restricted   :String       The restricted domain. This is the safe relative path domain.
+     * 
+     * @return The unrestricted domain if the fully qualified domain matches the current browser's domain
+     *             or the restricted domain if they do not match.
+     */
+    private function sameDomain(unrestricted :String, restricted :String) :String
+    {
+        if (!(unrestricted.startsWith("http://") || unrestricted.startsWith("https://"))) {
+            return unrestricted;
+        }
+        var host = unrestricted.replace("http://","").replace("https://","").split("/")[0];
+        return (host == js.Browser.window.location.host) ? unrestricted : restricted;
+    }
+#end
 
     private function get_relativeBasePath () :String
     {
@@ -192,6 +211,9 @@ class Manifest
         if (basePath != null) {
             Assert.that(basePath.startsWith("http://") || basePath.startsWith("https://"),
                 "externalBasePath must be on an external domain, starting with http(s)://");
+            #if (debug && html)
+            Log.warn("externalBasePath setting is unreliable on some browsers (Android) and AssetFormat.Data. Use relativeBasePath instead.");
+            #end
         }
         return basePath;
     }

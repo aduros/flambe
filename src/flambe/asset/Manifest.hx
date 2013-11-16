@@ -182,9 +182,6 @@ class Manifest
         if (basePath != null) {
             Assert.that(basePath.startsWith("http://") || basePath.startsWith("https://"),
                 "externalBasePath must be on an external domain, starting with http(s)://");
-            if (!_supportsCrossOrigin) {
-                Log.warn("This browser does not support cross-domain asset loading, externalBasePath will not be used.");
-            }
         }
         return basePath;
     }
@@ -218,21 +215,27 @@ class Manifest
 
     // Whether the environment fully supports loading assets from another domain
     private static var _supportsCrossOrigin :Bool = (function () {
+        var detected =
 #if html
-        // CORS in the stock Android browser is buggy. If your game is contained in an iframe, XHR
-        // will work the first time. If the response had an Expires header, on subsequent page loads
-        // instead of retrieving it from the cache, it will fail with error code 0.
-        // http://stackoverflow.com/questions/6090816/android-cors-requests-work-only-once
-        if (js.Browser.navigator.userAgent.indexOf("Linux; U; Android") >= 0) {
-            return false;
-        }
+        (function () {
+            // CORS in the stock Android browser is buggy. If your game is contained in an iframe, XHR
+            // will work the first time. If the response had an Expires header, on subsequent page loads
+            // instead of retrieving it from the cache, it will fail with error code 0.
+            // http://stackoverflow.com/questions/6090816/android-cors-requests-work-only-once
+            if (js.Browser.navigator.userAgent.indexOf("Linux; U; Android") >= 0) {
+                return false;
+            }
 
-        var xhr :Dynamic = untyped __new__("XMLHttpRequest");
-        return (xhr.withCredentials != null);
+            var xhr :Dynamic = untyped __new__("XMLHttpRequest");
+            return (xhr.withCredentials != null);
+        })();
 #else
-        // Assumes you have a valid crossdomain.xml
-        return true;
+            true; // Assumes you have a valid crossdomain.xml
 #end
+        if (!detected) {
+            Log.warn("This browser does not support cross-domain asset loading, any Manifest.externalBasePath setting will be ignored.");
+        }
+        return detected;
     })();
 
     private var _entries :Array<AssetEntry>;

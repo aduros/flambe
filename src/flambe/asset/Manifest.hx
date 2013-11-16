@@ -182,6 +182,9 @@ class Manifest
         if (basePath != null) {
             Assert.that(basePath.startsWith("http://") || basePath.startsWith("https://"),
                 "externalBasePath must be on an external domain, starting with http(s)://");
+            if (!_supportsCrossOrigin) {
+                Log.warn("This browser does not support cross-domain asset loading, externalBasePath will not be used.");
+            }
         }
         return basePath;
     }

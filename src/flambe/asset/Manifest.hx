@@ -147,23 +147,13 @@ class Manifest
 
     /**
      * Get the full URL to load an asset from. May prepend relativeBasePath or externalBasePath
-     * depending on cross-domain support and the asset format.
+     * depending on cross-domain support.
      */
     public function getFullURL (entry :AssetEntry) :String
     {
-        var restricted = (externalBasePath != null && _supportsCrossOrigin) ?
+        var basePath = (externalBasePath != null && _supportsCrossOrigin) ?
             externalBasePath : relativeBasePath;
-        var unrestricted = (externalBasePath != null) ? externalBasePath : relativeBasePath;
-
-        var base = unrestricted;
-#if html
-        if (entry.format == Data) {
-            // Without CORS, readable data must be loaded from the same origin
-            // TODO(bruno): Do this for Images too, required for readPixels.
-            base = restricted;
-        }
-#end
-        return (base != null) ? base.joinPath(entry.url) : entry.url;
+        return (basePath != null) ? basePath.joinPath(entry.url) : entry.url;
     }
 
     private function get_relativeBasePath () :String

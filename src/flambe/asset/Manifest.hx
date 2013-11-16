@@ -223,11 +223,7 @@ class Manifest
         // will work the first time. If the response had an Expires header, on subsequent page loads
         // instead of retrieving it from the cache, it will fail with error code 0.
         // http://stackoverflow.com/questions/6090816/android-cors-requests-work-only-once
-        //
-        // TODO(bruno): Better UA detection that only blacklists the stock browser, not Chrome or FF
-        // for Android
-        var blacklist = ~/\b(Android)\b/;
-        if (blacklist.match(js.Browser.window.navigator.userAgent)) {
+        if (js.Browser.navigator.userAgent.indexOf("Linux; U; Android") >= 0) {
             return false;
         }
 

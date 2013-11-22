@@ -134,7 +134,7 @@ class HtmlPlatform
                 lastTouchTime = event.timeStamp;
 
                 switch (event.type) {
-                case "touchstart", "MSPointerDown":
+                case "touchstart", "MSPointerDown", "pointerdown":
                     event.preventDefault();
                     if (HtmlUtil.SHOULD_HIDE_MOBILE_BROWSER) {
                         HtmlUtil.hideMobileBrowser();
@@ -146,7 +146,7 @@ class HtmlPlatform
                         basicTouch.submitDown(id, x, y);
                     }
 
-                case "touchmove", "MSPointerMove":
+                case "touchmove", "MSPointerMove", "pointermove":
                     event.preventDefault();
                     for (touch in changedTouches) {
                         var x = getX(touch, bounds);
@@ -155,7 +155,7 @@ class HtmlPlatform
                         basicTouch.submitMove(id, x, y);
                     }
 
-                case "touchend", "touchcancel", "MSPointerUp":
+                case "touchend", "touchcancel", "MSPointerUp", "pointerup":
                     for (touch in changedTouches) {
                         var x = getX(touch, bounds);
                         var y = getY(touch, bounds);

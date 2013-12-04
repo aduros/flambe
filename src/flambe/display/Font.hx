@@ -344,15 +344,12 @@ class TextLayout
 
         var addLine = function () {
             bounds.width = FMath.max(bounds.width, lineWidth);
-			
-			if (Math.isNaN(lineHeight) || lineHeight == 0)
-			{
-				bounds.height += height;
-			}
-			else
-			{
-				bounds.height += lineHeight;
-			}
+            
+            if (Math.isNaN(lineHeight) || lineHeight == 0) {
+                bounds.height += height;
+            } else  {
+                bounds.height += lineHeight;
+            }
 
             lineWidths[lines] = lineWidth;
             lineWidth = 0;
@@ -379,14 +376,11 @@ class TextLayout
                 }
                 lastSpaceIdx = -1;
 
-				if (Math.isNaN(lineHeight) || lineHeight == 0)
-				{
-					height = font.size;
-				}
-				else
-				{
-					height = lineHeight;
-				}
+                if (Math.isNaN(lineHeight) || lineHeight == 0) {
+                    height = font.size;
+                } else {
+                    height = lineHeight;
+                }
                 addLine();
 
             } else {
@@ -394,15 +388,12 @@ class TextLayout
                     lastSpaceIdx = ii;
                 }
                 lineWidth += glyph.xAdvance;
-				
-				if (Math.isNaN(lineHeight) || lineHeight == 0)
-				{
-					height = FMath.max(height, glyph.height + glyph.yOffset);
-				}
-				else
-				{
-					height = lineHeight;
-				}
+                
+                if (Math.isNaN(lineHeight) || lineHeight == 0) {
+                    height = FMath.max(height, glyph.height + glyph.yOffset);
+                } else {
+                    height = lineHeight;
+                }
 
                 // Handle kerning with the next glyph
                 if (ii+1 < _glyphs.length) {
@@ -431,7 +422,7 @@ class TextLayout
             var glyph = _glyphs[ii];
 
             if (glyph.charCode == "\n".code) {
-				lineY += (Math.isNaN(lineHeight) || lineHeight == 0) ? font.size : lineHeight;
+                lineY += (Math.isNaN(lineHeight) || lineHeight == 0) ? font.size : lineHeight;
                 ++line;
                 alignOffset = getAlignOffset(align, lineWidths[line], wrapWidth);
             }
@@ -447,20 +438,18 @@ class TextLayout
         bounds.x = getAlignOffset(align, bounds.width, wrapWidth);
         bounds.y = top;
         bounds.height = bottom - top;
-		
-		
-		_charsPerLine = [];
-		var ls = 0;
-		var line = 0;
-		for(glyph in _glyphs) {
-            if (glyph.charCode == "\n".code) 
-			{
-				ls = 0;
-				line++;
-			}
-			_charsPerLine[line] = ls;
-			ls++;
-		}
+        
+        _charsPerLine = [];
+        var ls = 0;
+        var line = 0;
+        for(glyph in _glyphs) {
+            if (glyph.charCode == "\n".code) {
+                ls = 0;
+                line++;
+            }
+            _charsPerLine[line] = ls;
+            ls++;
+        }
     }
 
     /** Draws this text to a Graphics. */
@@ -469,21 +458,21 @@ class TextLayout
         var y = 0.0;
         var ii = 0;
         var ll = _glyphs.length;
-		var ls = 0;
+        var ls = 0;
 		
-		var line = 0;
-		ls = align == Left ? 0 : (align == Center ? -Math.round(_charsPerLine[line]/2) : -_charsPerLine[line]);
+        var line = 0;
+        ls = align == Left ? 0 : (align == Center ? -Math.round(_charsPerLine[line]/2) : -_charsPerLine[line]);
         while (ii < ll) {
             var glyph = _glyphs[ii];
             if (glyph.charCode == "\n".code) {
                 y += (Math.isNaN(lineHeight) || lineHeight == 0) ? _font.size : lineHeight;
-				line++;
-				ls = align == Left ? 0 : (align == Center ? -Math.round(_charsPerLine[line]/2) : -_charsPerLine[line]);
+                line++;
+                ls = align == Left ? 0 : (align == Center ? -Math.round(_charsPerLine[line]/2) : -_charsPerLine[line]);
             } else {
                 var x = _offsets[ii];
-				if (!(Math.isNaN(letterSpacing) || letterSpacing == 0))  x += letterSpacing * ls;
+                if (!(Math.isNaN(letterSpacing) || letterSpacing == 0))  x += letterSpacing * ls;
                 glyph.draw(g, x, y);
-				++ls;
+                ++ls;
             }
             ++ii;
         }

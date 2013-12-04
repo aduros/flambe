@@ -49,12 +49,12 @@ class TextSprite extends Sprite
         _align = Left;
         _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
 
-		this.wrapWidth = new AnimatedFloat(0, function (_,_) {
+        this.wrapWidth = new AnimatedFloat(0, function (_,_) {
             _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
         });
 		
-		this.lineHeight = new AnimatedFloat(lineHeight);
-		this.letterSpacing = new AnimatedFloat(letterSpacing);
+        this.lineHeight = new AnimatedFloat(lineHeight);
+        this.letterSpacing = new AnimatedFloat(letterSpacing);
     }
 
     override public function draw (g :Graphics)

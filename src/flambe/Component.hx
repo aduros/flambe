@@ -34,6 +34,28 @@ class Component
     public function onAdded ()
     {
     }
+	
+    /**
+     * Called after the owner (Entity) has been added to a parent.
+     */
+    public function onEntityAdded ()
+    {
+    }
+	
+    /**
+     * Called after the owner (Entity) has been removed from its parent.
+     */
+    public function onEntityRemoved ()
+    {
+    }
+
+    /** Called after the owner (Entity) has been added. Using this function the order of adding
+	 * components doesn't matter, all other added components are available.
+	 * When a component is added after the owner is added, this function will also be triggered
+     */
+    public function onStart ()
+    {
+    }
 
     /**
      * Called just before this component has been removed from its entity.
@@ -75,4 +97,6 @@ class Component
     {
         this.next = next;
     }
+	
+	@:allow(flambe) var isStarted(default, null):Bool = false;
 }

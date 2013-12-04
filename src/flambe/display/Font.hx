@@ -317,6 +317,9 @@ class TextLayout
 {
     /** The bounding box that contains this text. */
     public var bounds (default, null) :Rectangle;
+	
+    /** amount of chars of largest line. */
+    public var largestLineCharCount (default, null) :Int;
 
     /** The number of lines in this text. */
     public var lines (default, null) :Int = 0;
@@ -444,11 +447,14 @@ class TextLayout
         bounds.y = top;
         bounds.height = bottom - top;
         
+		largestLineCharCount = 0;
+		
         _charsPerLine = [];
         var ls = 0;
         var line = 0;
         for(glyph in _glyphs) {
             if (glyph.charCode == "\n".code) {
+				largestLineCharCount = FMath.max(ls, largestLineCharCount);
                 ls = 0;
                 line++;
             }
@@ -465,18 +471,21 @@ class TextLayout
         var ll = _glyphs.length;
         var ls = 0;
 		
+		largestLineCharCount = 0;
         var line = 0;
         ls = align == Left ? 0 : (align == Center ? -Math.round(_charsPerLine[line]/2) : -_charsPerLine[line]);
         while (ii < ll) {
             var glyph = _glyphs[ii];
             if (glyph.charCode == "\n".code) {
                 y += (Math.isNaN(lineHeight) || lineHeight == 0) ? _font.lineHeight : lineHeight;
+                largestLineCharCount = FMath.max(ls, largestLineCharCount);
                 line++;
                 ls = align == Left ? 0 : (align == Center ? -Math.round(_charsPerLine[line]/2) : -_charsPerLine[line]);
             } else {
                 var x = _offsets[ii];
                 if (!(Math.isNaN(letterSpacing) || letterSpacing == 0))  x += letterSpacing * ls;
                 glyph.draw(g, x, y);
+                largestLineCharCount = FMath.max(ls, largestLineCharCount);
                 ++ls;
             }
             ++ii;

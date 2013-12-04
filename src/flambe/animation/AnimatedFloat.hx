@@ -47,6 +47,16 @@ class AnimatedFloat extends Value<Float>
     {
         behavior = new Tween(_value, to, seconds, easing);
     }
+    
+    public function curveTo (to :Float, control:Float, seconds :Float, ?easing :EaseFunction)
+    {
+        behavior = new QuadTween(_value, control, to, seconds, easing);
+    }
+	
+    public function cubicCurveTo (to :Float, controlA:Float, controlB:Float, seconds :Float, ?easing :EaseFunction)
+    {
+        behavior = new CubicTween(_value, to, controlA, controlB, seconds, easing);
+    }
 
     public function animateBy (by :Float, seconds :Float, ?easing :EaseFunction)
     {

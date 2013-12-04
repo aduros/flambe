@@ -25,23 +25,13 @@ class TextSprite extends Sprite
      * (no word wrapping).
      */
     public var wrapWidth (default, null) :AnimatedFloat;
-	
-    /**
-     * A fixed line height in px. If 0, it defaults to Font.size
-     */
-    public var lineHeight (default, null) :AnimatedFloat;
-	
-    /**
-     * The letter-spacing property increases or decreases the space between characters in a text.
-     */
-    public var letterSpacing (default, null) :AnimatedFloat;
 
     /**
      * The horizontal text alignment, for multiline text. Left by default.
      */
     public var align (get, set) :TextAlign;
 
-    public function new (font :Font, ?text :String = "", ?lineHeight:Float, ?letterSpacing:Float)
+    public function new (font :Font, ?text :String = "")
     {
         super();
         _font = font;
@@ -49,12 +39,9 @@ class TextSprite extends Sprite
         _align = Left;
         _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
 
-        this.wrapWidth = new AnimatedFloat(0, function (_,_) {
+        wrapWidth = new AnimatedFloat(0, function (_,_) {
             _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
         });
-		
-        this.lineHeight = new AnimatedFloat(lineHeight);
-        this.letterSpacing = new AnimatedFloat(letterSpacing);
     }
 
     override public function draw (g :Graphics)
@@ -67,19 +54,19 @@ class TextSprite extends Sprite
         g.fillRect(0x00ff00, _layout.bounds.x, _layout.bounds.y, _layout.bounds.width, _layout.bounds.height);
 #end
 
-        _layout.draw(g, align, lineHeight._, letterSpacing._);
+        _layout.draw(g, align);
     }
 
     override public function getNaturalWidth () :Float
     {
         updateLayout();
-        return (wrapWidth._ > 0) ? wrapWidth._ : _layout.bounds.width + _layout.largestLineCharCount * letterSpacing._;
+        return (wrapWidth._ > 0) ? wrapWidth._ : _layout.bounds.width;
     }
 
     override public function getNaturalHeight () :Float
     {
         updateLayout();
-        var paddedHeight = _layout.lines * lineHeight._;
+        var paddedHeight = _layout.lines * _font.lineHeight;
         var boundsHeight = _layout.bounds.height;
         return FMath.max(paddedHeight, boundsHeight);
     }
@@ -145,7 +132,7 @@ class TextSprite extends Sprite
         // Recreate the layout if necessary
         if (_flags.contains(Sprite.TEXTSPRITE_DIRTY)) {
             _flags = _flags.remove(Sprite.TEXTSPRITE_DIRTY);
-            _layout = font.layoutText(_text, _align, wrapWidth._, _lineHeight);
+            _layout = font.layoutText(_text, _align, wrapWidth._);
         }
     }
 
@@ -153,13 +140,10 @@ class TextSprite extends Sprite
     {
         super.onUpdate(dt);
         wrapWidth.update(dt);
-        letterSpacing.update(dt);
-        lineHeight.update(dt);
     }
 
     private var _font :Font;
     private var _text :String;
-    private var _lineHeight :Float;
     private var _align :TextAlign;
 
     private var _layout :TextLayout = null;

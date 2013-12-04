@@ -29,6 +29,11 @@ class Font
     public var size (default, null) :Float;
 
     /**
+	* The vertical distance between each line of text in this font, in pixels.
+	*/
+    public var lineHeight (default, null) :Float;
+	
+    /**
      * Parses a font using files in an asset pack.
      * @param name The path to the font within the asset pack, excluding the .fnt suffix.
      */
@@ -377,7 +382,7 @@ class TextLayout
                 lastSpaceIdx = -1;
 
                 if (Math.isNaN(lineHeight) || lineHeight == 0) {
-                    height = font.size;
+                    height = font.lineHeight;
                 } else {
                     height = lineHeight;
                 }
@@ -422,7 +427,7 @@ class TextLayout
             var glyph = _glyphs[ii];
 
             if (glyph.charCode == "\n".code) {
-                lineY += (Math.isNaN(lineHeight) || lineHeight == 0) ? font.size : lineHeight;
+                lineY += (Math.isNaN(lineHeight) || lineHeight == 0) ? font.lineHeight : lineHeight;
                 ++line;
                 alignOffset = getAlignOffset(align, lineWidths[line], wrapWidth);
             }
@@ -465,7 +470,7 @@ class TextLayout
         while (ii < ll) {
             var glyph = _glyphs[ii];
             if (glyph.charCode == "\n".code) {
-                y += (Math.isNaN(lineHeight) || lineHeight == 0) ? _font.size : lineHeight;
+                y += (Math.isNaN(lineHeight) || lineHeight == 0) ? _font.lineHeight : lineHeight;
                 line++;
                 ls = align == Left ? 0 : (align == Center ? -Math.round(_charsPerLine[line]/2) : -_charsPerLine[line]);
             } else {

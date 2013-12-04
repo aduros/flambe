@@ -79,6 +79,9 @@ class TextSprite extends Sprite
     override public function getNaturalHeight () :Float
     {
         updateLayout();
+        var paddedHeight = _layout.lines * _font.lineHeight;
+        var boundsHeight = _layout.bounds.height;
+        return FMath.max(paddedHeight, boundsHeight);
         return _layout.lines * _font.size;
     }
 

@@ -89,7 +89,13 @@ using Lambda;
 
         component.init(this, null);
         component.onAdded();
-
+		
+		if (_isStarted && !component.isStarted)
+		{
+			component.onStart();
+			component.isStarted = false;
+		}
+		
         return this;
     }
 
@@ -195,7 +201,19 @@ using Lambda;
             entity.next = firstChild;
             firstChild = entity;
         }
-
+		
+		var child = entity.firstComponent;
+		while (child != null) {
+			var next = child.next;
+			if (!child.isStarted)
+			{
+				child.onStart();
+				child.isStarted = true;
+			}
+			child.onEntityAdded();
+			child = next;
+		}
+		_isStarted = true;
         return this;
     }
 
@@ -218,6 +236,13 @@ using Lambda;
             prev = p;
             p = next;
         }
+		
+		var child = entity.firstComponent;
+		while (child != null) {
+			var next = child.next;
+			child.onEntityRemoved();
+			child = next;
+		}
     }
 
     /**
@@ -243,6 +268,9 @@ using Lambda;
         while (firstComponent != null) {
             firstComponent.dispose();
         }
+		
+		_isStarted = false;
+		
         disposeChildren();
     }
 
@@ -294,4 +322,5 @@ using Lambda;
      * Object/Dictionary for the quickest possible lookups in this critical part of Flambe.
      */
     private var _compMap :Dynamic<Component>;
+	private var _isStarted:Bool = false;
 }

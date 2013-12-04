@@ -73,16 +73,15 @@ class TextSprite extends Sprite
     override public function getNaturalWidth () :Float
     {
         updateLayout();
-        return (wrapWidth._ > 0) ? wrapWidth._ : _layout.bounds.width;
+        return (wrapWidth._ > 0 ? wrapWidth._ : _layout.bounds.width) + (_layout.largestLineCharCount * letterSpacing._);
     }
 
     override public function getNaturalHeight () :Float
     {
         updateLayout();
-        var paddedHeight = _layout.lines * _font.lineHeight;
+        var paddedHeight = _layout.lines * lineHeight._;
         var boundsHeight = _layout.bounds.height;
         return FMath.max(paddedHeight, boundsHeight);
-        return _layout.lines * _font.size;
     }
 
     override public function containsLocal (localX :Float, localY :Float) :Bool

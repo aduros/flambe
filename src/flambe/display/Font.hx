@@ -24,7 +24,7 @@ class Font
     public var name (default, null) :String;
 
     /**
-     * The vertical size of this font, in pixels.
+     * The size of this font, in pixels.
      */
     public var size (default, null) :Float;
 
@@ -149,7 +149,8 @@ class Font
         // The basename of the font's path, where we'll find the textures
         var idx = name.lastIndexOf("/");
         var basePath = (idx >= 0) ? name.substr(0, idx+1) : "";
-
+        
+         // BMFont spec: http://www.angelcode.com/products/bmfont/doc/file_format.html
         for (keyword in parser.keywords()) {
             switch (keyword) {
             case "info":
@@ -159,6 +160,15 @@ class Font
                         size = pair.getInt();
                     }
                 }
+
+            case "common":
+                for (pair in parser.pairs()) {
+                    switch (pair.key) {
+                    case "lineHeight":
+                        lineHeight = pair.getInt();
+                    }
+                }
+
 
             case "page":
                 var pageId :Int = 0;
@@ -500,8 +510,8 @@ private class ConfigParser
     public function new (config :String)
     {
         _configText = config;
-        _keywordPattern = ~/([a-z]+)(.*)/;
-        _pairPattern = ~/([a-z]+)=("[^"]*"|[^\s]+)/;
+        _keywordPattern = ~/([A-Za-z]+)(.*)/;
+        _pairPattern = ~/([A-Za-z]+)=("[^"]*"|[^\s]+)/;
     }
 
     public function keywords () :Iterator<String>

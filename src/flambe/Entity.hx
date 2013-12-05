@@ -44,6 +44,12 @@ using Lambda;
 
     /** This entity's first component. */
     public var firstComponent (default, null) :Component = null;
+	
+	
+	//Use setZOrder() to set this value instead of zOrder = x
+	public var zOrder : Int = 0;
+	public var orderOfArrival : Int = 1;
+	public var isZOrderChanged(default, null) : Bool = false;
 
     public function new ()
     {
@@ -92,6 +98,8 @@ using Lambda;
 
         return this;
     }
+	
+	
 
     /**
      * Remove a component from this entity.
@@ -170,34 +178,86 @@ using Lambda;
      * @param append Whether to add the entity to the end or beginning of the child list.
      * @returns This instance, for chaining.
      */
-    public function addChild (entity :Entity, append :Bool=true)
+    public function addChild (entity :Entity, append :Bool = true, ?zOrder : Int)
     {
         if (entity.parent != null) {
             entity.parent.removeChild(entity);
         }
         entity.parent = this;
-
-        if (append) {
-            // Append it to the child list
-            var tail = null, p = firstChild;
-            while (p != null) {
-                tail = p;
-                p = p.next;
-            }
-            if (tail != null) {
-                tail.next = entity;
-            } else {
-                firstChild = entity;
-            }
-
-        } else {
-            // Prepend it to the child list
-            entity.next = firstChild;
+		
+		if (append) {
+			var tail = null, p = firstChild;
+			
+			while (p != null) {
+				tail = p;
+				p = p.next;
+			}
+			
+			if (tail != null) {
+				if (zOrder == null) {
+					if (entity.isZOrderChanged) {
+						zOrder = entity.zOrder;
+					} else {
+						zOrder = tail.zOrder;
+					}	
+				}
+				if (tail.zOrder <= zOrder) {
+					tail.next = entity;
+				} else {
+					var p = firstChild;
+					var pre : Entity = null;
+					while (p != null) {
+						if (p.zOrder > zOrder) {
+							if (pre != null) {
+								pre.next = entity;
+								entity.next = p;
+								
+							} else {
+								entity.next = firstChild;
+								firstChild = entity;
+							}
+							break;
+						} else {
+							pre = p;
+							p = p.next;
+						}	
+					}
+				}
+			} else {
+				//Add First Child
+				firstChild = entity;
+				if (zOrder == null) {
+					zOrder = this.zOrder;
+				}
+			}
+		} else {
+			//You can't assign a zOrder if append is false. 
+			if (firstChild == null) {
+				zOrder = 0;
+			} else {
+				zOrder = firstChild.zOrder - 1;
+			}
+			entity.next = firstChild;
             firstChild = entity;
-        }
+		}
+		
+		entity.zOrder = zOrder;
 
         return this;
     }
+	
+	public function setZOrder(z : Int) {
+		if (this.zOrder == z) {
+			return;
+		} else {
+			this.zOrder = z;
+			this.isZOrderChanged = true;
+			if (this.parent != null) {
+				this.parent.addChild(this, true, this.zOrder);
+			}
+		}
+		
+	}
 
     public function removeChild (entity :Entity)
     {

@@ -109,9 +109,9 @@ private class HtmlPlayback
         return paused;
     }
 
-    inline public function get_ended () :Bool
+    public function get_ended () :Bool
     {
-        return _clonedElement.ended;
+        return _disposed || _clonedElement.ended;
     }
 
     public function get_position () :Float
@@ -139,6 +139,7 @@ private class HtmlPlayback
     public function dispose ()
     {
         paused = true;
+        _disposed = true;
     }
 
     private function playAudio ()
@@ -187,4 +188,6 @@ private class HtmlPlayback
     private var _tickableAdded :Bool;
     private var _hideBinding :Disposable;
     private var _wasPaused :Bool;
+
+    private var _disposed :Bool = false;
 }

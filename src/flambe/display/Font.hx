@@ -24,9 +24,14 @@ class Font
     public var name (default, null) :String;
 
     /**
-     * The vertical size of this font, in pixels.
+     * The size of this font, in pixels.
      */
     public var size (default, null) :Float;
+
+    /**
+     * The vertical distance between each line of text in this font, in pixels.
+     */
+    public var lineHeight (default, null) :Float;
 
     /**
      * Parses a font using files in an asset pack.
@@ -150,6 +155,7 @@ class Font
         var idx = name.lastIndexOf("/");
         var basePath = (idx >= 0) ? name.substr(0, idx+1) : "";
 
+        // BMFont spec: http://www.angelcode.com/products/bmfont/doc/file_format.html
         for (keyword in parser.keywords()) {
             switch (keyword) {
             case "info":
@@ -157,6 +163,14 @@ class Font
                     switch (pair.key) {
                     case "size":
                         size = pair.getInt();
+                    }
+                }
+
+            case "common":
+                for (pair in parser.pairs()) {
+                    switch (pair.key) {
+                    case "lineHeight":
+                        lineHeight = pair.getInt();
                     }
                 }
 
@@ -361,7 +375,7 @@ class TextLayout
                 }
                 lastSpaceIdx = -1;
 
-                lineHeight = font.size;
+                lineHeight = font.lineHeight;
                 addLine();
 
             } else {
@@ -398,7 +412,7 @@ class TextLayout
             var glyph = _glyphs[ii];
 
             if (glyph.charCode == "\n".code) {
-                lineY += font.size;
+                lineY += font.lineHeight;
                 ++line;
                 alignOffset = getAlignOffset(align, lineWidths[line], wrapWidth);
             }
@@ -426,7 +440,7 @@ class TextLayout
         while (ii < ll) {
             var glyph = _glyphs[ii];
             if (glyph.charCode == "\n".code) {
-                y += _font.size;
+                y += _font.lineHeight;
             } else {
                 var x = _offsets[ii];
                 glyph.draw(g, x, y);
@@ -455,8 +469,8 @@ private class ConfigParser
     public function new (config :String)
     {
         _configText = config;
-        _keywordPattern = ~/([a-z]+)(.*)/;
-        _pairPattern = ~/([a-z]+)=("[^"]*"|[^\s]+)/;
+        _keywordPattern = ~/([A-Za-z]+)(.*)/;
+        _pairPattern = ~/([A-Za-z]+)=("[^"]*"|[^\s]+)/;
     }
 
     public function keywords () :Iterator<String>

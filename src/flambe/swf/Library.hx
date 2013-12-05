@@ -75,7 +75,7 @@ class Library
                     // animates at 60 FPS, which can cause unexpected motion/flickering as those
                     // one-frame keyframes are interpolated. So, assume that these frames are never
                     // meant to actually be displayed and hide them.
-                    if (kf.duration == 1 && ii+1 < ll) {
+                    if (kf.tweened && kf.duration == 1 && ii+1 < ll) {
                         var nextKf = keyframes[ii+1];
                         if (!nextKf.visible || nextKf.symbolName == null) {
                             kf.setVisible(false);

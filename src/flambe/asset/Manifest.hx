@@ -147,23 +147,13 @@ class Manifest
 
     /**
      * Get the full URL to load an asset from. May prepend relativeBasePath or externalBasePath
-     * depending on cross-domain support and the asset format.
+     * depending on cross-domain support.
      */
     public function getFullURL (entry :AssetEntry) :String
     {
-        var restricted = (externalBasePath != null && _supportsCrossOrigin) ?
+        var basePath = (externalBasePath != null && _supportsCrossOrigin) ?
             externalBasePath : relativeBasePath;
-        var unrestricted = (externalBasePath != null) ? externalBasePath : relativeBasePath;
-
-        var base = unrestricted;
-#if html
-        if (entry.format == Data) {
-            // Without CORS, readable data must be loaded from the same origin
-            // TODO(bruno): Do this for Images too, required for readPixels.
-            base = restricted;
-        }
-#end
-        return (base != null) ? base.joinPath(entry.url) : entry.url;
+        return (basePath != null) ? basePath.joinPath(entry.url) : entry.url;
     }
 
     private function get_relativeBasePath () :String
@@ -225,25 +215,27 @@ class Manifest
 
     // Whether the environment fully supports loading assets from another domain
     private static var _supportsCrossOrigin :Bool = (function () {
+        var detected =
 #if html
-        // CORS in the stock Android browser is buggy. If your game is contained in an iframe, XHR
-        // will work the first time. If the response had an Expires header, on subsequent page loads
-        // instead of retrieving it from the cache, it will fail with error code 0.
-        // http://stackoverflow.com/questions/6090816/android-cors-requests-work-only-once
-        //
-        // TODO(bruno): Better UA detection that only blacklists the stock browser, not Chrome or FF
-        // for Android
-        var blacklist = ~/\b(Android)\b/;
-        if (blacklist.match(js.Browser.window.navigator.userAgent)) {
-            return false;
-        }
+        (function () {
+            // CORS in the stock Android browser is buggy. If your game is contained in an iframe, XHR
+            // will work the first time. If the response had an Expires header, on subsequent page loads
+            // instead of retrieving it from the cache, it will fail with error code 0.
+            // http://stackoverflow.com/questions/6090816/android-cors-requests-work-only-once
+            if (js.Browser.navigator.userAgent.indexOf("Linux; U; Android") >= 0) {
+                return false;
+            }
 
-        var xhr :Dynamic = untyped __new__("XMLHttpRequest");
-        return (xhr.withCredentials != null);
+            var xhr :Dynamic = untyped __new__("XMLHttpRequest");
+            return (xhr.withCredentials != null);
+        })();
 #else
-        // Assumes you have a valid crossdomain.xml
-        return true;
+            true; // Assumes you have a valid crossdomain.xml
 #end
+        if (!detected) {
+            Log.warn("This browser does not support cross-domain asset loading, any Manifest.externalBasePath setting will be ignored.");
+        }
+        return detected;
     })();
 
     private var _entries :Array<AssetEntry>;

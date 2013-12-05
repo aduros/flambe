@@ -51,8 +51,8 @@ class Strings
      */
     public static function joinPath (base :String, relative :String) :String
     {
-        if (base.fastCodeAt(base.length-1) != "/".code) {
-            base += "/"; // Ensure it ends with a trailing slash
+        if (base.length > 0 && base.fastCodeAt(base.length-1) != "/".code) {
+            base += "/"; // Ensure base ends with a trailing slash
         }
         return base + relative;
     }

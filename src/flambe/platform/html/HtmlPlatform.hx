@@ -58,7 +58,7 @@ class HtmlPlatform
         _renderer = createRenderer(canvas);
 
         mainLoop = new MainLoop();
-		
+
         // Used by browsers that don't support audio very well
         musicPlaying = false;
 
@@ -134,7 +134,7 @@ class HtmlPlatform
                 lastTouchTime = event.timeStamp;
 
                 switch (event.type) {
-                case "touchstart", "MSPointerDown":
+                case "touchstart", "MSPointerDown", "pointerdown":
                     event.preventDefault();
                     if (HtmlUtil.SHOULD_HIDE_MOBILE_BROWSER) {
                         HtmlUtil.hideMobileBrowser();
@@ -146,7 +146,7 @@ class HtmlPlatform
                         basicTouch.submitDown(id, x, y);
                     }
 
-                case "touchmove", "MSPointerMove":
+                case "touchmove", "MSPointerMove", "pointermove":
                     event.preventDefault();
                     for (touch in changedTouches) {
                         var x = getX(touch, bounds);
@@ -155,7 +155,7 @@ class HtmlPlatform
                         basicTouch.submitMove(id, x, y);
                     }
 
-                case "touchend", "touchcancel", "MSPointerUp":
+                case "touchend", "touchcancel", "MSPointerUp", "pointerup":
                     for (touch in changedTouches) {
                         var x = getX(touch, bounds);
                         var y = getY(touch, bounds);
@@ -407,9 +407,16 @@ class HtmlPlatform
     {
 #if !flambe_disable_webgl
         try {
-            var gl = canvas.getContextWebGL({alpha: false, depth: false});
+            var gl = canvas.getContextWebGL(cast {
+                alpha: false,
+                depth: false,
+                // http://blog.tojicode.com/2013/12/failifmajorperformancecaveat-with-great.html
+                failIfMajorPerformanceCaveat: true,
+            });
             if (gl != null) {
 #if !flambe_disable_canvas
+                // TODO(bruno): Remove this check once failIfMajorPerformanceCaveat becomes
+                // prevalent
                 if (HtmlUtil.detectSlowDriver(gl)) {
                     Log.warn("Detected a slow WebGL driver, falling back to canvas");
                 } else

@@ -93,7 +93,7 @@ using Lambda;
 		if (_isStarted && !component.isStarted)
 		{
 			component.onStart();
-			component.isStarted = false;
+			component.isStarted = true;
 		}
 		
         return this;

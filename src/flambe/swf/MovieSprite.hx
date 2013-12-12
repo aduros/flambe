@@ -71,7 +71,7 @@ class MovieSprite extends Sprite
         _animators = Arrays.create(symbol.layers.length);
         for (ii in 0..._animators.length) {
             var layer = symbol.layers[ii];
-            _animators[ii] = new LayerAnimator(layer, this);
+            _animators[ii] = new LayerAnimator(layer);
         }
 		
         _frame = -1;

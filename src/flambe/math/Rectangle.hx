@@ -71,6 +71,37 @@ class Rectangle
     {
         return x == other.x && y == other.y && width == other.width && height == other.height;
     }
+	
+	public function intersect(rect : Rectangle) : Bool {
+		return !(rectGetMaxX() < rect.rectGetMinX() ||
+			rect.rectGetMaxX() < rectGetMinX() ||
+			rectGetMaxY() < rect.rectGetMinY() ||
+			rect.rectGetMaxY() < rectGetMinY());
+	}
+	
+	public function rectGetMaxX() : Float{
+		return (x + width);
+	}
+	
+	public function rectGetMidX() : Float {
+		return ((x + width) / 2);
+	}
+	
+	public function rectGetMinX() : Float {
+		return x;
+	}
+	
+	public function rectGetMaxY() : Float{
+		return (y + height);
+	}
+	
+	public function rectGetMidY() : Float {
+		return ((y + height) / 2);
+	}
+	
+	public function rectGetMinY() : Float {
+		return this.y;
+	}
 
     #if debug @:keep #end public function toString () :String
     {

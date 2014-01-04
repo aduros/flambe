@@ -194,7 +194,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
             interval = Browser.window.setInterval(function () {
                 // If the download has started, and enough time has passed since the last progress
                 // event, consider it stalled and abort
-                if (xhr.readyState >= 1 && HtmlUtil.now() - lastActivity > XHR_TIMEOUT) {
+                if (xhr.readyState == XMLHttpRequest.LOADING && HtmlUtil.now() - lastActivity > XHR_TIMEOUT) {
                     xhr.abort();
 
                     // Retry stalled connections a few times

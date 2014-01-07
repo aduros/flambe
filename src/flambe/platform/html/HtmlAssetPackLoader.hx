@@ -222,6 +222,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                 }
 
                 lastProgress = HtmlUtil.now();
+                handleProgress(entry, event.loaded);
             };
 
             xhr.onerror = function (_) {

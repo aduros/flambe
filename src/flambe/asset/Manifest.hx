@@ -20,15 +20,16 @@ using flambe.util.Strings;
 class Manifest
 {
     /**
-     * A relative path to load this manifest's assets from, or null.
+     * A base path on the current domain to load this manifest's assets from, or null.
      */
-    public var relativeBasePath (get, set) :String;
+    public var localBase (get, set) :String;
 
     /**
-     * A URL on another domain to load this manifest's assets from, or null. May be used to load
-     * assets from a CDN, in browsers that support cross-domain requests.
+     * A base URL on another domain to load this manifest's assets from, or null. May be used to
+     * load assets from a CDN, in browsers that support cross-domain requests. If not supported or
+     * unset, will fallback to using localBase.
      */
-    public var externalBasePath (get, set) :String;
+    public var remoteBase (get, set) :String;
 
     public function new ()
     {
@@ -52,7 +53,7 @@ class Manifest
         }
 
         var manifest = new Manifest();
-        manifest.relativeBasePath = "assets";
+        manifest.localBase = "assets";
 
         for (asset in packData) {
             var name = asset.name;
@@ -139,51 +140,48 @@ class Manifest
     public function clone () :Manifest
     {
         var copy = new Manifest();
-        copy.relativeBasePath = relativeBasePath;
-        copy.externalBasePath = externalBasePath;
+        copy.localBase = localBase;
+        copy.remoteBase = remoteBase;
         copy._entries = _entries.copy();
         return copy;
     }
 
     /**
-     * Get the full URL to load an asset from. May prepend relativeBasePath or externalBasePath
-     * depending on cross-domain support.
+     * Get the full URL to load an asset from. Will prepend localBase or remoteBase depending on
+     * cross-domain support.
      */
     public function getFullURL (entry :AssetEntry) :String
     {
-        var basePath = (externalBasePath != null && _supportsCrossOrigin) ?
-            externalBasePath : relativeBasePath;
+        var basePath = (remoteBase != null && _supportsCrossOrigin) ? remoteBase : localBase;
         return (basePath != null) ? basePath.joinPath(entry.url) : entry.url;
     }
 
-    private function get_relativeBasePath () :String
+    private function get_localBase () :String
     {
-        return _relativeBasePath;
+        return _localBase;
     }
 
-    private function set_relativeBasePath (basePath :String) :String
+    private function set_localBase (localBase :String) :String
     {
-        _relativeBasePath = basePath;
-        if (basePath != null) {
-            Assert.that(!basePath.startsWith("http://") && !basePath.startsWith("https://"),
-                "relativeBasePath must be a relative path on the same domain, NOT starting with http(s)://");
+        if (localBase != null) {
+            Assert.that(!localBase.startsWith("http://") && !localBase.startsWith("https://"),
+                "localBase must be a path on the same domain, NOT starting with http(s)://");
         }
-        return basePath;
+        return _localBase = localBase;
     }
 
-    private function get_externalBasePath () :String
+    private function get_remoteBase () :String
     {
-        return _externalBasePath;
+        return _remoteBase;
     }
 
-    private function set_externalBasePath (basePath :String) :String
+    private function set_remoteBase (remoteBase :String) :String
     {
-        _externalBasePath = basePath;
-        if (basePath != null) {
-            Assert.that(basePath.startsWith("http://") || basePath.startsWith("https://"),
-                "externalBasePath must be on an external domain, starting with http(s)://");
+        if (remoteBase != null) {
+            Assert.that(remoteBase.startsWith("http://") || remoteBase.startsWith("https://"),
+                "remoteBase must be on a remote domain, starting with http(s)://");
         }
-        return basePath;
+        return _remoteBase = remoteBase;
     }
 
     private static function inferFormat (url :String) :AssetFormat
@@ -233,13 +231,13 @@ class Manifest
             true; // Assumes you have a valid crossdomain.xml
 #end
         if (!detected) {
-            Log.warn("This browser does not support cross-domain asset loading, any Manifest.externalBasePath setting will be ignored.");
+            Log.warn("This browser does not support cross-domain asset loading, any Manifest.remoteBase setting will be ignored.");
         }
         return detected;
     })();
 
     private var _entries :Array<AssetEntry>;
 
-    private var _relativeBasePath :String;
-    private var _externalBasePath :String;
+    private var _localBase :String = null;
+    private var _remoteBase :String = null;
 }

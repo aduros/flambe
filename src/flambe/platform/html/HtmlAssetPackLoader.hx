@@ -331,8 +331,14 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
 
     private static function supportsBlob () :Bool
     {
+        // Checks for XHR Blob responseType support
+        // http://html5test.com/compare/feature/communication-xmlhttprequest2.response-blob/communication-websocket.binary.html
         if (_detectBlobSupport) {
             _detectBlobSupport = false;
+
+            if ((untyped Browser.window).Blob == null) {
+                return false; // No Blob constructor
+            }
 
             var xhr = new XMLHttpRequest();
             // Hack for IE, which throws an InvalidStateError upon setting the responseType when

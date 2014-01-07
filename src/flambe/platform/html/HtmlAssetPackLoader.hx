@@ -170,66 +170,89 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
 
     private function download (url :String, entry :AssetEntry, responseType :String, onLoad :Dynamic -> Void)
     {
-        var xhr = new XMLHttpRequest();
+        var xhr :XMLHttpRequest = null;
+        var start = null;
 
-        var lastActivity = 0.0;
-        var start = function () {
-            lastActivity = HtmlUtil.now();
+        var intervalId = 0;
+        var hasInterval = false;
+        var clearRetryInterval = function () {
+            if (hasInterval) {
+                hasInterval = false;
+                Browser.window.clearInterval(intervalId);
+            }
+        };
+
+        var retries = XHR_RETRIES;
+        var maybeRetry = function () {
+            // Returns true if the download was retried
+            --retries;
+            if (retries >= 0) {
+                Log.warn("Retrying asset download", ["url", entry.url]);
+                start();
+                return true;
+            }
+            return false;
+        };
+
+        start = function () {
+            clearRetryInterval();
+
+            if (xhr != null) {
+                xhr.abort();
+            }
+            xhr = new XMLHttpRequest();
             xhr.open("GET", url, true);
+
             xhr.responseType = responseType;
             if (xhr.responseType == "") {
                 // Dumb hack for iOS 6, which supports blobs but not the blob responseType
                 xhr.responseType = "arraybuffer";
             }
+
+            var lastProgress = 0.0;
+            xhr.onprogress = function (event :ProgressEvent) {
+                // When the first progress event comes in, start detecting stalled downloads
+                if (!hasInterval) {
+                    hasInterval = true;
+                    intervalId = Browser.window.setInterval(function () {
+                        // If the download isn't finished, and enough time has passed since the last
+                        // progress event, consider it stalled and attempt to retry
+                        if (xhr.readyState != XMLHttpRequest.DONE && HtmlUtil.now() - lastProgress > XHR_TIMEOUT) {
+                            if (!maybeRetry()) {
+                                clearRetryInterval();
+                                handleError(entry, "Download stalled");
+                            }
+                        }
+                    }, 1000);
+                }
+
+                lastProgress = HtmlUtil.now();
+            };
+
+            xhr.onerror = function (_) {
+                if (xhr.status != 0 || !maybeRetry()) {
+                    clearRetryInterval();
+                    handleError(entry, "HTTP error " + xhr.status);
+                }
+            };
+
+            xhr.onload = function (_) {
+                var response :Dynamic = xhr.response;
+                if (response == null) {
+                    // Hack for IE9, which doesn't have xhr.response, only responseText
+                    response = xhr.responseText;
+                } else if (responseType == "blob" && xhr.responseType == "arraybuffer") {
+                    // Dumb hack for iOS 6, which supports blobs but not the blob responseType
+                    response = new Blob([xhr.response]);
+                }
+                clearRetryInterval();
+                onLoad(response);
+            };
+
             xhr.send();
         };
 
-        var interval = 0;
-        if (untyped __js__("typeof")(xhr.onprogress) != "undefined") {
-            var attempts = XHR_ATTEMPTS;
-            xhr.onprogress = function (event :Dynamic) {
-                lastActivity = HtmlUtil.now();
-                handleProgress(entry, event.loaded);
-            };
-            interval = Browser.window.setInterval(function () {
-                // If the download has started, and enough time has passed since the last progress
-                // event, consider it stalled and abort
-                if (xhr.readyState == XMLHttpRequest.LOADING && HtmlUtil.now() - lastActivity > XHR_TIMEOUT) {
-                    xhr.abort();
-
-                    // Retry stalled connections a few times
-                    --attempts;
-                    if (attempts > 0) {
-                        Log.warn("Retrying stalled asset request", ["url", entry.url]);
-                        start();
-                    } else {
-                        Browser.window.clearInterval(interval);
-                        handleError(entry, "Request timed out");
-                    }
-                }
-            }, 1000);
-        }
-
-        xhr.onload = function (_) {
-            Browser.window.clearInterval(interval);
-
-            var response :Dynamic = xhr.response;
-            if (response == null) {
-                // Hack for IE9, which doesn't have xhr.response, only responseText
-                response = xhr.responseText;
-            } else if (responseType == "blob" && xhr.responseType == "arraybuffer") {
-                // Dumb hack for iOS 6, which supports blobs but not the blob responseType
-                response = new Blob([xhr.response]);
-            }
-            onLoad(response);
-        };
-        xhr.onerror = function (_) {
-            Browser.window.clearInterval(interval);
-            handleError(entry, "Failed to load asset: error #" + xhr.status);
-        };
-
         start();
-        return xhr;
     }
 
     private static function detectImageFormats (fn :Array<AssetFormat> -> Void)
@@ -339,7 +362,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
     }
 
     private static inline var XHR_TIMEOUT = 5000;
-    private static inline var XHR_ATTEMPTS = 4;
+    private static inline var XHR_RETRIES = 3;
 
     private static var _supportedFormats :Promise<Array<AssetFormat>> = null;
 

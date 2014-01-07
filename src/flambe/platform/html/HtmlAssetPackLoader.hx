@@ -202,12 +202,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
             }
             xhr = new XMLHttpRequest();
             xhr.open("GET", url, true);
-
             xhr.responseType = responseType;
-            if (xhr.responseType == "") {
-                // Dumb hack for iOS 6, which supports blobs but not the blob responseType
-                xhr.responseType = "arraybuffer";
-            }
 
             var lastProgress = 0.0;
             xhr.onprogress = function (event :ProgressEvent) {
@@ -241,9 +236,6 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                 if (response == null) {
                     // Hack for IE9, which doesn't have xhr.response, only responseText
                     response = xhr.responseText;
-                } else if (responseType == "blob" && xhr.responseType == "arraybuffer") {
-                    // Dumb hack for iOS 6, which supports blobs but not the blob responseType
-                    response = new Blob([xhr.response]);
                 }
                 clearRetryInterval();
                 onLoad(response);

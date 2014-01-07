@@ -350,10 +350,12 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
             // request so it's all good.
             xhr.open("GET", ".", true);
 
-            // Ensure the blob responseType is supported
+            if (xhr.responseType != "") {
+                return false; // No responseType supported at all
+            }
             xhr.responseType = "blob";
             if (xhr.responseType != "blob") {
-                return false;
+                return false; // Blob responseType not supported
             }
 
             _URL = HtmlUtil.loadExtension("URL").value;

@@ -45,6 +45,7 @@ class HtmlPlatform
         canvas.setAttribute("tabindex", "0");
         // ...but hide the focus rectangle
         canvas.style.outlineStyle = "none";
+        (untyped canvas.style).webkitTapHighlightColor = "transparent";
 
         // Browser optimization hints
         canvas.setAttribute("moz-opaque", "true");

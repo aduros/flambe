@@ -63,7 +63,11 @@
 <div id="content"></div>
 <script src="flambe.js"></script>
 <script>
-  flambe.embed(["targets/main-flash.swf", "targets/main-html.js"], "content");
+  	// prioritize Flash on all platforms, except on Android (some have FlashPlayer, which you don't want to use)
+	var embedPaths = ["targets/main-flash.swf", "targets/main-html.js"];
+	if (navigator.userAgent.match(/android/i)) embedPaths.reverse();
+	
+  flambe.embed(embedPaths, "content");
 </script>
 
 <footer class="no-mobile">

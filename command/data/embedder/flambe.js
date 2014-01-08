@@ -46,7 +46,9 @@ flambe.embed = function (urls, elementId) {
         switch (ext) {
         case "swf":
             if ((pref == null || pref == "flash")
-                    && swfobject.hasFlashPlayerVersion(flambe.FLASH_VERSION)) {
+                    && swfobject.hasFlashPlayerVersion(flambe.FLASH_VERSION)
+                    // Android Flash is old and busted
+                    && !/\bAndroid\b/.exec(navigator.userAgent)) {
 
                 // SWFObject replaces the element it's given, so create a temporary inner element
                 // for parity with JS

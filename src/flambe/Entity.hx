@@ -131,9 +131,6 @@ using Lambda;
     /**
      * Gets a component of a given type from this entity.
      */
-	#if display  
-		public function get<A:Component> (componentClass :Class<A>) :A return null;
-	#else
     macro public function get<A> (self :Expr, componentClass :ExprOf<Class<A>>) :ExprOf<A>
     {
         switch (componentClass.expr) {
@@ -151,8 +148,7 @@ using Lambda;
             Context.currentPos());
         return null;
     }
-	#end
-	
+
     /**
      * Checks if this entity has a component of the given type.
      */
@@ -285,11 +281,13 @@ using Lambda;
     }
 
     // A semi-private helper method used by Entity.get()
+#if !display
     @:extern // Inline even in debug builds
     inline public function _internal_getComponentTyped<A:Component> (name :String, cl :Class<A>) :A
     {
         return cast getComponent(name);
     }
+#end
 
     /**
      * Maps String -> Component. Usually you would use a Haxe Map here, but I'm dropping down to plain

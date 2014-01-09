@@ -11,6 +11,7 @@ using haxe.macro.ExprTools;
 #end
 
 import flambe.util.Disposable;
+import flambe.util.Signal1.Signal1;
 
 using Lambda;
 
@@ -41,6 +42,9 @@ using Lambda;
 
     /** This entity's next sibling, for iteration. */
     public var next (default, null) :Entity = null;
+	
+    public var message(get, null):Signal1<String>;
+	private function get_message() {if (message == null) message = new Signal1<String>(); return message; }
 
     /** This entity's first component. */
     public var firstComponent (default, null) :Component = null;
@@ -89,7 +93,13 @@ using Lambda;
 
         component.init(this, null);
         component.onAdded();
-
+		
+		if (_isStarted && !component.isStarted)
+		{
+			component.onStart();
+			component.isStarted = false;
+		}
+		
         return this;
     }
 
@@ -131,7 +141,10 @@ using Lambda;
     /**
      * Gets a component of a given type from this entity.
      */
-    macro public function get<A> (self :Expr, componentClass :ExprOf<Class<A>>) :ExprOf<A>
+    #if display  
+        public function get<A:Component> (componentClass :Class<A>) :A return null;
+    #else
+    macro public function get<A:Component> (self :Expr, componentClass :ExprOf<Class<A>>) :ExprOf<A>
     {
         switch (componentClass.expr) {
         case EConst(CIdent(name)):
@@ -148,15 +161,15 @@ using Lambda;
             Context.currentPos());
         return null;
     }
-
+	#end
+	
     /**
      * Checks if this entity has a component of the given type.
      */
-    macro public function has<A> (self :Expr, componentClass :ExprOf<Class<A>>) :ExprOf<Bool>
+    macro public function has<A:Component> (self :Expr, componentClass :ExprOf<Class<A>>) :ExprOf<Bool>
     {
         return macro $self.get($componentClass) != null;
     }
-
     /**
      * Gets a component by name from this entity.
      */
@@ -168,9 +181,10 @@ using Lambda;
     /**
      * Adds a child to this entity.
      * @param append Whether to add the entity to the end or beginning of the child list.
+     * @param notifyComponents Call onStart or onEntityAdded. Useful when sorting.
      * @returns This instance, for chaining.
      */
-    public function addChild (entity :Entity, append :Bool=true)
+    public function addChild (entity :Entity, append :Bool=true, notifyComponents :Bool=true)
     {
         if (entity.parent != null) {
             entity.parent.removeChild(entity);
@@ -195,7 +209,22 @@ using Lambda;
             entity.next = firstChild;
             firstChild = entity;
         }
-
+		
+		if (notifyComponents)
+		{
+			var child = entity.firstComponent;
+			while (child != null) {
+				var next = child.next;
+				if (!child.isStarted)
+				{
+					child.onStart();
+					child.isStarted = true;
+				}
+				child.onEntityAdded();
+				child = next;
+			}
+			_isStarted = true;
+		}
         return this;
     }
 
@@ -218,6 +247,13 @@ using Lambda;
             prev = p;
             p = next;
         }
+		
+		var child = entity.firstComponent;
+		while (child != null) {
+			var next = child.next;
+			child.onEntityRemoved();
+			child = next;
+		}
     }
 
     /**
@@ -243,6 +279,9 @@ using Lambda;
         while (firstComponent != null) {
             firstComponent.dispose();
         }
+		
+		_isStarted = false;
+		
         disposeChildren();
     }
 
@@ -281,17 +320,16 @@ using Lambda;
     }
 
     // A semi-private helper method used by Entity.get()
-#if !display
     @:extern // Inline even in debug builds
     inline public function _internal_getComponentTyped<A:Component> (name :String, cl :Class<A>) :A
     {
         return cast getComponent(name);
     }
-#end
 
     /**
      * Maps String -> Component. Usually you would use a Haxe Map here, but I'm dropping down to plain
      * Object/Dictionary for the quickest possible lookups in this critical part of Flambe.
      */
     private var _compMap :Dynamic<Component>;
+	private var _isStarted:Bool = false;
 }

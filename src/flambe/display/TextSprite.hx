@@ -78,6 +78,16 @@ class TextSprite extends Sprite
     }
 
     /**
+     * Chainable convenience method to set the wrap width.
+     * @returns This instance, for chaining.
+     */
+    public function setWrapWidth (wrapWidth :Float) :TextSprite
+    {
+        this.wrapWidth._ = wrapWidth;
+        return this;
+    }
+
+    /**
      * Chainable convenience method to set the text alignment.
      * @returns This instance, for chaining.
      */

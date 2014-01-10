@@ -76,16 +76,16 @@ class TextSprite extends Sprite
         updateLayout();
         return _layout.bounds.contains(localX, localY);
     }
-    
+
     /**
-     * Chainable convenience method to uniformly set the text alignment.
+     * Chainable convenience method to set the text alignment.
      * @returns This instance, for chaining.
      */
-	public function setAlign(align:TextAlign):TextSprite
-	{
-		this.align = align;
-		return this;
-	}
+    public function setAlign (align :TextAlign) :TextSprite
+    {
+        this.align = align;
+        return this;
+    }
 
     inline private function get_text () :String
     {

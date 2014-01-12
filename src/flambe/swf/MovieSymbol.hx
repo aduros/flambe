@@ -36,16 +36,28 @@ class MovieSymbol
      */
     public var duration (default, null) :Float;
 
+	/**
+	 * All frame labels within the layers of this symbol
+	 */
+	public var frameLabels(default, null):Map<String,Float>;
+	
+	
     public function new (lib :Library, json :MovieFormat)
     {
         _name = json.id;
         frameRate = lib.frameRate;
-
+		frameLabels = new Map<String,Float>();
+		
         frames = 0;
         layers = Arrays.create(json.layers.length);
         for (ii in 0...layers.length) {
             var layer = new MovieLayer(json.layers[ii]);
             frames = cast Math.max(layer.frames, frames);
+			for (kf  in layer.keyframes) {
+				var kfi = kf.index;
+				if (kf.label != null) frameLabels.set(kf.label, kf.index);
+			}
+			
             layers[ii] = layer;
         }
         duration = frames / frameRate;
@@ -60,33 +72,43 @@ class MovieSymbol
     {
         return new MovieSprite(this);
     }
-
-    private var _name :String;
+	
+	/**
+	 * Find the frame for a given label
+	 * @param	name
+	 * @return	An index, or -1 if not found
+	 */
+	public function findLabel(name:String):Float
+	{
+		return frameLabels.exists(name) ? frameLabels.get(name) : -1;
+	}
+	
+	private var _name :String;
+	
 }
 
 class MovieLayer
 {
-    public var name (default, null) :String;
+	public var name (default, null) :String;
     public var keyframes (default, null) :Array<MovieKeyframe>;
     public var frames (default, null) :Int;
-
-    /** Whether this layer has no symbol instances. */
+	
+    /** Whether this layer has no symbol instances, and no labels. */
     public var empty (default, null) :Bool = true;
-
+	
     public function new (json :LayerFormat)
     {
         name = json.name;
-
+		
         var prevKf = null;
         keyframes = Arrays.create(json.keyframes.length);
         for (ii in 0...keyframes.length) {
             prevKf = new MovieKeyframe(json.keyframes[ii], prevKf);
             keyframes[ii] = prevKf;
-
-            empty = empty && prevKf.symbolName == null;
+            empty = (empty && prevKf.symbolName == null && prevKf.label == null);
         }
-
-        frames = (prevKf != null) ? prevKf.index + Std.int(prevKf.duration) : 0;
+		
+		frames 	= (prevKf != null) ? prevKf.index + Std.int(prevKf.duration) : 0;
     }
 }
 

@@ -300,7 +300,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
 #else
         var blacklist = ~/\b(iPhone|iPod|iPad|Android|Windows Phone)\b/;
 #end
-        var userAgent = Browser.window.navigator.userAgent;
+        var userAgent = Browser.navigator.userAgent;
         if (!WebAudioSound.supported && blacklist.match(userAgent)) {
             Log.warn("HTML5 audio is blacklisted for this browser", ["userAgent", userAgent]);
             return [];
@@ -335,6 +335,11 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
         // http://html5test.com/compare/feature/communication-xmlhttprequest2.response-blob/communication-websocket.binary.html
         if (_detectBlobSupport) {
             _detectBlobSupport = false;
+
+            // Blobs on Amazon Silk are buggy: https://github.com/aduros/flambe/issues/194
+            if (~/\bSilk\b/.match(Browser.navigator.userAgent)) {
+                return false;
+            }
 
             if ((untyped Browser.window).Blob == null) {
                 return false; // No Blob constructor

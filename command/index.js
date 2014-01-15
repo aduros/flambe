@@ -30,7 +30,12 @@ exports.loadConfig = function (file) {
     })
     .then(function (text) {
         var yaml = require("js-yaml");
-        return yaml.safeLoad(text.toString());
+        // yaml barfs on tab indentation, replace with spaces. This can lead to problems with
+        // mixed tabs/spaces on multiline values though...
+        var converted = text.toString().replace(/^\t+/gm, function (tabs) {
+            return tabs.replace(/\t/g, "    ");
+        });
+        return yaml.safeLoad(converted);
     });
     return promise;
 };

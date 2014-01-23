@@ -62,7 +62,15 @@ class Config
                     // Trim off quotes
                     value = value.substr(1, value.length-2);
                 }
-                currentSection.set(key, value);
+                currentSection.set(key, value
+                    // Unescape certain characters
+                    .replace("\\n", "\n")
+                    .replace("\\r", "\r")
+                    .replace("\\t", "\t")
+                    .replace("\\'", "\'")
+                    .replace("\\\"", "\"")
+                    .replace("\\\\", "\\")
+                );
             }
         }
 

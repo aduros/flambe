@@ -29,10 +29,10 @@ class Font
     public var size (default, null) :Float;
 
     /**
-     * The vertical distance between each line of text in this font, in pixels.
-     */
+	* The vertical distance between each line of text in this font, in pixels.
+	*/
     public var lineHeight (default, null) :Float;
-
+	
     /**
      * Parses a font using files in an asset pack.
      * @param name The path to the font within the asset pack, excluding the .fnt suffix.
@@ -115,12 +115,12 @@ class Font
         return list;
     }
 
-    public function layoutText (text :String, ?align :TextAlign, wrapWidth :Float = 0) :TextLayout
+    public function layoutText (text :String, ?align :TextAlign, wrapWidth :Float = 0, lineHeight :Float = 0, letterSpacing :Float = 0) :TextLayout
     {
         if (align == null) {
             align = Left;
         }
-        return new TextLayout(this, text, align, wrapWidth);
+        return new TextLayout(this, text, align, wrapWidth, lineHeight, letterSpacing);
     }
 
     /**
@@ -154,8 +154,8 @@ class Font
         // The basename of the font's path, where we'll find the textures
         var idx = name.lastIndexOf("/");
         var basePath = (idx >= 0) ? name.substr(0, idx+1) : "";
-
-        // BMFont spec: http://www.angelcode.com/products/bmfont/doc/file_format.html
+        
+         // BMFont spec: http://www.angelcode.com/products/bmfont/doc/file_format.html
         for (keyword in parser.keywords()) {
             switch (keyword) {
             case "info":
@@ -173,6 +173,7 @@ class Font
                         lineHeight = pair.getInt();
                     }
                 }
+
 
             case "page":
                 var pageId :Int = 0;
@@ -316,11 +317,14 @@ class TextLayout
 {
     /** The bounding box that contains this text. */
     public var bounds (default, null) :Rectangle;
+	
+    /** amount of chars of largest line. */
+    public var largestLineCharCount (default, null) :Int;
 
     /** The number of lines in this text. */
     public var lines (default, null) :Int = 0;
 
-    @:allow(flambe) function new (font :Font, text :String, align :TextAlign, wrapWidth :Float)
+    @:allow(flambe) function new (font :Font, text :String, align :TextAlign, wrapWidth :Float, lineHeight :Float, letterSpacing :Float)
     {
         _font = font;
         _glyphs = [];
@@ -343,16 +347,21 @@ class TextLayout
 
         var lastSpaceIdx = -1;
         var lineWidth = 0.0;
-        var lineHeight = 0.0;
+        var height = 0.0;
         var newline = font.getGlyph("\n".code);
 
         var addLine = function () {
             bounds.width = FMath.max(bounds.width, lineWidth);
-            bounds.height += lineHeight;
+            
+            if (Math.isNaN(lineHeight) || lineHeight == 0) {
+                bounds.height += height;
+            } else  {
+                bounds.height += lineHeight;
+            }
 
             lineWidths[lines] = lineWidth;
             lineWidth = 0;
-            lineHeight = 0;
+            height = 0;
             ++lines;
         };
 
@@ -375,7 +384,11 @@ class TextLayout
                 }
                 lastSpaceIdx = -1;
 
-                lineHeight = font.lineHeight;
+                if (Math.isNaN(lineHeight) || lineHeight == 0) {
+                    height = font.lineHeight;
+                } else {
+                    height = lineHeight;
+                }
                 addLine();
 
             } else {
@@ -383,7 +396,12 @@ class TextLayout
                     lastSpaceIdx = ii;
                 }
                 lineWidth += glyph.xAdvance;
-                lineHeight = FMath.max(lineHeight, glyph.height + glyph.yOffset);
+                
+                if (Math.isNaN(lineHeight) || lineHeight == 0) {
+                    height = FMath.max(height, glyph.height + glyph.yOffset);
+                } else {
+                    height = lineHeight;
+                }
 
                 // Handle kerning with the next glyph
                 if (ii+1 < _glyphs.length) {
@@ -412,7 +430,7 @@ class TextLayout
             var glyph = _glyphs[ii];
 
             if (glyph.charCode == "\n".code) {
-                lineY += font.lineHeight;
+                lineY += (Math.isNaN(lineHeight) || lineHeight == 0) ? font.lineHeight : lineHeight;
                 ++line;
                 alignOffset = getAlignOffset(align, lineWidths[line], wrapWidth);
             }
@@ -428,22 +446,47 @@ class TextLayout
         bounds.x = getAlignOffset(align, bounds.width, wrapWidth);
         bounds.y = top;
         bounds.height = bottom - top;
+        
+		largestLineCharCount = 0;
+		
+        _charsPerLine = [];
+        var ls = 0;
+        var line = 0;
+        for(glyph in _glyphs) {
+            if (glyph.charCode == "\n".code) {
+				largestLineCharCount = FMath.max(ls, largestLineCharCount);
+                ls = 0;
+                line++;
+            }
+            _charsPerLine[line] = ls;
+            ls++;
+        }
     }
 
     /** Draws this text to a Graphics. */
-    public function draw (g :Graphics, align :TextAlign)
+    public function draw (g :Graphics, align :TextAlign, ?lineHeight:Float, ?letterSpacing:Float)
     {
         var y = 0.0;
         var ii = 0;
         var ll = _glyphs.length;
-
+        var ls = 0;
+		
+		largestLineCharCount = 0;
+        var line = 0;
+        ls = align == Left ? 0 : (align == Center ? -Math.round(_charsPerLine[line]/2) : -_charsPerLine[line]);
         while (ii < ll) {
             var glyph = _glyphs[ii];
             if (glyph.charCode == "\n".code) {
-                y += _font.lineHeight;
+                y += (Math.isNaN(lineHeight) || lineHeight == 0) ? _font.lineHeight : lineHeight;
+                largestLineCharCount = FMath.max(ls, largestLineCharCount);
+                line++;
+                ls = align == Left ? 0 : (align == Center ? -Math.round(_charsPerLine[line]/2) : -_charsPerLine[line]);
             } else {
                 var x = _offsets[ii];
+                if (!(Math.isNaN(letterSpacing) || letterSpacing == 0))  x += letterSpacing * ls;
                 glyph.draw(g, x, y);
+                largestLineCharCount = FMath.max(ls, largestLineCharCount);
+                ++ls;
             }
             ++ii;
         }
@@ -462,6 +505,7 @@ class TextLayout
     private var _font :Font;
     private var _glyphs :Array<Glyph>;
     private var _offsets :Array<Float>;
+    private var _charsPerLine :Array<Int>;
 }
 
 private class ConfigParser

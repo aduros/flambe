@@ -27,7 +27,7 @@ class WebGLBatcher
     {
         _gl = gl;
 
-        gl.clearColor(0, 0, 0, 1);
+        gl.clearColor(0, 0, 0, 0);
         gl.enable(GL.BLEND);
         gl.pixelStorei(GL.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
 
@@ -53,7 +53,9 @@ class WebGLBatcher
 
     public function willRender ()
     {
-        // _gl.clear(GL.COLOR_BUFFER_BIT);
+#if flambe_transparent
+        _gl.clear(GL.COLOR_BUFFER_BIT);
+#end
     }
 
     public function didRender ()

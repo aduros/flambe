@@ -48,7 +48,9 @@ class HtmlPlatform
         (untyped canvas.style).webkitTapHighlightColor = "transparent";
 
         // Browser optimization hints
+#if !flambe_transparent
         canvas.setAttribute("moz-opaque", "true");
+#end
         // canvas.style.webkitTransform = "translateZ(0)";
         // canvas.style.backgroundColor = "#000";
 
@@ -409,7 +411,9 @@ class HtmlPlatform
 #if !flambe_disable_webgl
         try {
             var gl = canvas.getContextWebGL(cast {
+#if !flambe_transparent
                 alpha: false,
+#end
                 depth: false,
                 // http://blog.tojicode.com/2013/12/failifmajorperformancecaveat-with-great.html
                 failIfMajorPerformanceCaveat: true,

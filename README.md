@@ -33,7 +33,8 @@ source, clone this repository and run:
 haxelib dev flambe ./src
 ```
 
-To later go back to a stable release, run `(sudo) flambe update`.
+To later go back to a stable release, run `(sudo) flambe update` and
+`haxelib dev flambe`.
 
 Are things not working? I'd be happy to help, open an [issue], ask on
 the [forum], [email me] privately, or talk to me in #Haxe on

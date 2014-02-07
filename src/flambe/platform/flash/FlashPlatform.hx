@@ -56,17 +56,20 @@ class FlashPlatform
         Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(
             UncaughtErrorEvent.UNCAUGHT_ERROR, onUncaughtError);
 
-#if flash11_2
-        // TODO(bruno): ThrottleEvent may not be exactly right, but VisibilityEvent is broken and
-        // Event.ACTIVATE only handles focus
-        // TODO(bruno): Get the currently throttled state when the app starts?
+        // TODO(bruno): Get the currently visible state when the app starts?
+#if air
+        stage.addEventListener(Event.ACTIVATE, onActivate);
+        stage.addEventListener(Event.DEACTIVATE, onActivate);
+#elseif flash11_2
+        // DEACTIVATE is fired when the Flash embed loses focus, so use throttle events in the
+        // browser instead to detect when the tab gets backgrounded
         stage.addEventListener(ThrottleEvent.THROTTLE, onThrottle);
+#end
         System.hidden.changed.connect(function (hidden,_) {
             if (!hidden) {
                 _skipFrame = true;
             }
         });
-#end
 
 // #if air
 //         // Ensure sound stops when the app is backgrounded or hardware muted on iOS
@@ -241,6 +244,11 @@ class FlashPlatform
     private function onUncaughtError (event :UncaughtErrorEvent)
     {
         System.uncaughtError.emit(FlashUtil.getErrorMessage(event.error));
+    }
+
+    private function onActivate (event :Event)
+    {
+        System.hidden._ = (event.type == Event.DEACTIVATE);
     }
 
 #if flash11_2

@@ -1,6 +1,10 @@
 <img src="https://raw.github.com/aduros/flambe/master/command/data/scaffold/icons/72x72.png" width="72" height="72" align="absmiddle"> Flambe
 ======
 
+<a href="https://github.com/aduros/flambe/wiki/Showcase">
+<img src="https://raw.github.com/wiki/aduros/flambe/images/showcase-montage.jpg" width="710" height="428">
+</a>
+
 Flambe is a 2D game engine that makes cross-platform development
 actually fun!
 

@@ -13,6 +13,11 @@ class Rectangle
     public var y :Float;
     public var width :Float;
     public var height :Float;
+    
+    public var top(get, null):Float;
+    public var right(get, null):Float;
+    public var bottom(get, null):Float;
+    public var left(get, null):Float;
 
     public function new (x :Float = 0, y :Float = 0, width :Float = 0, height :Float = 0)
     {
@@ -25,6 +30,26 @@ class Rectangle
         this.y = y;
         this.width = width;
         this.height = height;
+    }
+
+    private function get_top () :Float
+    {
+        return y;
+    }
+
+    private function get_right () :Float
+    {
+        return x + width;
+    }
+
+    private function get_bottom () :Float
+    {
+        return y + height;
+    }
+
+    private function get_left () :Float
+    {
+        return x;
     }
 
     /**
@@ -71,7 +96,7 @@ class Rectangle
     {
         return x == other.x && y == other.y && width == other.width && height == other.height;
     }
-
+    
     #if debug @:keep #end public function toString () :String
     {
         return "(" + x + "," + y + " " + width + "x" + height + ")";

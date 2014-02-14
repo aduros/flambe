@@ -18,8 +18,12 @@ class HtmlUtil
      * Whether the annoying scrolling address bar in some iOS and Android browsers may be hidden.
      */
     public static var SHOULD_HIDE_MOBILE_BROWSER =
+#if !flambe_disable_hide_mobile_browser
         Browser.window.top == Browser.window &&
         ~/Mobile(\/.*)? Safari/.match(Browser.navigator.userAgent);
+#else
+        false;
+#end
 
     public static function callLater (func :Void -> Void, delay :Int = 0)
     {

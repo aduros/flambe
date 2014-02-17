@@ -27,8 +27,8 @@ class DrawPattern extends Shader
             out = input.pos.xyzw;
         }
 
-        function fragment (texture :Texture, maxUV :Float2) {
-            out = texture.get(_uv % maxUV) * _alpha;
+        function fragment (texture :Texture, region :Float4) {
+            out = texture.get(region.xy + _uv%region.zw, clamp) * _alpha;
         }
     }
 }

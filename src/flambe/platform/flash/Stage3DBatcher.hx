@@ -73,10 +73,10 @@ class Stage3DBatcher
     }
 
     /** Safely delete a texture. */
-    public function deleteTexture (texture :Stage3DTexture)
+    public function deleteTexture (texture :Stage3DTextureRoot)
     {
         // If we have unflushed quads that use this texture, flush them now
-        if (texture == _lastTexture) {
+        if (_lastTexture != null && _lastTexture.root == texture) {
             flush();
             _lastTexture = null;
         }
@@ -85,7 +85,7 @@ class Stage3DBatcher
     }
 
     /** Reads the pixels out from a texture. May return a BitmapData larger than requested. */
-    public function readPixels (texture :Stage3DTexture, x :Int, y :Int,
+    public function readPixels (texture :Stage3DTextureRoot, x :Int, y :Int,
         width :Int, height :Int) :BitmapData
     {
         // Turns out Stage3D doesn't make it easy to get data out of a texture. So we have to:
@@ -133,7 +133,8 @@ class Stage3DBatcher
         ]));
         ortho.transformVectors(scratch, scratch);
 
-        var offset = prepareDrawImage(null, Copy, null, texture);
+        var offset = prepareDrawImage(null, Copy, null,
+            texture.createTexture(texture.width, texture.height));
         data[  offset] = scratch[0];
         data[++offset] = scratch[1];
         data[++offset] = 0;
@@ -142,20 +143,20 @@ class Stage3DBatcher
 
         data[++offset] = scratch[3];
         data[++offset] = scratch[4];
-        data[++offset] = texture.maxU;
+        data[++offset] = 1;
         data[++offset] = 0;
         data[++offset] = 1;
 
         data[++offset] = scratch[6];
         data[++offset] = scratch[7];
-        data[++offset] = texture.maxU;
-        data[++offset] = texture.maxV;
+        data[++offset] = 1;
+        data[++offset] = 1;
         data[++offset] = 1;
 
         data[++offset] = scratch[9];
         data[++offset] = scratch[10];
         data[++offset] = 0;
-        data[++offset] = texture.maxV;
+        data[++offset] = 1;
         data[++offset] = 1;
 
         // Create a temporary back buffer of the given size, and draw the texture on it
@@ -178,7 +179,7 @@ class Stage3DBatcher
     }
 
     /** Adds a quad to the batch, using the DrawImage shader. */
-    public function prepareDrawImage (renderTarget :Stage3DTexture,
+    public function prepareDrawImage (renderTarget :Stage3DTextureRoot,
         blendMode :BlendMode, scissor :Rectangle, texture :Stage3DTexture) :Int
     {
         if (texture != _lastTexture) {
@@ -189,7 +190,7 @@ class Stage3DBatcher
     }
 
     /** Adds a quad to the batch, using the DrawPattern shader. */
-    public function prepareDrawPattern (renderTarget :Stage3DTexture,
+    public function prepareDrawPattern (renderTarget :Stage3DTextureRoot,
         blendMode :BlendMode, scissor :Rectangle, texture :Stage3DTexture) :Int
     {
         if (texture != _lastTexture) {
@@ -200,13 +201,13 @@ class Stage3DBatcher
     }
 
     /** Adds a quad to the batch, using the FillRect shader. */
-    public function prepareFillRect (renderTarget :Stage3DTexture,
+    public function prepareFillRect (renderTarget :Stage3DTextureRoot,
         blendMode :BlendMode, scissor :Rectangle) :Int
     {
         return prepareQuad(6, renderTarget, blendMode, scissor, _fillRectShader);
     }
 
-    private function prepareQuad (elementsPerVertex :Int, renderTarget :Stage3DTexture,
+    private function prepareQuad (elementsPerVertex :Int, renderTarget :Stage3DTextureRoot,
         blendMode :BlendMode, scissor :Rectangle, shader :Shader) :Int
     {
         if (renderTarget != _lastRenderTarget) {
@@ -284,18 +285,20 @@ class Stage3DBatcher
         var vertexBuffer = null;
         // TODO(bruno): Optimize with switch/case?
         if (_lastShader == _drawImageShader) {
-            _drawImageShader.texture = _lastTexture.nativeTexture;
+            _drawImageShader.texture = _lastTexture.root.nativeTexture;
             _drawImageShader.rebuildVars();
             vertexBuffer = _vertexBuffer5;
 
         } else if (_lastShader == _drawPatternShader) {
-            var maxUV = _scratchVector3D;
-            maxUV.x = _lastTexture.maxU;
-            maxUV.y = _lastTexture.maxV;
-            // maxUV.z = 0;
-            // maxUV.w = 0;
-            _drawPatternShader.texture = _lastTexture.nativeTexture;
-            _drawPatternShader.maxUV = maxUV;
+            var region = _scratchVector3D;
+            var texture = _lastTexture;
+            var root = texture.root;
+            region.x = texture.rootX / root.width;
+            region.y = texture.rootY / root.height;
+            region.z = texture.width / root.width;
+            region.w = texture.height / root.height;
+            _drawPatternShader.texture = root.nativeTexture;
+            _drawPatternShader.region = region;
             _drawPatternShader.rebuildVars();
             vertexBuffer = _vertexBuffer5;
 
@@ -364,14 +367,14 @@ class Stage3DBatcher
 
     // Used to keep track of context changes requiring a flush
     private var _lastBlendMode :BlendMode;
-    private var _lastRenderTarget :Stage3DTexture;
+    private var _lastRenderTarget :Stage3DTextureRoot;
     private var _lastShader :Shader;
     private var _lastTexture :Stage3DTexture;
     private var _lastScissor :Rectangle;
 
     // Used to avoid redundant Context3D calls
     private var _currentBlendMode :BlendMode;
-    private var _currentRenderTarget :Stage3DTexture;
+    private var _currentRenderTarget :Stage3DTextureRoot;
 
     // Extra stuff for scissor test tracking
     private var _scratchScissor :Rectangle;

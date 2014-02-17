@@ -74,10 +74,10 @@ class WebGLBatcher
     }
 
     /** Safely delete a texture. */
-    public function deleteTexture (texture :WebGLTexture)
+    public function deleteTexture (texture :WebGLTextureRoot)
     {
         // If we have unflushed quads that use this texture, flush them now
-        if (texture == _lastTexture) {
+        if (_lastTexture != null && _lastTexture.root == texture) {
             flush();
             _lastTexture = null;
             _currentTexture = null;
@@ -87,7 +87,7 @@ class WebGLBatcher
     }
 
     /** Safely bind a framebuffer. */
-    public function bindFramebuffer (texture :WebGLTexture)
+    public function bindFramebuffer (texture :WebGLTextureRoot)
     {
         if (texture != _lastRenderTarget) {
             flush();
@@ -96,7 +96,7 @@ class WebGLBatcher
     }
 
     /** Safely delete a framebuffer. */
-    public function deleteFramebuffer (texture :WebGLTexture)
+    public function deleteFramebuffer (texture :WebGLTextureRoot)
     {
         // If we have unflushed quads that render to this texture, flush them now
         if (texture == _lastRenderTarget) {
@@ -108,7 +108,7 @@ class WebGLBatcher
         _gl.deleteFramebuffer(texture.framebuffer);
     }
 
-    public function prepareDrawImage (renderTarget :WebGLTexture,
+    public function prepareDrawImage (renderTarget :WebGLTextureRoot,
         blendMode :BlendMode, scissor :Rectangle, texture :WebGLTexture) :Int
     {
         if (texture != _lastTexture) {
@@ -118,7 +118,7 @@ class WebGLBatcher
         return prepareQuad(5, renderTarget, blendMode, scissor, _drawImageShader);
     }
 
-    public function prepareDrawPattern (renderTarget :WebGLTexture,
+    public function prepareDrawPattern (renderTarget :WebGLTextureRoot,
         blendMode :BlendMode, scissor :Rectangle, texture :WebGLTexture) :Int
     {
         if (texture != _lastTexture) {
@@ -128,13 +128,13 @@ class WebGLBatcher
         return prepareQuad(5, renderTarget, blendMode, scissor, _drawPatternShader);
     }
 
-    public function prepareFillRect (renderTarget :WebGLTexture,
+    public function prepareFillRect (renderTarget :WebGLTextureRoot,
         blendMode :BlendMode, scissor :Rectangle) :Int
     {
         return prepareQuad(6, renderTarget, blendMode, scissor, _fillRectShader);
     }
 
-    private function prepareQuad (elementsPerVertex :Int, renderTarget :WebGLTexture,
+    private function prepareQuad (elementsPerVertex :Int, renderTarget :WebGLTextureRoot,
         blendMode :BlendMode, scissor :Rectangle, shader :ShaderGL) :Int
     {
         if (renderTarget != _lastRenderTarget) {
@@ -202,7 +202,7 @@ class WebGLBatcher
         }
 
         if (_lastTexture != _currentTexture) {
-            _gl.bindTexture(GL.TEXTURE_2D, _lastTexture.nativeTexture);
+            _gl.bindTexture(GL.TEXTURE_2D, _lastTexture.root.nativeTexture);
             _currentTexture = _lastTexture;
         }
 
@@ -213,7 +213,13 @@ class WebGLBatcher
         }
 
         if (_lastShader == _drawPatternShader) {
-            _drawPatternShader.setMaxUV(_lastTexture.maxU, _lastTexture.maxV);
+            var texture = _lastTexture;
+            var root = texture.root;
+            _drawPatternShader.setRegion(
+                texture.rootX / root.width,
+                texture.rootY / root.height,
+                texture.width / root.width,
+                texture.height / root.height);
         }
 
         // _gl.bufferSubData(GL.ARRAY_BUFFER, 0, data.subarray(0, _dataOffset));
@@ -250,7 +256,7 @@ class WebGLBatcher
         _gl.bufferData(GL.ELEMENT_ARRAY_BUFFER, indices, GL.STATIC_DRAW);
     }
 
-    private function bindRenderTarget (texture :WebGLTexture)
+    private function bindRenderTarget (texture :WebGLTextureRoot)
     {
         // Bind the texture framebuffer, or the original backbuffer
         if (texture != null) {
@@ -271,7 +277,7 @@ class WebGLBatcher
 
     // Used to keep track of context changes requiring a flush
     private var _lastBlendMode :BlendMode = null;
-    private var _lastRenderTarget :WebGLTexture = null;
+    private var _lastRenderTarget :WebGLTextureRoot = null;
     private var _lastShader :ShaderGL = null;
     private var _lastTexture :WebGLTexture = null;
     private var _lastScissor :Rectangle = null;
@@ -280,7 +286,7 @@ class WebGLBatcher
     private var _currentBlendMode :BlendMode = null;
     private var _currentShader :ShaderGL = null;
     private var _currentTexture :WebGLTexture = null;
-    private var _currentRenderTarget :WebGLTexture = null;
+    private var _currentRenderTarget :WebGLTextureRoot = null;
     private var _pendingSetScissor :Bool = false;
 
     private var _vertexBuffer :Buffer;

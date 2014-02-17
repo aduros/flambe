@@ -27,12 +27,14 @@ class CanvasRenderer
 
     public function createTexture (image :Dynamic) :Texture
     {
-        return new CanvasTexture(CANVAS_TEXTURES ? HtmlUtil.createCanvas(image) : image);
+        var root = new CanvasTextureRoot(CANVAS_TEXTURES ? HtmlUtil.createCanvas(image) : image);
+        return root.createTexture(root.width, root.height);
     }
 
     public function createEmptyTexture (width :Int, height :Int) :Texture
     {
-        return new CanvasTexture(HtmlUtil.createEmptyCanvas(width, height));
+        var root = new CanvasTextureRoot(HtmlUtil.createEmptyCanvas(width, height));
+        return root.createTexture(width, height);
     }
 
     public function getCompressedTextureFormats () :Array<AssetFormat>

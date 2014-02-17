@@ -56,10 +56,10 @@ class Stage3DRenderer
         }
 
         var bitmapData :BitmapData = cast bitmapData;
-        var texture = new Stage3DTexture(this, bitmapData.width, bitmapData.height);
-        texture.init(_context3D, false);
-        texture.uploadBitmapData(bitmapData);
-        return texture;
+        var root = new Stage3DTextureRoot(this, bitmapData.width, bitmapData.height);
+        root.init(_context3D, false);
+        root.uploadBitmapData(bitmapData);
+        return root.createTexture(bitmapData.width, bitmapData.height);
     }
 
     public function createEmptyTexture (width :Int, height :Int) :Stage3DTexture
@@ -68,9 +68,9 @@ class Stage3DRenderer
             return null; // No Stage3D context yet
         }
 
-        var texture = new Stage3DTexture(this, width, height);
-        texture.init(_context3D, true);
-        return texture;
+        var root = new Stage3DTextureRoot(this, width, height);
+        root.init(_context3D, true);
+        return root.createTexture(width, height);
     }
 
     public function getCompressedTextureFormats () :Array<AssetFormat>
@@ -84,7 +84,7 @@ class Stage3DRenderer
         return null;
     }
 
-    public function createGraphics (renderTarget :Stage3DTexture) :Stage3DGraphics
+    public function createGraphics (renderTarget :Stage3DTextureRoot) :Stage3DGraphics
     {
         return new Stage3DGraphics(batcher, renderTarget);
     }

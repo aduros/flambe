@@ -45,9 +45,9 @@ class WebGLRenderer
         if (gl.isContextLost()) {
             return null;
         }
-        var texture = new WebGLTexture(this, image.width, image.height);
-        texture.uploadImageData(image);
-        return texture;
+        var root = new WebGLTextureRoot(this, image.width, image.height);
+        root.uploadImageData(image);
+        return root.createTexture(image.width, image.height);
     }
 
     public function createEmptyTexture (width :Int, height :Int) :WebGLTexture
@@ -55,9 +55,9 @@ class WebGLRenderer
         if (gl.isContextLost()) {
             return null;
         }
-        var texture = new WebGLTexture(this, width, height);
-        texture.clear();
-        return texture;
+        var root = new WebGLTextureRoot(this, width, height);
+        root.clear();
+        return root.createTexture(width, height);
     }
 
     public function getCompressedTextureFormats () :Array<AssetFormat>

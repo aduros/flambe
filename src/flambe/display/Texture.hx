@@ -68,4 +68,12 @@ interface Texture extends Asset
      * @param height The height of the region.
      */
     function subTexture (x :Int, y :Int, width :Int, height :Int) :SubTexture;
+
+    /**
+     * Splits this texture into multiple tiles using `subTexture()`.
+     *
+     * @param tilesWide The width, in number of tiles.
+     * @param tilesHigh The height, in number of tiles.
+     */
+    function split (tilesWide :Int, tilesHigh :Int = 1) :Array<SubTexture>;
 }

@@ -42,6 +42,16 @@ class BasicTexture<R:(TextureRoot,BasicAsset<R>)> extends BasicAsset<BasicTextur
         _height = height;
     }
 
+    public function readPixels (x :Int, y :Int, width :Int, height :Int) :Bytes
+    {
+        return root.readPixels(rootX+x, rootY+y, width, height);
+    }
+
+    public function writePixels (pixels :Bytes, x :Int, y :Int, sourceW :Int, sourceH :Int)
+    {
+        root.writePixels(pixels, rootX+x, rootY+y, sourceW, sourceH);
+    }
+
     public function subTexture (x :Int, y :Int, width :Int, height :Int) :SubTexture
     {
         var sub :BasicTexture<R> = cast root.createTexture(width, height);
@@ -53,14 +63,17 @@ class BasicTexture<R:(TextureRoot,BasicAsset<R>)> extends BasicAsset<BasicTextur
         return sub;
     }
 
-    public function readPixels (x :Int, y :Int, width :Int, height :Int) :Bytes
+    public function split (tilesWide :Int, tilesHigh :Int = 1) :Array<SubTexture>
     {
-        return root.readPixels(rootX+x, rootY+y, width, height);
-    }
-
-    public function writePixels (pixels :Bytes, x :Int, y :Int, sourceW :Int, sourceH :Int)
-    {
-        root.writePixels(pixels, rootX+x, rootY+y, sourceW, sourceH);
+        var tiles = [];
+        var tileWidth = Std.int(_width / tilesWide);
+        var tileHeight = Std.int(_height / tilesHigh);
+        for (y in 0...tilesHigh) {
+            for (x in 0...tilesWide) {
+                tiles.push(subTexture(x*tileWidth, y*tileHeight, tileWidth, tileHeight));
+            }
+        }
+        return tiles;
     }
 
     // FIXME(bruno): Different textures that share the same root also share the same Graphics. This

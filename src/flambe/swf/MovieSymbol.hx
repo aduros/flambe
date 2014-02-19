@@ -51,7 +51,7 @@ class MovieSymbol
         duration = frames / frameRate;
     }
 
-    public function get_name () :String
+    inline private function get_name () :String
     {
         return _name;
     }

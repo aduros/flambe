@@ -44,7 +44,7 @@ class BitmapSymbol
         return sprite;
     }
 
-    public function get_name () :String
+    inline private function get_name () :String
     {
         return _name;
     }

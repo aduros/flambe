@@ -97,8 +97,8 @@ class MovieKeyframe
     /** The length of this keyframe in frames. */
     public var duration (default, null) :Float;
 
-    public var symbolName (default, null) :String;
-    public var symbol :Symbol = null;
+    @:allow(flambe) var symbolName (default, null) :String;
+    public var symbol (default, null) :Symbol = null;
 
     public var label (default, null) :String;
 
@@ -174,5 +174,10 @@ class MovieKeyframe
     @:allow(flambe) inline function setVisible (visible :Bool)
     {
         this.visible = visible;
+    }
+
+    @:allow(flambe) inline function setSymbol (symbol :Symbol)
+    {
+        this.symbol = symbol;
     }
 }

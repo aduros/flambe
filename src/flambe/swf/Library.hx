@@ -66,7 +66,7 @@ class Library
                     if (kf.symbolName != null) {
                         var symbol = _symbols.get(kf.symbolName);
                         Assert.that(symbol != null);
-                        kf.symbol = symbol;
+                        kf.setSymbol(symbol);
                     }
 
                     // Specially handle "stop frames". These are one-frame keyframes that preceed an

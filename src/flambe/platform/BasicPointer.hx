@@ -82,13 +82,9 @@ class BasicPointer
         // Finally, emit the event up the chain
         prepare(viewX, viewY, hit, source);
         for (sprite in chain) {
-            // Avoid calling the public getter and lazily instanciating this signal
-            var signal = sprite._pointerDown;
-            if (signal != null) {
-                signal.emit(_sharedEvent);
-                if (_sharedEvent._stopped) {
-                    return;
-                }
+            sprite.onPointerDown(_sharedEvent);
+            if (_sharedEvent._stopped) {
+                return;
             }
         }
         down.emit(_sharedEvent);
@@ -116,13 +112,9 @@ class BasicPointer
         // Finally, emit the event up the chain
         prepare(viewX, viewY, hit, source);
         for (sprite in chain) {
-            // Avoid calling the public getter and lazily instanciating this signal
-            var signal = sprite._pointerMove;
-            if (signal != null) {
-                signal.emit(_sharedEvent);
-                if (_sharedEvent._stopped) {
-                    return;
-                }
+            sprite.onPointerMove(_sharedEvent);
+            if (_sharedEvent._stopped) {
+                return;
             }
         }
         move.emit(_sharedEvent);
@@ -155,13 +147,9 @@ class BasicPointer
         // Finally, emit the event up the chain
         prepare(viewX, viewY, hit, source);
         for (sprite in chain) {
-            // Avoid calling the public getter and lazily instanciating this signal
-            var signal = sprite._pointerUp;
-            if (signal != null) {
-                signal.emit(_sharedEvent);
-                if (_sharedEvent._stopped) {
-                    return;
-                }
+            sprite.onPointerUp(_sharedEvent);
+            if (_sharedEvent._stopped) {
+                return;
             }
         }
         up.emit(_sharedEvent);

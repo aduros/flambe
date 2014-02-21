@@ -13,6 +13,7 @@ import flambe.math.Point;
 import flambe.math.Rectangle;
 import flambe.scene.Director;
 import flambe.util.Signal1;
+import flambe.util.SignalConnection;
 import flambe.util.Value;
 
 using flambe.util.BitSets;
@@ -102,6 +103,17 @@ class Sprite extends Component
      * Emitted when the pointer is raised over this sprite.
      */
     public var pointerUp (get, null) :Signal1<PointerEvent>;
+
+    /**
+     * Emitted when the pointer is moved inside of this sprite.
+     */
+    public var pointerIn (get, null) :Signal1<PointerEvent>;
+
+    /**
+     * Emitted when the pointer is moved outside of this sprite. If the pointer is a touch, also
+     * emitted when the touch is lifted from this sprite.
+     */
+    public var pointerOut (get, null) :Signal1<PointerEvent>;
 
     /**
      * Whether this sprite or any children should receive pointer events. Defaults to true.
@@ -409,6 +421,21 @@ class Sprite extends Component
         return this;
     }
 
+    override public function onAdded ()
+    {
+        if (_flags.contains(HOVERING)) {
+            connectHover();
+        }
+    }
+
+    override public function onRemoved ()
+    {
+        if (_hoverConnection != null) {
+            _hoverConnection.dispose();
+            _hoverConnection = null;
+        }
+    }
+
     override public function onUpdate (dt :Float)
     {
         x.update(dt);
@@ -482,6 +509,47 @@ class Sprite extends Component
         return _pointerUp;
     }
 
+    private function get_pointerIn () :Signal1<PointerEvent>
+    {
+        if (_pointerIn == null) {
+            _pointerIn = new Signal1();
+        }
+        return _pointerIn;
+    }
+
+    private function get_pointerOut () :Signal1<PointerEvent>
+    {
+        if (_pointerOut == null) {
+            _pointerOut = new Signal1();
+        }
+        return _pointerOut;
+    }
+
+    private function connectHover ()
+    {
+        if (_hoverConnection != null) {
+            return;
+        }
+        _hoverConnection = System.pointer.move.connect(function (event) {
+            // Return early if this sprite was in the event chain
+            var hit = event.hit;
+            while (hit != null) {
+                if (hit == this) {
+                    return;
+                }
+                hit = hit.getParentSprite();
+            }
+
+            // This sprite is not under the pointer
+            if (_pointerOut != null && _flags.contains(HOVERING)) {
+                _pointerOut.emit(event);
+            }
+            _flags = _flags.remove(HOVERING);
+            _hoverConnection.dispose();
+            _hoverConnection = null;
+        });
+    }
+
     inline private function get_visible () :Bool
     {
         return _flags.contains(VISIBLE);
@@ -515,7 +583,47 @@ class Sprite extends Component
         return pixelSnapping;
     }
 
-    private static function hitTestBackwards (entity :Entity, x :Float, y :Float)
+    @:allow(flambe) function onPointerDown (event :PointerEvent)
+    {
+        if (_pointerDown != null) {
+            _pointerDown.emit(event);
+        }
+    }
+
+    @:allow(flambe) function onPointerMove (event :PointerEvent)
+    {
+        if (_pointerMove != null) {
+            _pointerMove.emit(event);
+        }
+        if ((_pointerIn != null || _pointerOut != null) && !_flags.contains(HOVERING)) {
+            if (_pointerIn != null) {
+                _pointerIn.emit(event);
+            }
+            connectHover();
+        }
+        _flags = _flags.add(HOVERING);
+    }
+
+    @:allow(flambe) function onPointerUp (event :PointerEvent)
+    {
+        if (_pointerUp != null) {
+            _pointerUp.emit(event);
+        }
+        switch (event.source) {
+        case Touch(point):
+            if (_pointerOut != null && _flags.contains(HOVERING)) {
+                _pointerOut.emit(event);
+            }
+            _flags = _flags.remove(HOVERING);
+            if (_hoverConnection != null) {
+                _hoverConnection.dispose();
+                _hoverConnection = null;
+            }
+        default:
+        }
+    }
+
+    private static function hitTestBackwards (entity :Entity, x :Float, y :Float) :Sprite
     {
         if (entity != null) {
             var result = hitTestBackwards(entity.next, x, y);
@@ -599,6 +707,7 @@ class Sprite extends Component
     private static inline var MOVIESPRITE_SKIP_NEXT = 1 << 5;
     private static inline var TEXTSPRITE_DIRTY = 1 << 6;
     private static inline var PIXEL_SNAPPING = 1 << 7;
+    private static inline var HOVERING = 1 << 8;
 
     private var _flags :Int;
 
@@ -608,7 +717,11 @@ class Sprite extends Component
     private var _viewMatrixUpdateCount :Int = 0;
     private var _parentViewMatrixUpdateCount :Int = 0;
 
-    @:allow(flambe) var _pointerDown :Signal1<PointerEvent>;
-    @:allow(flambe) var _pointerMove :Signal1<PointerEvent>;
-    @:allow(flambe) var _pointerUp :Signal1<PointerEvent>;
+    private var _pointerDown :Signal1<PointerEvent>;
+    private var _pointerMove :Signal1<PointerEvent>;
+    private var _pointerUp :Signal1<PointerEvent>;
+
+    private var _pointerIn :Signal1<PointerEvent>;
+    private var _pointerOut :Signal1<PointerEvent>;
+    private var _hoverConnection :SignalConnection;
 }

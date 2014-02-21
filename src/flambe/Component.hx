@@ -9,7 +9,7 @@ import flambe.util.Disposable;
 /**
  * Components are bits of data and logic that can be added to entities.
  */
-#if !macro
+#if (!macro && !display)
 @:autoBuild(flambe.platform.ComponentBuilder.build())
 #end
 @:componentBase

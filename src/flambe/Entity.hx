@@ -131,6 +131,10 @@ using Lambda;
     /**
      * Gets a component of a given type from this entity.
      */
+#if (display || dox)
+    public function get<A:Component> (componentClass :Class<A>) :A return null;
+
+#else
     macro public function get<A> (self :Expr, componentClass :ExprOf<Class<A>>) :ExprOf<A>
     {
         switch (componentClass.expr) {
@@ -148,14 +152,20 @@ using Lambda;
             Context.currentPos());
         return null;
     }
+#end
 
     /**
      * Checks if this entity has a component of the given type.
      */
+#if (display || dox)
+    public function has<A:Component> (componentClass :Class<A>) :Bool return false;
+
+#else
     macro public function has<A> (self :Expr, componentClass :ExprOf<Class<A>>) :ExprOf<Bool>
     {
         return macro $self.get($componentClass) != null;
     }
+#end
 
     /**
      * Gets a component by name from this entity.

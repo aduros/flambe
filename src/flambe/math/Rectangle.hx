@@ -13,11 +13,18 @@ class Rectangle
     public var y :Float;
     public var width :Float;
     public var height :Float;
-    
-    public var top(get, null):Float;
-    public var right(get, null):Float;
-    public var bottom(get, null):Float;
-    public var left(get, null):Float;
+
+    /** The X-coordinate of the left side of the rectangle. */
+    public var left (get, null) :Float;
+
+    /** The X-coordinate of the right side of the rectangle. */
+    public var right (get, null) :Float;
+
+    /** The Y-coordinate of the top side of the rectangle. */
+    public var top (get, null) :Float;
+
+    /** The Y-coordinate of the bottom side of the rectangle. */
+    public var bottom (get, null) :Float;
 
     public function new (x :Float = 0, y :Float = 0, width :Float = 0, height :Float = 0)
     {
@@ -32,7 +39,12 @@ class Rectangle
         this.height = height;
     }
 
-    private function get_top () :Float
+    inline private function get_left () :Float
+    {
+        return x;
+    }
+
+    inline private function get_top () :Float
     {
         return y;
     }
@@ -45,11 +57,6 @@ class Rectangle
     private function get_bottom () :Float
     {
         return y + height;
-    }
-
-    private function get_left () :Float
-    {
-        return x;
     }
 
     /**
@@ -96,7 +103,7 @@ class Rectangle
     {
         return x == other.x && y == other.y && width == other.width && height == other.height;
     }
-    
+
     #if debug @:keep #end public function toString () :String
     {
         return "(" + x + "," + y + " " + width + "x" + height + ")";

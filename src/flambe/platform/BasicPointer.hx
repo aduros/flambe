@@ -63,6 +63,8 @@ class BasicPointer
         if (_isDown) {
             return; // Ignore repeat down events
         }
+        // Ensure a move event is sent first
+        submitMove(viewX, viewY, source);
         _isDown = true;
 
         // Take a snapshot of the entire event bubbling chain
@@ -95,6 +97,10 @@ class BasicPointer
      */
     public function submitMove (viewX :Float, viewY :Float, source :EventSource)
     {
+        if (viewX == _x && viewY == _y) {
+            return; // Ignore repeated duplicate move events
+        }
+
         // Take a snapshot of the entire event bubbling chain
         var chain = [];
         var hit = Sprite.hitTest(System.root, viewX, viewY);
@@ -128,6 +134,8 @@ class BasicPointer
         if (!_isDown) {
             return; // Ignore repeat up events
         }
+        // Ensure a move event is sent first
+        submitMove(viewX, viewY, source);
         _isDown = false;
 
         // Take a snapshot of the entire event bubbling chain

@@ -585,6 +585,7 @@ class Sprite extends Component
 
     @:allow(flambe) function onPointerDown (event :PointerEvent)
     {
+        onHover(event);
         if (_pointerDown != null) {
             _pointerDown.emit(event);
         }
@@ -592,23 +593,30 @@ class Sprite extends Component
 
     @:allow(flambe) function onPointerMove (event :PointerEvent)
     {
+        onHover(event);
         if (_pointerMove != null) {
             _pointerMove.emit(event);
         }
-        if ((_pointerIn != null || _pointerOut != null) && !_flags.contains(HOVERING)) {
+    }
+
+    private function onHover (event :PointerEvent)
+    {
+        if (_flags.contains(HOVERING)) {
+            return; // Already hovering
+        }
+        _flags = _flags.add(HOVERING);
+
+        // Notify listeners and connect the hover-out listener
+        if ((_pointerIn != null || _pointerOut != null)) {
             if (_pointerIn != null) {
                 _pointerIn.emit(event);
             }
             connectHover();
         }
-        _flags = _flags.add(HOVERING);
     }
 
     @:allow(flambe) function onPointerUp (event :PointerEvent)
     {
-        if (_pointerUp != null) {
-            _pointerUp.emit(event);
-        }
         switch (event.source) {
         case Touch(point):
             if (_pointerOut != null && _flags.contains(HOVERING)) {
@@ -620,6 +628,10 @@ class Sprite extends Component
                 _hoverConnection = null;
             }
         default:
+        }
+
+        if (_pointerUp != null) {
+            _pointerUp.emit(event);
         }
     }
 

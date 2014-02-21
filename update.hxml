@@ -1,0 +1,2 @@
+-lib haxelib_client
+--run tools.haxelib.Rebuild

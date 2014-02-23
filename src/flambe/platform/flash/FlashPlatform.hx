@@ -96,7 +96,7 @@ class FlashPlatform
         new DebugLogic(this);
         _catapult = FlashCatapultClient.canUse() ? new FlashCatapultClient() : null;
 #end
-        Log.info("Initialized Flash platform", ["renderer", _renderer.getName()]);
+        Log.info("Initialized Flash platform", ["renderer", _renderer.type]);
     }
 
     public function loadAssetPack (manifest :Manifest) :Promise<AssetPack>
@@ -189,7 +189,7 @@ class FlashPlatform
         return _motion;
     }
 
-    public function getRenderer () :Renderer
+    public function getRenderer () :Stage3DRenderer
     {
         return _renderer;
     }
@@ -261,7 +261,7 @@ class FlashPlatform
     // Statically initialized subsystems
     private var _mouse :MouseSystem;
     private var _pointer :BasicPointer;
-    private var _renderer :Renderer;
+    private var _renderer :Stage3DRenderer;
     private var _stage :FlashStage;
     private var _touch :TouchSystem;
 

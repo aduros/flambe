@@ -254,7 +254,7 @@ class HtmlPlatform
         new DebugLogic(this);
         _catapult = HtmlCatapultClient.canUse() ? new HtmlCatapultClient() : null;
 #end
-        Log.info("Initialized HTML platform", ["renderer", _renderer.getName()]);
+        Log.info("Initialized HTML platform", ["renderer", _renderer.type]);
     }
 
     public function loadAssetPack (manifest :Manifest) :Promise<AssetPack>
@@ -391,7 +391,7 @@ class HtmlPlatform
         return _motion;
     }
 
-    public function getRenderer () :Renderer
+    public function getRenderer () :InternalRenderer<Dynamic>
     {
         return _renderer;
     }
@@ -406,7 +406,7 @@ class HtmlPlatform
         return (event.clientY - bounds.top)*_stage.height/bounds.height;
     }
 
-    private function createRenderer (canvas :CanvasElement) :Renderer
+    private function createRenderer (canvas :CanvasElement) :InternalRenderer<Dynamic>
     {
 #if !flambe_disable_webgl
         try {
@@ -448,7 +448,7 @@ class HtmlPlatform
     // Statically initialized subsystems
     private var _mouse :HtmlMouse;
     private var _pointer :BasicPointer;
-    private var _renderer :Renderer;
+    private var _renderer :InternalRenderer<Dynamic>;
     private var _stage :HtmlStage;
     private var _touch :TouchSystem;
 

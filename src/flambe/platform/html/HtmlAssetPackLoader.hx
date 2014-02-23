@@ -43,7 +43,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
                     _URL.revokeObjectURL(image.src);
                 }
 
-                var texture = _platform.getRenderer().createTexture(image);
+                var texture = _platform.getRenderer().createTextureFromImage(image);
                 if (texture != null) {
                     handleLoad(entry, texture);
                 } else {

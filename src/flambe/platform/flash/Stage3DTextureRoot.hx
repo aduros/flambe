@@ -110,7 +110,7 @@ class Stage3DTextureRoot extends BasicAsset<Stage3DTextureRoot>
         } else {
             // Since there's no way to update a texture's subregion in Stage3D, create a temporary
             // texture and draw it to this one at the right position
-            var temp = _renderer.createEmptyTexture(sourceW, sourceH);
+            var temp = _renderer.createTexture(sourceW, sourceH);
             temp.root.nativeTexture.uploadFromBitmapData(bitmapData);
             drawTexture(temp, x, y, 0, 0, sourceW, sourceH);
             temp.dispose();

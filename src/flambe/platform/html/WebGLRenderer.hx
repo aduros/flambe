@@ -9,13 +9,16 @@ import js.html.webgl.*;
 import haxe.io.Bytes;
 
 import flambe.asset.AssetEntry;
-import flambe.display.Graphics;
-import flambe.display.Texture;
+import flambe.subsystem.RendererSystem;
 import flambe.util.Assert;
+import flambe.util.Value;
 
 class WebGLRenderer
-    implements Renderer
+    implements InternalRenderer<Dynamic>
 {
+    public var type (get, null) :RendererType;
+    public var hasGPU (get, null) :Value<Bool>;
+
     public var graphics :InternalGraphics;
 
     public var gl (default, null) :RenderingContext;
@@ -23,24 +26,36 @@ class WebGLRenderer
 
     public function new (stage :HtmlStage, gl :RenderingContext)
     {
+        _hasGPU = new Value<Bool>(true);
         this.gl = gl;
 
         // Handle GL context loss
         gl.canvas.addEventListener("webglcontextlost", function (event) {
             event.preventDefault();
             Log.warn("WebGL context lost");
-            System.hasGPU._ = false;
+            _hasGPU._ = false;
         }, false);
         gl.canvas.addEventListener("webglcontextrestore", function (event) {
             Log.warn("WebGL context restored");
             init();
+            _hasGPU._ = true;
         }, false);
 
         stage.resize.connect(onResize);
         init();
     }
 
-    public function createTexture (image :Dynamic) :WebGLTexture
+    inline private function get_type () :RendererType
+    {
+        return WebGL;
+    }
+
+    inline private function get_hasGPU () :Value<Bool>
+    {
+        return _hasGPU;
+    }
+
+    public function createTextureFromImage (image :Dynamic) :WebGLTexture
     {
         if (gl.isContextLost()) {
             return null;
@@ -50,7 +65,7 @@ class WebGLRenderer
         return root.createTexture(image.width, image.height);
     }
 
-    public function createEmptyTexture (width :Int, height :Int) :WebGLTexture
+    public function createTexture (width :Int, height :Int) :WebGLTexture
     {
         if (gl.isContextLost()) {
             return null;
@@ -85,11 +100,6 @@ class WebGLRenderer
         graphics.didRender();
     }
 
-    public function getName () :String
-    {
-        return "WebGL";
-    }
-
     private function onResize ()
     {
         var width = gl.canvas.width, height = gl.canvas.height;
@@ -102,6 +112,7 @@ class WebGLRenderer
         batcher = new WebGLBatcher(gl);
         graphics = new WebGLGraphics(batcher, null);
         onResize();
-        System.hasGPU._ = true;
     }
+
+    private var _hasGPU :Value<Bool>;
 }

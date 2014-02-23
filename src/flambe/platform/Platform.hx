@@ -20,12 +20,11 @@ interface Platform
     function getMotion() :MotionSystem;
     function getMouse () :MouseSystem;
     function getPointer () :PointerSystem;
+    function getRenderer () :InternalRenderer<Dynamic>;
     function getStage () :StageSystem;
     function getStorage () :StorageSystem;
     function getTouch () :TouchSystem;
     function getWeb () :WebSystem;
-
-    function getRenderer () :Renderer;
 
     function createLogHandler (tag :String) :LogHandler;
     function loadAssetPack (manifest :Manifest) :Promise<AssetPack>;

@@ -9,20 +9,11 @@ import haxe.io.Bytes;
 import flambe.asset.AssetEntry;
 import flambe.display.Graphics;
 import flambe.display.Texture;
+import flambe.subsystem.RendererSystem;
 
-interface Renderer
+interface InternalRenderer<NativeImage> extends RendererSystem<NativeImage>
 {
     public var graphics :InternalGraphics;
-
-    /**
-     * Creates a texture from some data source.
-     */
-    function createTexture (data :Dynamic) :Texture;
-
-    /**
-     * Creates a texture, initialized to transparent black.
-     */
-    function createEmptyTexture (width :Int, height :Int) :Texture;
 
     /**
      * The compressed texture formats supported by this renderer.
@@ -40,9 +31,4 @@ interface Renderer
      * Notifies the renderer that drawing the frame is complete.
      */
     function didRender () :Void;
-
-    /**
-     * Get the name of the renderer, for debug logging.
-     */
-    function getName () :String;
 }

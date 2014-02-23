@@ -91,7 +91,7 @@ class Library
      * converted to a movie that can be instanciated with `createMovie()`.
      *
      * Example:
-     * ```
+     * ```haxe
      * var lib = Library.fromFlipbooks({
      *     // A walk animation from a 5x3 sprite sheet, that lasts 5 seconds
      *     "walk": new Flipbook(spriteSheet.split(5, 3)).setDuration(5).setAnchor(10, 10),

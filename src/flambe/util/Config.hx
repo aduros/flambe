@@ -11,7 +11,7 @@ typedef ConfigSection = Map<String,String>;
 /**
  * An INI-like config file parser.
  *
- * ```
+ * ```ini
  * ; This is a comment
  * foo = some value
  * [my section]

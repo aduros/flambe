@@ -21,7 +21,7 @@ import flambe.util.Logger;
  *
  * ```haxe
  * // In src/foobar/Log.hx
- * class Log extends PackageLogger {}
+ * class Log extends PackageLog {}
  *
  * // In src/foobar/something/deeper/Widget.hx
  * // (Importing foobar.Log is not needed, as Haxe automatically imports classes in parent directories)

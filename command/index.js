@@ -236,7 +236,7 @@ exports.build = function (config, platforms, opts) {
     var generateAirXml = function (swf, output) {
         var xmldom = require("xmldom");
         var xml =
-            "<application xmlns=\"http://ns.adobe.com/air/application/3.7\">\n" +
+            "<application xmlns=\"http://ns.adobe.com/air/application/4.0\">\n" +
             "  <id>"+get(config, "id")+"</id>\n" +
             "  <versionNumber>"+get(config, "version")+"</versionNumber>\n" +
             "  <filename>"+get(config, "name")+"</filename>\n" +

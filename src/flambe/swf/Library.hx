@@ -142,6 +142,44 @@ class Library
         return lib;
     }
 
+	public static function fromFlipbookArray (flipbooks :Array<Flipbook>) :Library
+    {
+        var lib = Type.createEmptyInstance(Library);
+        lib._symbols = new Map();
+        lib.frameRate = 60;
+
+        for (flipbook in flipbooks)
+		{
+            // Fake up some Flump metadata to create a movie symbol
+            var keyframes :Array<KeyframeFormat> = [];
+            for (frame in flipbook.frames) {
+                keyframes.push(cast {
+                    duration: frame.duration*lib.frameRate,
+                    label: frame.label,
+                    pivot: [frame.anchorX, frame.anchorY],
+                    ref: "", // Hack so that this keyframe doesn't get marked as empty
+                });
+            }
+            var movie = new MovieSymbol(lib, {
+                id: flipbook.name,
+                layers: [{
+                    name: "flipbook",
+                    flipbook: true,
+                    keyframes: keyframes,
+                }],
+            });
+            lib._symbols.set(flipbook.name, movie);
+
+            // Assign symbols at each keyframe
+            var keyframes = movie.layers[0].keyframes;
+            for (ii in 0...flipbook.frames.length) {
+                keyframes[ii].setSymbol(flipbook.frames[ii].toSymbol());
+            }
+        }
+
+        return lib;
+    }
+	
     /**
      * Retrieve a name symbol from this library, or null if not found.
      */

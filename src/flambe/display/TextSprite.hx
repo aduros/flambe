@@ -15,6 +15,7 @@ using flambe.util.BitSets;
  */
 class TextSprite extends Sprite
 {
+    /** The text being displayed. Can contain contain newline characters (\n) for multiline text. */
     public var text (get, set) :String;
 
     /** The font used to display the text. */
@@ -99,6 +100,26 @@ class TextSprite extends Sprite
     public function setWrapWidth (wrapWidth :Float) :TextSprite
     {
         this.wrapWidth._ = wrapWidth;
+        return this;
+    }
+
+    /**
+     * Chainable convenience method to set the letter spacing.
+     * @returns This instance, for chaining.
+     */
+    public function setLetterSpacing (letterSpacing :Float) :TextSprite
+    {
+        this.letterSpacing._ = letterSpacing;
+        return this;
+    }
+
+    /**
+     * Chainable convenience method to set the line spacing.
+     * @returns This instance, for chaining.
+     */
+    public function setLineSpacing (lineSpacing :Float) :TextSprite
+    {
+        this.lineSpacing._ = lineSpacing;
         return this;
     }
 

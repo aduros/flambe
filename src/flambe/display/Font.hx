@@ -115,12 +115,13 @@ class Font
         return list;
     }
 
-    public function layoutText (text :String, ?align :TextAlign, wrapWidth :Float = 0) :TextLayout
+    public function layoutText (text :String, ?align :TextAlign, wrapWidth :Float = 0,
+        letterSpacing :Float = 0) :TextLayout
     {
         if (align == null) {
             align = Left;
         }
-        return new TextLayout(this, text, align, wrapWidth);
+        return new TextLayout(this, text, align, wrapWidth, letterSpacing);
     }
 
     /**
@@ -320,7 +321,8 @@ class TextLayout
     /** The number of lines in this text. */
     public var lines (default, null) :Int = 0;
 
-    @:allow(flambe) function new (font :Font, text :String, align :TextAlign, wrapWidth :Float)
+    @:allow(flambe) function new (font :Font, text :String, align :TextAlign, wrapWidth :Float,
+        letterSpacing :Float)
     {
         _font = font;
         _glyphs = [];
@@ -382,7 +384,7 @@ class TextLayout
                 if (glyph.charCode == " ".code) {
                     lastSpaceIdx = ii;
                 }
-                lineWidth += glyph.xAdvance;
+                lineWidth += glyph.xAdvance + letterSpacing;
                 lineHeight = FMath.max(lineHeight, glyph.height + glyph.yOffset);
 
                 // Handle kerning with the next glyph

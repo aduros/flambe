@@ -33,6 +33,12 @@ class TextSprite extends Sprite
     public var letterSpacing (default, null) :AnimatedFloat;
 
     /**
+     * Additional vertical space to apply between lines, in pixels. Defaults to 0. Positive values
+     * make lines look "looser", negative values look "tighter".
+     */
+    public var lineSpacing (default, null) :AnimatedFloat;
+
+    /**
      * The horizontal text alignment, for multiline text. Left by default.
      */
     public var align (get, set) :TextAlign;
@@ -50,6 +56,7 @@ class TextSprite extends Sprite
         };
         wrapWidth = new AnimatedFloat(0, dirtyText);
         letterSpacing = new AnimatedFloat(0, dirtyText);
+        lineSpacing = new AnimatedFloat(0, dirtyText);
     }
 
     override public function draw (g :Graphics)
@@ -74,7 +81,7 @@ class TextSprite extends Sprite
     override public function getNaturalHeight () :Float
     {
         updateLayout();
-        var paddedHeight = _layout.lines * _font.lineHeight;
+        var paddedHeight = _layout.lines * (_font.lineHeight+lineSpacing._);
         var boundsHeight = _layout.bounds.height;
         return FMath.max(paddedHeight, boundsHeight);
     }
@@ -160,7 +167,7 @@ class TextSprite extends Sprite
         // Recreate the layout if necessary
         if (_flags.contains(Sprite.TEXTSPRITE_DIRTY)) {
             _flags = _flags.remove(Sprite.TEXTSPRITE_DIRTY);
-            _layout = font.layoutText(_text, _align, wrapWidth._, letterSpacing._);
+            _layout = font.layoutText(_text, _align, wrapWidth._, letterSpacing._, lineSpacing._);
         }
     }
 
@@ -169,6 +176,7 @@ class TextSprite extends Sprite
         super.onUpdate(dt);
         wrapWidth.update(dt);
         letterSpacing.update(dt);
+        lineSpacing.update(dt);
     }
 
     private var _font :Font;

@@ -116,12 +116,12 @@ class Font
     }
 
     public function layoutText (text :String, ?align :TextAlign, wrapWidth :Float = 0,
-        letterSpacing :Float = 0) :TextLayout
+        letterSpacing :Float = 0, lineSpacing :Float = 0) :TextLayout
     {
         if (align == null) {
             align = Left;
         }
-        return new TextLayout(this, text, align, wrapWidth, letterSpacing);
+        return new TextLayout(this, text, align, wrapWidth, letterSpacing, lineSpacing);
     }
 
     /**
@@ -322,11 +322,12 @@ class TextLayout
     public var lines (default, null) :Int = 0;
 
     @:allow(flambe) function new (font :Font, text :String, align :TextAlign, wrapWidth :Float,
-        letterSpacing :Float)
+        letterSpacing :Float, lineSpacing :Float)
     {
         _font = font;
         _glyphs = [];
         _offsets = [];
+        _lineOffset = font.lineHeight + lineSpacing;
 
         bounds = new Rectangle();
         var lineWidths = [];
@@ -377,7 +378,7 @@ class TextLayout
                 }
                 lastSpaceIdx = -1;
 
-                lineHeight = font.lineHeight;
+                lineHeight = _lineOffset;
                 addLine();
 
             } else {
@@ -414,7 +415,7 @@ class TextLayout
             var glyph = _glyphs[ii];
 
             if (glyph.charCode == "\n".code) {
-                lineY += font.lineHeight;
+                lineY += _lineOffset;
                 ++line;
                 alignOffset = getAlignOffset(align, lineWidths[line], wrapWidth);
             }
@@ -442,7 +443,7 @@ class TextLayout
         while (ii < ll) {
             var glyph = _glyphs[ii];
             if (glyph.charCode == "\n".code) {
-                y += _font.lineHeight;
+                y += _lineOffset;
             } else {
                 var x = _offsets[ii];
                 glyph.draw(g, x, y);
@@ -464,6 +465,7 @@ class TextLayout
     private var _font :Font;
     private var _glyphs :Array<Glyph>;
     private var _offsets :Array<Float>;
+    private var _lineOffset :Float;
 }
 
 private class ConfigParser

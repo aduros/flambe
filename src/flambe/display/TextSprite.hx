@@ -27,6 +27,11 @@ class TextSprite extends Sprite
     public var wrapWidth (default, null) :AnimatedFloat;
 
     /**
+     * The spacing between letters. Defaults to 0
+     */
+    public var letterSpacing (default, null) :AnimatedFloat;
+
+    /**
      * The horizontal text alignment, for multiline text. Left by default.
      */
     public var align (get, set) :TextAlign;
@@ -40,6 +45,9 @@ class TextSprite extends Sprite
         _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
 
         wrapWidth = new AnimatedFloat(0, function (_,_) {
+            _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
+        });
+        letterSpacing = new AnimatedFloat(0, function (_,_) {
             _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
         });
     }
@@ -152,7 +160,7 @@ class TextSprite extends Sprite
         // Recreate the layout if necessary
         if (_flags.contains(Sprite.TEXTSPRITE_DIRTY)) {
             _flags = _flags.remove(Sprite.TEXTSPRITE_DIRTY);
-            _layout = font.layoutText(_text, _align, wrapWidth._);
+            _layout = font.layoutText(_text, _align, wrapWidth._, letterSpacing._);
         }
     }
 
@@ -160,6 +168,7 @@ class TextSprite extends Sprite
     {
         super.onUpdate(dt);
         wrapWidth.update(dt);
+        letterSpacing.update(dt);
     }
 
     private var _font :Font;

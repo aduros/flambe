@@ -69,7 +69,7 @@ class TextSprite extends Sprite
         g.fillRect(0x00ff00, _layout.bounds.x, _layout.bounds.y, _layout.bounds.width, _layout.bounds.height);
 #end
 
-        _layout.draw(g, align);
+        _layout.draw(g);
     }
 
     override public function getNaturalWidth () :Float

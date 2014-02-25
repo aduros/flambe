@@ -434,7 +434,7 @@ class TextLayout
     }
 
     /** Draws this text to a Graphics. */
-    public function draw (g :Graphics, align :TextAlign)
+    public function draw (g :Graphics)
     {
         var y = 0.0;
         var ii = 0;

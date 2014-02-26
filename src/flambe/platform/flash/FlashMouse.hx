@@ -19,14 +19,14 @@ class FlashMouse extends BasicMouse
         stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
         stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
         stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
-        stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);
 
-#if flash11_2
         stage.addEventListener(MouseEvent.MIDDLE_MOUSE_DOWN, onMouseDown);
         stage.addEventListener(MouseEvent.MIDDLE_MOUSE_UP, onMouseUp);
+
         stage.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onMouseDown);
         stage.addEventListener(MouseEvent.RIGHT_MOUSE_UP, onMouseUp);
-#end
+
+        stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);
     }
 
     public static function shouldUse () :Bool
@@ -49,8 +49,8 @@ class FlashMouse extends BasicMouse
     {
         var buttonCode;
         switch (event.type) {
-            case "middleMouseDown": buttonCode = MouseCodes.MIDDLE;
-            case "rightMouseDown": buttonCode = MouseCodes.RIGHT;
+            case MouseEvent.MIDDLE_MOUSE_DOWN: buttonCode = MouseCodes.MIDDLE;
+            case MouseEvent.RIGHT_MOUSE_DOWN: buttonCode = MouseCodes.RIGHT;
             default: buttonCode = MouseCodes.LEFT;
         }
         submitDown(event.stageX, event.stageY, buttonCode);
@@ -65,8 +65,8 @@ class FlashMouse extends BasicMouse
     {
         var buttonCode;
         switch (event.type) {
-            case "middleMouseUp": buttonCode = MouseCodes.MIDDLE;
-            case "rightMouseUp": buttonCode = MouseCodes.RIGHT;
+            case MouseEvent.MIDDLE_MOUSE_UP: buttonCode = MouseCodes.MIDDLE;
+            case MouseEvent.RIGHT_MOUSE_UP: buttonCode = MouseCodes.RIGHT;
             default: buttonCode = MouseCodes.LEFT;
         }
         submitUp(event.stageX, event.stageY, buttonCode);

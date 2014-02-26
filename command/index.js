@@ -213,7 +213,7 @@ exports.build = function (config, platforms, opts) {
     var buildFlash = function () {
         var swf = "build/web/targets/main-flash.swf";
         var flashFlags = swfFlags(false).concat([
-            "-swf-version", "11", "-swf", swf]);
+            "-swf-version", "11.2", "-swf", swf]);
 
         return prepareWeb()
         .then(function () { return prepareAssets("build/web/assets") })

@@ -7,9 +7,6 @@
  */
 var flambe = {};
 
-/** @define {string} */
-flambe.FLASH_VERSION = "11";
-
 /**
  * Embed a Flambe game into the page.
  *
@@ -45,8 +42,10 @@ flambe.embed = function (urls, elementId) {
 
         switch (ext) {
         case "swf":
+            var flashVersion = "11.2";
+
             if ((pref == null || pref == "flash")
-                    && swfobject.hasFlashPlayerVersion(flambe.FLASH_VERSION)
+                    && swfobject.hasFlashPlayerVersion(flashVersion)
                     // Android Flash is old and busted
                     && !/\bAndroid\b/.exec(navigator.userAgent)) {
 
@@ -66,10 +65,9 @@ flambe.embed = function (urls, elementId) {
                     };
                 }
 
-                swfobject.embedSWF(url, swf.id, "100%", "100%", flambe.FLASH_VERSION, null, {}, {
+                swfobject.embedSWF(url, swf.id, "100%", "100%", flashVersion, null, {}, {
                     allowScriptAccess: "always",
                     allowFullScreen: "true",
-                    fullscreenOnSelection: "true",
                     wmode: "direct"
                 }, {id: swf.id, name: swf.id});
                 return true;

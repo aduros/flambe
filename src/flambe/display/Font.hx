@@ -327,7 +327,7 @@ class TextLayout
         _font = font;
         _glyphs = [];
         _offsets = [];
-        _lineOffset = font.lineHeight + lineSpacing;
+        _lineOffset = Math.round(font.lineHeight + lineSpacing);
 
         bounds = new Rectangle();
         var lineWidths = [];
@@ -362,7 +362,7 @@ class TextLayout
         var ii = 0;
         while (ii < _glyphs.length) {
             var glyph = _glyphs[ii];
-            _offsets[ii] = lineWidth;
+            _offsets[ii] = Math.round(lineWidth);
 
             var wordWrap = wrapWidth > 0 && lineWidth + glyph.width > wrapWidth;
             if (wordWrap || glyph == newline) {
@@ -458,7 +458,7 @@ class TextLayout
         switch (align) {
             case Left: return 0;
             case Right: return totalWidth - lineWidth;
-            case Center: return (totalWidth - lineWidth) / 2;
+            case Center: return Math.round((totalWidth-lineWidth) / 2);
         }
     }
 

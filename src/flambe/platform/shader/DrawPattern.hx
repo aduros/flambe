@@ -28,7 +28,8 @@ class DrawPattern extends Shader
         }
 
         function fragment (texture :Texture, region :Float4) {
-            out = texture.get(region.xy + _uv%region.zw, clamp) * _alpha;
+            // region is weirdly ordered to workaround a Windows bug
+            out = texture.get(region.zw + _uv%region.xy, clamp) * _alpha;
         }
     }
 }

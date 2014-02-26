@@ -293,10 +293,10 @@ class Stage3DBatcher
             var region = _scratchVector3D;
             var texture = _lastTexture;
             var root = texture.root;
-            region.x = texture.rootX / root.width;
-            region.y = texture.rootY / root.height;
-            region.z = texture.width / root.width;
-            region.w = texture.height / root.height;
+            region.z = texture.rootX / root.width; // x
+            region.w = texture.rootY / root.height; // y
+            region.x = texture.width / root.width; // width
+            region.y = texture.height / root.height; // height
             _drawPatternShader.texture = root.nativeTexture;
             _drawPatternShader.region = region;
             _drawPatternShader.rebuildVars();

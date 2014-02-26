@@ -28,8 +28,13 @@ class HtmlExternal
             params = [];
         }
 
-        var method = Reflect.field(Browser.window, name);
-        return Reflect.callMethod(null, method, params);
+        var object = Browser.window;
+        var method = object;
+        for (fieldName in name.split(".")) {
+            object = method;
+            method = Reflect.field(object, fieldName);
+        }
+        return Reflect.callMethod(object, method, params);
     }
 
     public function bind (name :String, fn :Dynamic)

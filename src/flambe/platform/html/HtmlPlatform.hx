@@ -117,6 +117,9 @@ class HtmlPlatform
         canvas.addEventListener("mousewheel", onMouse, false);
         canvas.addEventListener("DOMMouseScroll", onMouse, false); // https://bugzil.la/719320
 
+        // Suppress the context menu so right-click events aren't interfered with
+        canvas.addEventListener("contextmenu", function (event) event.preventDefault(), false);
+
         // Detect touch support. See http://modernizr.github.com/Modernizr/touch.html for more
         // sophisticated detection methods, but this seems to cover all important browsers
         var standardTouch :Bool = untyped __js__("typeof")(Browser.window.ontouchstart) != "undefined";

@@ -21,8 +21,11 @@ class Macros
         var fields :Array<Field> = [];
         switch (block.expr) {
             case EBlock(exprs):
+                var metas = [];
                 for (expr in exprs) {
                     switch (expr.expr) {
+                        case EMeta(meta, e):
+                            metas.push(meta);
                         case EVars(vars):
                             for (v in vars) {
                                 fields.push({
@@ -31,9 +34,10 @@ class Macros
                                     access: getAccess(v.name),
                                     kind: FVar(v.type, v.expr),
                                     pos: v.expr.pos,
-                                    meta: []
+                                    meta: metas,
                                 });
                             }
+                            metas = [];
                         case EFunction(name, f):
                             fields.push({
                                 name: getFieldName(name),
@@ -41,8 +45,9 @@ class Macros
                                 access: getAccess(name),
                                 kind: FFun(f),
                                 pos: f.expr.pos,
-                                meta: []
+                                meta: metas,
                             });
+                            metas = [];
                         default:
                     }
                 }

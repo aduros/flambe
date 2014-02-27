@@ -24,6 +24,7 @@ class ComponentBuilder
         var componentType = TPath({pack: cl.pack, name: cl.name, params: []});
 
         var fields = Macros.buildFields(macro {
+            #if doc @:noDoc #end
             var public__static__inline__NAME = $name;
         });
 

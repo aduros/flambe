@@ -73,7 +73,7 @@ class Macros
 
     private static function getFieldName (name :String) :String
     {
-        var idx = name.lastIndexOf("__");
-        return (idx < 0) ? name : name.substr(idx + 2);
+        var parts = name.split("__");
+        return parts[parts.length-1];
     }
 }

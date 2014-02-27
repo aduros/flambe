@@ -232,7 +232,7 @@ class System
     private static var _platform :Platform =
 #if flash
         flambe.platform.flash.FlashPlatform.instance;
-#elseif html
+#elseif (html || firefox)
         flambe.platform.html.HtmlPlatform.instance;
 #else
         null;

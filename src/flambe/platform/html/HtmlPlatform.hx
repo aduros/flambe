@@ -32,6 +32,8 @@ class HtmlPlatform
     {
         HtmlUtil.fixAndroidMath();
 
+#if html
+        // If running in a plain web browser, look up the canvas from the embedder
         var canvas :CanvasElement = null;
         try {
             // Use the canvas assigned to us by the flambe.js embedder
@@ -40,6 +42,11 @@ class HtmlPlatform
         }
         Assert.that(canvas != null,
             "Could not find a Flambe canvas! Are you embedding with flambe.js?");
+#else
+        // Otherwise create our own
+        var canvas = Browser.document.createCanvasElement();
+        Browser.document.getElementById("content").appendChild(canvas);
+#end
 
         // Allow the canvas to trap keyboard focus
         canvas.setAttribute("tabindex", "0");
@@ -255,7 +262,9 @@ class HtmlPlatform
 
 #if debug
         new DebugLogic(this);
+#if html
         _catapult = HtmlCatapultClient.canUse() ? new HtmlCatapultClient() : null;
+#end
 #end
         Log.info("Initialized HTML platform", ["renderer", _renderer.type]);
     }

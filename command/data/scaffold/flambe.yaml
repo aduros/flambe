@@ -52,3 +52,13 @@ ios:
     </array>
     <key>UIPrerenderedIcon</key>
     <true/>
+
+# Firefox App-specific configuration.
+firefox:
+  # https://developer.mozilla.org/en-US/docs/Web/Apps/Manifest
+  manifest.webapp:
+    {
+      default_locale: "en",
+      # type: "privileged",
+      # permissions: [...]
+    }

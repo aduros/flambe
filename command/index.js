@@ -18,7 +18,7 @@ var HAXE_COMPILER_PORT = 6000;
 var HTTP_PORT = 7000;
 var SOCKET_PORT = HTTP_PORT+1;
 
-exports.PLATFORMS = ["html", "flash", "android", "ios"];
+exports.PLATFORMS = ["html", "flash", "android", "ios", "firefox"];
 
 exports.VERSION = JSON.parse(fs.readFileSync(__dirname + "/package.json")).version;
 
@@ -104,6 +104,10 @@ exports.run = function (config, platform, opts) {
                 return p;
             })
             break;
+
+        case "firefox":
+            console.log("Open "+path.resolve("build/firefox")+" from about:app-manager in Firefox.");
+            return Q.resolve();
         }
     };
 
@@ -181,32 +185,49 @@ exports.build = function (config, platforms, opts) {
         return flags;
     };
 
-    var buildHtml = function () {
-        var htmlFlags = ["-D", "html", "-D", "js-flatten"];
-        var unminified = CACHE_DIR+"main-html.unminified.js";
-        var js = "build/web/targets/main-html.js";
+    var buildJS = function (opts) {
+        var target = opts.target;
+        var outputDir = opts.outputDir;
+        var assetFlags = opts.assetFlags;
 
-        return prepareWeb()
-        .then(function () { return prepareAssets("build/web/assets") })
-        .then(function (assetFlags) {
-            console.log("Building: " + js);
-            var flags = commonFlags.concat(assetFlags).concat(htmlFlags);
-            if (debug) {
-                return haxe(flags.concat(["-js", js]));
-            } else {
-                // Minify release builds
-                return haxe(flags.concat(["-js", unminified]))
-                .then(function () {
-                    return minify([unminified], js, {strict: true});
-                })
-                .then(function () {
-                    // Delete the source map file produced by debug builds
-                    return Q.nfcall(fs.unlink, js+".map")
-                    .catch(function () {
-                        // Ignore errors
-                    });
+        var assetDir = outputDir + "/assets";
+        var unminified = CACHE_DIR + target + ".unminified.js";
+        var js = outputDir + "/targets/main-" + target + ".js";
+
+        wrench.mkdirSyncRecursive(outputDir);
+
+        var jsFlags = ["-D", target, "-D", "js-es5", "-D", "js-flatten"];
+        var flags = commonFlags.concat(jsFlags).concat(assetFlags);
+        if (debug) {
+            return haxe(flags.concat(["-js", js]));
+        } else {
+            // Minify release builds
+            return haxe(flags.concat(["-js", unminified]))
+            .then(function () {
+                return minify([unminified], js, {strict: true});
+            })
+            .then(function () {
+                // Delete the source map file produced by debug builds
+                return Q.nfcall(fs.unlink, js+".map")
+                .catch(function () {
+                    // Ignore errors
                 });
-            }
+            });
+        }
+    };
+
+    var buildHtml = function () {
+        var outputDir = "build/web";
+
+        return prepareWeb(outputDir)
+        .then(function () { return prepareAssets(outputDir+"/assets") })
+        .then(function (assetFlags) {
+            console.log("Building: " + outputDir);
+            return buildJS({
+                target: "html",
+                outputDir: outputDir,
+                assetFlags: assetFlags,
+            });
         });
     };
 
@@ -379,6 +400,54 @@ exports.build = function (config, platforms, opts) {
         });
     };
 
+    var buildFirefox = function () {
+        var outputDir = "build/firefox";
+        wrench.mkdirSyncRecursive(outputDir+"/targets");
+
+        return prepareAssets(outputDir+"/assets")
+        .then(function (assetFlags) {
+            console.log("Building: " + outputDir);
+            return buildJS({
+                target: "firefox",
+                outputDir: outputDir,
+                assetFlags: assetFlags,
+            });
+        })
+        .then(function () {
+            return copyDirs(DATA_DIR+"firefox", outputDir);
+        })
+        .then(function () {
+            if (fs.existsSync("icons")) {
+                return copyDirs("icons", outputDir+"/icons");
+            }
+        })
+        .then(function () {
+
+            var manifest = {
+                name: get(config, "name"),
+                description: get(config, "description"),
+                developer: {
+                    name: get(config, "developer name"),
+                    url: get(config, "developer url"),
+                },
+                version: get(config, "version"),
+                launch_path: "/index.html",
+                orientation: get(config, "orientation", "portrait").toLowerCase() == "portrait" ?
+                    ["portrait", "portrait-secondary"] : ["landscape", "landscape-secondary"],
+                fullscreen: get(config, "fullscreen", true),
+                icons: {},
+            };
+            findIcons("icons").forEach(function (icon) {
+                manifest.icons[icon.size] = "/"+icon.image;
+            });
+
+            // Copy any additional fields into manifest from 2DKit.yaml
+            clone(get(config, "firefox manifest.webapp", {}), manifest);
+
+            fs.writeFileSync(outputDir+"/manifest.webapp", JSON.stringify(manifest));
+        });
+    };
+
     wrench.mkdirSyncRecursive(CACHE_DIR);
 
     var connectFlags = ["--connect", HAXE_COMPILER_PORT];
@@ -411,6 +480,7 @@ exports.build = function (config, platforms, opts) {
             flash: buildFlash,
             android: buildAndroid,
             ios: buildIos,
+            firefox: buildFirefox,
         };
         var promise = Q();
         platforms.forEach(function (platform, idx) {
@@ -788,4 +858,28 @@ var getIP = function () {
         });
     }
     return ip;
+};
+
+var clone = function (from, into) {
+    into = into || {};
+    for (var key in from) {
+        into[key] = from[key];
+    }
+    return into;
+};
+
+var findIcons = function (dir) {
+    var icons = [];
+    fs.readdirSync(dir).forEach(function (file) {
+        // Only include properly named square icons
+        var match = file.match(/^(\d+)x\1\.png$/);
+        if (match) {
+            icons.push({
+                size: match[1],
+                image: dir+"/"+file,
+            });
+        }
+        // TODO(bruno): Warn if not matched?
+    });
+    return icons;
 };

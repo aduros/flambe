@@ -66,7 +66,7 @@ class Library
                     if (kf.symbolName != null) {
                         var symbol = _symbols.get(kf.symbolName);
                         Assert.that(symbol != null);
-                        kf.symbol = symbol;
+                        kf.setSymbol(symbol);
                     }
 
                     // Specially handle "stop frames". These are one-frame keyframes that preceed an
@@ -84,6 +84,62 @@ class Library
                 }
             }
         }
+    }
+
+    /**
+     * Creates a library procedurally using a set of Flipbook definitions. Each flipbook will be
+     * converted to a movie that can be instanciated with `createMovie()`.
+     *
+     * Example:
+     * ```haxe
+     * var lib = Library.fromFlipbooks({
+     *     // A walk animation from a 5x3 sprite sheet, that lasts 5 seconds
+     *     "walk": new Flipbook(spriteSheet.split(5, 3)).setDuration(5).setAnchor(10, 10),
+     *
+     *     // Another animation where each frame comes from a separate image (Jump1.png, Jump2.png, ...)
+     *     "jump": new Flipbook([for (frame in 1...10) pack.getTexture("Jump"+frame)]),
+     * });
+     *
+     * var movie = lib.createMovie("walk");
+     * ```
+     */
+    public static function fromFlipbooks (flipbooks :Dynamic<Flipbook>) :Library
+    {
+        var lib = Type.createEmptyInstance(Library);
+        lib._symbols = new Map();
+        lib.frameRate = 60;
+
+        for (name in Reflect.fields(flipbooks)) {
+            var flipbook :Flipbook = Reflect.field(flipbooks, name);
+
+            // Fake up some Flump metadata to create a movie symbol
+            var keyframes :Array<KeyframeFormat> = [];
+            for (frame in flipbook.frames) {
+                keyframes.push(cast {
+                    duration: frame.duration*lib.frameRate,
+                    label: frame.label,
+                    pivot: [frame.anchorX, frame.anchorY],
+                    ref: "", // Hack so that this keyframe doesn't get marked as empty
+                });
+            }
+            var movie = new MovieSymbol(lib, {
+                id: name,
+                layers: [{
+                    name: "flipbook",
+                    flipbook: true,
+                    keyframes: keyframes,
+                }],
+            });
+            lib._symbols.set(name, movie);
+
+            // Assign symbols at each keyframe
+            var keyframes = movie.layers[0].keyframes;
+            for (ii in 0...flipbook.frames.length) {
+                keyframes[ii].setSymbol(flipbook.frames[ii].toSymbol());
+            }
+        }
+
+        return lib;
     }
 
     /**

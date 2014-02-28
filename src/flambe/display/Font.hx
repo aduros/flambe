@@ -115,12 +115,13 @@ class Font
         return list;
     }
 
-    public function layoutText (text :String, ?align :TextAlign, wrapWidth :Float = 0) :TextLayout
+    public function layoutText (text :String, ?align :TextAlign, wrapWidth :Float = 0,
+        letterSpacing :Float = 0, lineSpacing :Float = 0) :TextLayout
     {
         if (align == null) {
             align = Left;
         }
-        return new TextLayout(this, text, align, wrapWidth);
+        return new TextLayout(this, text, align, wrapWidth, letterSpacing, lineSpacing);
     }
 
     /**
@@ -320,11 +321,13 @@ class TextLayout
     /** The number of lines in this text. */
     public var lines (default, null) :Int = 0;
 
-    @:allow(flambe) function new (font :Font, text :String, align :TextAlign, wrapWidth :Float)
+    @:allow(flambe) function new (font :Font, text :String, align :TextAlign, wrapWidth :Float,
+        letterSpacing :Float, lineSpacing :Float)
     {
         _font = font;
         _glyphs = [];
         _offsets = [];
+        _lineOffset = Math.round(font.lineHeight + lineSpacing);
 
         bounds = new Rectangle();
         var lineWidths = [];
@@ -359,7 +362,7 @@ class TextLayout
         var ii = 0;
         while (ii < _glyphs.length) {
             var glyph = _glyphs[ii];
-            _offsets[ii] = lineWidth;
+            _offsets[ii] = Math.round(lineWidth);
 
             var wordWrap = wrapWidth > 0 && lineWidth + glyph.width > wrapWidth;
             if (wordWrap || glyph == newline) {
@@ -375,14 +378,14 @@ class TextLayout
                 }
                 lastSpaceIdx = -1;
 
-                lineHeight = font.lineHeight;
+                lineHeight = _lineOffset;
                 addLine();
 
             } else {
                 if (glyph.charCode == " ".code) {
                     lastSpaceIdx = ii;
                 }
-                lineWidth += glyph.xAdvance;
+                lineWidth += glyph.xAdvance + letterSpacing;
                 lineHeight = FMath.max(lineHeight, glyph.height + glyph.yOffset);
 
                 // Handle kerning with the next glyph
@@ -412,7 +415,7 @@ class TextLayout
             var glyph = _glyphs[ii];
 
             if (glyph.charCode == "\n".code) {
-                lineY += font.lineHeight;
+                lineY += _lineOffset;
                 ++line;
                 alignOffset = getAlignOffset(align, lineWidths[line], wrapWidth);
             }
@@ -431,7 +434,7 @@ class TextLayout
     }
 
     /** Draws this text to a Graphics. */
-    public function draw (g :Graphics, align :TextAlign)
+    public function draw (g :Graphics)
     {
         var y = 0.0;
         var ii = 0;
@@ -440,7 +443,7 @@ class TextLayout
         while (ii < ll) {
             var glyph = _glyphs[ii];
             if (glyph.charCode == "\n".code) {
-                y += _font.lineHeight;
+                y += _lineOffset;
             } else {
                 var x = _offsets[ii];
                 glyph.draw(g, x, y);
@@ -455,13 +458,14 @@ class TextLayout
         switch (align) {
             case Left: return 0;
             case Right: return totalWidth - lineWidth;
-            case Center: return (totalWidth - lineWidth) / 2;
+            case Center: return Math.round((totalWidth-lineWidth) / 2);
         }
     }
 
     private var _font :Font;
     private var _glyphs :Array<Glyph>;
     private var _offsets :Array<Float>;
+    private var _lineOffset :Float;
 }
 
 private class ConfigParser

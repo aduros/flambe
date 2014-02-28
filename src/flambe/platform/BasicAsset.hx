@@ -25,9 +25,7 @@ class BasicAsset<A/*:BasicAsset<A>*/>
     @:final public function reload (asset :A)
     {
         copyFrom(asset);
-        if (_reloadCount != null) {
-            ++_reloadCount._;
-        }
+        ++reloadCount._;
     }
 
     @:final public function dispose ()
@@ -50,6 +48,7 @@ class BasicAsset<A/*:BasicAsset<A>*/>
         Assert.fail(); // See subclasses
     }
 
+    // Overridden in subclasses!
     private function get_reloadCount () :Value<Int>
     {
         if (_reloadCount == null) {

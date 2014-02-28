@@ -7,11 +7,11 @@ package flambe.math;
 /**
  * A 2D transform matrix.
  *
- * <pre>
+ * ```
  * [ m00 m01 m02 ]
  * [ m10 m11 m12 ]
  * [  0   0   1  ]
- * </pre>
+ * ```
  */
 class Matrix
 {

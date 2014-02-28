@@ -5,8 +5,10 @@
 package flambe.input;
 
 /**
- * Represents an event coming from a physical key press. NOTE: For performance reasons,
- * KeyboardEvent instances are reused by Flambe. Use clone() to retain a reference to an event.
+ * Represents an event coming from a physical key press.
+ *
+ * _NOTE_: For performance reasons, KeyboardEvent instances are reused by Flambe. Use `clone()` to
+ * retain a reference to an event.
  */
 class KeyboardEvent
 {

@@ -1,29 +1,39 @@
-# The name, version and identifier, for mobile app packaging
+# Basic information about the game.
 name: Your Game
-version: 1.0.0
-id: com.urdomain.urgame
+description: A short one-line description.
 
-# The main class name
+# Information about the game developer.
+developer:
+  name: Your Company Name
+  url: http://yourwebsite.com
+
+# The game's unique identifier.
+id: com.yourdomain.yourgame
+
+# The game's version string.
+version: 1.0.0
+
+# The main class name.
 main: urgame.Main
 
-# The platform to use when invoking `run` or `build` with no arguments
+# The platform to use when invoking `run` or `build` with no arguments.
 default_platform: flash
 
-# Additional flags to pass to the Haxe compiler
+# The initial orientation and fullscreen state on mobile devices.
+orientation: portrait
+fullscreen: true
+
+# Additional flags to pass to the Haxe compiler.
 # haxe_flags: -lib nape -D foobar
 
-# Additional paths to include in the build
+# Additional paths to include in the build.
 # extra_paths:
 #   assets: dir1 dir2
 #   libs: dir1 dir2
 #   src: ../dir1 ../dir2
 #   web: ["dir1 with spaces", "dir2"]
 
-# The initial orientation and fullscreen state
-orientation: portrait
-fullscreen: true
-
-# Android-specific configuration
+# Android-specific configuration.
 android:
   # https://developer.android.com/guide/topics/manifest/manifest-intro.html
   AndroidManifest.xml: |
@@ -31,7 +41,7 @@ android:
       <uses-permission android:name="android.permission.INTERNET" />
     </manifest>
 
-# iOS-specific configuration
+# iOS-specific configuration.
 ios:
   # http://developer.apple.com/library/ios/#documentation/general/Reference/InfoPlistKeyReference
   Info.plist: |
@@ -42,3 +52,13 @@ ios:
     </array>
     <key>UIPrerenderedIcon</key>
     <true/>
+
+# Firefox App-specific configuration.
+firefox:
+  # https://developer.mozilla.org/en-US/docs/Web/Apps/Manifest
+  manifest.webapp:
+    {
+      default_locale: "en",
+      # type: "privileged",
+      # permissions: [...]
+    }

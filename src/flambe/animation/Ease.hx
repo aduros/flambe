@@ -10,8 +10,7 @@ import flambe.math.FMath;
 typedef EaseFunction = Float -> Float;
 
 /**
- * Easing functions that can be used to animate values. For a cheat sheet, see <a
- * href="http://easings.net" target="_blank">easings.net</a>.
+ * Easing functions that can be used to animate values. For a cheat sheet, see <http://easings.net>.
  */
 class Ease
 {

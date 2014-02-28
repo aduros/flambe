@@ -14,20 +14,17 @@ enum EmitterType
 }
 
 /**
- * <p>A particle system configuration, that can be used to create emitter sprites. The configuration
- * is loaded from a .pex file, authored in a tool such as Particle Designer.</p>
+ * A particle system configuration, that can be used to create emitter sprites. The configuration is
+ * loaded from a .pex file, authored in a tool such as Particle Designer.
  *
- * <p><b>NOTE</b>: There are some restrictions to keep in mind when using Particle Designer with
- * Flambe:
- * <ul>
- * <li>Particle coloring is not supported.</li>
- * <li>Only normal and additive blend modes are supported.</li>
- * </ul>
- * </p>
+ * _NOTE_: There are some restrictions to keep in mind when using Particle Designer with Flambe:
  *
- * <p>Also keep in mind that gratuitous particle systems are a great way to kill performance,
- * especially on mobile. Try to keep maxParticles as low as possible to achieve the desired
- * effect.</p>
+ * - Particle coloring is not supported.
+ * - Only normal and additive blend modes are supported.
+ *
+ *
+ * Also keep in mind that gratuitous particle systems are a great way to kill performance,
+ * especially on mobile. Try to keep maxParticles as low as possible to achieve the desired effect.
  */
 class EmitterMold
 {

@@ -10,29 +10,44 @@ import js.html.*;
 import haxe.io.Bytes;
 
 import flambe.asset.AssetEntry;
-import flambe.display.Graphics;
-import flambe.display.Texture;
+import flambe.subsystem.RendererSystem;
 import flambe.util.Assert;
+import flambe.util.Value;
 
 class CanvasRenderer
-    implements Renderer
+    implements InternalRenderer<Dynamic>
 {
+    public var type (get, null) :RendererType;
+    public var hasGPU (get, null) :Value<Bool>;
+
     public var graphics :InternalGraphics;
 
     public function new (canvas :CanvasElement)
     {
         graphics = new CanvasGraphics(canvas);
-        System.hasGPU._ = true;
+        _hasGPU = new Value<Bool>(true);
     }
 
-    public function createTexture (image :Dynamic) :Texture
+    inline private function get_type () :RendererType
     {
-        return new CanvasTexture(CANVAS_TEXTURES ? HtmlUtil.createCanvas(image) : image);
+        return Canvas;
     }
 
-    public function createEmptyTexture (width :Int, height :Int) :Texture
+    inline private function get_hasGPU () :Value<Bool>
     {
-        return new CanvasTexture(HtmlUtil.createEmptyCanvas(width, height));
+        return _hasGPU;
+    }
+
+    public function createTextureFromImage (image :Dynamic) :CanvasTexture
+    {
+        var root = new CanvasTextureRoot(CANVAS_TEXTURES ? HtmlUtil.createCanvas(image) : image);
+        return root.createTexture(root.width, root.height);
+    }
+
+    public function createTexture (width :Int, height :Int) :CanvasTexture
+    {
+        var root = new CanvasTextureRoot(HtmlUtil.createEmptyCanvas(width, height));
+        return root.createTexture(width, height);
     }
 
     public function getCompressedTextureFormats () :Array<AssetFormat>
@@ -40,7 +55,7 @@ class CanvasRenderer
         return [];
     }
 
-    public function createCompressedTexture (format :AssetFormat, data :Bytes) :Texture
+    public function createCompressedTexture (format :AssetFormat, data :Bytes) :CanvasTexture
     {
         Assert.fail(); // Unsupported
         return null;
@@ -68,4 +83,6 @@ class CanvasRenderer
         var pattern = ~/(iPhone|iPod|iPad)/;
         return pattern.match(Browser.window.navigator.userAgent);
     })();
+
+    private var _hasGPU :Value<Bool>;
 }

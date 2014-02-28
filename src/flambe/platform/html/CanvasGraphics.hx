@@ -51,19 +51,9 @@ class CanvasGraphics
         _canvasCtx.restore();
     }
 
-    public function drawImage (texture :Texture, x :Float, y :Float)
+    public function drawImage (texture :Texture, destX :Float, destY :Float)
     {
-        if (_firstDraw) {
-            _firstDraw = false;
-            _canvasCtx.globalCompositeOperation = "copy";
-            drawImage(texture, x, y);
-            _canvasCtx.globalCompositeOperation = "source-over";
-            return;
-        }
-
-        var texture :CanvasTexture = cast texture;
-        texture.assertNotDisposed();
-        _canvasCtx.drawImage(texture.image, Std.int(x), Std.int(y));
+        drawSubImage(texture, destX, destY, 0, 0, texture.width, texture.height);
     }
 
     public function drawSubImage (texture :Texture, destX :Float, destY :Float,
@@ -78,9 +68,12 @@ class CanvasGraphics
         }
 
         var texture :CanvasTexture = cast texture;
-        texture.assertNotDisposed();
-        _canvasCtx.drawImage(texture.image,
-            Std.int(sourceX), Std.int(sourceY), Std.int(sourceW), Std.int(sourceH),
+        var root = texture.root;
+        root.assertNotDisposed();
+
+        _canvasCtx.drawImage(root.image,
+            Std.int(texture.rootX+sourceX), Std.int(texture.rootY+sourceY),
+            Std.int(sourceW), Std.int(sourceH),
             Std.int(destX), Std.int(destY), Std.int(sourceW), Std.int(sourceH));
     }
 
@@ -95,11 +88,10 @@ class CanvasGraphics
         }
 
         var texture :CanvasTexture = cast texture;
-        texture.assertNotDisposed();
-        if (texture.pattern == null) {
-            texture.pattern = _canvasCtx.createPattern(texture.image, "repeat");
-        }
-        _canvasCtx.fillStyle = texture.pattern;
+        var root = texture.root;
+        root.assertNotDisposed();
+
+        _canvasCtx.fillStyle = texture.getPattern();
         _canvasCtx.fillRect(Std.int(x), Std.int(y), Std.int(width), Std.int(height));
     }
 
@@ -119,7 +111,6 @@ class CanvasGraphics
             hex = "0"+hex;
         }
         _canvasCtx.fillStyle = "#"+hex;
-
         _canvasCtx.fillRect(Std.int(x), Std.int(y), Std.int(width), Std.int(height));
     }
 

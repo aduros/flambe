@@ -22,7 +22,7 @@ class CatapultClient
     {
 #if !flambe_disable_reloading
         // Only care about packs loaded from the assets directory
-        if (loader.manifest.relativeBasePath == "assets") {
+        if (loader.manifest.localBase == "assets") {
             _loaders.push(loader);
         }
 #end

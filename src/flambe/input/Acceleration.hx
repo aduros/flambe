@@ -5,9 +5,9 @@
 package flambe.input;
 
 /**
- * <p>A 3D vector that represents the linear acceleration being applied to the device.</p>
+ * A 3D vector that represents the linear acceleration being applied to the device.
  *
- * <p><img src="https://aduros.com/flambe/images/Axes.png"></p>
+ * <img src="https://aduros.com/flambe/images/Axes.png">
  */
 class Acceleration
 {

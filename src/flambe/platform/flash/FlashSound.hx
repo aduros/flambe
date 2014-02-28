@@ -31,6 +31,11 @@ class FlashSound extends BasicAsset<FlashSound>
     {
         assertNotDisposed();
 
+#if ios
+        // Temporary hack around a bug in Haxe+AIR+iOS:
+        // https://github.com/HaxeFoundation/haxe/issues/2431
+        if (Math.isNaN(volume)) volume = 1.0;
+#end
         return new FlashPlayback(this, volume, 0);
     }
 
@@ -38,6 +43,11 @@ class FlashSound extends BasicAsset<FlashSound>
     {
         assertNotDisposed();
 
+#if ios
+        // Temporary hack around a bug in Haxe+AIR+iOS:
+        // https://github.com/HaxeFoundation/haxe/issues/2431
+        if (Math.isNaN(volume)) volume = 1.0;
+#end
         return new FlashPlayback(this, volume, FMath.INT_MAX);
     }
 

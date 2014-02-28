@@ -20,7 +20,7 @@ import flambe.util.Assert;
 class Stage3DGraphics
     implements InternalGraphics
 {
-    public function new (batcher :Stage3DBatcher, renderTarget :Stage3DTexture)
+    public function new (batcher :Stage3DBatcher, renderTarget :Stage3DTextureRoot)
     {
         _batcher = batcher;
         _renderTarget = renderTarget;
@@ -105,15 +105,16 @@ class Stage3DGraphics
             return;
         }
         var texture = Lib.as(texture, Stage3DTexture);
-        texture.assertNotDisposed();
+        var root = texture.root;
+        root.assertNotDisposed();
 
         var pos = transformQuad(destX, destY, sourceW, sourceH);
-        var w = texture.width;
-        var h = texture.height;
-        var u1 = texture.maxU*sourceX / w;
-        var v1 = texture.maxV*sourceY / h;
-        var u2 = texture.maxU*(sourceX + sourceW) / w;
-        var v2 = texture.maxV*(sourceY + sourceH) / h;
+        var rootWidth = root.width;
+        var rootHeight = root.height;
+        var u1 = (texture.rootX+sourceX) / rootWidth;
+        var v1 = (texture.rootY+sourceY) / rootHeight;
+        var u2 = u1 + sourceW/rootWidth;
+        var v2 = v1 + sourceH/rootHeight;
         var alpha = state.alpha;
 
         var offset = _batcher.prepareDrawImage(_renderTarget, state.blendMode, state.getScissor(), texture);
@@ -151,11 +152,12 @@ class Stage3DGraphics
             return;
         }
         var texture = Lib.as(texture, Stage3DTexture);
-        texture.assertNotDisposed();
+        var root = texture.root;
+        root.assertNotDisposed();
 
         var pos = transformQuad(x, y, width, height);
-        var u2 = texture.maxU * (width / texture.width);
-        var v2 = texture.maxV * (height / texture.height);
+        var u2 = width / root.width;
+        var v2 = height / root.height;
         var alpha = state.alpha;
 
         var offset = _batcher.prepareDrawPattern(_renderTarget, state.blendMode, state.getScissor(), texture);
@@ -347,7 +349,7 @@ class Stage3DGraphics
     })();
 
     private var _batcher :Stage3DBatcher;
-    private var _renderTarget :Stage3DTexture;
+    private var _renderTarget :Stage3DTextureRoot;
 
     private var _inverseProjection :Matrix3D;
     private var _stateList :DrawingState;

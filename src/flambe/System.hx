@@ -9,7 +9,16 @@ import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
 import flambe.display.Texture;
 import flambe.platform.Platform;
-import flambe.subsystem.*;
+import flambe.subsystem.ExternalSystem; // IDEA doesn't support wildcard imports
+import flambe.subsystem.KeyboardSystem;
+import flambe.subsystem.MotionSystem;
+import flambe.subsystem.MouseSystem;
+import flambe.subsystem.PointerSystem;
+import flambe.subsystem.RendererSystem;
+import flambe.subsystem.StageSystem;
+import flambe.subsystem.StorageSystem;
+import flambe.subsystem.TouchSystem;
+import flambe.subsystem.WebSystem;
 import flambe.util.Assert;
 import flambe.util.Logger;
 import flambe.util.Promise;
@@ -71,6 +80,17 @@ class System
      */
     public static var motion (get, null) :MotionSystem;
 
+    /**
+     * The Renderer subsystem, for creating textures and accessing the GPU.
+     */
+    public static var renderer (get, null) :RendererSystem<
+#if flash
+        flash.display.BitmapData
+#elseif js
+        js.html.Element
+#end
+    >;
+
     // TODO(bruno): Subsystems for gamepads, haptic, geolocation, video, textInput
 
     /**
@@ -80,8 +100,7 @@ class System
     public static var locale (get, null) :String;
 
     /**
-     * Emitted when an uncaught exception occurs, if the platform supports it. You can wire this up
-     * to your telemetry reporting service of choice.
+     * Emitted when an uncaught exception occurs, if the platform supports it.
      */
     public static var uncaughtError (default, null) :Signal1<String> = new Signal1<String>();
 
@@ -96,16 +115,6 @@ class System
      * platform, this may be slightly more efficient than Date.now().getTime().
      */
     public static var time (get, null) :Float;
-
-    /**
-     * <p>Whether the app currently has a GPU context. In some renderers (Stage3D) the GPU and all
-     * its resources may be destroyed at any time by the system. On renderers that don't need to
-     * worry about reclaiming GPU resources (HTML5 canvas) this is always true.</p>
-     *
-     * <p>When this becomes false, all Textures and Graphics objects are destroyed and become
-     * invalid. When it returns to true, apps should reload its textures.</p>
-     */
-    public static var hasGPU (default, null) :Value<Bool> = new Value<Bool>(false);
 
     /**
      * The global volume applied to all sounds, defaults to 1.
@@ -130,23 +139,6 @@ class System
     {
         #if debug assertCalledInit(); #end
         return _platform.loadAssetPack(manifest);
-    }
-
-    /**
-     * Creates a new blank Texture, initialized to transparent black.
-     */
-    public static function createTexture (width :Int, height :Int) :Texture
-    {
-#if debug
-        assertCalledInit();
-        var texture = _platform.getRenderer().createEmptyTexture(width, height);
-        if (texture == null) {
-            Log.warn("Failed to create texture. Is the GPU context unavailable?");
-        }
-        return texture;
-#else
-        return _platform.getRenderer().createEmptyTexture(width, height);
-#end
     }
 
     /**
@@ -226,6 +218,12 @@ class System
         return _platform.getMotion();
     }
 
+    inline static function get_renderer () // inferred return type
+    {
+        #if debug assertCalledInit(); #end
+        return cast _platform.getRenderer();
+    }
+
     private static function assertCalledInit ()
     {
         Assert.that(_calledInit, "You must call System.init() first");
@@ -234,7 +232,7 @@ class System
     private static var _platform :Platform =
 #if flash
         flambe.platform.flash.FlashPlatform.instance;
-#elseif html
+#elseif (html || firefox)
         flambe.platform.html.HtmlPlatform.instance;
 #else
         null;

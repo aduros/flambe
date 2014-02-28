@@ -11,7 +11,11 @@ import flambe.animation.AnimatedFloat;
  */
 class PatternSprite extends Sprite
 {
+    /**
+     * The texture being displayed, or null if none.
+     */
     public var texture :Texture;
+
     public var width (default, null) :AnimatedFloat;
     public var height (default, null) :AnimatedFloat;
 
@@ -21,19 +25,21 @@ class PatternSprite extends Sprite
         this.texture = texture;
 
         if (width < 0) {
-            width = texture.width;
+            width = (texture != null) ? texture.width : 0;
         }
         this.width = new AnimatedFloat(width);
 
         if (height < 0) {
-            height = texture.height;
+            height = (texture != null) ? texture.height : 0;
         }
         this.height = new AnimatedFloat(height);
     }
 
     override public function draw (g :Graphics)
     {
-        g.drawPattern(texture, 0, 0, width._, height._);
+        if (texture != null) {
+            g.drawPattern(texture, 0, 0, width._, height._);
+        }
     }
 
     override public function getNaturalWidth () :Float

@@ -55,7 +55,7 @@ class MainLoop
         updateEntity(System.root, dt);
     }
 
-    public function render (renderer :Renderer)
+    public function render<A> (renderer :InternalRenderer<A>)
     {
         var graphics = renderer.graphics;
         if (graphics != null) {

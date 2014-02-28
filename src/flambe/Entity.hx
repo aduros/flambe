@@ -15,12 +15,12 @@ import flambe.util.Disposable;
 using Lambda;
 
 /**
- * <p>A node in the entity hierarchy, and a collection of components.</p>
+ * A node in the entity hierarchy, and a collection of components.
  *
- * <p>To iterate over the hierarchy, use the parent, firstChild, next and firstComponent fields. For
- * example:</p>
+ * To iterate over the hierarchy, use the parent, firstChild, next and firstComponent fields. For
+ * example:
  *
- * <pre>
+ * ```haxe
  * // Iterate over entity's children
  * var child = entity.firstChild;
  * while (child != null) {
@@ -28,7 +28,7 @@ using Lambda;
  *     process(child);
  *     child = next;
  * }
- * </pre>
+ * ```
  */
 @:final class Entity
     implements Disposable
@@ -131,6 +131,10 @@ using Lambda;
     /**
      * Gets a component of a given type from this entity.
      */
+#if (display || dox)
+    public function get<A:Component> (componentClass :Class<A>) :A return null;
+
+#else
     macro public function get<A> (self :Expr, componentClass :ExprOf<Class<A>>) :ExprOf<A>
     {
         switch (componentClass.expr) {
@@ -148,14 +152,20 @@ using Lambda;
             Context.currentPos());
         return null;
     }
+#end
 
     /**
      * Checks if this entity has a component of the given type.
      */
+#if (display || dox)
+    public function has<A:Component> (componentClass :Class<A>) :Bool return false;
+
+#else
     macro public function has<A> (self :Expr, componentClass :ExprOf<Class<A>>) :ExprOf<Bool>
     {
         return macro $self.get($componentClass) != null;
     }
+#end
 
     /**
      * Gets a component by name from this entity.
@@ -170,7 +180,7 @@ using Lambda;
      * @param append Whether to add the entity to the end or beginning of the child list.
      * @returns This instance, for chaining.
      */
-    public function addChild (entity :Entity, append :Bool=true)
+    public function addChild (entity :Entity, append :Bool=true) :Entity
     {
         if (entity.parent != null) {
             entity.parent.removeChild(entity);

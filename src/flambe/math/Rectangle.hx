@@ -14,6 +14,24 @@ class Rectangle
     public var width :Float;
     public var height :Float;
 
+    /** The X-coordinate of the left side of the rectangle. */
+    public var left (get, null) :Float;
+
+    /** The X-coordinate of the right side of the rectangle. */
+    public var right (get, null) :Float;
+
+    /** The Y-coordinate of the top side of the rectangle. */
+    public var top (get, null) :Float;
+
+    /** The Y-coordinate of the bottom side of the rectangle. */
+    public var bottom (get, null) :Float;
+
+    /** The X-coordinate of the center of the rectangle. */
+    public var centerX (get, null) :Float;
+
+    /** The Y-coordinate of the center of the rectangle. */
+    public var centerY (get, null) :Float;
+
     public function new (x :Float = 0, y :Float = 0, width :Float = 0, height :Float = 0)
     {
         set(x, y, width, height);
@@ -75,5 +93,35 @@ class Rectangle
     #if debug @:keep #end public function toString () :String
     {
         return "(" + x + "," + y + " " + width + "x" + height + ")";
+    }
+
+    inline private function get_left () :Float
+    {
+        return x;
+    }
+
+    inline private function get_top () :Float
+    {
+        return y;
+    }
+
+    private function get_right () :Float
+    {
+        return x + width;
+    }
+
+    private function get_bottom () :Float
+    {
+        return y + height;
+    }
+
+    private function get_centerX () :Float
+    {
+        return x + width/2;
+    }
+
+    private function get_centerY () :Float
+    {
+        return y + height/2;
     }
 }

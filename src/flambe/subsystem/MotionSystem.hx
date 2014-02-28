@@ -9,9 +9,7 @@ import flambe.input.Attitude;
 import flambe.util.Signal1;
 
 /**
- * <p>Functions related to the device's motion sensors.</p>
- *
- * <p>NOTE: Not yet supported in Flash/AIR.</p>
+ * Functions related to the device's motion sensors.
  */
 interface MotionSystem
 {

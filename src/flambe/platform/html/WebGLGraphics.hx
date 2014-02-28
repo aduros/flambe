@@ -18,7 +18,7 @@ import flambe.util.Assert;
 class WebGLGraphics
     implements InternalGraphics
 {
-    public function new (batcher :WebGLBatcher, renderTarget :WebGLTexture)
+    public function new (batcher :WebGLBatcher, renderTarget :WebGLTextureRoot)
     {
         // Initialize this here to prevent blowing up during static init on browsers without typed
         // array support
@@ -105,15 +105,16 @@ class WebGLGraphics
     {
         var state = getTopState();
         var texture :WebGLTexture = cast texture;
-        texture.assertNotDisposed();
+        var root = texture.root;
+        root.assertNotDisposed();
 
         var pos = transformQuad(destX, destY, sourceW, sourceH);
-        var w = texture.width;
-        var h = texture.height;
-        var u1 = texture.maxU*sourceX / w;
-        var v1 = texture.maxV*sourceY / h;
-        var u2 = texture.maxU*(sourceX + sourceW) / w;
-        var v2 = texture.maxV*(sourceY + sourceH) / h;
+        var rootWidth = root.width;
+        var rootHeight = root.height;
+        var u1 = (texture.rootX+sourceX) / rootWidth;
+        var v1 = (texture.rootY+sourceY) / rootHeight;
+        var u2 = u1 + sourceW/rootWidth;
+        var v2 = v1 + sourceH/rootHeight;
         var alpha = state.alpha;
 
         var offset = _batcher.prepareDrawImage(_renderTarget, state.blendMode, state.scissor, texture);
@@ -148,11 +149,12 @@ class WebGLGraphics
     {
         var state = getTopState();
         var texture :WebGLTexture = cast texture;
-        texture.assertNotDisposed();
+        var root = texture.root;
+        root.assertNotDisposed();
 
         var pos = transformQuad(x, y, width, height);
-        var u2 = texture.maxU * (width / texture.width);
-        var v2 = texture.maxV * (height / texture.height);
+        var u2 = width / root.width;
+        var v2 = height / root.height;
         var alpha = state.alpha;
 
         var offset = _batcher.prepareDrawPattern(_renderTarget, state.blendMode, state.scissor, texture);
@@ -325,7 +327,7 @@ class WebGLGraphics
     private static var _scratchQuadArray :Float32Array = null;
 
     private var _batcher :WebGLBatcher;
-    private var _renderTarget :WebGLTexture;
+    private var _renderTarget :WebGLTextureRoot;
 
     private var _inverseProjection :Matrix = null;
     private var _stateList :DrawingState = null;

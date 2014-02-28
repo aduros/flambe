@@ -15,6 +15,7 @@ using flambe.util.BitSets;
  */
 class TextSprite extends Sprite
 {
+    /** The text being displayed. Can contain contain newline characters (\n) for multiline text. */
     public var text (get, set) :String;
 
     /** The font used to display the text. */
@@ -25,6 +26,18 @@ class TextSprite extends Sprite
      * (no word wrapping).
      */
     public var wrapWidth (default, null) :AnimatedFloat;
+
+    /**
+     * Additional horizontal space to apply between letters, in pixels. Defaults to 0. Positive
+     * values make text look "looser", negative values look "tighter".
+     */
+    public var letterSpacing (default, null) :AnimatedFloat;
+
+    /**
+     * Additional vertical space to apply between lines, in pixels. Defaults to 0. Positive values
+     * make lines look "looser", negative values look "tighter".
+     */
+    public var lineSpacing (default, null) :AnimatedFloat;
 
     /**
      * The horizontal text alignment, for multiline text. Left by default.
@@ -39,9 +52,12 @@ class TextSprite extends Sprite
         _align = Left;
         _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
 
-        wrapWidth = new AnimatedFloat(0, function (_,_) {
+        var dirtyText = function (_,_) {
             _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
-        });
+        };
+        wrapWidth = new AnimatedFloat(0, dirtyText);
+        letterSpacing = new AnimatedFloat(0, dirtyText);
+        lineSpacing = new AnimatedFloat(0, dirtyText);
     }
 
     override public function draw (g :Graphics)
@@ -54,7 +70,7 @@ class TextSprite extends Sprite
         g.fillRect(0x00ff00, _layout.bounds.x, _layout.bounds.y, _layout.bounds.width, _layout.bounds.height);
 #end
 
-        _layout.draw(g, align);
+        _layout.draw(g);
     }
 
     override public function getNaturalWidth () :Float
@@ -66,7 +82,7 @@ class TextSprite extends Sprite
     override public function getNaturalHeight () :Float
     {
         updateLayout();
-        var paddedHeight = _layout.lines * _font.lineHeight;
+        var paddedHeight = _layout.lines * (_font.lineHeight+lineSpacing._);
         var boundsHeight = _layout.bounds.height;
         return FMath.max(paddedHeight, boundsHeight);
     }
@@ -75,6 +91,46 @@ class TextSprite extends Sprite
     {
         updateLayout();
         return _layout.bounds.contains(localX, localY);
+    }
+
+    /**
+     * Chainable convenience method to set the wrap width.
+     * @returns This instance, for chaining.
+     */
+    public function setWrapWidth (wrapWidth :Float) :TextSprite
+    {
+        this.wrapWidth._ = wrapWidth;
+        return this;
+    }
+
+    /**
+     * Chainable convenience method to set the letter spacing.
+     * @returns This instance, for chaining.
+     */
+    public function setLetterSpacing (letterSpacing :Float) :TextSprite
+    {
+        this.letterSpacing._ = letterSpacing;
+        return this;
+    }
+
+    /**
+     * Chainable convenience method to set the line spacing.
+     * @returns This instance, for chaining.
+     */
+    public function setLineSpacing (lineSpacing :Float) :TextSprite
+    {
+        this.lineSpacing._ = lineSpacing;
+        return this;
+    }
+
+    /**
+     * Chainable convenience method to set the text alignment.
+     * @returns This instance, for chaining.
+     */
+    public function setAlign (align :TextAlign) :TextSprite
+    {
+        this.align = align;
+        return this;
     }
 
     inline private function get_text () :String
@@ -132,7 +188,7 @@ class TextSprite extends Sprite
         // Recreate the layout if necessary
         if (_flags.contains(Sprite.TEXTSPRITE_DIRTY)) {
             _flags = _flags.remove(Sprite.TEXTSPRITE_DIRTY);
-            _layout = font.layoutText(_text, _align, wrapWidth._);
+            _layout = font.layoutText(_text, _align, wrapWidth._, letterSpacing._, lineSpacing._);
         }
     }
 
@@ -140,6 +196,8 @@ class TextSprite extends Sprite
     {
         super.onUpdate(dt);
         wrapWidth.update(dt);
+        letterSpacing.update(dt);
+        lineSpacing.update(dt);
     }
 
     private var _font :Font;

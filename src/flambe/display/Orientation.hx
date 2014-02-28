@@ -5,7 +5,7 @@
 package flambe.display;
 
 /**
- * A display orientation for devices, used by Stage.lockOrientation.
+ * A display orientation for devices, used by `Stage.lockOrientation()`.
  */
 enum Orientation
 {

@@ -47,7 +47,7 @@ typedef LayerFormat = {
 
 typedef KeyframeFormat = {
     // The number of frames until the next keyframe
-    duration: Int,
+    duration: Float,
 
     // Optional: The name of the symbol that should be shown at this keyframe
     ref: Null<String>,

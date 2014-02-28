@@ -19,14 +19,14 @@ import flambe.util.Logger;
  * Creating a class that extends PackageLog at the base of your project is a convenient way to
  * include logging across a whole codebase.
  *
- * <pre>
+ * ```haxe
  * // In src/foobar/Log.hx
- * class Log extends PackageLogger {}
+ * class Log extends PackageLog {}
  *
  * // In src/foobar/something/deeper/Widget.hx
  * // (Importing foobar.Log is not needed, as Haxe automatically imports classes in parent directories)
  * Log.info("Hello world"); // Logs "foobar: Hello world"
- * </pre>
+ * ```
  */
 @:autoBuild(flambe.util.PackageLog.build())
 #end

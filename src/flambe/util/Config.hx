@@ -11,12 +11,12 @@ typedef ConfigSection = Map<String,String>;
 /**
  * An INI-like config file parser.
  *
- * <pre>
+ * ```ini
  * ; This is a comment
  * foo = some value
  * [my section]
  * password = "  quotes are optional, and useful if you want to preserve surrounding spaces  "
- * </pre>
+ * ```
  */
 class Config
 {
@@ -62,7 +62,15 @@ class Config
                     // Trim off quotes
                     value = value.substr(1, value.length-2);
                 }
-                currentSection.set(key, value);
+                currentSection.set(key, value
+                    // Unescape certain characters
+                    .replace("\\n", "\n")
+                    .replace("\\r", "\r")
+                    .replace("\\t", "\t")
+                    .replace("\\'", "\'")
+                    .replace("\\\"", "\"")
+                    .replace("\\\\", "\\")
+                );
             }
         }
 

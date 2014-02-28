@@ -13,9 +13,9 @@ import flambe.math.FMath;
 class Sine
     implements Behavior
 {
-	/** The end value */
+	/** The end value. */
 	public var end(default, null):Float;
-	/** The starting value */
+	/** The starting value. */
 	public var start(default, null):Float;
 	/** The number of times to animate between the starting value and the end value. */
 	public var cycles(default, null):Float;
@@ -23,12 +23,12 @@ class Sine
 	public var speed(default, null):AnimatedFloat;
 	
 	/**
-	 * @param	start	The starting value for the animated float.
-	 * @param	end		The last value for the animated float.
-	 * @param	?speed	The speed (in seconds) it takes to go from the start value to the end value.
-	 * @param	?cycles	The number of animation cycles to go through. A value of 0 will cycle forever,
-	 * 					whereas a value of 1 will go from the start position, to the end position, and back to start.
-	 * @param	?offset	The number of seconds to offset the animation. Useful for offseting the animation for a series of sine behaviors.
+	 * @param start The starting value for the animated float.
+	 * @param end The last value for the animated float.
+	 * @param speed The speed (in seconds) it takes to go from the start value to the end value.
+	 * @param cycles The number of animation cycles to go through. A value of 0 will cycle forever,
+	 *   whereas a value of 1 will go from the start position, to the end position, and back to start.
+	 * @param offset The number of seconds to offset the animation. Useful for offseting the animation for a series of sine behaviors.
 	 */
 	public function new(start:Float, end:Float, ?speed:Float = 1, ?cycles:Float = 0, ?offset:Float = 0) 
 	{

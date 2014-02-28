@@ -6,38 +6,42 @@ package flambe.display;
 
 /**
  * Blend mode used to composite a sprite.
- * https://en.wikipedia.org/wiki/Blend_modes
+ *
+ * See [Wikipedia](https://en.wikipedia.org/wiki/Blend_modes) for more info.
  */
-enum BlendMode {
+enum BlendMode
+{
     /**
-     * <p>Blends the source color on top of the destination, respecting transparency.</p>
-     * <p><img src="https://aduros.com/flambe/images/BlendMode-Normal.png"></p>
+     * Blends the source color on top of the destination, respecting transparency.
+     *
+     * <img src="https://aduros.com/flambe/images/BlendMode-Normal.png">
      */
     Normal;
 
     /**
-     * <p>Adds the source and destination colors, lightening the final image.</p>
-     * <p><img src="https://aduros.com/flambe/images/BlendMode-Add.png"></p>
+     * Adds the source and destination colors, lightening the final image.
+     *
+     * <img src="https://aduros.com/flambe/images/BlendMode-Add.png">
      */
     Add;
 
     /**
-     * <p>Masks the overlapping area by applying the source alpha to the destination image.</p>
+     * Masks the overlapping area by applying the source alpha to the destination image.
      *
-     * <p>WARNING: In HTML5 canvas, this blend mode is unbounded. It will clear the entire
-     * destination image, not just the bounds within the source image.</p>
+     * __WARNING__: In HTML5 canvas, this blend mode is unbounded. It will clear the entire
+     * destination image, not just the bounds within the source image.
      *
-     * <p><img src="https://aduros.com/flambe/images/BlendMode-Mask.png"></p>
+     * <img src="https://aduros.com/flambe/images/BlendMode-Mask.png">
      */
     Mask;
 
     /**
-     * <p>Ignores the destination color, and copies the source without handling transparency.</p>
+     * Ignores the destination color, and copies the source without handling transparency.
      *
-     * <p>WARNING: In HTML5 canvas, this blend mode is unbounded. It will clear the entire
-     * destination image, not just the bounds within the source image.</p>
+     * __WARNING__: In HTML5 canvas, this blend mode is unbounded. It will clear the entire
+     * destination image, not just the bounds within the source image.
      *
-     * <p><img src="https://aduros.com/flambe/images/BlendMode-Copy.png"></p>
+     * <img src="https://aduros.com/flambe/images/BlendMode-Copy.png">
      */
     Copy;
 }

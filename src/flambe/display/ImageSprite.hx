@@ -9,6 +9,9 @@ package flambe.display;
  */
 class ImageSprite extends Sprite
 {
+    /**
+     * The texture being displayed, or null if none.
+     */
     public var texture :Texture;
 
     public function new (texture :Texture)
@@ -19,16 +22,18 @@ class ImageSprite extends Sprite
 
     override public function draw (g :Graphics)
     {
-        g.drawImage(texture, 0, 0);
+        if (texture != null) {
+            g.drawImage(texture, 0, 0);
+        }
     }
 
     override public function getNaturalWidth () :Float
     {
-        return texture.width;
+        return (texture != null) ? texture.width : 0;
     }
 
     override public function getNaturalHeight () :Float
     {
-        return texture.height;
+        return (texture != null) ? texture.height : 0;
     }
 }

@@ -4,7 +4,8 @@
 
 package flambe.swf;
 
-import flambe.display.Sprite;
+import flambe.display.ImageSprite;
+import flambe.display.SubTexture;
 import flambe.display.Texture;
 import flambe.swf.Format;
 
@@ -15,24 +16,16 @@ class BitmapSymbol
     implements Symbol
 {
     public var name (get, null) :String;
-    public var atlas (default, null) :Texture;
-    public var x (default, null) :Int;
-    public var y (default, null) :Int;
-    public var width (default, null) :Int;
-    public var height (default, null) :Int;
+    public var texture (default, null) :SubTexture;
     public var anchorX (default, null) :Float;
     public var anchorY (default, null) :Float;
 
     public function new (json :TextureFormat, atlas :Texture)
     {
         _name = json.symbol;
-        this.atlas = atlas;
 
         var rect = json.rect;
-        x = rect[0];
-        y = rect[1];
-        width = rect[2];
-        height = rect[3];
+        texture = atlas.subTexture(rect[0], rect[1], rect[2], rect[3]);
 
         var origin = json.origin;
         if (origin != null) {
@@ -44,12 +37,14 @@ class BitmapSymbol
         }
     }
 
-    public function createSprite () :Sprite
+    public function createSprite () :ImageSprite
     {
-        return new BitmapSprite(this);
+        var sprite = new ImageSprite(texture);
+        sprite.setAnchor(anchorX, anchorY);
+        return sprite;
     }
 
-    public function get_name () :String
+    inline private function get_name () :String
     {
         return _name;
     }

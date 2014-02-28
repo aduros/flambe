@@ -63,6 +63,8 @@ class BasicPointer
         if (_isDown) {
             return; // Ignore repeat down events
         }
+        // Ensure a move event is sent first
+        submitMove(viewX, viewY, source);
         _isDown = true;
 
         // Take a snapshot of the entire event bubbling chain
@@ -82,13 +84,9 @@ class BasicPointer
         // Finally, emit the event up the chain
         prepare(viewX, viewY, hit, source);
         for (sprite in chain) {
-            // Avoid calling the public getter and lazily instanciating this signal
-            var signal = sprite._pointerDown;
-            if (signal != null) {
-                signal.emit(_sharedEvent);
-                if (_sharedEvent._stopped) {
-                    return;
-                }
+            sprite.onPointerDown(_sharedEvent);
+            if (_sharedEvent._stopped) {
+                return;
             }
         }
         down.emit(_sharedEvent);
@@ -99,6 +97,10 @@ class BasicPointer
      */
     public function submitMove (viewX :Float, viewY :Float, source :EventSource)
     {
+        if (viewX == _x && viewY == _y) {
+            return; // Ignore repeated duplicate move events
+        }
+
         // Take a snapshot of the entire event bubbling chain
         var chain = [];
         var hit = Sprite.hitTest(System.root, viewX, viewY);
@@ -116,13 +118,9 @@ class BasicPointer
         // Finally, emit the event up the chain
         prepare(viewX, viewY, hit, source);
         for (sprite in chain) {
-            // Avoid calling the public getter and lazily instanciating this signal
-            var signal = sprite._pointerMove;
-            if (signal != null) {
-                signal.emit(_sharedEvent);
-                if (_sharedEvent._stopped) {
-                    return;
-                }
+            sprite.onPointerMove(_sharedEvent);
+            if (_sharedEvent._stopped) {
+                return;
             }
         }
         move.emit(_sharedEvent);
@@ -136,6 +134,8 @@ class BasicPointer
         if (!_isDown) {
             return; // Ignore repeat up events
         }
+        // Ensure a move event is sent first
+        submitMove(viewX, viewY, source);
         _isDown = false;
 
         // Take a snapshot of the entire event bubbling chain
@@ -155,13 +155,9 @@ class BasicPointer
         // Finally, emit the event up the chain
         prepare(viewX, viewY, hit, source);
         for (sprite in chain) {
-            // Avoid calling the public getter and lazily instanciating this signal
-            var signal = sprite._pointerUp;
-            if (signal != null) {
-                signal.emit(_sharedEvent);
-                if (_sharedEvent._stopped) {
-                    return;
-                }
+            sprite.onPointerUp(_sharedEvent);
+            if (_sharedEvent._stopped) {
+                return;
             }
         }
         up.emit(_sharedEvent);

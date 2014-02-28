@@ -13,9 +13,10 @@ enum EventSource
 }
 
 /**
- * Represents an event coming from a pointing device, such as a mouse or finger. NOTE: For
- * performance reasons, PointerEvent instances are reused by Flambe. Use clone() to retain a
- * reference to an event.
+ * Represents an event coming from a pointing device, such as a mouse or finger.
+ *
+ * _NOTE_: For performance reasons, PointerEvent instances are reused by Flambe. Use `clone()` to
+ * retain a reference to an event.
  */
 class PointerEvent
 {

@@ -37,6 +37,16 @@ class DummySound extends BasicAsset<DummySound>
         return 0;
     }
 
+    override private function copyFrom (asset :DummySound)
+    {
+        // Nothing at all
+    }
+
+    override private function onDisposed ()
+    {
+        // Nothing at all
+    }
+
     public static function getInstance () :DummySound
     {
         if (_instance == null) {

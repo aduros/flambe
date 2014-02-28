@@ -314,6 +314,7 @@ exports.build = function (config, platforms, opts) {
     var buildAndroid = function () {
         var apk = "build/main-android.apk";
         console.log("Building: " + apk);
+        var pass = get(config, "password", "password");
 
         var swf = "main-android.swf";
         var cert = CACHE_DIR+"air/certificate-android.p12";
@@ -337,7 +338,7 @@ exports.build = function (config, platforms, opts) {
             } else {
                 androidFlags.push("-target", "apk-captive-runtime");
             }
-            androidFlags.push("-storetype", "pkcs12", "-keystore", cert, "-storepass", "password",
+            androidFlags.push("-storetype", "pkcs12", "-keystore", cert, "-storepass", pass,
                 apk, xml);
             androidFlags = androidFlags.concat(pathOptions);
             androidFlags.push("-C", CACHE_DIR+"air", swf, "assets");
@@ -353,6 +354,7 @@ exports.build = function (config, platforms, opts) {
         var cert = "certs/ios-development.p12";
         var mobileProvision = "certs/ios.mobileprovision";
         var xml = CACHE_DIR+"air/config-ios.xml";
+        var pass = get(config, "password", "password");
 
         return buildAir(["-D", "ios", "-D", "no-flash-override", "-swf", CACHE_DIR+"air/"+swf])
         .then(function () {
@@ -366,7 +368,7 @@ exports.build = function (config, platforms, opts) {
                 iosFlags.push("-target", "ipa-ad-hoc");
             }
             // TODO(bruno): Make these cert options configurable
-            iosFlags.push("-storetype", "pkcs12", "-keystore", cert, "-storepass", "password",
+            iosFlags.push("-storetype", "pkcs12", "-keystore", cert, "-storepass", pass,
                 "-provisioning-profile", mobileProvision, ipa, xml);
             iosFlags = iosFlags.concat(pathOptions);
             iosFlags.push("-C", CACHE_DIR+"air", swf, "assets");

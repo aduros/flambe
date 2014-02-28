@@ -434,7 +434,7 @@ exports.build = function (config, platforms, opts) {
                 launch_path: "/index.html",
                 orientation: get(config, "orientation", "portrait").toLowerCase() == "portrait" ?
                     ["portrait", "portrait-secondary"] : ["landscape", "landscape-secondary"],
-                fullscreen: get(config, "fullscreen", true),
+                fullscreen: ""+get(config, "fullscreen", true),
                 icons: {},
             };
             findIcons("icons").forEach(function (icon) {

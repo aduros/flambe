@@ -10,6 +10,9 @@ developer:
 # The game's unique identifier.
 id: com.yourdomain.yourgame
 
+# The password for the app certificate
+password: topsecret
+
 # The game's version string.
 version: 1.0.0
 

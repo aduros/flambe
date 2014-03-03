@@ -214,10 +214,12 @@ class HtmlPlatform
             // Adds some lock screen support for iOS, possibly other devices that don't support the
             // page visibility api.
             var onPageTransitionChange = function (event) {
-                System.hidden._ = (event.type == "pagehide");
+                System.hidden._ = (event.type == "pagehide" || event.type == "blur");
             };
             Browser.window.addEventListener("pageshow", onPageTransitionChange, false);
             Browser.window.addEventListener("pagehide", onPageTransitionChange, false);
+            Browser.window.addEventListener("focus", onPageTransitionChange, false);
+            Browser.window.addEventListener("blur", onPageTransitionChange, false);
         }
 
         // Skip the next frame when coming back from being hidden

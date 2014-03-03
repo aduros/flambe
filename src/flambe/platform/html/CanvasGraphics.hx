@@ -51,18 +51,18 @@ class CanvasGraphics
         _canvasCtx.restore();
     }
 
-    public function drawImage (texture :Texture, destX :Float, destY :Float)
+    public function drawTexture (texture :Texture, destX :Float, destY :Float)
     {
-        drawSubImage(texture, destX, destY, 0, 0, texture.width, texture.height);
+        drawSubTexture(texture, destX, destY, 0, 0, texture.width, texture.height);
     }
 
-    public function drawSubImage (texture :Texture, destX :Float, destY :Float,
+    public function drawSubTexture (texture :Texture, destX :Float, destY :Float,
         sourceX :Float, sourceY :Float, sourceW :Float, sourceH :Float)
     {
         if (_firstDraw) {
             _firstDraw = false;
             _canvasCtx.globalCompositeOperation = "copy";
-            drawSubImage(texture, destX, destY, sourceX, sourceY, sourceW, sourceH);
+            drawSubTexture(texture, destX, destY, sourceX, sourceY, sourceW, sourceH);
             _canvasCtx.globalCompositeOperation = "source-over";
             return;
         }

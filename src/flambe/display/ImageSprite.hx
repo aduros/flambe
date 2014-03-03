@@ -23,7 +23,7 @@ class ImageSprite extends Sprite
     override public function draw (g :Graphics)
     {
         if (texture != null) {
-            g.drawImage(texture, 0, 0);
+            g.drawTexture(texture, 0, 0);
         }
     }
 

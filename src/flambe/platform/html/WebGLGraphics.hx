@@ -95,12 +95,12 @@ class WebGLGraphics
         _stateList = _stateList.prev;
     }
 
-    public function drawImage (texture :Texture, x :Float, y :Float)
+    public function drawTexture (texture :Texture, x :Float, y :Float)
     {
-        drawSubImage(texture, x, y, 0, 0, texture.width, texture.height);
+        drawSubTexture(texture, x, y, 0, 0, texture.width, texture.height);
     }
 
-    public function drawSubImage (texture :Texture, destX :Float, destY :Float,
+    public function drawSubTexture (texture :Texture, destX :Float, destY :Float,
         sourceX :Float, sourceY :Float, sourceW :Float, sourceH :Float)
     {
         var state = getTopState();
@@ -117,7 +117,7 @@ class WebGLGraphics
         var v2 = v1 + sourceH/rootHeight;
         var alpha = state.alpha;
 
-        var offset = _batcher.prepareDrawImage(_renderTarget, state.blendMode, state.scissor, texture);
+        var offset = _batcher.prepareDrawTexture(_renderTarget, state.blendMode, state.scissor, texture);
         var data = _batcher.data;
 
         data[  offset] = pos[0];

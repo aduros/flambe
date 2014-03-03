@@ -10,7 +10,7 @@ import js.html.webgl.RenderingContext;
 
 import flambe.platform.html.WebGLTexture;
 
-class DrawImageGL extends ShaderGL
+class DrawTextureGL extends ShaderGL
 {
     public function new (gl :RenderingContext)
     {

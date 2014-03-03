@@ -165,7 +165,7 @@ class Stage3DTextureRoot extends BasicAsset<Stage3DTextureRoot>
         ]));
         ortho.transformVectors(scratch, scratch);
 
-        var offset = _renderer.batcher.prepareDrawImage(this, Copy, null, source);
+        var offset = _renderer.batcher.prepareDrawTexture(this, Copy, null, source);
         var data = _renderer.batcher.data;
         var u1 = (source.rootX+sourceX) / source.root.width;
         var v1 = (source.rootY+sourceY) / source.root.height;

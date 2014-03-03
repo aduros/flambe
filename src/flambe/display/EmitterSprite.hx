@@ -287,7 +287,7 @@ class EmitterSprite extends Sprite
             if (particle.scale != 1) {
                 g.scale(particle.scale, particle.scale);
             }
-            g.drawImage(texture, offset, offset);
+            g.drawTexture(texture, offset, offset);
             g.restore();
 
             ++ii;

@@ -283,7 +283,7 @@ class Glyph
     {
         // Avoid drawing whitespace
         if (width > 0) {
-            g.drawSubImage(page, destX + xOffset, destY + yOffset, x, y, width, height);
+            g.drawSubTexture(page, destX + xOffset, destY + yOffset, x, y, width, height);
         }
     }
 

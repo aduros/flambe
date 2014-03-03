@@ -367,6 +367,9 @@ exports.build = function (config, platforms, opts) {
                 apk, xml);
             androidFlags = androidFlags.concat(pathOptions);
             androidFlags.push("-C", CACHE_DIR+"air", swf, "assets");
+            if (fs.existsSync("android")) {
+                androidFlags.push("-C", "android", ".");
+            }
             return adt(androidFlags);
         });
     };
@@ -396,6 +399,9 @@ exports.build = function (config, platforms, opts) {
                 "-provisioning-profile", mobileProvision, ipa, xml);
             iosFlags = iosFlags.concat(pathOptions);
             iosFlags.push("-C", CACHE_DIR+"air", swf, "assets");
+            if (fs.existsSync("ios")) {
+                iosFlags.push("-C", "ios", ".");
+            }
             return adt(iosFlags);
         });
     };
@@ -422,7 +428,6 @@ exports.build = function (config, platforms, opts) {
             }
         })
         .then(function () {
-
             var manifest = {
                 name: get(config, "name"),
                 description: get(config, "description"),

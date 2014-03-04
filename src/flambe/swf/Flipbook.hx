@@ -13,6 +13,7 @@ import flambe.display.Texture;
  */
 class Flipbook
 {
+    public var name (default, default) :String;
     public var frames (default, null) :Array<FlipbookFrame>;
 
     public function new<A:Texture> (textures :Array<A>)
@@ -24,6 +25,8 @@ class Flipbook
         for (texture in textures) {
             frames.push(new FlipbookFrame(texture, durationPerFrame));
         }
+
+        name = "";
     }
 
     /**

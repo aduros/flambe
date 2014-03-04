@@ -402,6 +402,16 @@ class Sprite extends Component
     }
 
     /**
+     * Chainable convenience method to set the blendMode.
+     * @returns This instance, for chaining.
+     */
+    public function setBlendMode (blendMode :BlendMode) :Sprite
+    {
+        this.blendMode = blendMode;
+        return this;
+    }
+
+    /**
      * Chainable convenience method to set pointerEnabled to false.
      * @returns This instance, for chaining.
      */

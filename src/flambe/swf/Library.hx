@@ -142,14 +142,21 @@ class Library
         return lib;
     }
 
-	public static function fromFlipbookArray (flipbooks :Array<Flipbook>) :Library
+    public static function fromFlipbookArray (flipbooks :Array<Flipbook>) :Library
     {
         var lib = Type.createEmptyInstance(Library);
         lib._symbols = new Map();
         lib.frameRate = 60;
 
+        var animCnt = 0;
         for (flipbook in flipbooks)
-		{
+        {
+            // Assign a name for this animation if one hasn't been set
+            if (flipbook.name == "") {
+                flipbook.name = "Anim" + animCnt;
+            }
+            animCnt++;
+
             // Fake up some Flump metadata to create a movie symbol
             var keyframes :Array<KeyframeFormat> = [];
             for (frame in flipbook.frames) {
@@ -179,7 +186,7 @@ class Library
 
         return lib;
     }
-	
+
     /**
      * Retrieve a name symbol from this library, or null if not found.
      */

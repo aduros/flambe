@@ -233,6 +233,54 @@ class Stage3DGraphics
         data[++offset] = a;
     }
 
+    public function drawLine (color :Int, xStart :Float, yStart :Float, xEnd :Float, yEnd :Float, width :Float, roundedCap :Bool) :Void
+    {
+        var state = getTopState();
+
+        var pos = transformQuadForLine(xStart, yStart, xEnd, yEnd, width);
+        var r = (color & 0xff0000) / 0xff0000;
+        var g = (color & 0x00ff00) / 0x00ff00;
+        var b = (color & 0x0000ff) / 0x0000ff;
+        var a = state.alpha;
+
+        var offset = _batcher.prepareFillRect(_renderTarget, state.blendMode, state.scissor);
+        var data = _batcher.data;
+
+        data[  offset] = pos[0];
+        data[++offset] = pos[1];
+        data[++offset] = r;
+        data[++offset] = g;
+        data[++offset] = b;
+        data[++offset] = a;
+
+        data[++offset] = pos[3];
+        data[++offset] = pos[4];
+        data[++offset] = r;
+        data[++offset] = g;
+        data[++offset] = b;
+        data[++offset] = a;
+
+        data[++offset] = pos[6];
+        data[++offset] = pos[7];
+        data[++offset] = r;
+        data[++offset] = g;
+        data[++offset] = b;
+        data[++offset] = a;
+
+        data[++offset] = pos[9];
+        data[++offset] = pos[10];
+        data[++offset] = r;
+        data[++offset] = g;
+        data[++offset] = b;
+        data[++offset] = a;
+
+        if (roundedCap)
+        {
+            drawLineCap(true, xStart, yStart, width, r, g, b, a);
+            drawLineCap(false, xEnd, yEnd, width, r, g, b, a);
+        }
+    }
+
     public function multiplyAlpha (factor :Float)
     {
         getTopState().alpha *= factor;
@@ -339,6 +387,134 @@ class Stage3DGraphics
         return pos;
     }
 
+    private function transformQuadForLine(xStart :Float, yStart :Float, xEnd :Float, yEnd :Float, width :Float) :Vector<Float>
+    {
+        var halfWidth = width * 0.5;
+        var pos = _scratchQuadVector;
+
+        pos[2] = 0;
+        pos[5] = 0;
+        pos[8] = 0;
+        pos[11] = 0;
+
+        // Case for vertical line
+        if(xStart == xEnd) {
+            pos[0] = xStart - halfWidth;
+            pos[1] = yStart;
+            pos[3] = xStart + halfWidth;
+            pos[4] = yStart;
+
+            pos[6] = xEnd + halfWidth;
+            pos[7] = yEnd;
+            pos[9] = xEnd - halfWidth;
+            pos[10] = yEnd;
+
+            _startTheta = (yStart > yEnd) ? Math.PI : 0.0;
+        }
+        // Case for horizontal line
+        else if(yStart == yEnd) {
+            pos[0] = xStart;
+            pos[1] = yStart - halfWidth;
+            pos[3] = xStart;
+            pos[4] = yStart + halfWidth;
+
+            pos[6] = xEnd;
+            pos[7] = yEnd + halfWidth;
+            pos[9] = xEnd;
+            pos[10] = yEnd - halfWidth;
+
+            _startTheta = (xStart > xEnd) ? 0.5*Math.PI : -0.5*Math.PI;
+        }
+        // Final case for any line with slope
+        else {
+            var slopePerp = (xStart - xEnd) / (yEnd - yStart);
+            var xOffset   = Math.sqrt((halfWidth * halfWidth) / (1.0 + (slopePerp * slopePerp)));
+
+            pos[0] = xStart - xOffset;
+            pos[1] = slopePerp * (pos[0] - xStart) + yStart;
+            pos[3] = xStart + xOffset;
+            pos[4] = slopePerp * (pos[3] - xStart) + yStart;
+
+            pos[6] = xEnd + xOffset;
+            pos[7] = slopePerp * (pos[6] - xEnd) + yEnd;
+            pos[9] = xEnd - xOffset;
+            pos[10] = slopePerp * (pos[9] - xEnd) + yEnd;
+
+            _startTheta = Math.atan(slopePerp);
+            if(yStart > yEnd) {
+                _startTheta += Math.PI;
+            }
+        }
+
+        getTopState().matrix.transformVectors(pos, pos);
+        return pos;
+    }
+
+    private function drawLineCap(startCap :Bool, xCtr :Float, yCtr :Float, width :Float, red :Float, green :Float, blue :Float, alpha :Float)
+    {
+        var halfWidth = width * 0.5;
+        var numWedgeForCap :Int = Std.int(width / 4);
+        if (numWedgeForCap < 6) numWedgeForCap = 6;
+
+        var wedgeAngle = (2.0 * Math.PI) / (numWedgeForCap * 2);
+        wedgeAngle *= (startCap ? -1.0 : 1.0);
+
+        for (i in 0...numWedgeForCap)
+        {
+            var pos = _scratchQuadVector;
+            pos[0] = xCtr;
+            pos[1] = yCtr;
+
+            var theta = _startTheta;
+            theta += i * wedgeAngle;
+
+            pos[3] = xCtr + halfWidth*Math.cos(theta);
+            pos[4] = yCtr + halfWidth*Math.sin(theta);
+
+            theta += wedgeAngle;
+
+            pos[6] = xCtr + halfWidth*Math.cos(theta);
+            pos[7] = yCtr + halfWidth*Math.sin(theta);
+
+            pos[9] = xCtr;
+            pos[10] = yCtr;
+
+            var state = getTopState();
+            state.matrix.transformVectors(pos, pos);
+
+            var offset = _batcher.prepareFillRect(_renderTarget, state.blendMode, state.scissor);
+            var data = _batcher.data;
+
+            data[  offset] = pos[0];
+            data[++offset] = pos[1];
+            data[++offset] = red;
+            data[++offset] = green;
+            data[++offset] = blue;
+            data[++offset] = alpha;
+
+            data[++offset] = pos[3];
+            data[++offset] = pos[4];
+            data[++offset] = red;
+            data[++offset] = green;
+            data[++offset] = blue;
+            data[++offset] = alpha;
+
+            data[++offset] = pos[6];
+            data[++offset] = pos[7];
+            data[++offset] = red;
+            data[++offset] = green;
+            data[++offset] = blue;
+            data[++offset] = alpha;
+
+            data[++offset] = pos[9];
+            data[++offset] = pos[10];
+            data[++offset] = red;
+            data[++offset] = green;
+            data[++offset] = blue;
+            data[++offset] = alpha;
+        }
+    }
+
     private static var _scratchMatrix3D = new Matrix3D();
     private static var _scratchClipVector = new Vector<Float>(2*3, true);
     private static var _scratchQuadVector = new Vector<Float>(4*3, true);
@@ -347,6 +523,8 @@ class Stage3DGraphics
         new Matrix3D().copyRawDataTo(v);
         return v;
     })();
+
+    private var _startTheta :Float; // Used for drawing rounded line caps
 
     private var _batcher :Stage3DBatcher;
     private var _renderTarget :Stage3DTextureRoot;

@@ -227,6 +227,54 @@ class WebGLGraphics
         data[++offset] = a;
     }
 
+    public function drawLine (color :Int, xStart :Float, yStart :Float, xEnd :Float, yEnd :Float, width :Float, roundedCap :Bool)
+    {
+        var state = getTopState();
+
+        var pos = transformQuadForLine(xStart, yStart, xEnd, yEnd, width);
+        var r = (color & 0xff0000) / 0xff0000;
+        var g = (color & 0x00ff00) / 0x00ff00;
+        var b = (color & 0x0000ff) / 0x0000ff;
+        var a = state.alpha;
+
+        var offset = _batcher.prepareFillRect(_renderTarget, state.blendMode, state.scissor);
+        var data = _batcher.data;
+
+        data[  offset] = pos[0];
+        data[++offset] = pos[1];
+        data[++offset] = r;
+        data[++offset] = g;
+        data[++offset] = b;
+        data[++offset] = a;
+
+        data[++offset] = pos[2];
+        data[++offset] = pos[3];
+        data[++offset] = r;
+        data[++offset] = g;
+        data[++offset] = b;
+        data[++offset] = a;
+
+        data[++offset] = pos[4];
+        data[++offset] = pos[5];
+        data[++offset] = r;
+        data[++offset] = g;
+        data[++offset] = b;
+        data[++offset] = a;
+
+        data[++offset] = pos[6];
+        data[++offset] = pos[7];
+        data[++offset] = r;
+        data[++offset] = g;
+        data[++offset] = b;
+        data[++offset] = a;
+
+        if (roundedCap)
+        {
+            drawLineCap(true, xStart, yStart, width, r, g, b, a);
+            drawLineCap(false, xEnd, yEnd, width, r, g, b, a);
+        }
+    }
+
     public function multiplyAlpha (factor :Float)
     {
         getTopState().alpha *= factor;
@@ -323,8 +371,133 @@ class WebGLGraphics
         return pos;
     }
 
+    private function transformQuadForLine(xStart :Float, yStart :Float, xEnd :Float, yEnd :Float, width :Float) :Float32Array
+    {
+        var halfWidth = width * 0.5;
+        var pos = _scratchQuadArray;
+
+        // Edge case for vertical line
+        if(xStart == xEnd) {
+            pos[0] = xStart - halfWidth;
+            pos[1] = yStart;
+            pos[2] = xStart + halfWidth;
+            pos[3] = yStart;
+
+            pos[4] = xEnd + halfWidth;
+            pos[5] = yEnd;
+            pos[6] = xEnd - halfWidth;
+            pos[7] = yEnd;
+
+            _startTheta = (yStart > yEnd) ? Math.PI : 0.0;
+        }
+        // Edge case for horizontal line
+        else if(yStart == yEnd) {
+            pos[0] = xStart;
+            pos[1] = yStart - halfWidth;
+            pos[2] = xStart;
+            pos[3] = yStart + halfWidth;
+
+            pos[4] = xEnd;
+            pos[5] = yEnd + halfWidth;
+            pos[6] = xEnd;
+            pos[7] = yEnd - halfWidth;
+
+            _startTheta = (xStart > xEnd) ? 0.5*Math.PI : -0.5*Math.PI;
+        }
+        // Final Edge case for any line with slope
+        else {
+            var slopePerp = (xStart - xEnd) / (yEnd - yStart);
+            var xOffset   = Math.sqrt((halfWidth * halfWidth) / (1.0 + (slopePerp * slopePerp)));
+
+            pos[0] = xStart - xOffset;
+            pos[1] = slopePerp * (pos[0] - xStart) + yStart;
+            pos[2] = xStart + xOffset;
+            pos[3] = slopePerp * (pos[2] - xStart) + yStart;
+
+            pos[4] = xEnd + xOffset;
+            pos[5] = slopePerp * (pos[4] - xEnd) + yEnd;
+            pos[6] = xEnd - xOffset;
+            pos[7] = slopePerp * (pos[6] - xEnd) + yEnd;
+
+            _startTheta = Math.atan(slopePerp);
+            if(yStart > yEnd) {
+                _startTheta += Math.PI;
+            }
+        }
+
+        getTopState().matrix.transformArray(cast pos, 8, cast pos);
+        return pos;
+    }
+
+    private function drawLineCap(startCap :Bool, xCtr :Float, yCtr :Float, width :Float, red :Float, green :Float, blue :Float, alpha :Float)
+    {
+        var halfWidth = width * 0.5;
+        var numWedgeForCap :Int = Std.int(width / 4);
+        if (numWedgeForCap < 6) numWedgeForCap = 6;
+
+        var wedgeAngle = (2.0 * Math.PI) / (numWedgeForCap * 2);
+        wedgeAngle *= (startCap ? -1.0 : 1.0);
+
+        for (i in 0...numWedgeForCap)
+        {
+            var pos = _scratchQuadArray;
+            pos[0] = xCtr;
+            pos[1] = yCtr;
+
+            var theta = _startTheta;
+            theta += i * wedgeAngle;
+
+            pos[2] = xCtr + halfWidth*Math.cos(theta);
+            pos[3] = yCtr + halfWidth*Math.sin(theta);
+
+            theta += wedgeAngle;
+
+            pos[4] = xCtr + halfWidth*Math.cos(theta);
+            pos[5] = yCtr + halfWidth*Math.sin(theta);
+
+            pos[6] = xCtr;
+            pos[7] = yCtr;
+
+            var state = getTopState();
+            state.matrix.transformArray(cast pos, 8, cast pos);
+
+            var offset = _batcher.prepareFillRect(_renderTarget, state.blendMode, state.scissor);
+            var data = _batcher.data;
+
+            data[  offset] = pos[0];
+            data[++offset] = pos[1];
+            data[++offset] = red;
+            data[++offset] = green;
+            data[++offset] = blue;
+            data[++offset] = alpha;
+
+            data[++offset] = pos[2];
+            data[++offset] = pos[3];
+            data[++offset] = red;
+            data[++offset] = green;
+            data[++offset] = blue;
+            data[++offset] = alpha;
+
+            data[++offset] = pos[4];
+            data[++offset] = pos[5];
+            data[++offset] = red;
+            data[++offset] = green;
+            data[++offset] = blue;
+            data[++offset] = alpha;
+
+            data[++offset] = pos[6];
+            data[++offset] = pos[7];
+            data[++offset] = red;
+            data[++offset] = green;
+            data[++offset] = blue;
+            data[++offset] = alpha;
+        }
+    }
+
     private static var _scratchMatrix = new Matrix();
     private static var _scratchQuadArray :Float32Array = null;
+
+    private var _startTheta :Float; // Used for drawing rounded line caps
 
     private var _batcher :WebGLBatcher;
     private var _renderTarget :WebGLTextureRoot;

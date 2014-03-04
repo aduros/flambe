@@ -95,7 +95,7 @@ private class MixerSound
     {
         for (ii in 0..._channels) {
             var playback = _playbacks[ii];
-            if (playback == null || playback.ended) {
+            if (playback == null || playback.complete._) {
                 return ii;
             }
         }

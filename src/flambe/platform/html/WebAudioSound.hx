@@ -9,6 +9,7 @@ import flambe.platform.Tickable;
 import flambe.sound.Playback;
 import flambe.sound.Sound;
 import flambe.util.Disposable;
+import flambe.util.Value;
 
 class WebAudioSound extends BasicAsset<WebAudioSound>
     implements Sound
@@ -112,7 +113,7 @@ private class WebAudioPlayback
 {
     public var volume (default, null) :AnimatedFloat;
     public var paused (get, set) :Bool;
-    public var ended (get, null) :Bool;
+    public var complete (get, null) :Value<Bool>;
     public var position (get, null) :Float;
     public var sound (get, null) :Sound;
 
@@ -120,11 +121,12 @@ private class WebAudioPlayback
     {
         _sound = sound;
         _head = WebAudioSound.gain;
+        _complete = new Value<Bool>(false);
 
         _sourceNode = WebAudioSound.ctx.createBufferSource();
         _sourceNode.buffer = sound.buffer;
         _sourceNode.loop = loop;
-        _sourceNode.onended = function () _ended = true; // Not supported on iOS!
+        _sourceNode.onended = function () _complete._ = true; // Not supported on iOS!
         WebAudioSound.start(_sourceNode, 0);
         playAudio();
 
@@ -164,16 +166,15 @@ private class WebAudioPlayback
         return paused;
     }
 
-    public function get_ended () :Bool
+    inline public function get_complete () :Value<Bool>
     {
-        // playbackState is used in old browsers that don't support onended (iOS)
-        return _ended || _sourceNode.playbackState == 3; // == FINISHED_STATE
+        return _complete;
     }
 
     public function get_position () :Float
     {
         // Web Audio sure doesn't make this simple...
-        if (ended) {
+        if (_complete._) {
             return _sound.duration;
 
         } else if (paused) {
@@ -189,8 +190,13 @@ private class WebAudioPlayback
     {
         volume.update(dt);
 
-        if (ended || paused) {
-            // Allow ended or paused sounds to be garbage collected
+        // playbackState is used in old browsers that don't support onended (iOS)
+        if (_sourceNode.playbackState == 3 /* FINISHED_STATE */) {
+            _complete._ = true;
+        }
+
+        if (_complete._ || paused) {
+            // Allow complete or paused sounds to be garbage collected
             _tickableAdded = false;
 
             // Release System references
@@ -204,7 +210,7 @@ private class WebAudioPlayback
     public function dispose ()
     {
         paused = true;
-        _ended = true;
+        _complete._ = true;
     }
 
     private function setVolume (volume :Float)
@@ -263,5 +269,5 @@ private class WebAudioPlayback
     private var _hideBinding :Disposable;
     private var _tickableAdded :Bool;
 
-    private var _ended :Bool = false;
+    private var _complete :Value<Bool>;
 }

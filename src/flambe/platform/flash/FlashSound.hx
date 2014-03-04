@@ -14,6 +14,7 @@ import flambe.platform.Tickable;
 import flambe.sound.Playback;
 import flambe.sound.Sound;
 import flambe.util.Disposable;
+import flambe.util.Value;
 
 class FlashSound extends BasicAsset<FlashSound>
     implements Sound
@@ -75,7 +76,7 @@ private class FlashPlayback
 {
     public var volume (default, null) :AnimatedFloat;
     public var paused (get, set) :Bool;
-    public var ended (get, null) :Bool;
+    public var complete (get, null) :Value<Bool>;
     public var position (get, null) :Float;
     public var sound (get, null) :Sound;
 
@@ -84,6 +85,7 @@ private class FlashPlayback
         _sound = sound;
         _loops = loops;
         this.volume = new AnimatedFloat(volume, onVolumeChanged);
+        _complete = new Value<Bool>(false);
 
         playAudio(0, new SoundTransform(volume));
 
@@ -130,9 +132,9 @@ private class FlashPlayback
         return paused;
     }
 
-    inline public function get_ended () :Bool
+    inline public function get_complete () :Value<Bool>
     {
-        return _ended;
+        return _complete;
     }
 
     public function get_position () :Float
@@ -144,8 +146,8 @@ private class FlashPlayback
     {
         volume.update(dt);
 
-        if (ended || paused) {
-            // Allow ended or paused sounds to be garbage collected
+        if (_complete._ || paused) {
+            // Allow complete or paused sounds to be garbage collected
             _tickableAdded = false;
 
             // Release references
@@ -160,12 +162,12 @@ private class FlashPlayback
     public function dispose ()
     {
         paused = true;
-        _ended = true;
+        _complete._ = true;
     }
 
     private function onSoundComplete (_)
     {
-        _ended = true;
+        _complete._ = true;
     }
 
     private function playAudio (startPosition :Float, soundTransform :SoundTransform)
@@ -183,7 +185,7 @@ private class FlashPlayback
         }
 
         _pausePosition = -1;
-        _ended = false;
+        _complete._ = false;
 
         if (!_tickableAdded) {
             FlashPlatform.instance.mainLoop.addTickable(this);
@@ -208,7 +210,7 @@ private class FlashPlayback
 
     private var _pausePosition :Float;
     private var _wasPaused :Bool;
-    private var _ended :Bool;
+    private var _complete :Value<Bool>;
     private var _tickableAdded :Bool;
     private var _hideBinding :Disposable;
 }

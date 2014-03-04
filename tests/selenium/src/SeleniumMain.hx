@@ -51,7 +51,7 @@ class SeleniumMain
             assert(System.storage.get("$flambe_tmp") == "foobar");
 
             // Test asset pack loading
-            var loader = System.loadAssetPack(Manifest.build("bootstrap"));
+            var loader = System.loadAssetPack(Manifest.fromAssets("bootstrap"));
             loader.error.connect(function (error) catchErrors(function () {
                 fail(error);
             }));

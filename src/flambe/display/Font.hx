@@ -216,7 +216,7 @@ class Font
 
             case "kerning":
                 var first :Glyph = null;
-                var second = -1;
+                var second = 0, amount = 0;
                 for (pair in parser.pairs()) {
                     switch (pair.key) {
                     case "first":
@@ -224,8 +224,11 @@ class Font
                     case "second":
                         second = pair.getInt();
                     case "amount":
-                        first.setKerning(second, pair.getInt());
+                        amount = pair.getInt();
                     }
+                }
+                if (first != null && amount != 0) {
+                    first.setKerning(second, amount);
                 }
             }
         }

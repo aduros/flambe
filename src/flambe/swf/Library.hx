@@ -92,26 +92,23 @@ class Library
      *
      * Example:
      * ```haxe
-     * var lib = Library.fromFlipbooks({
+     * var lib = Library.fromFlipbooks([
      *     // A walk animation from a 5x3 sprite sheet, that lasts 5 seconds
-     *     "walk": new Flipbook(spriteSheet.split(5, 3)).setDuration(5).setAnchor(10, 10),
+     *     new Flipbook("walk", spriteSheet.split(5, 3)).setDuration(5).setAnchor(10, 10),
      *
      *     // Another animation where each frame comes from a separate image (Jump1.png, Jump2.png, ...)
-     *     "jump": new Flipbook([for (frame in 1...10) pack.getTexture("Jump"+frame)]),
-     * });
-     *
+     *     new Flipbook("jump", [for (frame in 1...10) pack.getTexture("Jump"+frame)]),
+     * ]);
      * var movie = lib.createMovie("walk");
      * ```
      */
-    public static function fromFlipbooks (flipbooks :Dynamic<Flipbook>) :Library
+    public static function fromFlipbooks (flipbooks :Array<Flipbook>) :Library
     {
         var lib = Type.createEmptyInstance(Library);
         lib._symbols = new Map();
         lib.frameRate = 60;
 
-        for (name in Reflect.fields(flipbooks)) {
-            var flipbook :Flipbook = Reflect.field(flipbooks, name);
-
+        for (flipbook in flipbooks) {
             // Fake up some Flump metadata to create a movie symbol
             var keyframes :Array<KeyframeFormat> = [];
             for (frame in flipbook.frames) {
@@ -123,14 +120,14 @@ class Library
                 });
             }
             var movie = new MovieSymbol(lib, {
-                id: name,
+                id: flipbook.name,
                 layers: [{
                     name: "flipbook",
                     flipbook: true,
                     keyframes: keyframes,
                 }],
             });
-            lib._symbols.set(name, movie);
+            lib._symbols.set(flipbook.name, movie);
 
             // Assign symbols at each keyframe
             var keyframes = movie.layers[0].keyframes;

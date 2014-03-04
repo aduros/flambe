@@ -4,9 +4,7 @@
 
 package flambe.swf;
 
-import flambe.Entity;
 import flambe.script.Action;
-import flambe.swf.MovieSprite;
 
 /**
  * An action that plays a movie once using the actor's MoviePlayer, completing when the movie
@@ -39,5 +37,5 @@ class PlayMovie
     }
 
     private var _name :String;
-    private var _movie :MovieSprite;
+    private var _movie :MovieSprite = null;
 }

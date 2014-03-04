@@ -199,7 +199,7 @@ exports.build = function (config, platforms, opts) {
         var jsFlags = ["-D", target, "-D", "js-es5", "-D", "js-flatten"];
         var flags = commonFlags.concat(jsFlags).concat(assetFlags);
         if (debug) {
-            return haxe(flags.concat(["-js", js]));
+            return haxe(flags.concat(["-D", "source-map-content", "-js", js]));
         } else {
             // Minify release builds
             return haxe(flags.concat(["-js", unminified]))

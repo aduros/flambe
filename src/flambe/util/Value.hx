@@ -15,7 +15,7 @@ import flambe.util.Signal2;
 class Value<A>
 {
     /**
-     * The wrapped value, setting this to a different value will fire the 'changed' signal.
+     * The wrapped value, setting this to a different value will fire the `changed` signal.
      */
     public var _ (get, set) :A;
 

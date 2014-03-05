@@ -2,9 +2,10 @@
 // Flambe - Rapid game development
 // https://github.com/aduros/flambe/blob/master/LICENSE.txt
 
-package flambe.sound;
+package flambe.script;
 
-import flambe.script.Action;
+import flambe.sound.Sound;
+import flambe.sound.Playback;
 
 /**
  * An action that plays a sound and waits for it to complete.

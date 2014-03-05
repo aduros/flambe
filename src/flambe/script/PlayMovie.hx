@@ -2,9 +2,10 @@
 // Flambe - Rapid game development
 // https://github.com/aduros/flambe/blob/master/LICENSE.txt
 
-package flambe.swf;
+package flambe.script;
 
-import flambe.script.Action;
+import flambe.swf.MoviePlayer;
+import flambe.swf.MovieSprite;
 
 /**
  * An action that plays a movie once using the actor's MoviePlayer, completing when the movie

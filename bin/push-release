@@ -35,18 +35,11 @@ pushd src
 git ls-files | zip $ARCHIVE -@
 popd
 
-# Include our haxedoc.xml as well
-bin/build-dox
-zip -j $ARCHIVE dox/haxedoc.xml
-
 read -p "Submit Flambe $VERSION to haxelib [Y/n]? " CONFIRM
 case "$CONFIRM" in
     "Y" | "y" | "")
         # Upload the demos
         $DEMOS_ROOT/bin/upload-all
-
-        # Upload the API docs
-        rsync -avz --delete dox/ catdap:web/flambe/api/
 
         # Upload the NPM module
         npm publish ./command --force

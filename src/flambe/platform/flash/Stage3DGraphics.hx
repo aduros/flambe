@@ -236,6 +236,9 @@ class Stage3DGraphics
     public function drawLine (color :Int, xStart :Float, yStart :Float, xEnd :Float, yEnd :Float, width :Float, roundedCap :Bool) :Void
     {
         var state = getTopState();
+        if (state.emptyScissor()) {
+            return;
+        }
 
         var pos = transformQuadForLine(xStart, yStart, xEnd, yEnd, width);
         var r = (color & 0xff0000) / 0xff0000;
@@ -243,7 +246,7 @@ class Stage3DGraphics
         var b = (color & 0x0000ff) / 0x0000ff;
         var a = state.alpha;
 
-        var offset = _batcher.prepareFillRect(_renderTarget, state.blendMode, state.scissor);
+        var offset = _batcher.prepareFillRect(_renderTarget, state.blendMode, state.getScissor());
         var data = _batcher.data;
 
         data[  offset] = pos[0];
@@ -482,7 +485,7 @@ class Stage3DGraphics
             var state = getTopState();
             state.matrix.transformVectors(pos, pos);
 
-            var offset = _batcher.prepareFillRect(_renderTarget, state.blendMode, state.scissor);
+            var offset = _batcher.prepareFillRect(_renderTarget, state.blendMode, state.getScissor());
             var data = _batcher.data;
 
             data[  offset] = pos[0];

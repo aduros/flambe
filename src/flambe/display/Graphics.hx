@@ -57,4 +57,7 @@ interface Graphics
 
     /** Draws a colored rectangle at the given region. */
     function fillRect (color :Int, x :Float, y :Float, width :Float, height :Float) :Void;
+
+    /** Draws a line using the given specifications. */
+    function drawLine (color :Int, xStart :Float, yStart :Float, xEnd :Float, yEnd :Float, width :Float, roundedCap :Bool) :Void;
 }

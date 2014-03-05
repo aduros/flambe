@@ -86,6 +86,11 @@ class OverdrawGraphics
         drawRegion(x, y, width, height);
     }
 
+    public function drawLine (color :Int, xStart :Float, yStart :Float, xEnd :Float, yEnd :Float, width :Float, roundedCap :Bool)
+    {
+        _impl.drawLine(color, xStart, yStart, xEnd, yEnd, width, roundedCap);
+    }
+
     public function willRender ()
     {
         _impl.willRender();

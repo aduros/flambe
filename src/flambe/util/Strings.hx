@@ -70,8 +70,11 @@ class Strings
 
     /**
      * Substitute all "{n}" tokens with the corresponding values.
-     * Example: `substitute("{1} sat on a {0}", ["wall", "Humpty Dumpty"])` returns `"Humpty Dumpty
-     * sat on a wall"`.
+     *
+     * ```haxe
+     * "{1} sat on a {0}".substitute(["wall", "Humpty Dumpty"]);
+     * // returns "Humpty Dumpty sat on a wall"
+     * ```
      */
     public static function substitute (str :String, values :Array<Dynamic>) :String
     {
@@ -85,8 +88,11 @@ class Strings
 
     /**
      * Format a message with named parameters into a standard format for logging and errors.
-     * Example: `withFields("Wobbles were frobulated", ["count", 5, "silly", true])` returns
-     * `"Wobbles were frobulated [count=5, silly=true]"`.
+     *
+     * ```haxe
+     * "Wobbles were frobulated".withFields(["count", 5, "silly", true]);
+     * // returns "Wobbles were frobulated [count=5, silly=true]"
+     * ```
      *
      * @param fields The field names and values to be formatted. Must have an even length.
      */

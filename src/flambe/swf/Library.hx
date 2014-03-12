@@ -90,7 +90,6 @@ class Library
      * Creates a library procedurally using a set of Flipbook definitions. Each flipbook will be
      * converted to a movie that can be instanciated with `createMovie()`.
      *
-     * Example:
      * ```haxe
      * var lib = Library.fromFlipbooks([
      *     // A walk animation from a 5x3 sprite sheet, that lasts 5 seconds

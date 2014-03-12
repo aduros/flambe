@@ -13,7 +13,7 @@ enum LogLevel {
     /** General helpful information. */
     Info;
 
-    /** An unexpected, but recoverable problem. */
+    /** An unexpected but recoverable problem. */
     Warn;
 
     /** A fatal, unrecoverable problem. */
@@ -26,8 +26,16 @@ interface LogHandler
 }
 
 /**
- * A logging system, for printing formatted debug messages. Logging is stripped from release
- * builds, unless the -D flambe_keep_logs compiler flag is used.
+ * A logging system, for printing formatted debug messages. Logging is stripped from release builds,
+ * unless the `-D flambe_keep_logs` compiler flag is used.
+ *
+ * ```haxe
+ * var log = System.createLogger("mygame");
+ * log.info("Player logged in", ["name", "Joe", "level", 24]);
+ * // Logs "INFO mygame: Player logged in [name=Joe, level=24]"
+ * ```
+ *
+ * See `PackageLog` for a handy way to setup logging across a whole project.
  */
 class Logger
 {
@@ -44,51 +52,43 @@ class Logger
      * Logs a message at the `Info` severity level.
      *
      * @param text The message to log.
-     * @param args A list of pairs that are formatted into extra information. For example,
-     *   `log.info("Player logged in", ["who", playerId, "level", 24])` will log something
-     *   like: `INFO urgame: Player logged in [who=aduros, level=24]`
+     * @param fields Extra information to be formatted with `Strings.withFields`.
      */
-    public function info (?text :String, ?args :Array<Dynamic>)
+    public function info (?text :String, ?fields :Array<Dynamic>)
     {
-        log(Info, text, args);
+        log(Info, text, fields);
     }
 
     /**
      * Logs a message at the `Warn` severity level.
      *
      * @param text The message to log.
-     * @param args A list of pairs that are formatted into extra information. For example,
-     *   `log.warn("Player disconnected abruptly", ["who", playerId, "level", 24])` will log
-     *   something like: `WARN urgame: Player disconnected abruptly [who=aduros, level=24]`
+     * @param fields Extra information to be formatted with `Strings.withFields`.
      */
-    public function warn (?text :String, ?args :Array<Dynamic>)
+    public function warn (?text :String, ?fields :Array<Dynamic>)
     {
-        log(Warn, text, args);
+        log(Warn, text, fields);
     }
 
     /**
      * Logs a message at the `Error` severity level.
      *
      * @param text The message to log.
-     * @param args A list of pairs that are formatted into extra information. For example,
-     *   `log.error("Couldn't connect to DB!", ["who", playerId, "level", 24])` will log something
-     *   like: `ERROR urgame: Couldn't connect to DB! [who=aduros, level=24]`
+     * @param fields Extra information to be formatted with `Strings.withFields`.
      */
-    public function error (?text :String, ?args :Array<Dynamic>)
+    public function error (?text :String, ?fields :Array<Dynamic>)
     {
-        log(Error, text, args);
+        log(Error, text, fields);
     }
 
     /**
-     * Logs a message.
+     * Logs a message at the given severity level.
      *
      * @param level The severity of the log message.
      * @param text The message to log.
-     * @param args A list of pairs that are formatted into extra information. For example,
-     *   `log.info("Player logged in", ["who", playerId, "level", 24])` will log something like:
-     *   `INFO urgame: Player logged in [who=aduros, level=24]`
+     * @param fields Extra information to be formatted with `Strings.withFields`.
      */
-    public function log (level :LogLevel, ?text :String, ?args :Array<Dynamic>)
+    public function log (level :LogLevel, ?text :String, ?fields :Array<Dynamic>)
     {
         if (_handler == null) {
             return; // No handler, carry on quietly
@@ -96,18 +96,18 @@ class Logger
         if (text == null) {
             text = "";
         }
-        if (args != null) {
-            text = text.withFields(args);
+        if (fields != null) {
+            text = text.withFields(fields);
         }
         _handler.log(level, text);
     }
 
 #else
     // In release builds, logging calls are stripped out
-    inline public function info (?text :String, ?args :Array<Dynamic>) {}
-    inline public function warn (?text :String, ?args :Array<Dynamic>) {}
-    inline public function error (?text :String, ?args :Array<Dynamic>) {}
-    inline public function log (level :LogLevel, ?text :String, ?args :Array<Dynamic>) {}
+    inline public function info (?text :String, ?fields :Array<Dynamic>) {}
+    inline public function warn (?text :String, ?fields :Array<Dynamic>) {}
+    inline public function error (?text :String, ?fields :Array<Dynamic>) {}
+    inline public function log (level :LogLevel, ?text :String, ?fields :Array<Dynamic>) {}
 #end
 
     private var _handler :LogHandler;

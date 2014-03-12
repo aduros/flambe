@@ -10,7 +10,6 @@ import flambe.sound.Playback;
 /**
  * An action that plays a sound and waits for it to complete.
  *
- * Example:
  * ```haxe
  * script.run(new Sequence([
  *     // Play a sound

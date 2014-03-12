@@ -68,7 +68,7 @@ class Value<A>
 
     #if debug @:keep #end public function toString () :String
     {
-        return cast _value;
+        return ""+_value;
     }
 
     private var _value :A;

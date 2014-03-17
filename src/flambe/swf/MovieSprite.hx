@@ -170,6 +170,14 @@ class MovieSprite extends Sprite
         return _looped;
     }
 
+    override private function set_pixelSnapping (pixelSnapping :Bool) :Bool
+    {
+        for (layer in _animators) {
+            layer.setPixelSnapping(pixelSnapping);
+        }
+        return super.set_pixelSnapping(pixelSnapping);
+    }
+
     /**
      * Internal method to set the position to 0 and skip the next update. This is required to modify
      * the playback position of child movies during an update step, so that after the update
@@ -316,6 +324,13 @@ private class LayerAnimator
         matrix.translate(-kf.pivotX, -kf.pivotY);
 
         sprite.alpha._ = alpha;
+    }
+
+    public function setPixelSnapping (pixelSnapping :Bool) :Void
+    {
+        for (sprite in _sprites) {
+            sprite.pixelSnapping = pixelSnapping;
+        }
     }
 
     // The sprite to show at each keyframe index, or null if this layer has no symbol instances

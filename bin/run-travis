@@ -17,8 +17,7 @@ haxelib dev flambe "$FLAMBE_SPACE/src"
 npm install -g ./command
 
 echo "Validating compilation..."
-haxe -js out.js --no-output --macro 'include("flambe", true, ["flambe.platform"])' \
-    -lib hxsl -cp "$FLAMBE_SPACE/src"
+haxe -js none.js --no-output -lib flambe --macro 'include("flambe", true, ["flambe.platform"])'
 
 echo "Running unit tests..."
 # flambe-server required to run the unit tests

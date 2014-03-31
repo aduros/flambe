@@ -15,10 +15,5 @@ before_script:
     - sudo apt-get install haxe -y
     - mkdir -p ~/.haxe/lib
     - haxelib setup ~/.haxe/lib
-    - git clone git://github.com/aduros/flambe-server.git
-    - haxelib dev flambe-server flambe-server/src
-    - haxelib install hxsl
-    - haxelib install air3
-    - haxelib install nape
 
 script: bin/run-travis

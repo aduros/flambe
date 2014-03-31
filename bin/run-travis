@@ -13,6 +13,8 @@ ln -sfT "$FLAMBE_ROOT" "$FLAMBE_SPACE"
 cd "$FLAMBE_SPACE"
 
 # Install the flambe command and library
+haxelib install hxsl
+haxelib install air3
 haxelib dev flambe "$FLAMBE_SPACE/src"
 npm install -g ./command
 

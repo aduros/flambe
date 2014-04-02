@@ -34,7 +34,7 @@ class HtmlExternal
             object = method;
             method = Reflect.field(object, fieldName);
         }
-        return Reflect.callMethod(object, method, params);
+        return Reflect.isFunction(method) ? Reflect.callMethod(object, method, params) : method;
     }
 
     public function bind (name :String, fn :Dynamic)

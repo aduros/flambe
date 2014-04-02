@@ -133,7 +133,7 @@ private class InternalGraphics extends CanvasGraphics
 {
     public function new (renderTarget :CanvasTextureRoot)
     {
-        super(renderTarget.image);
+        super(renderTarget.image, true);
         _renderTarget = renderTarget;
     }
 

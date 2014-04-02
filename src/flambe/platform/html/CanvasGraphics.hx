@@ -16,9 +16,9 @@ import flambe.math.FMath;
 class CanvasGraphics
     implements InternalGraphics
 {
-    public function new (canvas :CanvasElement)
+    public function new (canvas :CanvasElement, alpha :Bool)
     {
-        _canvasCtx = canvas.getContext2d();
+        _canvasCtx = (untyped canvas).getContext("2d", {alpha: alpha});
     }
 
     public function save ()

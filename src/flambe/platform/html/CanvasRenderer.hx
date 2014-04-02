@@ -24,7 +24,7 @@ class CanvasRenderer
 
     public function new (canvas :CanvasElement)
     {
-        graphics = new CanvasGraphics(canvas);
+        graphics = new CanvasGraphics(canvas, #if kit_transparent true #else false #end);
         _hasGPU = new Value<Bool>(true);
     }
 

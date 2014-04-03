@@ -33,7 +33,7 @@ class AnimateTo
         if (_value.behavior != _tween) {
             var overtime = _tween.elapsed - _seconds;
             _tween = null;
-            return (overtime > 0) ? dt - overtime : 0;
+            return (overtime > 0) ? Math.max(0, dt - overtime) : 0;
         }
         return -1;
     }

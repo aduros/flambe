@@ -12,19 +12,19 @@ import flambe.math.FMath;
  */
 class Random
 {
-	/**
-	 * The original used seed. When seed is set, state will reset to give the ability 
-	 * to run the same sequence of random numbers again.
-	 */
+    /**
+     * The original used seed. When seed is set, internal state will reset to give the ability 
+     * to run the same sequence of random numbers again.
+     */
     public var seed(get, set) :Int;
 
     public function new (?seed :Int)
     {
-		this.seed = (seed != null) ? seed : Math.floor(Math.random() * FMath.INT_MAX);
+        this.seed = (seed != null) ? seed : Math.floor(Math.random() * FMath.INT_MAX);
     }
 
     /**
-     * Returns an integer in [0, INT_MAX)
+     * Returns an integer in [0, INT_MAX]
      */
     public function nextInt () :Int
     {
@@ -35,7 +35,7 @@ class Random
     }
 
     /**
-     * Returns a number in [0, 1)
+     * Returns a number in [0, 1]
      */
     public function nextFloat () :Float
     {
@@ -47,7 +47,7 @@ class Random
         return _seed;
     }
 
-    inline private function set_seed(value:Int)
+    inline private function set_seed(value :Int)
     {
         _seed = _state = value;
         return value;

@@ -216,6 +216,27 @@ class Ease
         return (1 - t * t * (-2.70158 * t - 1.70158)) / 2 + .5;
     }
 
+    /** Elastic in. */
+    public static function elasticIn (t :Float) :Float
+    {
+        return -(ELASTIC_AMPLITUDE * Math.pow(2, 10 * (t -= 1)) * Math.sin( (t - (ELASTIC_PERIOD / (2 * Math.PI) * Math.asin(1 / ELASTIC_AMPLITUDE))) * (2 * Math.PI) / ELASTIC_PERIOD));
+    }
+
+    /** Elastic out. */
+    public static function elasticOut (t :Float) :Float
+    {
+        return (ELASTIC_AMPLITUDE * Math.pow(2, -10 * t) * Math.sin((t - (ELASTIC_PERIOD / (2 * Math.PI) * Math.asin(1 / ELASTIC_AMPLITUDE))) * (2 * Math.PI) / ELASTIC_PERIOD) + 1);
+    }
+
+    /** Elastic in and out. */
+    public static function elasticInOut (t :Float) :Float
+    {
+        if (t < 0.5) {
+            return -0.5 * (Math.pow(2, 10 * (t -= 0.5)) * Math.sin((t - (ELASTIC_PERIOD / 4)) * (2 * Math.PI) / ELASTIC_PERIOD));
+        }
+        return Math.pow(2, -10 * (t -= 0.5)) * Math.sin((t - (ELASTIC_PERIOD / 4)) * (2 * Math.PI) / ELASTIC_PERIOD) * 0.5 + 1;
+    }
+
     private static inline var PI :Float = FMath.PI;
     private static inline var PI2 :Float = FMath.PI / 2;
     private static inline var B1 :Float = 1 / 2.75;
@@ -224,4 +245,6 @@ class Ease
     private static inline var B4 :Float = 2.5 / 2.75;
     private static inline var B5 :Float = 2.25 / 2.75;
     private static inline var B6 :Float = 2.625 / 2.75;
+    private static inline var ELASTIC_AMPLITUDE :Float = 1;
+    private static inline var ELASTIC_PERIOD :Float = 0.4;
 }

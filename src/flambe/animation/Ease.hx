@@ -107,13 +107,13 @@ class Ease
     /** Sine in. */
     public static function sineIn (t :Float) :Float
     {
-        return 1 - Math.cos(PI2 * t);
+        return 1 - Math.cos(PIhalf * t);
     }
 
     /** Sine out. */
     public static function sineOut (t :Float) :Float
     {
-        return Math.sin(PI2 * t);
+        return Math.sin(PIhalf * t);
     }
 
     /** Sine in and out. */
@@ -219,26 +219,27 @@ class Ease
     /** Elastic in. */
     public static function elasticIn (t :Float) :Float
     {
-        return -(ELASTIC_AMPLITUDE * Math.pow(2, 10 * (t -= 1)) * Math.sin( (t - (ELASTIC_PERIOD / (2 * Math.PI) * Math.asin(1 / ELASTIC_AMPLITUDE))) * (2 * Math.PI) / ELASTIC_PERIOD));
+        return -(ELASTIC_AMPLITUDE * Math.pow(2, 10 * (t -= 1)) * Math.sin( (t - (ELASTIC_PERIOD / PI2 * Math.asin(1 / ELASTIC_AMPLITUDE))) * PI2 / ELASTIC_PERIOD));
     }
 
     /** Elastic out. */
     public static function elasticOut (t :Float) :Float
     {
-        return (ELASTIC_AMPLITUDE * Math.pow(2, -10 * t) * Math.sin((t - (ELASTIC_PERIOD / (2 * Math.PI) * Math.asin(1 / ELASTIC_AMPLITUDE))) * (2 * Math.PI) / ELASTIC_PERIOD) + 1);
+        return (ELASTIC_AMPLITUDE * Math.pow(2, -10 * t) * Math.sin((t - (ELASTIC_PERIOD / PI2 * Math.asin(1 / ELASTIC_AMPLITUDE))) * PI2 / ELASTIC_PERIOD) + 1);
     }
 
     /** Elastic in and out. */
     public static function elasticInOut (t :Float) :Float
     {
         if (t < 0.5) {
-            return -0.5 * (Math.pow(2, 10 * (t -= 0.5)) * Math.sin((t - (ELASTIC_PERIOD / 4)) * (2 * Math.PI) / ELASTIC_PERIOD));
+            return -0.5 * (Math.pow(2, 10 * (t -= 0.5)) * Math.sin((t - (ELASTIC_PERIOD / 4)) * PI2 / ELASTIC_PERIOD));
         }
-        return Math.pow(2, -10 * (t -= 0.5)) * Math.sin((t - (ELASTIC_PERIOD / 4)) * (2 * Math.PI) / ELASTIC_PERIOD) * 0.5 + 1;
+        return Math.pow(2, -10 * (t -= 0.5)) * Math.sin((t - (ELASTIC_PERIOD / 4)) * PI2 / ELASTIC_PERIOD) * 0.5 + 1;
     }
 
+    private static inline var PIhalf :Float = FMath.PI / 2;
     private static inline var PI :Float = FMath.PI;
-    private static inline var PI2 :Float = FMath.PI / 2;
+    private static inline var PI2 :Float = FMath.PI * 2;
     private static inline var B1 :Float = 1 / 2.75;
     private static inline var B2 :Float = 2 / 2.75;
     private static inline var B3 :Float = 1.5 / 2.75;

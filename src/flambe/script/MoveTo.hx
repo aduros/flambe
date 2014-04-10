@@ -43,7 +43,7 @@ class MoveTo
             var overtime = FMath.max(_tweenX.elapsed, _tweenY.elapsed) - _seconds;
             _tweenX = null;
             _tweenY = null;
-            return (overtime > 0) ? dt - overtime : 0;
+            return (overtime > 0) ? Math.max(0, dt - overtime) : 0;
         }
         return -1;
     }

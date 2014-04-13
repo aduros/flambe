@@ -18,7 +18,7 @@ class Random
     }
 
     /**
-     * Returns an integer in [0, INT_MAX)
+     * Returns an integer between >= 0 and < INT_MAX
      */
     public function nextInt () :Int
     {
@@ -29,11 +29,16 @@ class Random
     }
 
     /**
-     * Returns a number in [0, 1)
+     * Returns a number >= 0 and < 1
      */
     public function nextFloat () :Float
     {
         return nextInt() / FMath.INT_MAX;
+    }
+
+    public function reset (value :Int)
+    {
+        _state = value;
     }
 
     private var _state :Int;

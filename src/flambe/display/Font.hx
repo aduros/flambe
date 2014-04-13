@@ -306,6 +306,13 @@ class Glyph
     private var _kernings :Map<Int,Int> = null;
 }
 
+enum TextAlign
+{
+    Left;
+    Center;
+    Right;
+}
+
 /**
  * Measures and lays out a block of text, handling word wrapping, alignment and newline characters.
  */

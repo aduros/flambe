@@ -148,7 +148,7 @@ class Sprite extends Component
     {
         var sprite = entity.get(Sprite);
         if (sprite != null) {
-            if (!sprite._flags.containsAll(VISIBLE | POINTER_ENABLED)) {
+            if (!sprite._flags.containsAll(VISIBLE | POINTER_ENABLED) || sprite.alpha._ == 0) {
                 return null; // Prune invisible or non-interactive subtrees
             }
             if (sprite.getLocalMatrix().inverseTransform(x, y, _scratchPoint)) {

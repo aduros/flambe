@@ -137,21 +137,39 @@ using Lambda;
 #else
     macro public function get<A> (self :Expr, componentClass :ExprOf<Class<A>>) :ExprOf<A>
     {
-        switch (componentClass.expr) {
-        case EConst(CIdent(name)):
-            var type = Context.getType(name);
+        var path = getClassPathFromExpr(componentClass);
+        if (path != null)
+        {
+            var type = Context.getType(path.join("."));
+
             if (Context.unify(type, Context.getType("flambe.Component"))) {
                 // Delegate through getComponentTyped to avoid a (slow) typed cast
                 return macro $self._internal_getComponentTyped($componentClass.NAME, $componentClass);
-            }
-        default:
-            // Pass through
+            }            
         }
 
         Context.error("Expected a class that extends Component, got " + componentClass.toString(),
             Context.currentPos());
         return null;
     }
+
+#if macro
+    static function getClassPathFromExpr<A> (componentClass :ExprOf<Class<A>>) :Array<String>
+    {
+        switch (componentClass.expr) {
+        case EConst(CIdent(name)):
+            return [name];
+        case EField(e, name):
+            var path = getClassPathFromExpr(e);
+            if (path != null)
+                path.push(name);
+            return path;
+        default:
+            return null;
+        }
+    }
+#end
+
 #end
 
     /**

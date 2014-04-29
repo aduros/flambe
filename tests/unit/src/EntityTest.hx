@@ -21,6 +21,9 @@ class EntityTest extends TestCase
         assertEquals(parent.get(TestComponent), comp);
         assertEquals(parent.firstComponent, comp);
 
+        assertTrue(parent.has(EntityTest.TestComponent));
+        assertEquals(parent.get(EntityTest.TestComponent), comp);
+
         comp.dispose();
         assertFalse(parent.has(TestComponent));
         assertEquals(parent.get(TestComponent), null);

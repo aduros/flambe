@@ -37,30 +37,6 @@ class Rectangle
         set(x, y, width, height);
     }
 
-    /**
-     * Calculates the intersection between two Rectangles. If the rectangles do not intersect,
-     * this method returns an empty Rectangle object with its properties set to 0.
-     */
-    public static function intersect (rect1 :Rectangle, rect2 :Rectangle, ?result: Rectangle) :Rectangle
-    {
-
-        if (result == null) {
-            result = new Rectangle();
-        }
-
-        var left:Float = rect1.x > rect2.x ? rect1.x : rect2.x;
-        var right:Float = rect1.right < rect2.right ? rect1.right : rect2.right;
-        var top:Float = rect1.y > rect2.y ? rect1.y : rect2.y;
-        var bottom:Float = rect1.bottom < rect2.bottom ? rect1.bottom : rect2.bottom;
-        
-        if (left > right || top > bottom)
-            result.set(0, 0, 0, 0);
-        else
-            result.set(left, top, right-left, bottom-top);
-            
-        return result;
-    }
-
     public function set (x :Float, y :Float, width :Float, height :Float)
     {
         this.x = x;
@@ -96,6 +72,34 @@ class Rectangle
 
         return true;
     }
+
+    /**
+     * Returns whether this rectangle intersects another rectangle.
+     *
+     * @param rect The other rectangle to check for intersection.
+     * @param result If supplied and the rectangles intersect, will be set to the calculated
+     *   intersection rectangle.
+     */
+    public function intersects (rect :Rectangle, ?result: Rectangle) :Bool
+    {
+        var left = FMath.max(x, rect.x);
+        var right = FMath.max(x+width, rect.x+rect.width);
+        if (left > right) {
+            return false;
+        }
+
+        var top = FMath.max(y, rect.y);
+        var bottom = FMath.max(y+height, rect.y+rect.height);
+        if (top > bottom) {
+            return false;
+        }
+
+        if (result != null) {
+            result.set(left, top, right-left, bottom-top);
+        }
+        return true;
+    }
+
 
     /**
      * Creates a copy of this rectangle.

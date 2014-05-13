@@ -17,6 +17,7 @@ class WebGLRenderer
     implements InternalRenderer<Dynamic>
 {
     public var type (get, null) :RendererType;
+    public var maxTextureSize (get, null) :Int;
     public var hasGPU (get, null) :Value<Bool>;
 
     public var graphics :InternalGraphics;
@@ -48,6 +49,11 @@ class WebGLRenderer
     inline private function get_type () :RendererType
     {
         return WebGL;
+    }
+
+    private function get_maxTextureSize () :Int
+    {
+        return gl.getParameter(GL.MAX_TEXTURE_SIZE);
     }
 
     inline private function get_hasGPU () :Value<Bool>

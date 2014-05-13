@@ -18,6 +18,12 @@ interface RendererSystem<NativeImage>
     var type (get, null) :RendererType;
 
     /**
+     * The maximum width and height of a Texture on this renderer, in pixels. Guaranteed to be at
+     * least 1024.
+     */
+    var maxTextureSize (get, null) :Int;
+
+    /**
      * Whether the renderer currently has a GPU context. In some renderers (Stage3D and WebGL) the
      * GPU and all its resources may be destroyed at any time by the system. On renderers that don't
      * need to worry about reclaiming GPU resources (Canvas) this is always true.

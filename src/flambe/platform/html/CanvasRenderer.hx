@@ -18,6 +18,7 @@ class CanvasRenderer
     implements InternalRenderer<Dynamic>
 {
     public var type (get, null) :RendererType;
+    public var maxTextureSize (get, null) :Int;
     public var hasGPU (get, null) :Value<Bool>;
 
     public var graphics :InternalGraphics;
@@ -31,6 +32,13 @@ class CanvasRenderer
     inline private function get_type () :RendererType
     {
         return Canvas;
+    }
+
+    private function get_maxTextureSize () :Int
+    {
+        // Canvases larger than 1024 prevent hardware acceleration in iOS
+        // TODO(bruno): Return 2048 on non-iOS browsers?
+        return 1024;
     }
 
     inline private function get_hasGPU () :Value<Bool>

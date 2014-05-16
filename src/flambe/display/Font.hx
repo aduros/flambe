@@ -36,13 +36,15 @@ class Font
     /**
      * Parses a font using files in an asset pack.
      * @param name The path to the font within the asset pack, excluding the .fnt suffix.
+     * @param disposeFiles Whether the .fnt File should be disposed after being read. Set to false
+     *   if you must create duplicate Fonts from the same source files.
      */
-    public function new (pack :AssetPack, name :String)
+    public function new (pack :AssetPack, name :String, ?disposeFiles :Bool = true)
     {
         this.name = name;
         _pack = pack;
 
-        reload();
+        reload(disposeFiles);
 #if debug
         _reloadCount = pack.getFile(name + ".fnt").reloadCount;
         _lastReloadCount = _reloadCount._;
@@ -138,18 +140,22 @@ class Font
         // If the .fnt file was reloaded since the last check, reload the font
         if (_lastReloadCount != _reloadCount._) {
             _lastReloadCount = _reloadCount._;
-            reload();
+            reload(false);
         }
         return _lastReloadCount;
     }
 #end
 
-    private function reload ()
+    private function reload (disposeFiles :Bool)
     {
         _glyphs = new Map();
         _glyphs.set(NEWLINE.charCode, NEWLINE);
 
-        var parser = new ConfigParser(_pack.getFile(name + ".fnt").toString());
+        var file = _pack.getFile(name+".fnt");
+        var parser = new ConfigParser(file.toString());
+        if (disposeFiles) {
+            file.dispose();
+        }
         var pages = new Map<Int,Texture>();
 
         // The basename of the font's path, where we'll find the textures

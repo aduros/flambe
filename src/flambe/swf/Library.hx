@@ -26,13 +26,18 @@ class Library
     /**
      * Creates a library using files in an AssetPack.
      * @param baseDir The directory in the pack containing Flump's library.json and texture atlases.
+     * @param disposeFiles Whether the library.json File should be disposed after being read. Set to
+     *   false if you must create duplicate Libraries from the same source files.
      */
-    public function new (pack :AssetPack, baseDir :String)
+    public function new (pack :AssetPack, baseDir :String, ?disposeFiles :Bool = true)
     {
+        var file = pack.getFile(baseDir+"/library.json");
+        var json :Format = Json.parse(file.toString());
+        if (disposeFiles) {
+            file.dispose();
+        }
+
         _symbols = new Map();
-
-        var json :Format = Json.parse(pack.getFile(baseDir + "/library.json").toString());
-
         frameRate = json.frameRate;
 
         var movies = [];

@@ -88,12 +88,23 @@ class EmitterMold
 
     public var blendMode :BlendMode;
 
-    public function new (pack :AssetPack, name :String)
+    /**
+     * Creates an EmitterMold using files in an asset pack.
+     * @param name The path to the particle system within the asset pack, excluding the .pex suffix.
+     * @param disposeFiles Whether the .pex File should be disposed after being read. Set to false
+     *   if you must create duplicate EmitterMolds from the same source files.
+     */
+    public function new (pack :AssetPack, name :String, ?disposeFiles :Bool = true)
     {
+        var file = pack.getFile(name+".pex");
+        var xml = Xml.parse(file.toString());
+        if (disposeFiles) {
+            file.dispose();
+        }
+
         var blendFuncSource = 0;
         var blendFuncDestination = 0;
 
-        var xml = Xml.parse(pack.getFile(name+".pex").toString());
         for (element in xml.firstElement().elements()) {
             switch (element.nodeName.toLowerCase()) {
             case "texture":

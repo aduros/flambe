@@ -18,6 +18,9 @@ var HAXE_COMPILER_PORT = 6000;
 var HTTP_PORT = 7000;
 var SOCKET_PORT = HTTP_PORT+1;
 
+// The minimum SWF version for browser Flash. For AIR, we always use the latest
+var SWF_VERSION = "11.2";
+
 exports.PLATFORMS = ["html", "flash", "android", "ios", "firefox"];
 
 exports.VERSION = JSON.parse(fs.readFileSync(__dirname + "/package.json")).version;
@@ -234,7 +237,7 @@ exports.build = function (config, platforms, opts) {
     var buildFlash = function () {
         var swf = "build/web/targets/main-flash.swf";
         var flashFlags = swfFlags(false).concat([
-            "-swf-version", "11.2", "-swf", swf]);
+            "-swf-version", SWF_VERSION, "-swf", swf]);
 
         return prepareWeb()
         .then(function () { return prepareAssets("build/web/assets") })
@@ -623,6 +626,26 @@ var fdb = function (commands) {
     process.stdin.pipe(child.stdin);
 };
 exports.fdb = fdb;
+
+var getHaxeArguments = function (config) {
+    var args = [
+        "-main", get(config, "main"),
+        "-lib", "flambe",
+        "-swf-version", SWF_VERSION,
+        "-D", "flash-strict",
+    ];
+    args = args.concat(toArray(get(config, "haxe_flags", [])));
+    getAllPaths(config, "src").forEach(function (srcPath) {
+        args.push("-cp", srcPath);
+    });
+    getAllPaths(config, "libs").forEach(function (libPath) {
+        forEachFileIn(libPath, function (file) {
+            args.push("-swf-lib-extern", libPath+"/"+file);
+        });
+    });
+    return args;
+}
+exports.getHaxeArguments = getHaxeArguments;
 
 var Server = function () {
 };

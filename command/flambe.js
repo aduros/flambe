@@ -125,6 +125,15 @@ cmd.setDefaults({action: function () {
         flambe.update(args.version, args._postInstall));
 }});
 
+var cmd = commands.addParser("_display", {description: argparse.Const.SUPPRESS});
+cmd.setDefaults({action: function () {
+    catchErrors(
+        flambe.loadConfig(args.config)
+        .then(function (config) {
+            console.log(flambe.getHaxeArguments(config).join("\n"));
+        }));
+}});
+
 var cmd = commands.addParser("help", {help: "Get more help for any of these commands.",
     description: "Don't panic!"});
 cmd.addArgument(["command"], {nargs: "?", help: "The command to get help for."});

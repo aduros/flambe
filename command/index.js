@@ -458,7 +458,7 @@ exports.build = function (config, platforms, opts) {
 
     wrench.mkdirSyncRecursive(CACHE_DIR);
 
-    var connectFlags = ["--connect", HAXE_COMPILER_PORT];
+    var connectFlags = ["--connect", opts.haxeServer || HAXE_COMPILER_PORT];
     return haxe(connectFlags, {check: false, verbose: false, output: false})
     .then(function (code) {
         // Use a Haxe compilation server if available

@@ -115,6 +115,17 @@ cmd.setDefaults({action: function () {
         }));
 }});
 
+var cmd = commands.addParser("haxe-flags", {help: "Show Haxe compiler completion flags.",
+    description: "For IDE implementors, prints flags that can be passed to the Haxe compiler for code completion."
+});
+cmd.setDefaults({action: function () {
+    catchErrors(
+        flambe.loadConfig(args.config)
+        .then(function (config) {
+            console.log(flambe.getHaxeFlags(config).join("\n"));
+        }));
+}});
+
 var cmd = commands.addParser("update", {help: "Update to the latest Flambe version.",
     description: "Upgrade to the latest version of Flambe, or downgrade to an earlier version. This command should be run as root/Administrator.",
     aliases: ["upgrade"]});
@@ -123,15 +134,6 @@ cmd.addArgument(["--_postInstall"], {action: "storeTrue", help: argparse.Const.S
 cmd.setDefaults({action: function () {
     catchErrors(
         flambe.update(args.version, args._postInstall));
-}});
-
-var cmd = commands.addParser("_display", {description: argparse.Const.SUPPRESS});
-cmd.setDefaults({action: function () {
-    catchErrors(
-        flambe.loadConfig(args.config)
-        .then(function (config) {
-            console.log(flambe.getHaxeArguments(config).join("\n"));
-        }));
 }});
 
 var cmd = commands.addParser("help", {help: "Get more help for any of these commands.",

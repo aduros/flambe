@@ -627,25 +627,25 @@ var fdb = function (commands) {
 };
 exports.fdb = fdb;
 
-var getHaxeArguments = function (config) {
-    var args = [
+var getHaxeFlags = function (config) {
+    var flags = [
         "-main", get(config, "main"),
         "-lib", "flambe",
         "-swf-version", SWF_VERSION,
         "-D", "flash-strict",
     ];
-    args = args.concat(toArray(get(config, "haxe_flags", [])));
+    flags = flags.concat(toArray(get(config, "haxe_flags", [])));
     getAllPaths(config, "src").forEach(function (srcPath) {
-        args.push("-cp", srcPath);
+        flags.push("-cp", srcPath);
     });
     getAllPaths(config, "libs").forEach(function (libPath) {
         forEachFileIn(libPath, function (file) {
-            args.push("-swf-lib-extern", libPath+"/"+file);
+            flags.push("-swf-lib-extern", libPath+"/"+file);
         });
     });
-    return args;
+    return flags;
 }
-exports.getHaxeArguments = getHaxeArguments;
+exports.getHaxeFlags = getHaxeFlags;
 
 var Server = function () {
 };

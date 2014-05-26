@@ -627,13 +627,35 @@ var fdb = function (commands) {
 };
 exports.fdb = fdb;
 
-var getHaxeFlags = function (config) {
+var getHaxeFlags = function (config, platform) {
+    if (platform == null) {
+        platform = get(config, "default_platform", "flash");
+    }
+    checkPlatforms([platform]);
+
     var flags = [
         "-main", get(config, "main"),
         "-lib", "flambe",
         "-swf-version", SWF_VERSION,
         "-D", "flash-strict",
+        "--no-output",
     ];
+
+    switch (platform) {
+    case "android": case "ios":
+        flags.push("-D", "air");
+        // Fall through
+    case "flash":
+        flags.push("-swf", "no-output.swf");
+        break;
+    default:
+        flags.push("-js", "no-output.js");
+        break;
+    }
+    if (platform != "flash") {
+        flags.push("-D", platform);
+    }
+
     flags = flags.concat(toArray(get(config, "haxe_flags", [])));
     getAllPaths(config, "src").forEach(function (srcPath) {
         flags.push("-cp", srcPath);

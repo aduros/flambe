@@ -118,11 +118,13 @@ cmd.setDefaults({action: function () {
 var cmd = commands.addParser("haxe-flags", {help: "Show Haxe compiler completion flags.",
     description: "For IDE implementors, prints flags that can be passed to the Haxe compiler for code completion."
 });
+cmd.addArgument(["platform"], {metavar: "platform", nargs: "?",
+    help: "A platform to target. Choose from " + flambe.PLATFORMS.join(", ") + ". If omitted, 'default_platform' from flambe.yaml will be used."});
 cmd.setDefaults({action: function () {
     catchErrors(
         flambe.loadConfig(args.config)
         .then(function (config) {
-            console.log(flambe.getHaxeFlags(config).join("\n"));
+            console.log(flambe.getHaxeFlags(config, args.platform).join("\n"));
         }));
 }});
 

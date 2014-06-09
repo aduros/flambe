@@ -5,6 +5,7 @@
 package flambe.display;
 
 import flambe.asset.AssetPack;
+import flambe.asset.File;
 import flambe.math.FMath;
 import flambe.math.Rectangle;
 import flambe.util.Value;
@@ -36,19 +37,29 @@ class Font
     /**
      * Parses a font using files in an asset pack.
      * @param name The path to the font within the asset pack, excluding the .fnt suffix.
-     * @param disposeFiles Whether the .fnt File should be disposed after being read. Set to false
-     *   if you must create duplicate Fonts from the same source files.
      */
-    public function new (pack :AssetPack, name :String, ?disposeFiles :Bool = true)
+    public function new (pack :AssetPack, name :String)
     {
         this.name = name;
         _pack = pack;
+        _file = pack.getFile(name+".fnt");
 
-        reload(disposeFiles);
+        reload();
 #if debug
-        _reloadCount = pack.getFile(name + ".fnt").reloadCount;
-        _lastReloadCount = _reloadCount._;
+        _lastReloadCount = _file.reloadCount._;
 #end
+    }
+
+    /**
+     * Disposes the source .fnt File used to create this Font. This can free up some memory, if you
+     * don't intend to recreate this Font later from the same AssetPack.
+     *
+     * @returns This instance, for chaining.
+     */
+    public function disposeFiles () :Font
+    {
+        _file.dispose();
+        return this;
     }
 
     /**
@@ -138,24 +149,21 @@ class Font
     @:allow(flambe) function checkReload () :Int
     {
         // If the .fnt file was reloaded since the last check, reload the font
-        if (_lastReloadCount != _reloadCount._) {
-            _lastReloadCount = _reloadCount._;
-            reload(false);
+        var reloadCount = _file.reloadCount._;
+        if (_lastReloadCount != reloadCount) {
+            _lastReloadCount = reloadCount;
+            reload();
         }
-        return _lastReloadCount;
+        return reloadCount;
     }
 #end
 
-    private function reload (disposeFiles :Bool)
+    private function reload ()
     {
         _glyphs = new Map();
         _glyphs.set(NEWLINE.charCode, NEWLINE);
 
-        var file = _pack.getFile(name+".fnt");
-        var parser = new ConfigParser(file.toString());
-        if (disposeFiles) {
-            file.dispose();
-        }
+        var parser = new ConfigParser(_file.toString());
         var pages = new Map<Int,Texture>();
 
         // The basename of the font's path, where we'll find the textures
@@ -244,13 +252,13 @@ class Font
     private static var NEWLINE = new Glyph('\n'.code);
 
     private var _pack :AssetPack;
+    private var _file :File;
     private var _glyphs :Map<Int,Glyph>;
 
 #if debug
     // Used to track live-reloading updates. A signal listener can't be used here, because we can't
     // guarantee it'll be properly disposed
     private var _lastReloadCount :Int;
-    private var _reloadCount :Value<Int>;
 #end
 }
 

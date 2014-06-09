@@ -7,8 +7,9 @@ package flambe.swf;
 import haxe.Json;
 
 import flambe.asset.AssetPack;
+import flambe.asset.File;
 import flambe.display.Sprite;
-import flambe.swf.Format;
+import flambe.platform.FlumpFormat;
 import flambe.util.Assert;
 
 using flambe.util.Strings;
@@ -26,16 +27,11 @@ class Library
     /**
      * Creates a library using files in an AssetPack.
      * @param baseDir The directory in the pack containing Flump's library.json and texture atlases.
-     * @param disposeFiles Whether the library.json File should be disposed after being read. Set to
-     *   false if you must create duplicate Libraries from the same source files.
      */
-    public function new (pack :AssetPack, baseDir :String, ?disposeFiles :Bool = true)
+    public function new (pack :AssetPack, baseDir :String)
     {
-        var file = pack.getFile(baseDir+"/library.json");
-        var json :Format = Json.parse(file.toString());
-        if (disposeFiles) {
-            file.dispose();
-        }
+        _file = pack.getFile(baseDir+"/library.json");
+        var json :Format = Json.parse(_file.toString());
 
         _symbols = new Map();
         frameRate = json.frameRate;
@@ -111,6 +107,7 @@ class Library
         var lib = Type.createEmptyInstance(Library);
         lib._symbols = new Map();
         lib.frameRate = 60;
+        lib._file = null;
 
         for (flipbook in flipbooks) {
             // Fake up some Flump metadata to create a movie symbol
@@ -142,6 +139,21 @@ class Library
 
         return lib;
     }
+
+    /**
+     * Disposes the source library.json File used to create this Library. This can free up some
+     * memory, if you don't intend to recreate this Library later from the same AssetPack.
+     *
+     * @returns This instance, for chaining.
+     */
+    public function disposeFiles () :Library
+    {
+        if (_file != null) {
+            _file.dispose();
+        }
+        return this;
+    }
+
 
     /**
      * Retrieve a name symbol from this library, or null if not found.
@@ -184,5 +196,6 @@ class Library
         return _symbols.iterator();
     }
 
+    private var _file :File;
     private var _symbols :Map<String,Symbol>;
 }

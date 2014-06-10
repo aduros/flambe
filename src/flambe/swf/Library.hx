@@ -154,7 +154,6 @@ class Library
         return this;
     }
 
-
     /**
      * Retrieve a name symbol from this library, or null if not found.
      */

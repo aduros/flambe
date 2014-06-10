@@ -101,10 +101,14 @@ class EmitterMold
         var blendFuncSource = 0;
         var blendFuncDestination = 0;
 
+        // The basename of the pex file's path, where we'll find the textures
+        var idx = name.lastIndexOf("/");
+        var basePath = (idx >= 0) ? name.substr(0, idx+1) : "";
+
         for (element in xml.firstElement().elements()) {
             switch (element.nodeName.toLowerCase()) {
             case "texture":
-                texture = pack.getTexture(element.get("name").removeFileExtension());
+                texture = pack.getTexture(basePath + element.get("name").removeFileExtension());
             case "angle":
                 angle = getValue(element);
             case "anglevariance":

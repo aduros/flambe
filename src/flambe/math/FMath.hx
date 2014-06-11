@@ -43,16 +43,19 @@ class FMath
         return radians * 180/PI;
     }
 
+    #if !js @:generic #end
     inline public static function max<T:Float> (a :T, b :T) :T
     {
         return (a > b) ? a : b;
     }
 
+    #if !js @:generic #end
     inline public static function min<T:Float> (a :T, b :T) :T
     {
         return (a < b) ? a : b;
     }
 
+    #if !js @:generic #end
     public static function clamp<T:Float> (value :T, min :T, max :T) :T
     {
         return if (value < min) min

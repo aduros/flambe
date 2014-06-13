@@ -9,7 +9,7 @@ import haxe.Json;
 import flambe.asset.AssetPack;
 import flambe.asset.File;
 import flambe.display.Sprite;
-import flambe.platform.FlumpFormat;
+import flambe.swf.Format;
 import flambe.util.Assert;
 
 using flambe.util.Strings;

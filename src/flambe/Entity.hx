@@ -230,7 +230,7 @@ using Lambda;
                 }
                 p.parent = null;
                 p.next = null;
-                return;
+                break;
             }
             prev = p;
             p = next;

@@ -77,12 +77,13 @@ class AnimatedFloat extends Value<Float>
         _behavior = null;
         super.dispose();
     }
-}
 
-class AnimatedFloatPool
-{
     private static var POOL :Pool<AnimatedFloat> = new Pool<AnimatedFloat>(allocate);
 
+    /**
+     * Take an object from the pool. If the pool is empty, a new AnimatedFloat 
+     * will be allocated.
+     */
     public static function take (value :Float, ?listener :Listener2<Float,Float>) :AnimatedFloat
     {
         var animatedFloat:AnimatedFloat = POOL.take();
@@ -93,7 +94,10 @@ class AnimatedFloatPool
         return animatedFloat;
     }
 
-    public static function put (animatedFloat :AnimatedFloat) :AnimatedFloat
+    /**
+     * Put an AnimatedFloat into the pool.
+     */
+    public static function put (animatedFloat:AnimatedFloat) :AnimatedFloat
     {
         if (animatedFloat != null) {
             animatedFloat.dispose();
@@ -102,7 +106,7 @@ class AnimatedFloatPool
         return null;
     }
 
-    private static function allocate () :AnimatedFloat
+    private static function allocate() :AnimatedFloat
     {
         return new AnimatedFloat(Math.NaN);
     }

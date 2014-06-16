@@ -128,15 +128,15 @@ class Sprite extends Component
         var dirtyMatrix = function (_,_) {
             _flags = _flags.add(LOCAL_MATRIX_DIRTY | VIEW_MATRIX_DIRTY);
         };
-        x = AnimatedFloatPool.take(0, dirtyMatrix);
-        y = AnimatedFloatPool.take(0, dirtyMatrix);
-        rotation = AnimatedFloatPool.take(0, dirtyMatrix);
-        scaleX = AnimatedFloatPool.take(1, dirtyMatrix);
-        scaleY = AnimatedFloatPool.take(1, dirtyMatrix);
-        anchorX = AnimatedFloatPool.take(0, dirtyMatrix);
-        anchorY = AnimatedFloatPool.take(0, dirtyMatrix);
+        x = AnimatedFloat.take(0, dirtyMatrix);
+        y = AnimatedFloat.take(0, dirtyMatrix);
+        rotation = AnimatedFloat.take(0, dirtyMatrix);
+        scaleX = AnimatedFloat.take(1, dirtyMatrix);
+        scaleY = AnimatedFloat.take(1, dirtyMatrix);
+        anchorX = AnimatedFloat.take(0, dirtyMatrix);
+        anchorY = AnimatedFloat.take(0, dirtyMatrix);
         
-        alpha = AnimatedFloatPool.take(1);
+        alpha = AnimatedFloat.take(1);
     }
 
     /**
@@ -739,14 +739,14 @@ class Sprite extends Component
 
     override public function dispose ()
     {
-        x = AnimatedFloatPool.put(x);
-        y = AnimatedFloatPool.put(y);
-        rotation = AnimatedFloatPool.put(rotation);
-        scaleX = AnimatedFloatPool.put(scaleX);
-        scaleY = AnimatedFloatPool.put(scaleY);
-        anchorX = AnimatedFloatPool.put(anchorX);
-        anchorY = AnimatedFloatPool.put(anchorY);
-        alpha = AnimatedFloatPool.put(alpha);
+        x = AnimatedFloat.put(x);
+        y = AnimatedFloat.put(y);
+        rotation = AnimatedFloat.put(rotation);
+        scaleX = AnimatedFloat.put(scaleX);
+        scaleY = AnimatedFloat.put(scaleY);
+        anchorX = AnimatedFloat.put(anchorX);
+        anchorY = AnimatedFloat.put(anchorY);
+        alpha = AnimatedFloat.put(alpha);
         super.dispose();
     }
 }

@@ -88,7 +88,7 @@ class AnimatedFloat extends Value<Float>
     {
         var animatedFloat:AnimatedFloat = POOL.take();
         animatedFloat.setValue(value);
-		if (listener != null) {
+        if (listener != null) {
             animatedFloat.changed.connect(listener);
         }
         return animatedFloat;
@@ -106,7 +106,7 @@ class AnimatedFloat extends Value<Float>
         return null;
     }
 
-    private static function allocate() :AnimatedFloat
+    private static function allocate () :AnimatedFloat
     {
         return new AnimatedFloat(Math.NaN);
     }

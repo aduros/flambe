@@ -71,4 +71,39 @@ class AnimatedFloat extends Value<Float>
     }
 
     private var _behavior :Behavior = null;
+
+    override function dispose ()
+    {
+        _behavior = null;
+        super.dispose();
+    }
+}
+
+class AnimatedFloatPool
+{
+    private static var POOL :Pool<AnimatedFloat> = new Pool<AnimatedFloat>(allocate);
+
+    public static function take (value :Float, ?listener :Listener2<Float,Float>) :AnimatedFloat
+    {
+        var animatedFloat:AnimatedFloat = POOL.take();
+        animatedFloat.setValue(value);
+		if (listener != null) {
+            animatedFloat.changed.connect(listener);
+        }
+        return animatedFloat;
+    }
+
+    public static function put (animatedFloat :AnimatedFloat) :AnimatedFloat
+    {
+        if (animatedFloat != null) {
+            animatedFloat.dispose();
+            POOL.put(animatedFloat);
+        }
+        return null;
+    }
+
+    private static function allocate () :AnimatedFloat
+    {
+        return new AnimatedFloat(Math.NaN);
+    }
 }

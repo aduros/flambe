@@ -73,4 +73,19 @@ class Value<A>
 
     private var _value :A;
     private var _changed :Signal2<A,A>;
+
+    @:allow(flambe) function dispose ()
+    {
+        _value = null;
+        if (_changed != null) {
+            _changed.dispose();
+        }
+    }
+
+	@:allow(flambe) function setValue (value :A)
+    {
+        _value = value;
+    }
+}
+
 }

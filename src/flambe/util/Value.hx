@@ -87,5 +87,3 @@ class Value<A>
         _value = value;
     }
 }
-
-}

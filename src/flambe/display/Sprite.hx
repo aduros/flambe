@@ -128,15 +128,15 @@ class Sprite extends Component
         var dirtyMatrix = function (_,_) {
             _flags = _flags.add(LOCAL_MATRIX_DIRTY | VIEW_MATRIX_DIRTY);
         };
-        x = new AnimatedFloat(0, dirtyMatrix);
-        y = new AnimatedFloat(0, dirtyMatrix);
-        rotation = new AnimatedFloat(0, dirtyMatrix);
-        scaleX = new AnimatedFloat(1, dirtyMatrix);
-        scaleY = new AnimatedFloat(1, dirtyMatrix);
-        anchorX = new AnimatedFloat(0, dirtyMatrix);
-        anchorY = new AnimatedFloat(0, dirtyMatrix);
-
-        alpha = new AnimatedFloat(1);
+        x = AnimatedFloatPool.take(0, dirtyMatrix);
+        y = AnimatedFloatPool.take(0, dirtyMatrix);
+        rotation = AnimatedFloatPool.take(0, dirtyMatrix);
+        scaleX = AnimatedFloatPool.take(1, dirtyMatrix);
+        scaleY = AnimatedFloatPool.take(1, dirtyMatrix);
+        anchorX = AnimatedFloatPool.take(0, dirtyMatrix);
+        anchorY = AnimatedFloatPool.take(0, dirtyMatrix);
+        
+        alpha = AnimatedFloatPool.take(1);
     }
 
     /**
@@ -736,4 +736,17 @@ class Sprite extends Component
     private var _pointerIn :Signal1<PointerEvent>;
     private var _pointerOut :Signal1<PointerEvent>;
     private var _hoverConnection :SignalConnection;
+
+    override public function dispose ()
+    {
+        x = AnimatedFloatPool.put(x);
+        y = AnimatedFloatPool.put(y);
+        rotation = AnimatedFloatPool.put(rotation);
+        scaleX = AnimatedFloatPool.put(scaleX);
+        scaleY = AnimatedFloatPool.put(scaleY);
+        anchorX = AnimatedFloatPool.put(anchorX);
+        anchorY = AnimatedFloatPool.put(anchorY);
+        alpha = AnimatedFloatPool.put(alpha);
+        super.dispose();
+    }
 }

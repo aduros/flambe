@@ -82,7 +82,7 @@ class Value<A>
         }
     }
 
-	@:allow(flambe) function setValue (value :A)
+    @:allow(flambe) function setValue (value :A)
     {
         _value = value;
     }

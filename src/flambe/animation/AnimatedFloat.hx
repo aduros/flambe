@@ -81,7 +81,7 @@ class AnimatedFloat extends Value<Float>
     private static var POOL :Pool<AnimatedFloat> = new Pool<AnimatedFloat>(allocate);
 
     /**
-     * Take an object from the pool. If the pool is empty, a new AnimatedFloat 
+     * Take an AnimatedFloat from the pool. If the pool is empty, a new AnimatedFloat 
      * will be allocated.
      */
     public static function take (value :Float, ?listener :Listener2<Float,Float>) :AnimatedFloat

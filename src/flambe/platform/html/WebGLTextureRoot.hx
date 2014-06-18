@@ -59,6 +59,13 @@ class WebGLTextureRoot extends BasicAsset<WebGLTextureRoot>
         _renderer.batcher.bindTexture(nativeTexture);
         var gl = _renderer.gl;
         gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, image);
+    #if flambe_webgl_enable_mipmapping
+        // gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST_MIPMAP_NEAREST);
+        // gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
+        // gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST_MIPMAP_LINEAR);
+        gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_LINEAR);
+        gl.generateMipmap(GL.TEXTURE_2D);
+    #end
     }
 
     public function clear ()
@@ -68,6 +75,9 @@ class WebGLTextureRoot extends BasicAsset<WebGLTextureRoot>
         _renderer.batcher.bindTexture(nativeTexture);
         var gl = _renderer.gl;
         gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, width, height, 0, GL.RGBA, GL.UNSIGNED_BYTE, null);
+        #if flambe_webgl_enable_mipmapping
+            gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST);
+        #end
     }
 
     public function readPixels (x :Int, y :Int, width :Int, height :Int) :Bytes
@@ -105,8 +115,11 @@ class WebGLTextureRoot extends BasicAsset<WebGLTextureRoot>
         // Can't update a texture used by a bound framebuffer apparently
         _renderer.batcher.bindFramebuffer(null);
 
-        // TODO(bruno): Avoid the redundant Uint8Array copy
         var gl = _renderer.gl;
+    #if flambe_webgl_enable_mipmapping
+        gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST);
+    #end
+        // TODO(bruno): Avoid the redundant Uint8Array copy
         gl.texSubImage2D(GL.TEXTURE_2D, 0, x, y, sourceW, sourceH,
             GL.RGBA, GL.UNSIGNED_BYTE, new Uint8Array(pixels.getData()));
     }

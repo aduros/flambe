@@ -283,6 +283,7 @@ exports.build = function (config, platforms, opts) {
             "    <Entitlements><![CDATA[\n" +
                    get(config, "ios Entitlements.plist", "") +
             "    ]]></Entitlements>\n" +
+            "    <requestedDisplayResolution>high</requestedDisplayResolution>\n" +
             "  </iPhone>\n" +
             "</application>";
         var doc = new xmldom.DOMParser().parseFromString(xml);

@@ -38,6 +38,7 @@ class BasicTexture<R:(TextureRoot,BasicAsset<R>)> extends BasicAsset<BasicTextur
 
     private function new (root :R, width :Int, height :Int)
     {
+        trace("new BasicTexture");
         super();
         this.root = root;
         _width = width;

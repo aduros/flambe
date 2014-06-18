@@ -4,6 +4,8 @@
 
 package flambe.platform;
 
+import flambe.math.FMath;
+import flambe.platform.MathUtil;
 import haxe.io.Bytes;
 
 import flambe.display.Graphics;
@@ -66,8 +68,10 @@ class BasicTexture<R:(TextureRoot,BasicAsset<R>)> extends BasicAsset<BasicTextur
     public function split (tilesWide :Int, tilesHigh :Int = 1) :Array<SubTexture>
     {
         var tiles = [];
+
         var tileWidth = Std.int(_width / tilesWide);
         var tileHeight = Std.int(_height / tilesHigh);
+
         for (y in 0...tilesHigh) {
             for (x in 0...tilesWide) {
                 tiles.push(subTexture(x*tileWidth, y*tileHeight, tileWidth, tileHeight));

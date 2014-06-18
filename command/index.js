@@ -340,7 +340,6 @@ exports.build = function (config, platforms, opts) {
     var buildAndroid = function () {
         var apk = "build/main-android.apk";
         console.log("Building: " + apk);
-        var pass = get(config, "password", "password");
 
         var swf = "main-android.swf";
         var cert = CACHE_DIR+"air/certificate-android.p12";
@@ -364,7 +363,7 @@ exports.build = function (config, platforms, opts) {
             } else {
                 androidFlags.push("-target", "apk-captive-runtime");
             }
-            androidFlags.push("-storetype", "pkcs12", "-keystore", cert, "-storepass", pass,
+            androidFlags.push("-storetype", "pkcs12", "-keystore", cert, "-storepass", "password",
                 apk, xml);
             androidFlags = androidFlags.concat(pathOptions);
             androidFlags.push("-C", CACHE_DIR+"air", swf, "assets");

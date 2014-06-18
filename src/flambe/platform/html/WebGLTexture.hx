@@ -34,12 +34,13 @@ class WebGLTexture extends BasicTexture<WebGLTextureRoot>
 
     override public function subTexture (x :Int, y :Int, width :Int, height :Int) :SubTexture
     {
+        var sub :BasicTexture<WebGLTextureRoot>;
+
+    #if flambe_webgl_enable_mipmapping
 		// 1 px textures cause weird DrawPattern sampling on some drivers
         var pow2Width = FMath.max(2, MathUtil.nextPowerOfTwo(width));
         var pow2Height = FMath.max(2, MathUtil.nextPowerOfTwo(height));
-
-        var sub :BasicTexture<WebGLTextureRoot>;
-    #if flambe_webgl_enable_mipmapping
+    	trace("WebGLTexture: subTexture POW2: " + pow2Width + " height: " + pow2Height);
     	sub = cast root.createTexture(pow2Width, pow2Height);
     #else
     	sub = cast root.createTexture(width, height);

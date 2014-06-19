@@ -25,7 +25,6 @@ class WebGLTextureRoot extends BasicAsset<WebGLTextureRoot>
 
     public function new (renderer :WebGLRenderer, width :Int, height :Int)
     {
-        trace("Creating new WebGLTextureRoot()");
         super();
         _renderer = renderer;
         // 1 px textures cause weird DrawPattern sampling on some drivers
@@ -40,16 +39,15 @@ class WebGLTextureRoot extends BasicAsset<WebGLTextureRoot>
         gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
     #if flambe_webgl_enable_mipmapping
         gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_LINEAR);
+    #elseif flambe_webgl_enable_linear
+        gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
     #else
         gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST);
     #end
-
-
     }
 
     public function createTexture (width :Int, height :Int) :WebGLTexture
     {
-        trace("WebGLTextureRoot:createTexture" + width + " height: " + height);
         return new WebGLTexture(this, width, height);
     }
 
@@ -69,7 +67,6 @@ class WebGLTextureRoot extends BasicAsset<WebGLTextureRoot>
         var gl = _renderer.gl;
         gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, image);
     #if flambe_webgl_enable_mipmapping
-        gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_LINEAR);
         gl.generateMipmap(GL.TEXTURE_2D);
     #end
     }
@@ -81,6 +78,9 @@ class WebGLTextureRoot extends BasicAsset<WebGLTextureRoot>
         _renderer.batcher.bindTexture(nativeTexture);
         var gl = _renderer.gl;
         gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, width, height, 0, GL.RGBA, GL.UNSIGNED_BYTE, null);
+    #if flambe_webgl_enable_mipmapping
+        gl.generateMipmap(GL.TEXTURE_2D);
+    #end
     }
 
     public function readPixels (x :Int, y :Int, width :Int, height :Int) :Bytes
@@ -111,7 +111,6 @@ class WebGLTextureRoot extends BasicAsset<WebGLTextureRoot>
 
     public function writePixels (pixels :Bytes, x :Int, y :Int, sourceW :Int, sourceH :Int)
     {
-        trace("WebGLTextureRoot writePixels");
         assertNotDisposed();
 
         _renderer.batcher.bindTexture(nativeTexture);
@@ -120,17 +119,9 @@ class WebGLTextureRoot extends BasicAsset<WebGLTextureRoot>
         _renderer.batcher.bindFramebuffer(null);
 
         var gl = _renderer.gl;
-    #if flambe_webgl_enable_mipmapping
-        var pow2Width:Int = FMath.max(2, MathUtil.nextPowerOfTwo(sourceW));
-        var pow2Height:Int = FMath.max(2, MathUtil.nextPowerOfTwo(sourceH));
-        trace("WebGLTextureRoot pow2Width: " + pow2Width + " height: " + pow2Height);
-        gl.texSubImage2D(GL.TEXTURE_2D, 0, x, y, pow2Width, pow2Height,
-            GL.RGBA, GL.UNSIGNED_BYTE, new Uint8Array(pixels.getData()));
-    #else
         // TODO(bruno): Avoid the redundant Uint8Array copy
         gl.texSubImage2D(GL.TEXTURE_2D, 0, x, y, sourceW, sourceH,
             GL.RGBA, GL.UNSIGNED_BYTE, new Uint8Array(pixels.getData()));
-    #end
     }
 
     public function getGraphics () :WebGLGraphics

@@ -25,6 +25,9 @@ bin/set-version "$VERSION"
 # Make sure the unit tests pass
 tests/unit/run-tests
 
+# Build the API documentation
+bin/build-dox
+
 rm -f $ARCHIVE
 
 git ls-files LICENSE.txt | zip $ARCHIVE -@
@@ -46,6 +49,9 @@ case "$CONFIRM" in
 
         # Upload the haxelib
         haxelib submit $ARCHIVE
+
+        # Upload the dox
+        rsync -avz --delete dox/build/web/ catdap:web/flambe/api/
 
         # Commit the version bump
         git commit -a -m "Release $VERSION"

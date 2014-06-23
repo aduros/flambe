@@ -1,0 +1,240 @@
+<macro name="printTypeParams(params)">
+	::if params.length > 0::
+		&lt;
+		::foreach param params::
+			<span class="type">::param::</span>
+			::if !repeat.param.last::, ::end::
+		::end::
+		&gt;
+	::end::
+</macro>
+
+<macro name="printPlatforms(platforms)">
+</macro>
+
+<macro name="printLinkedPath(path, params)">
+	::if api.isKnownType(path)::
+		<a class="type" title="::api.getSentenceDesc(api.resolveType(path))::" ::attr href api.pathToUrl(path)::>::api.getPathName(path)::</a>
+	::else::
+		<span class="type">::api.getPathName(path)::</span>
+	::end::
+	::if params.length > 0::
+		&lt;
+		::foreach param params::
+			$$printLinkedType(::param::)
+			::if !repeat.param.last::, ::end::
+		::end::
+		&gt;
+	::end::
+</macro>
+
+<macro name="printLinkedType(ctype)">
+	::switch ctype::
+	::case::Unknown
+	::case::$$printLinkedPath(::args[0]::,::args[1]::)
+	::case::$$printLinkedPath(::args[0]::,::args[1]::)
+	::case::$$printLinkedPath(::args[0]::,::args[1]::)
+	::case::
+		::if args[0].length == 0::
+			$$printLinkedPath(::"Void"::,::[]::) -&gt;&nbsp;
+		::else::
+			::foreach arg args[0]::
+				$$printLinkedType(::arg.t::) -&gt;&nbsp;
+			::end::
+		::end::
+		$$printLinkedType(::args[1]::)
+	::case::
+	{
+		::foreach field args[0]::
+			::field.name:::$$printLinkedType(::field.type::)
+			::if !repeat.field.last::, ::end::
+		::end::
+	}
+	::case::$$printLinkedPath(::"Dynamic"::,::null::)::if args[0] != null::&lt;$$printLinkedType(::args[0]::)&gt;::end::
+	::case::$$printLinkedPath(::args[0]::,::args[1]::)
+	::end::
+</macro>
+
+<macro name="printModule(module)">
+	<p ::cond module != null && module != "StdTypes"::>
+        <h4><small>defined in</small> ::module::</h4>
+	</p>
+</macro>
+
+<macro name="printFieldSignature(field, isStatic)">
+	::if isStatic::
+		<span class="label">static</span>
+	::end::
+
+	::switch field.type::
+        ::switch field.set::
+        ::case 1::
+            <span class="label">read only</span>
+        ::end::
+        ::switch field.get::
+        ::case 1::
+            <span class="label">write only</span>
+        ::end::
+
+        <code>
+		<a href="#::field.name::"><span class="identifier">::field.name::</span></a> :$$printLinkedType(::field.type::)
+        </code>
+
+	::case 4::
+        <code>
+		<a href="#::field.name::"><span class="identifier">::field.name::</span></a>
+		$$printTypeParams(::field.params::) (
+		::foreach arg args[0]::
+			::if arg.opt::?::end::
+			::arg.name:: :$$printLinkedType(::arg.t::)
+			::if arg.value != null && arg.value != "null":: = ::arg.value::::end::
+			::if !repeat.arg.last::, ::end::
+		::end::
+		)
+        ::if field.name != "new"::
+            :$$printLinkedType(::args[1]::)
+        ::end::
+        </code>
+	::end::
+</macro>
+
+<macro name="printClassBody(type)">
+    ::set flambe_src = "/home/bruno/dev/flambe/src"::
+    ::set source_url = if (type.file != null && type.file.indexOf(flambe_src) == 0)
+        "https://github.com/aduros/flambe/blob/master/src"+type.file.split(flambe_src).join("")
+        else null::
+
+    ::set showSection = false::
+    ::foreach field type.fields::
+        ::if field.isPublic && field.name == "new"::
+            ::switch field.type::
+            ::case 4::
+                ::eval showSection = true::
+            ::end::
+        ::end::
+    ::end::
+    ::if showSection::
+        <h3 class="section">Constructor</h3>
+        <div class="fields">
+            ::foreach field type.fields::
+                ::set isStatic = false::
+                ::if field.isPublic && field.name == "new"::
+                    ::switch field.type::
+                    ::case 4::
+                        ::use "class_field.mtt"::::end::
+                    ::end::
+                ::end::
+            ::end::
+        </div>
+    ::end::
+
+    ::set showSection = false::
+    ::foreach field type.fields::
+        ::if field.isPublic::
+            ::switch field.type::
+                ::eval showSection = true::
+            ::case 4::
+            ::end::
+        ::end::
+    ::end::
+    ::if showSection::
+        <h3 class="section">Properties</h3>
+        <div class="fields">
+            ::foreach field type.fields::
+                ::set isStatic = false::
+                ::if field.isPublic::
+                    ::switch field.type::
+                        ::use "class_field.mtt"::::end::
+                    ::case 4::
+                    ::end::
+                ::end::
+            ::end::
+        </div>
+    ::end::
+
+    ::set showSection = false::
+    ::foreach field type.fields::
+        ::if field.isPublic && field.name != "new"::
+            ::switch field.type::
+            ::case 4::
+                ::eval showSection = true::
+            ::end::
+        ::end::
+    ::end::
+    ::if showSection::
+        <h3 class="section">Methods</h3>
+        <div class="fields">
+            ::foreach field type.fields::
+                ::set isStatic = false::
+                ::if field.isPublic && field.name != "new"::
+                    ::switch field.type::
+                    ::case 4::
+                        ::use "class_field.mtt"::::end::
+                    ::end::
+                ::end::
+            ::end::
+        </div>
+    ::end::
+
+    ::set showSection = false::
+    ::foreach field type.statics::
+        ::if field.isPublic::
+            ::switch field.type::
+                ::eval showSection = true::
+            ::case 4::
+            ::end::
+        ::end::
+    ::end::
+    ::if showSection::
+        <h3 class="section">Static properties</h3>
+        <div class="fields">
+            ::foreach field type.statics::
+                ::set isStatic = true::
+                ::if field.isPublic::
+                    ::switch field.type::
+                        ::use "class_field.mtt"::::end::
+                    ::case 4::
+                    ::end::
+                ::end::
+            ::end::
+        </div>
+    ::end::
+
+    ::set showSection = false::
+    ::foreach field type.statics::
+        ::if field.isPublic::
+            ::switch field.type::
+            ::case 4::
+                ::eval showSection = true::
+            ::end::
+        ::end::
+    ::end::
+    ::if showSection::
+        <h3 class="section">Static methods</h3>
+        <div class="fields">
+            ::foreach field type.statics::
+                ::set isStatic = true::
+                ::if field.isPublic::
+                    ::switch field.type::
+                    ::case 4::
+                        ::use "class_field.mtt"::::end::
+                    ::end::
+                ::end::
+            ::end::
+        </div>
+    ::end::
+</macro>
+
+<macro name="printPackage(type)">
+    ::set flambe_src = "/home/bruno/dev/flambe/src"::
+    ::set source_url = if (type.file != null && type.file.indexOf(flambe_src) == 0)
+        "https://github.com/aduros/flambe/blob/master/src"+type.file.split(flambe_src).join("")
+        else null::
+    ::if source_url != null::
+        <a class="pull-right" href="::source_url::" target="_blank"><span class="icon-eye-open"></span> View source</a>
+    ::end::
+
+    ::if type.path.indexOf(".") >= 0::
+        <h4><small>package ::type.path.split(".").slice(0, -1).join(".")::</small></h4>
+    ::end::
+</macro>

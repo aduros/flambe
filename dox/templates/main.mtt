@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset='utf-8'/>
+	<link href="::api.config.rootPath::bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+	<link href="::api.config.rootPath::bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet" />
+	<script src="::api.config.rootPath::jquery-1.9.1.min.js"></script>
+	<script src="::api.config.rootPath::bootstrap/js/bootstrap.min.js"></script>
+	<link href="::api.config.rootPath::styles.css" rel="stylesheet" />
+	<script type="text/javascript">var dox = {
+		rootPath: "::api.config.rootPath::",
+		platforms: [
+			::foreach pf api.config.platforms::
+				"::pf::"
+				::if !repeat.pf.last::,::end::
+			::end::
+		]
+	};</script>
+	<script type="text/javascript" src="::api.config.rootPath::/nav.js"></script>
+	<script type="text/javascript" src="::api.config.rootPath::/index.js"></script>
+	<link rel="icon" href="::api.config.rootPath::/favicon.ico" type="image/x-icon"></link>
+	<title>::api.currentPageName::::if api.config.pageTitle !=null:: - ::api.config.pageTitle::::end::</title>
+</head>
+<body>
+	<div class="container">
+        <div class="row-fluid">
+            <div class="span3">
+              <div class="well sidebar-nav">
+                <form class="form-search" id="searchForm">
+                  <div class="input-prepend input-block-level">
+                    <span class="add-on"><i class="icon-search"></i></span>
+                    <input id="search" type="text" placeholder="Search" autocomplete="off"/>
+                  </div>
+                </form>
+                <div id="nav"></div>
+              </div>
+            </div>
+            <div class="span9">::raw __content__::</div>
+        </div>
+	</div>
+
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+</body>
+</html>

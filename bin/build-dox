@@ -1,0 +1,42 @@
+#!/bin/bash -e
+#
+# Generates API documentation
+
+project_root=`readlink -f $(dirname $0)/..`
+
+dox_dir="$project_root/dox"
+rm -rf "$dox_dir/build"
+
+tmp_dir=`mktemp -d`
+
+# Generate intermediary haxedoc.xml
+cd "$tmp_dir"
+haxe -xml flambe.xml -debug \
+    --macro 'include("", true, ["flambe.platform",
+        "format", "hxsl", "air",
+        "haxe.remoting.SyncSocketConnection", "haxe.remoting.SocketWrapper", "haxe.macro.ExampleJSGenerator",
+        "cpp", "cs", "flash", "flash8", "java", "js", "neko", "php", "sys", "tools"])' \
+    -lib flambe -D dox -dce no \
+    -js none.js --no-output
+
+# Generate the actual dox directory
+haxelib run dox -i "$tmp_dir" -o "$dox_dir/build/web" \
+    --exclude '^js' --exclude '^flambe\.platform' \
+    --title "Flambe API Reference" \
+    --template-path "$dox_dir/templates"
+    # -theme "$dox_dir"
+
+# Copy resources manually because -theme and --resource-path doesn't do a recursive copy
+cp -r "$dox_dir/resources"/* "$dox_dir/build/web"
+
+pushd "$dox_dir/build/web"
+zip -r offline.zip .
+popd
+
+# Pluck out the haxelib.xml for possible haxelib packaging
+mv "$tmp_dir/flambe.xml" "$dox_dir/build/haxelib.xml"
+
+rm -rf "$tmp_dir"
+
+# Decent terminals will turn this into a clickable link
+echo "API docs generated at file://$dox_dir/build/web/index.html"

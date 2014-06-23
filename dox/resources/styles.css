@@ -1,0 +1,172 @@
+/* .navbar { position:static !important; margin:0px !important;} */
+
+/* #nav { */
+/*   float: left; */
+/*   width: 250px; */
+/*   background: green; */
+/* } */
+/*#content .header { position:absolute; background:rgba(255,255,255,0.9); left:250px; right:15px; padding:0px 12px; border-bottom:1px solid #EEE;}*/
+/*#content .body { padding-top:80px;}*/
+
+/* .doc { margin-top:16px; } */
+.toggle-hide { display:block; }
+.toggle-show { display:none; }
+.toggle-on .toggle-hide { display:none !important; }
+.toggle-on .toggle-show { display:block !important; }
+.related-types .toggle-hide { padding-top:4px; }
+/* .availability { margin-left:14px; color:#93a1a1; } */
+/* .doc { margin-left:14px; } */
+
+/* #nav li { list-style-type: none; } */
+#nav .expando > ul { display:none; }
+#nav .expando.expanded > ul { display:inherit; }
+/* #nav ul, #nav li li { margin-left: 10px; } */
+#nav img { padding-right:4px; }
+#nav .pack { display:none; }
+
+/* .nav .nav li { margin-left: 14px; } */
+
+#nav.searching .expando > ul { display:inherit; }
+#nav.searching .expando > a { display:none; }
+#nav.searching ul { margin-left:0px; }
+#nav.searching .pack { display:inline; }
+#nav.searching .nav-list .nav-list { padding-left: 0; padding-right: 0; }
+
+/* h1 code { padding:4px; font-size:15px; } */
+/* h3 code { padding:4px; font-size:13px; } */
+code {
+  border: 0;
+  font-weight: normal;
+  color: #666666;
+  background: none;
+}
+code .identifier, code.type {
+  font-weight: bold;
+}
+
+/* code { background:#FDF6E3; color:#002b36; tab-size:4; } [> light <] */
+code a { text-decoration:none; }
+code a:hover { text-decoration:underline; }
+
+/*code.dark { background:#272822; color:#F8F8F2; border:none; } */
+code .identifier { color:#002b36; }
+code .type { color:#268bd2; }
+/* code .keyword { color:#dc322f; } */
+/* code .directive { color:#2aa198; } */
+/* code .constant { color:#AE81FF; } */
+/* code .comment { color:#75715E; } */
+/* code .string { color:#E6DB74; } */
+/* code .macro { color:#A6E22A; } */
+/* code .inactive { color:#75715E; } */
+
+/* .navbar-fixed-top { position: fixed; } */
+/* .navbar-fixed-top .navbar-inner, */
+/* .navbar-fixed-bottom .navbar-inner { padding: 0; } */
+
+body {
+  padding-top: 20px;
+}
+
+.sidebar-nav {
+  padding: 9px 0;
+}
+
+#searchForm {
+  padding: 0 9px;
+}
+
+#searchForm .control-group {
+  margin: 0;
+}
+
+.indent {
+  margin-left: 40px;
+}
+
+.doc-main {
+  margin-bottom: 40px;
+}
+
+.section {
+  border-bottom: 1px solid #eee;
+}
+
+.javadoc {
+  /* font-weight: normal; */
+  /* font-size: small; */
+  margin-top: 20px;
+  font-style: italic;
+}
+.inline-content * {
+  display: inline;
+}
+
+/**
+ * Stuff for input-block-level:
+ * http://stackoverflow.com/questions/13306670/bootstrap-prepended-and-appended-input-how-to-max-input-field-width
+ */
+.input-append.input-block-level,
+.input-prepend.input-block-level {
+  display: table;
+}
+.input-append.input-block-level .add-on,
+.input-prepend.input-block-level .add-on {
+  display: table-cell;
+}
+.input-append.input-block-level > input,
+.input-prepend.input-block-level > input {
+  box-sizing: border-box; /* use bootstrap mixin or include vendor variants */
+  -moz-box-sizing: border-box; /* for Firefox */
+  -webkit-box-sizing: border-box; /* for Firefox */
+  -ms-box-sizing: border-box; /* for Firefox */
+  -o-box-sizing: border-box; /* for Firefox */
+  display: table; /* table-cell is not working well in Chrome for small widths */
+  min-height: inherit;
+  width: 100%;
+}
+.input-append.input-block-level > input {
+  border-right: 0;
+}
+.input-prepend.input-block-level > input {
+  border-left: 0;
+}
+
+.field {
+  padding-bottom: 10px;
+}
+.field + .field {
+  border-top: 1px solid #eee;
+}
+.fields {
+  margin-left: 40px;
+}
+.field-source {
+  margin-top: 15px;
+  visibility: hidden;
+}
+.field:hover .field-source {
+  visibility: inherit;
+}
+
+pre.example {
+  position: relative;
+  padding-top: 34.5px;
+}
+pre.example:before {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+
+  content: "Example";
+  color: #999;
+  padding: 2px 6px;
+  background: #fff;
+  font-weight: bold;
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+
+  -moz-border-radius: 4px 0;
+  -ms-border-radius: 4px 0;
+  -webkit-border-radius: 4px 0;
+  border-radius: 4px 0;
+  border: 1px solid rgba(0,0,0,0.15);
+}

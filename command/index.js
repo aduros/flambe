@@ -10,8 +10,10 @@ var os = require("os");
 var path = require("path");
 var spawn = require("child_process").spawn;
 var wrench = require("wrench");
+var xmldom = require("xmldom");
 
 var DATA_DIR = __dirname + "/data/";
+var BIN_DIR = __dirname + "/../bin/";
 var CACHE_DIR = "build/.cache/";
 
 var HAXE_COMPILER_PORT = 6000;
@@ -154,12 +156,74 @@ exports.build = function (config, platforms, opts) {
         return Q();
     };
 
-    var prepareAssets = function (dest) {
+    var generateAssetXml = function (relAssetDir, hxswfmlDoc) {
+        forEachFileIn(relAssetDir, function (file) {
+            var filePath = relAssetDir + "/" + file;
+            if(fs.lstatSync(filePath).isDirectory()) {
+                generateAssetXml(filePath, hxswfmlDoc);
+            } else {
+                var dataType = "";
+                var extension = filePath.substring(filePath.lastIndexOf(".") + 1).toLowerCase();
+                switch (extension) {
+                    case "png":
+                    case "jpg":
+                    case "jpeg":
+                    case "jxr":
+                    case "gif":
+                        dataType = "bitmap";
+                        break;
+                    case "mp3":
+                        dataType = "sound";
+                        break;
+                    default:
+                        dataType = "bytearray";
+                        break;
+                }
+
+                var el = hxswfmlDoc.createElement(dataType);
+                el.setAttribute("file", filePath);
+                // create a valid AS3 class name from the asset url by replacing all non digits, non word characters, and leading non-letters with dollar signs
+                var className = filePath.substring(filePath.indexOf("/") + 1, filePath.lastIndexOf(".")).replace(/[^\d|\w|\$]|^[^A-za-z]/g, '$');
+                el.setAttribute("class", className);
+                hxswfmlDoc.documentElement.appendChild(el);
+            }
+        });
+    };
+
+    var prepareEmbeddedAssetLibrary = function () {
+        var hxswfmlDoc = new xmldom.DOMParser().parseFromString("<lib></lib>");
+        assetPaths.forEach(function (assetPath) {
+            generateAssetXml(assetPath, hxswfmlDoc);
+        });
+        hxswfmlDoc.documentElement.appendChild(hxswfmlDoc.createElement("frame"));
+
+        var xmlPath = CACHE_DIR+"swf/hxswfml_asset_lib_def.xml";
+        fs.writeFileSync(xmlPath, new xmldom.XMLSerializer().serializeToString(hxswfmlDoc));
+
+        return hxswfml(["xml2lib", xmlPath, "libs/library.swf"]);
+    };
+
+    var prepareAssets = function (dest, platform) {
+        var assetFlags = ["--macro", "flambe.platform.ManifestBuilder.use(\""+dest+"\")"];
+
         wrench.rmdirSyncRecursive(dest, true);
+        if(fs.existsSync("libs/library.swf")) {
+            fs.unlinkSync("libs/library.swf");
+        }
+
         // TODO(bruno): Filter out certain formats based on the platform
-        return copyDirs(assetPaths, dest)
-        .then(function () {
-            return ["--macro", "flambe.platform.ManifestBuilder.use(\""+dest+"\")"];
+        var promise = copyDirs(assetPaths, dest);
+        if(platform == "flash" && get(config, "embed_assets")) {
+            wrench.mkdirSyncRecursive(CACHE_DIR+"swf");
+            assetFlags.push("-D", "embed_assets");
+
+            promise = promise.then(function () {
+                prepareEmbeddedAssetLibrary()
+            });
+        }
+
+        return promise.then(function () {
+                return assetFlags;
         });
     };
 
@@ -223,7 +287,7 @@ exports.build = function (config, platforms, opts) {
         var outputDir = "build/web";
 
         return prepareWeb(outputDir)
-        .then(function () { return prepareAssets(outputDir+"/assets") })
+        .then(function () { return prepareAssets(outputDir+"/assets", "html") })
         .then(function (assetFlags) {
             console.log("Building: " + outputDir);
             return buildJS({
@@ -236,29 +300,28 @@ exports.build = function (config, platforms, opts) {
 
     var buildFlash = function () {
         var swf = "build/web/targets/main-flash.swf";
-        var flashFlags = swfFlags(false).concat([
-            "-swf-version", SWF_VERSION, "-swf", swf]);
 
         return prepareWeb()
-        .then(function () { return prepareAssets("build/web/assets") })
+        .then(function () { return prepareAssets("build/web/assets", "flash") })
         .then(function (assetFlags) {
             console.log("Building: " + swf);
+            var flashFlags = swfFlags(false).concat([
+            "-swf-version", SWF_VERSION, "-swf", swf]);
             return haxe(commonFlags.concat(assetFlags).concat(flashFlags));
         });
     };
 
-    var buildAir = function (flags) {
+    var buildAir = function (flags, platform) {
         var airFlags = swfFlags(true).concat(["-swf-version", "11.7", "-D", "air"]);
 
         wrench.mkdirSyncRecursive(CACHE_DIR+"air");
-        return prepareAssets(CACHE_DIR+"air/assets")
+        return prepareAssets(CACHE_DIR+"air/assets", platform)
         .then(function (assetFlags) {
             return haxe(commonFlags.concat(assetFlags).concat(airFlags).concat(flags));
         });
     };
 
     var generateAirXml = function (swf, output) {
-        var xmldom = require("xmldom");
         var xml =
             "<application xmlns=\"http://ns.adobe.com/air/application/4.0\">\n" +
             "  <id>"+get(config, "id")+"</id>\n" +
@@ -349,7 +412,7 @@ exports.build = function (config, platforms, opts) {
         var cert = CACHE_DIR+"air/certificate-android.p12";
         var xml = CACHE_DIR+"air/config-android.xml";
 
-        return buildAir(["-D", "android", "-swf", CACHE_DIR+"air/"+swf])
+        return buildAir(["-D", "android", "-swf", CACHE_DIR+"air/"+swf], "android")
         .then(function () {
             // Generate a dummy certificate if it doesn't exist
             if (!fs.existsSync(cert)) {
@@ -387,7 +450,7 @@ exports.build = function (config, platforms, opts) {
         var mobileProvision = "certs/ios.mobileprovision";
         var xml = CACHE_DIR+"air/config-ios.xml";
 
-        return buildAir(["-D", "ios", "-D", "no-flash-override", "-swf", CACHE_DIR+"air/"+swf])
+        return buildAir(["-D", "ios", "-D", "no-flash-override", "-swf", CACHE_DIR+"air/"+swf], "ios")
         .then(function () {
             var pathOptions = generateAirXml(swf, xml);
 
@@ -414,7 +477,7 @@ exports.build = function (config, platforms, opts) {
         var outputDir = "build/firefox";
         wrench.mkdirSyncRecursive(outputDir+"/targets");
 
-        return prepareAssets(outputDir+"/assets")
+        return prepareAssets(outputDir+"/assets", "firefox")
         .then(function (assetFlags) {
             console.log("Building: " + outputDir);
             return buildJS({
@@ -562,6 +625,11 @@ var haxelib = function (flags, opts) {
     return exec("haxelib", flags, opts);
 };
 exports.haxelib = haxelib;
+
+var hxswfml = function (flags, opts) {
+    return exec("neko " + BIN_DIR + "hxswfml.n", flags, opts);
+};
+exports.hxswfml = hxswfml;
 
 var adt = function (flags, opts) {
     return exec("adt", flags, opts);

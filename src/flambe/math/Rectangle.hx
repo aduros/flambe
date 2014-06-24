@@ -82,14 +82,14 @@ class Rectangle
      */
     public function intersects (rect :Rectangle, ?result: Rectangle) :Bool
     {
-        var left = FMath.max(x, rect.x);
-        var right = FMath.max(x+width, rect.x+rect.width);
+        var left = FMath.max(this.left, rect.left);
+        var right = FMath.min(this.right, rect.right);
         if (left > right) {
             return false;
         }
 
-        var top = FMath.max(y, rect.y);
-        var bottom = FMath.max(y+height, rect.y+rect.height);
+        var top = FMath.max(this.top, rect.top);
+        var bottom = FMath.min(this.bottom, rect.bottom);
         if (top > bottom) {
             return false;
         }
@@ -99,7 +99,6 @@ class Rectangle
         }
         return true;
     }
-
 
     /**
      * Creates a copy of this rectangle.

@@ -13,7 +13,7 @@ import flambe.util.Promise;
 
 interface Platform
 {
-    function init () :Void;
+    function init () :Promise<Bool>;
 
     function getExternal () :ExternalSystem;
     function getKeyboard () :KeyboardSystem;

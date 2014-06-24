@@ -266,7 +266,12 @@ class HtmlPlatform
         _catapult = HtmlCatapultClient.canUse() ? new HtmlCatapultClient() : null;
 #end
 #end
-        Log.info("Initialized HTML platform", ["renderer", _renderer.type]);
+        var promise = new Promise<Bool>();
+        promise.success.connect(function (result) {
+            Log.info("Initialized HTML platform", ["renderer", _renderer.type]);
+        });
+        promise.result = true;
+        return promise;
     }
 
     public function loadAssetPack (manifest :Manifest) :Promise<AssetPack>

@@ -37,6 +37,10 @@ class FlashPlatform
     public function init ()
     {
         var stage = Lib.current.stage;
+        var promise = new Promise<Bool>();
+        promise.success.connect(function (result) {
+            Log.info("Initialized Flash platform", ["renderer", _renderer.type]);
+        });
 
         _stage = new FlashStage(stage);
         _pointer = new BasicPointer();
@@ -47,7 +51,12 @@ class FlashPlatform
         _touch = new DummyTouch();
 #end
 
-        _renderer = new Stage3DRenderer();
+        var stage3DRenderer = new Stage3DRenderer();
+        _renderer = stage3DRenderer;
+        stage3DRenderer.promise.success.connect(function (result) {
+            // Stage3DRenderer's initialization is the only asynchronous part of FlashPlatform's init
+            promise.result = result;
+        });
         mainLoop = new MainLoop();
 
         stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
@@ -96,7 +105,7 @@ class FlashPlatform
         new DebugLogic(this);
         _catapult = FlashCatapultClient.canUse() ? new FlashCatapultClient() : null;
 #end
-        Log.info("Initialized Flash platform", ["renderer", _renderer.type]);
+        return promise;
     }
 
     public function loadAssetPack (manifest :Manifest) :Promise<AssetPack>

@@ -4,7 +4,6 @@
 
 package flambe.platform.html;
 
-import flambe.platform.MathUtil;
 import js.html.CanvasElement;
 import js.html.Uint8Array;
 import js.html.webgl.*;
@@ -12,6 +11,7 @@ import js.html.webgl.*;
 import haxe.io.Bytes;
 
 import flambe.math.FMath;
+import flambe.platform.MathUtil;
 
 class WebGLTextureRoot extends BasicAsset<WebGLTextureRoot>
     implements TextureRoot

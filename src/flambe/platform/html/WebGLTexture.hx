@@ -4,8 +4,6 @@
 
 package flambe.platform.html;
 
-import flambe.platform.html.WebGLTextureRoot;
-
 class WebGLTexture extends BasicTexture<WebGLTextureRoot>
 {
     public function new (root :WebGLTextureRoot, width :Int, height :Int)

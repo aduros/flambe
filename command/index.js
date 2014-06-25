@@ -218,7 +218,7 @@ exports.build = function (config, platforms, opts) {
             assetFlags.push("-D", "embed_assets");
 
             promise = promise.then(function () {
-                prepareEmbeddedAssetLibrary()
+                return prepareEmbeddedAssetLibrary()
             });
         }
 

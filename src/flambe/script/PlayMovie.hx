@@ -2,10 +2,9 @@
 // Flambe - Rapid game development
 // https://github.com/aduros/flambe/blob/master/LICENSE.txt
 
-package flambe.swf;
+package flambe.script;
 
-import flambe.Entity;
-import flambe.script.Action;
+import flambe.swf.MoviePlayer;
 import flambe.swf.MovieSprite;
 
 /**
@@ -39,5 +38,5 @@ class PlayMovie
     }
 
     private var _name :String;
-    private var _movie :MovieSprite;
+    private var _movie :MovieSprite = null;
 }

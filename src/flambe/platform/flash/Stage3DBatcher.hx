@@ -17,8 +17,8 @@ import flash.geom.Vector3D;
 import hxsl.Shader;
 
 import flambe.display.BlendMode;
-import flambe.platform.shader.DrawImage;
 import flambe.platform.shader.DrawPattern;
+import flambe.platform.shader.DrawTexture;
 import flambe.platform.shader.FillRect;
 import flambe.util.Assert;
 
@@ -29,7 +29,7 @@ class Stage3DBatcher
     public function new (context3D :Context3D)
     {
         _context3D = context3D;
-        _drawImageShader = new DrawImage();
+        _drawTextureShader = new DrawTexture();
         _drawPatternShader = new DrawPattern();
         _fillRectShader = new FillRect();
 
@@ -133,7 +133,7 @@ class Stage3DBatcher
         ]));
         ortho.transformVectors(scratch, scratch);
 
-        var offset = prepareDrawImage(null, Copy, null,
+        var offset = prepareDrawTexture(null, Copy, null,
             texture.createTexture(texture.width, texture.height));
         data[  offset] = scratch[0];
         data[++offset] = scratch[1];
@@ -178,15 +178,15 @@ class Stage3DBatcher
         return pixels;
     }
 
-    /** Adds a quad to the batch, using the DrawImage shader. */
-    public function prepareDrawImage (renderTarget :Stage3DTextureRoot,
+    /** Adds a quad to the batch, using the DrawTexture shader. */
+    public function prepareDrawTexture (renderTarget :Stage3DTextureRoot,
         blendMode :BlendMode, scissor :Rectangle, texture :Stage3DTexture) :Int
     {
         if (texture != _lastTexture) {
             flush();
             _lastTexture = texture;
         }
-        return prepareQuad(5, renderTarget, blendMode, scissor, _drawImageShader);
+        return prepareQuad(5, renderTarget, blendMode, scissor, _drawTextureShader);
     }
 
     /** Adds a quad to the batch, using the DrawPattern shader. */
@@ -284,9 +284,9 @@ class Stage3DBatcher
 
         var vertexBuffer = null;
         // TODO(bruno): Optimize with switch/case?
-        if (_lastShader == _drawImageShader) {
-            _drawImageShader.texture = _lastTexture.root.nativeTexture;
-            _drawImageShader.rebuildVars();
+        if (_lastShader == _drawTextureShader) {
+            _drawTextureShader.texture = _lastTexture.root.nativeTexture;
+            _drawTextureShader.rebuildVars();
             vertexBuffer = _vertexBuffer5;
 
         } else if (_lastShader == _drawPatternShader) {
@@ -380,7 +380,7 @@ class Stage3DBatcher
     private var _scratchScissor :Rectangle;
     private var _pendingSetScissor :Bool;
 
-    private var _drawImageShader :DrawImage;
+    private var _drawTextureShader :DrawTexture;
     private var _drawPatternShader :DrawPattern;
     private var _fillRectShader :FillRect;
 

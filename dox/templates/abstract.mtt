@@ -1,0 +1,36 @@
+::use 'main.mtt'::
+	<div class="page-header">
+        $$printPackage(::type::)
+		<h1><small>abstract</small>
+            ::api.currentPageName::$$printTypeParams(::type.params::)($$printLinkedType(::type.athis::))
+        </h1>
+
+        ::foreach t type.from::
+            ::if t.field == null::
+                <h4>
+                    <small>from</small> $$printLinkedType(::t.t::)
+                </h4>
+            ::end::
+        ::end::
+        ::foreach t type.to::
+            ::if t.field == null::
+                <h4>
+                    <small>to</small> $$printLinkedType(::t.t::)
+                </h4>
+            ::end::
+        ::end::
+        $$printModule(::type.module::)
+	</div>
+
+	<div class="body">
+		<div class="doc doc-main" ::cond type.doc != null::>
+            <div class="indent">
+                ::raw type.doc::
+            </div>
+		</div>
+
+		::if type.impl != null::
+            $$printClassBody(::type.impl::)
+        ::end::
+	</div>
+::end::

@@ -7,6 +7,7 @@ package flambe.swf;
 import haxe.Json;
 
 import flambe.asset.AssetPack;
+import flambe.asset.File;
 import flambe.display.Sprite;
 import flambe.swf.Format;
 import flambe.util.Assert;
@@ -29,10 +30,10 @@ class Library
      */
     public function new (pack :AssetPack, baseDir :String)
     {
+        _file = pack.getFile(baseDir+"/library.json");
+        var json :Format = Json.parse(_file.toString());
+
         _symbols = new Map();
-
-        var json :Format = Json.parse(pack.getFile(baseDir + "/library.json").toString());
-
         frameRate = json.frameRate;
 
         var movies = [];
@@ -90,28 +91,25 @@ class Library
      * Creates a library procedurally using a set of Flipbook definitions. Each flipbook will be
      * converted to a movie that can be instanciated with `createMovie()`.
      *
-     * Example:
      * ```haxe
-     * var lib = Library.fromFlipbooks({
+     * var lib = Library.fromFlipbooks([
      *     // A walk animation from a 5x3 sprite sheet, that lasts 5 seconds
-     *     "walk": new Flipbook(spriteSheet.split(5, 3)).setDuration(5).setAnchor(10, 10),
+     *     new Flipbook("walk", spriteSheet.split(5, 3)).setDuration(5).setAnchor(10, 10),
      *
      *     // Another animation where each frame comes from a separate image (Jump1.png, Jump2.png, ...)
-     *     "jump": new Flipbook([for (frame in 1...10) pack.getTexture("Jump"+frame)]),
-     * });
-     *
+     *     new Flipbook("jump", [for (frame in 1...10) pack.getTexture("Jump"+frame)]),
+     * ]);
      * var movie = lib.createMovie("walk");
      * ```
      */
-    public static function fromFlipbooks (flipbooks :Dynamic<Flipbook>) :Library
+    public static function fromFlipbooks (flipbooks :Array<Flipbook>) :Library
     {
         var lib = Type.createEmptyInstance(Library);
         lib._symbols = new Map();
         lib.frameRate = 60;
+        lib._file = null;
 
-        for (name in Reflect.fields(flipbooks)) {
-            var flipbook :Flipbook = Reflect.field(flipbooks, name);
-
+        for (flipbook in flipbooks) {
             // Fake up some Flump metadata to create a movie symbol
             var keyframes :Array<KeyframeFormat> = [];
             for (frame in flipbook.frames) {
@@ -123,14 +121,14 @@ class Library
                 });
             }
             var movie = new MovieSymbol(lib, {
-                id: name,
+                id: flipbook.name,
                 layers: [{
                     name: "flipbook",
                     flipbook: true,
                     keyframes: keyframes,
                 }],
             });
-            lib._symbols.set(name, movie);
+            lib._symbols.set(flipbook.name, movie);
 
             // Assign symbols at each keyframe
             var keyframes = movie.layers[0].keyframes;
@@ -140,6 +138,20 @@ class Library
         }
 
         return lib;
+    }
+
+    /**
+     * Disposes the source library.json File used to create this Library. This can free up some
+     * memory, if you don't intend to recreate this Library later from the same AssetPack.
+     *
+     * @returns This instance, for chaining.
+     */
+    public function disposeFiles () :Library
+    {
+        if (_file != null) {
+            _file.dispose();
+        }
+        return this;
     }
 
     /**
@@ -183,5 +195,6 @@ class Library
         return _symbols.iterator();
     }
 
+    private var _file :File;
     private var _symbols :Map<String,Symbol>;
 }

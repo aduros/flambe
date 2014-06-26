@@ -11,7 +11,6 @@ using flambe.util.Arrays;
 /**
  * A pool of reusable objects that can be used to avoid allocation.
  *
- * Example:
  * ```haxe
  * // Create a pool and preallocate it with 10 ExpensiveObjects.
  * var pool = new Pool(function () return new ExpensiveObject()).setSize(10);

@@ -5,6 +5,7 @@
 package flambe.display;
 
 import flambe.asset.AssetPack;
+import flambe.asset.File;
 import flambe.math.FMath;
 import flambe.math.Rectangle;
 import flambe.util.Value;
@@ -41,12 +42,24 @@ class Font
     {
         this.name = name;
         _pack = pack;
+        _file = pack.getFile(name+".fnt");
 
         reload();
 #if debug
-        _reloadCount = pack.getFile(name + ".fnt").reloadCount;
-        _lastReloadCount = _reloadCount._;
+        _lastReloadCount = _file.reloadCount._;
 #end
+    }
+
+    /**
+     * Disposes the source .fnt File used to create this Font. This can free up some memory, if you
+     * don't intend to recreate this Font later from the same AssetPack.
+     *
+     * @returns This instance, for chaining.
+     */
+    public function disposeFiles () :Font
+    {
+        _file.dispose();
+        return this;
     }
 
     /**
@@ -136,11 +149,12 @@ class Font
     @:allow(flambe) function checkReload () :Int
     {
         // If the .fnt file was reloaded since the last check, reload the font
-        if (_lastReloadCount != _reloadCount._) {
-            _lastReloadCount = _reloadCount._;
+        var reloadCount = _file.reloadCount._;
+        if (_lastReloadCount != reloadCount) {
+            _lastReloadCount = reloadCount;
             reload();
         }
-        return _lastReloadCount;
+        return reloadCount;
     }
 #end
 
@@ -149,7 +163,7 @@ class Font
         _glyphs = new Map();
         _glyphs.set(NEWLINE.charCode, NEWLINE);
 
-        var parser = new ConfigParser(_pack.getFile(name + ".fnt").toString());
+        var parser = new ConfigParser(_file.toString());
         var pages = new Map<Int,Texture>();
 
         // The basename of the font's path, where we'll find the textures
@@ -216,7 +230,7 @@ class Font
 
             case "kerning":
                 var first :Glyph = null;
-                var second = -1;
+                var second = 0, amount = 0;
                 for (pair in parser.pairs()) {
                     switch (pair.key) {
                     case "first":
@@ -224,8 +238,11 @@ class Font
                     case "second":
                         second = pair.getInt();
                     case "amount":
-                        first.setKerning(second, pair.getInt());
+                        amount = pair.getInt();
                     }
+                }
+                if (first != null && amount != 0) {
+                    first.setKerning(second, amount);
                 }
             }
         }
@@ -235,13 +252,13 @@ class Font
     private static var NEWLINE = new Glyph('\n'.code);
 
     private var _pack :AssetPack;
+    private var _file :File;
     private var _glyphs :Map<Int,Glyph>;
 
 #if debug
     // Used to track live-reloading updates. A signal listener can't be used here, because we can't
     // guarantee it'll be properly disposed
     private var _lastReloadCount :Int;
-    private var _reloadCount :Value<Int>;
 #end
 }
 
@@ -283,7 +300,7 @@ class Glyph
     {
         // Avoid drawing whitespace
         if (width > 0) {
-            g.drawSubImage(page, destX + xOffset, destY + yOffset, x, y, width, height);
+            g.drawSubTexture(page, destX + xOffset, destY + yOffset, x, y, width, height);
         }
     }
 

@@ -14,7 +14,7 @@ using flambe.util.Strings;
 
 /**
  * An asset manifest contains all the information needed to load an asset pack. A manifest is
- * usually created with `Manifest.build("directory")`, but manifests can also be assembled
+ * usually created with `Manifest.fromAssets("directory")`, but manifests can also be assembled
  * programmatically.
  */
 class Manifest
@@ -42,7 +42,7 @@ class Manifest
      * @param required When true and this pack was not found, throw an error. Otherwise null is
      *   returned.
      */
-    public static function build (packName :String, required :Bool = true) :Manifest
+    public static function fromAssets (packName :String, required :Bool = true) :Manifest
     {
         var packData :Array<Dynamic> = Reflect.field(Meta.getType(Manifest).assets[0], packName);
         if (packData == null) {
@@ -74,13 +74,14 @@ class Manifest
 
     /**
      * Tries to find a pack suffixed with the closest available variant of the locale. For example,
-     * buildLocalized("foo", "pt-BR") will first try to load foo_pt-BR, then foo_pt, then just foo.
+     * fromAssetsLocalized("foo", "pt-BR") will first try to load foo_pt-BR, then foo_pt, then just
+     * foo.
      * @param packName The folder name in your assets/ directory.
      * @param locale An RFC 4646 language tag, or null to use the system language.
      * @param required When true and this pack was not found, throw an error. Otherwise null is
      *   returned.
      */
-    public static function buildLocalized (
+    public static function fromAssetsLocalized (
         packName :String, locale :String = null, required :Bool = true) :Manifest
     {
         if (locale == null) {
@@ -90,14 +91,14 @@ class Manifest
         if (locale != null) {
             var parts = locale.split("-");
             while (parts.length > 0) {
-                var manifest = build(packName + "_" + parts.join("-"), false);
+                var manifest = fromAssets(packName + "_" + parts.join("-"), false);
                 if (manifest != null) {
                     return manifest;
                 }
                 parts.pop();
             }
         }
-        return build(packName, required);
+        return fromAssets(packName, required);
     }
 
     /**

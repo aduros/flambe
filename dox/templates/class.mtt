@@ -1,0 +1,40 @@
+::use 'main.mtt'::
+	<div class="page-header">
+        $$printPackage(::type::)
+		<h1>
+            <small>::if type.isInterface::interface::else::class::end::</small>
+            ::api.currentPageName::$$printTypeParams(::type.params::)
+        </h1>
+        ::if type.superClass != null::
+        <h4>
+            <small>extends</small> $$printLinkedPath(::type.superClass.path::,::type.superClass.params::)
+        </h4>
+        ::end::
+        ::foreach i type.interfaces::
+        <h4>
+            <small>implements</small> $$printLinkedPath(::i.path::,::i.params::)
+        </h4>
+        ::end::
+
+		$$printModule(::type.module::)
+
+        <div ::cond subClasses !=null::>
+            ::set title = "extended by"::
+            ::set infos = subClasses::
+            ::use "related_types.mtt"::::end::
+        </div>
+        <div ::cond implementors !=null::>
+            ::set title = "implemented by"::
+            ::set infos = implementors::
+            ::use "related_types.mtt"::::end::
+        </div>
+	</div>
+	<div class="body">
+        <div class="doc doc-main" ::cond type.doc != null::>
+            <div class="indent">
+                ::raw type.doc::
+            </div>
+        </div>
+        $$printClassBody(::type::)
+	</div>
+::end::

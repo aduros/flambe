@@ -5,6 +5,7 @@
 package flambe.display;
 
 import flambe.asset.AssetPack;
+import flambe.asset.File;
 
 using flambe.util.Strings;
 
@@ -88,16 +89,26 @@ class EmitterMold
 
     public var blendMode :BlendMode;
 
+    /**
+     * Creates an EmitterMold using files in an asset pack.
+     * @param name The path to the particle system within the asset pack, excluding the .pex suffix.
+     */
     public function new (pack :AssetPack, name :String)
     {
+        _file = pack.getFile(name+".pex");
+        var xml = Xml.parse(_file.toString());
+
         var blendFuncSource = 0;
         var blendFuncDestination = 0;
 
-        var xml = Xml.parse(pack.getFile(name+".pex").toString());
+        // The basename of the pex file's path, where we'll find the textures
+        var idx = name.lastIndexOf("/");
+        var basePath = (idx >= 0) ? name.substr(0, idx+1) : "";
+
         for (element in xml.firstElement().elements()) {
             switch (element.nodeName.toLowerCase()) {
             case "texture":
-                texture = pack.getTexture(element.get("name").removeFileExtension());
+                texture = pack.getTexture(basePath + element.get("name").removeFileExtension());
             case "angle":
                 angle = getValue(element);
             case "anglevariance":
@@ -187,6 +198,18 @@ class EmitterMold
         }
     }
 
+    /**
+     * Disposes the source .pex File used to create this EmitterMold. This can free up some memory,
+     * if you don't intend to recreate this EmitterMold later from the same AssetPack.
+     *
+     * @returns This instance, for chaining.
+     */
+    public function disposeFiles () :EmitterMold
+    {
+        _file.dispose();
+        return this;
+    }
+
     /** Creates a new EmitterSprite using this mold. */
     public function createEmitter () :EmitterSprite
     {
@@ -212,4 +235,6 @@ class EmitterMold
     {
         return getFloat(xml, "y");
     }
+
+    private var _file :File;
 }

@@ -18,6 +18,9 @@ var HAXE_COMPILER_PORT = 6000;
 var HTTP_PORT = 7000;
 var SOCKET_PORT = HTTP_PORT+1;
 
+// The minimum SWF version for browser Flash. For AIR, we always use the latest
+var SWF_VERSION = "11.2";
+
 exports.PLATFORMS = ["html", "flash", "android", "ios", "firefox"];
 
 exports.VERSION = JSON.parse(fs.readFileSync(__dirname + "/package.json")).version;
@@ -199,7 +202,7 @@ exports.build = function (config, platforms, opts) {
         var jsFlags = ["-D", target, "-D", "js-es5", "-D", "js-flatten"];
         var flags = commonFlags.concat(jsFlags).concat(assetFlags);
         if (debug) {
-            return haxe(flags.concat(["-js", js]));
+            return haxe(flags.concat(["-D", "source-map-content", "-js", js]));
         } else {
             // Minify release builds
             return haxe(flags.concat(["-js", unminified]))
@@ -234,7 +237,7 @@ exports.build = function (config, platforms, opts) {
     var buildFlash = function () {
         var swf = "build/web/targets/main-flash.swf";
         var flashFlags = swfFlags(false).concat([
-            "-swf-version", "11.2", "-swf", swf]);
+            "-swf-version", SWF_VERSION, "-swf", swf]);
 
         return prepareWeb()
         .then(function () { return prepareAssets("build/web/assets") })
@@ -280,6 +283,7 @@ exports.build = function (config, platforms, opts) {
             "    <Entitlements><![CDATA[\n" +
                    get(config, "ios Entitlements.plist", "") +
             "    ]]></Entitlements>\n" +
+            "    <requestedDisplayResolution>high</requestedDisplayResolution>\n" +
             "  </iPhone>\n" +
             "</application>";
         var doc = new xmldom.DOMParser().parseFromString(xml);
@@ -367,6 +371,9 @@ exports.build = function (config, platforms, opts) {
                 apk, xml);
             androidFlags = androidFlags.concat(pathOptions);
             androidFlags.push("-C", CACHE_DIR+"air", swf, "assets");
+            if (fs.existsSync("android")) {
+                androidFlags.push("-C", "android", ".");
+            }
             return adt(androidFlags);
         });
     };
@@ -396,6 +403,9 @@ exports.build = function (config, platforms, opts) {
                 "-provisioning-profile", mobileProvision, ipa, xml);
             iosFlags = iosFlags.concat(pathOptions);
             iosFlags.push("-C", CACHE_DIR+"air", swf, "assets");
+            if (fs.existsSync("ios")) {
+                iosFlags.push("-C", "ios", ".");
+            }
             return adt(iosFlags);
         });
     };
@@ -422,7 +432,6 @@ exports.build = function (config, platforms, opts) {
             }
         })
         .then(function () {
-
             var manifest = {
                 name: get(config, "name"),
                 description: get(config, "description"),
@@ -450,15 +459,12 @@ exports.build = function (config, platforms, opts) {
 
     wrench.mkdirSyncRecursive(CACHE_DIR);
 
-    var connectFlags = ["--connect", HAXE_COMPILER_PORT];
+    var connectFlags = ["--connect", opts.haxeServer || HAXE_COMPILER_PORT];
     return haxe(connectFlags, {check: false, verbose: false, output: false})
     .then(function (code) {
-        // Hide the compilation server behind an environment variable for now until stable
-        if ("FLAMBE_HAXE_SERVER" in process.env) {
-            // Use a Haxe compilation server if available
-            if (code == 0) {
-                commonFlags = commonFlags.concat(connectFlags);
-            }
+        // Use a Haxe compilation server if available
+        if (code == 0) {
+            commonFlags = commonFlags.concat(connectFlags);
         }
 
         commonFlags.push("-main", get(config, "main"));
@@ -619,6 +625,48 @@ var fdb = function (commands) {
 };
 exports.fdb = fdb;
 
+var getHaxeFlags = function (config, platform) {
+    if (platform == null) {
+        platform = get(config, "default_platform", "flash");
+    }
+    checkPlatforms([platform]);
+
+    var flags = [
+        "-main", get(config, "main"),
+        "-lib", "flambe",
+        "-swf-version", SWF_VERSION,
+        "-D", "flash-strict",
+        "--no-output",
+    ];
+
+    switch (platform) {
+    case "android": case "ios":
+        flags.push("-D", "air");
+        // Fall through
+    case "flash":
+        flags.push("-swf", "no-output.swf");
+        break;
+    default:
+        flags.push("-js", "no-output.js");
+        break;
+    }
+    if (platform != "flash") {
+        flags.push("-D", platform);
+    }
+
+    flags = flags.concat(toArray(get(config, "haxe_flags", [])));
+    getAllPaths(config, "src").forEach(function (srcPath) {
+        flags.push("-cp", srcPath);
+    });
+    getAllPaths(config, "libs").forEach(function (libPath) {
+        forEachFileIn(libPath, function (file) {
+            flags.push("-swf-lib-extern", libPath+"/"+file);
+        });
+    });
+    return flags;
+}
+exports.getHaxeFlags = getHaxeFlags;
+
 var Server = function () {
 };
 exports.Server = Server;
@@ -629,12 +677,9 @@ Server.prototype.start = function () {
     var url = require("url");
     var websocket = require("websocket");
 
-    // Hide the compilation server behind an environment variable for now until stable
-    if ("FLAMBE_HAXE_SERVER" in process.env) {
-        // Fire up a Haxe compiler server, ignoring all output. It's fine if this command fails, the
-        // build will fallback to not using a compiler server
-        spawn("haxe", ["--wait", HAXE_COMPILER_PORT], {stdio: "ignore"});
-    }
+    // Fire up a Haxe compiler server, ignoring all output. It's fine if this command fails, the
+    // build will fallback to not using a compiler server
+    spawn("haxe", ["--wait", HAXE_COMPILER_PORT], {stdio: "ignore"});
 
     // Start a static HTTP server
     var host = "0.0.0.0";

@@ -133,20 +133,20 @@ private class InternalGraphics extends CanvasGraphics
 {
     public function new (renderTarget :CanvasTextureRoot)
     {
-        super(renderTarget.image);
+        super(renderTarget.image, true);
         _renderTarget = renderTarget;
     }
 
-    override public function drawImage (texture :Texture, x :Float, y :Float)
+    override public function drawTexture (texture :Texture, x :Float, y :Float)
     {
-        super.drawImage(texture, x, y);
+        super.drawTexture(texture, x, y);
         _renderTarget.dirtyContents();
     }
 
-    override public function drawSubImage (texture :Texture, destX :Float, destY :Float,
+    override public function drawSubTexture (texture :Texture, destX :Float, destY :Float,
         sourceX :Float, sourceY :Float, sourceW :Float, sourceH :Float)
     {
-        super.drawSubImage(texture, destX, destY, sourceX, sourceY, sourceW, sourceH);
+        super.drawSubTexture(texture, destX, destY, sourceX, sourceY, sourceW, sourceH);
         _renderTarget.dirtyContents();
     }
 

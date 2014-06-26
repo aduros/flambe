@@ -1,0 +1,22 @@
+::use 'main.mtt'::
+	::if full == ""::
+        <div class="page-header">
+            <h1>::api.config.pageTitle::</h1>
+        </div>
+		<p>Use the menu to see more documentation. You can also <a href="::api.config.rootPath::offline.zip">download</a> these docs for offline browsing.</p>
+
+	::else::
+        <h1><span class="directive">package</span> ::full::</h1>
+        <table class="table table-condensed">
+            <tbody>
+                ::foreach tree subs::
+                    ::set name = api.getTreeName(tree)::
+                    <tr ::cond name.charAt(0) != "_"::>
+                        <td width="200"><a href="::api.getTreeUrl(tree)::">::name::</a></td>
+                        <td>::raw api.getTreeShortDesc(tree)::</td>
+                    </tr>
+                ::end::
+            </tbody>
+        </table>
+    ::end::
+::end::

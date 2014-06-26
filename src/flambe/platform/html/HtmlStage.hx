@@ -30,6 +30,9 @@ class HtmlStage
         _canvas = canvas;
         resize = new Signal0();
 
+#if flambe_disable_html_retina
+        scaleFactor = 1;
+#else
         // If the DPI is being scaled by the browser, reverse it so that one canvas pixel equals
         // one screen pixel
         scaleFactor = computeScaleFactor();
@@ -38,6 +41,7 @@ class HtmlStage
             HtmlUtil.setVendorStyle(_canvas, "transform-origin", "top left");
             HtmlUtil.setVendorStyle(_canvas, "transform", "scale(" + (1/scaleFactor) + ")");
         }
+#end
 
 #if !flambe_disable_autoresize
         if (HtmlUtil.SHOULD_HIDE_MOBILE_BROWSER) {

@@ -9,7 +9,7 @@ import hxsl.Shader;
 /**
  * Shader that draws textured triangles with a given alpha.
  */
-class DrawImage extends Shader
+class DrawTexture extends Shader
 {
     static var SRC = {
         var input :{

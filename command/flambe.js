@@ -60,6 +60,7 @@ cmd.setDefaults({action: function (args) {
 var addCommonArguments = function (parser) {
     parser.addArgument(["--debug"], {action: "storeTrue", help: "Build in debug mode."});
     parser.addArgument(["--fdb-host"], {help: "The address AIR apps should connect to for debugging."});
+    parser.addArgument(["--haxe-server"], {help: "Connect to a Haxe compiler server at this address/port."});
 
     // For FlashDevelop, does absolutely nothing
     parser.addArgument(["--release"], {action: "storeTrue", help: argparse.Const.SUPPRESS});
@@ -76,7 +77,13 @@ cmd.setDefaults({action: function (args) {
     catchErrors(
         flambe.loadConfig(args.config)
         .then(function (config) {
-            return flambe.run(config, args.platform, {debug: args.debug, noBuild: args.no_build, fdbHost: args.fdb_host, noFdb: args.no_fdb});
+            return flambe.run(config, args.platform, {
+                debug: args.debug,
+                fdbHost: args.fdb_host,
+                haxeServer: args.haxe_server,
+                noBuild: args.no_build,
+                noFdb: args.no_fdb,
+            });
         }));
 }});
 
@@ -89,7 +96,11 @@ cmd.setDefaults({action: function (args) {
     catchErrors(
         flambe.loadConfig(args.config)
         .then(function (config) {
-            return flambe.build(config, args.platforms, {debug: args.debug, fdbHost: args.fdb_host});
+            return flambe.build(config, args.platforms, {
+                debug: args.debug,
+                fdbHost: args.fdb_host,
+                haxeServer: args.haxe_server,
+            });
         }));
 }});
 
@@ -112,6 +123,19 @@ cmd.setDefaults({action: function () {
         flambe.loadConfig(args.config)
         .then(function (config) {
             flambe.clean();
+        }));
+}});
+
+var cmd = commands.addParser("haxe-flags", {help: "Show Haxe compiler completion flags.",
+    description: "For IDE implementors, prints flags that can be passed to the Haxe compiler for code completion."
+});
+cmd.addArgument(["platform"], {metavar: "platform", nargs: "?",
+    help: "A platform to target. Choose from " + flambe.PLATFORMS.join(", ") + ". If omitted, 'default_platform' from flambe.yaml will be used."});
+cmd.setDefaults({action: function () {
+    catchErrors(
+        flambe.loadConfig(args.config)
+        .then(function (config) {
+            console.log(flambe.getHaxeFlags(config, args.platform).join("\n"));
         }));
 }});
 

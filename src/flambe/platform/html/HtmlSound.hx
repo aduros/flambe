@@ -11,6 +11,7 @@ import flambe.platform.Tickable;
 import flambe.sound.Playback;
 import flambe.sound.Sound;
 import flambe.util.Disposable;
+import flambe.util.Value;
 
 class HtmlSound extends BasicAsset<HtmlSound>
     implements Sound
@@ -62,7 +63,7 @@ private class HtmlPlayback
 {
     public var volume (default, null) :AnimatedFloat;
     public var paused (get, set) :Bool;
-    public var ended (get, null) :Bool;
+    public var complete (get, null) :Value<Bool>;
     public var position (get, null) :Float;
     public var sound (get, null) :Sound;
 
@@ -78,6 +79,7 @@ private class HtmlPlayback
 
         this.volume = new AnimatedFloat(volume, function (_,_) updateVolume());
         updateVolume();
+        _complete = new Value<Bool>(false);
 
         playAudio();
 
@@ -109,9 +111,9 @@ private class HtmlPlayback
         return paused;
     }
 
-    public function get_ended () :Bool
+    public function get_complete () :Value<Bool>
     {
-        return _disposed || _clonedElement.ended;
+        return _complete;
     }
 
     public function get_position () :Float
@@ -122,9 +124,10 @@ private class HtmlPlayback
     public function update (dt :Float) :Bool
     {
         volume.update(dt);
+        _complete._ = _clonedElement.ended;
 
-        if (ended || paused) {
-            // Allow ended or paused sounds to be garbage collected
+        if (_complete._ || paused) {
+            // Allow complete or paused sounds to be garbage collected
             _tickableAdded = false;
 
             // Release System references
@@ -139,7 +142,7 @@ private class HtmlPlayback
     public function dispose ()
     {
         paused = true;
-        _disposed = true;
+        _complete._ = true;
     }
 
     private function playAudio ()
@@ -189,5 +192,5 @@ private class HtmlPlayback
     private var _hideBinding :Disposable;
     private var _wasPaused :Bool;
 
-    private var _disposed :Bool = false;
+    private var _complete :Value<Bool>;
 }

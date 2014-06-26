@@ -6,6 +6,7 @@ package flambe.sound;
 
 import flambe.animation.AnimatedFloat;
 import flambe.util.Disposable;
+import flambe.util.Value;
 
 /**
  * Represents a currently playing sound.
@@ -24,10 +25,15 @@ interface Playback extends Disposable
     var paused (get, set) :Bool;
 
     /**
-     * True if the playback has finished playing, or has been disposed. Looping playbacks will never
-     * end naturally, and return true only after being disposed.
+     * Whether the playback has finished playing or has been disposed. Looping playbacks will never
+     * complete naturally, and are complete only after being disposed.
+     *
+     * In environments that don't support audio, this will be true.
+     *
+     * Do not set this value! To pause the playback, set `paused`. To stop it completely, call
+     * `dispose()`.
      */
-    var ended (get, null) :Bool;
+    var complete (get, null) :Value<Bool>;
 
     /**
      * The current playback position in seconds.

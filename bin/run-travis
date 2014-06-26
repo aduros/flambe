@@ -13,23 +13,27 @@ ln -sfT "$FLAMBE_ROOT" "$FLAMBE_SPACE"
 cd "$FLAMBE_SPACE"
 
 # Install the flambe command and library
+haxelib install hxsl
+haxelib install air3
 haxelib dev flambe "$FLAMBE_SPACE/src"
 npm install -g ./command
 
 echo "Validating compilation..."
-haxe -js out.js --no-output --macro 'include("flambe", true, ["flambe.platform"])' \
-    -lib hxsl -cp "$FLAMBE_SPACE/src"
+haxe -js none.js --no-output -lib flambe --macro 'include("flambe", true, ["flambe.platform"])'
 
 echo "Running unit tests..."
+# flambe-server required to run the unit tests
+haxelib git flambe-server https://github.com/aduros/flambe-server master src
 tests/unit/run-tests
 
 echo "Building demos..."
 git clone git://github.com/aduros/flambe-demos.git
+haxelib install nape # Used by physics demo
 flambe-demos/bin/build-all --debug
 
 # Run the Selenium tests if the Sauce auth key is available (not in pull requests), and only run on
 # one of the build workers
-if [[ "$TRAVIS_SECURE_ENV_VARS" == "true" && "$TRAVIS_JOB_NUMBER" == *.1 ]]; then
+if [[ "$TRAVIS_REPO_SLUG" == "aduros/flambe" && "$TRAVIS_SECURE_ENV_VARS" == "true" && "$TRAVIS_JOB_NUMBER" == *.1 ]]; then
     # Download and start Sauce Connect
     mkdir -p /tmp/sauce
     pushd /tmp/sauce

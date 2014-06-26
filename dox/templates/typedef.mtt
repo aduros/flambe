@@ -1,0 +1,44 @@
+::use 'main.mtt'::
+	<div class="page-header">
+        $$printPackage(::type::)
+		<h1><small>typedef</small>
+            ::api.currentPageName::$$printTypeParams(::type.params::)
+        </h1>
+
+        ::switch type.type::
+        <h4>
+            <small>alias for</small> $$printLinkedType(::type.type::)
+        </h4>
+        ::case 5::
+        ::end::
+
+		$$printModule(::type.module::)
+	</div>
+
+	<div class="body">
+		<div class="doc doc-main" ::cond type.doc != null::>
+            <div class="indent">
+                ::raw type.doc::
+            </div>
+		</div>
+
+        ::set showSection = false::
+		::switch type.type::
+		::case 5::
+			::foreach field args[0]::
+				::eval showSection = true::
+			::end::
+		::end::
+        ::if showSection::
+            <h3 class="section">Properties</h3>
+            <div class="indent">
+                ::switch type.type::
+                ::case 5::
+                    ::foreach field args[0]::
+                        ::use "class_field.mtt"::::end::
+                    ::end::
+                ::end::
+            </div>
+        ::end::
+	</div>
+::end::

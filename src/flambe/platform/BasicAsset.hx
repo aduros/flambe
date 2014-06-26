@@ -24,6 +24,8 @@ class BasicAsset<A/*:BasicAsset<A>*/>
 
     @:final public function reload (asset :A)
     {
+        dispose();
+        _disposed = false;
         copyFrom(asset);
         ++reloadCount._;
     }

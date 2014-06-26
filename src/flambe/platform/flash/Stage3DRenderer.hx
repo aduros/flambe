@@ -24,6 +24,7 @@ class Stage3DRenderer
     implements InternalRenderer<BitmapData>
 {
     public var type (get, null) :RendererType;
+    public var maxTextureSize (get, null) :Int;
     public var hasGPU (get, null) :Value<Bool>;
 
     public var graphics :InternalGraphics = null;
@@ -58,6 +59,11 @@ class Stage3DRenderer
     inline private function get_type () :RendererType
     {
         return Stage3D;
+    }
+
+    inline private function get_maxTextureSize () :Int
+    {
+        return 2048; // The max supported by BASELINE_CONSTRAINED
     }
 
     inline private function get_hasGPU () :Value<Bool>

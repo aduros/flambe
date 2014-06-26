@@ -1,0 +1,27 @@
+::if (field.doc != null && field.doc != "<p></p>") || !field.isOverride::
+
+<div class="field">
+::if source_url != null && field.line != null::
+    <a href="::source_url::#L::field.line::" class="field-source pull-right" target="_blank">
+        <span class="icon-eye-open"></span> View source
+    </a>
+::end::
+
+	<a ::attr name field.name::></a>
+	<h3>
+		<p>$$printFieldSignature(::field::,::isStatic::)</p>
+		::if field.overloads != null::
+			::foreach field field.overloads::
+				<p>$$printFieldSignature(::field::,::isStatic::)</p>
+			::end::
+		::end::
+	</h3>
+	::if field.platforms.length != type.platforms.length && field.platforms.length > 0 && field.platforms.length < api.config.platforms.length::
+		$$printPlatforms(::field.platforms::)
+	::end::
+	::if field.doc != null::
+		<div class="doc">::raw field.doc::</div>
+	::end::
+</div>
+
+::end::

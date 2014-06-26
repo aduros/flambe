@@ -10,8 +10,8 @@ import js.html.webgl.RenderingContext;
 
 import flambe.display.BlendMode;
 import flambe.math.Rectangle;
-import flambe.platform.shader.DrawImageGL;
 import flambe.platform.shader.DrawPatternGL;
+import flambe.platform.shader.DrawTextureGL;
 import flambe.platform.shader.FillRectGL;
 import flambe.platform.shader.ShaderGL;
 
@@ -37,7 +37,7 @@ class WebGLBatcher
         _quadIndexBuffer = gl.createBuffer();
         gl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, _quadIndexBuffer);
 
-        _drawImageShader = new DrawImageGL(gl);
+        _drawTextureShader = new DrawTextureGL(gl);
         _drawPatternShader = new DrawPatternGL(gl);
         _fillRectShader = new FillRectGL(gl);
 
@@ -108,14 +108,14 @@ class WebGLBatcher
         _gl.deleteFramebuffer(texture.framebuffer);
     }
 
-    public function prepareDrawImage (renderTarget :WebGLTextureRoot,
+    public function prepareDrawTexture (renderTarget :WebGLTextureRoot,
         blendMode :BlendMode, scissor :Rectangle, texture :WebGLTexture) :Int
     {
         if (texture != _lastTexture) {
             flush();
             _lastTexture = texture;
         }
-        return prepareQuad(5, renderTarget, blendMode, scissor, _drawImageShader);
+        return prepareQuad(5, renderTarget, blendMode, scissor, _drawTextureShader);
     }
 
     public function prepareDrawPattern (renderTarget :WebGLTextureRoot,
@@ -292,7 +292,7 @@ class WebGLBatcher
     private var _vertexBuffer :Buffer;
     private var _quadIndexBuffer :Buffer;
 
-    private var _drawImageShader :DrawImageGL;
+    private var _drawTextureShader :DrawTextureGL;
     private var _drawPatternShader :DrawPatternGL;
     private var _fillRectShader :FillRectGL;
 

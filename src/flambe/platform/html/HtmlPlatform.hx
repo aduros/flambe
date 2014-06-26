@@ -421,6 +421,13 @@ class HtmlPlatform
     private function createRenderer (canvas :CanvasElement) :InternalRenderer<Dynamic>
     {
 #if !flambe_disable_webgl
+
+#if firefox
+        // WebGL is buggy in Firefox OS 1.1, so blacklist it there
+        // https://developer.mozilla.org/en-US/docs/Gecko_user_agent_string_reference#Firefox_OS
+        var majorVersion = ~/\bFirefox\/(\d+)/;
+        if (!majorVersion.match(Browser.navigator.userAgent) || Std.parseInt(majorVersion.matched(1)) >= 26)
+#end
         try {
             var gl = canvas.getContextWebGL(cast {
 #if !flambe_transparent

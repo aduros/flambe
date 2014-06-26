@@ -1,30 +1,42 @@
-#!/bin/sh -e
+#!/bin/bash -e
 #
 # Generates API documentation
 
-FLAMBE_ROOT=`readlink -f $(dirname $0)/..`
+project_root=`readlink -f $(dirname $0)/..`
 
-DOX_DIR="$FLAMBE_ROOT/dox"
-rm -rf "$DOX_DIR"
+dox_dir="$project_root/dox"
+rm -rf "$dox_dir/build"
 
-TMP_DIR=`mktemp -d`
+tmp_dir=`mktemp -d`
 
 # Generate intermediary haxedoc.xml
-cd "$TMP_DIR"
+cd "$tmp_dir"
 haxe -xml flambe.xml -debug \
-    --macro 'include("flambe", true, ["flambe.platform"])' \
-    -lib flambe \
+    --macro 'include("", true, ["flambe.platform",
+        "format", "hxsl", "air",
+        "haxe.remoting.SyncSocketConnection", "haxe.remoting.SocketWrapper", "haxe.macro.ExampleJSGenerator",
+        "cpp", "cs", "flash", "flash8", "java", "js", "neko", "php", "sys", "tools"])' \
+    -lib flambe -D dox -dce no \
     -js none.js --no-output
 
 # Generate the actual dox directory
-haxelib run dox -r /flambe/api/ -i "$TMP_DIR" -o "$DOX_DIR" \
-    --exclude js --exclude flambe.platform \
-    --title "Flambe API Reference"
+haxelib run dox -i "$tmp_dir" -o "$dox_dir/build/web" \
+    --exclude '^js' --exclude '^flambe\.platform' \
+    --title "Flambe API Reference" \
+    --template-path "$dox_dir/templates"
+    # -theme "$dox_dir"
 
-# Pluck out the haxedoc.xml for possible haxelib packaging
-mv "$TMP_DIR/flambe.xml" "$DOX_DIR/haxedoc.xml"
+# Copy resources manually because -theme and --resource-path doesn't do a recursive copy
+cp -r "$dox_dir/resources"/* "$dox_dir/build/web"
 
-rm -rf "$TMP_DIR"
+pushd "$dox_dir/build/web"
+zip -r offline.zip .
+popd
+
+# Pluck out the haxelib.xml for possible haxelib packaging
+mv "$tmp_dir/flambe.xml" "$dox_dir/build/haxelib.xml"
+
+rm -rf "$tmp_dir"
 
 # Decent terminals will turn this into a clickable link
-echo "API docs generated at file://$DOX_DIR/index.html"
+echo "API docs generated at file://$dox_dir/build/web/index.html"

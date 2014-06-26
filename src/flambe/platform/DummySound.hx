@@ -7,6 +7,7 @@ package flambe.platform;
 import flambe.animation.AnimatedFloat;
 import flambe.sound.Playback;
 import flambe.sound.Sound;
+import flambe.util.Value;
 
 /**
  * An empty sound used in environments that don't support audio.
@@ -66,7 +67,7 @@ class DummyPlayback
 {
     public var volume (default, null) :AnimatedFloat;
     public var paused (get, set) :Bool;
-    public var ended (get, null) :Bool;
+    public var complete (get, null) :Value<Bool>;
     public var position (get, null) :Float;
     public var sound (get, null) :Sound;
 
@@ -74,6 +75,7 @@ class DummyPlayback
     {
         _sound = sound;
         this.volume = new AnimatedFloat(0); // A little quirky? All DummyPlaybacks share the same volume
+        _complete = new Value<Bool>(true);
     }
 
     public function get_sound () :Sound
@@ -91,9 +93,9 @@ class DummyPlayback
         return true;
     }
 
-    public function get_ended () :Bool
+    public function get_complete () :Value<Bool>
     {
-        return true;
+        return _complete;
     }
 
     public function get_position () :Float
@@ -107,4 +109,6 @@ class DummyPlayback
     }
 
     private var _sound :Sound;
+
+    private var _complete :Value<Bool>;
 }

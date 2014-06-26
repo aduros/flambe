@@ -9,14 +9,21 @@ import flambe.display.Texture;
 
 /**
  * Defines a flipbook-style movie, typically created from a spritesheet. Use
- * `Library.fromFlipbooks()` to create a Library from a set of Flipbooks.
+ * `Library.fromFlipbooks()` to create a Library from a list of Flipbooks.
  */
 class Flipbook
 {
+    public var name (default, null) :String;
     public var frames (default, null) :Array<FlipbookFrame>;
 
-    public function new<A:Texture> (textures :Array<A>)
+    /**
+     * @param name The name of the symbol that will be placed in the library.
+     * @param textures The frames of the flipbook animation.
+     */
+    public function new<A:Texture> (name :String, textures :Array<A>)
     {
+        this.name = name;
+
         // By default, play the animation for one second
         var durationPerFrame = 1 / textures.length;
 

@@ -46,10 +46,10 @@ interface Graphics
     function restore () :Void;
 
     /** Draws a texture at the given point. */
-    function drawImage (texture :Texture, destX :Float, destY :Float) :Void;
+    function drawTexture (texture :Texture, destX :Float, destY :Float) :Void;
 
     /** Draws a texture sub-region at the given point. */
-    function drawSubImage (texture :Texture, destX :Float, destY :Float,
+    function drawSubTexture (texture :Texture, destX :Float, destY :Float,
         sourceX :Float, sourceY :Float, sourceW :Float, sourceH :Float) :Void;
 
     /** Draws a repeating texture to the given region. */

@@ -11,7 +11,7 @@ import flambe.util.Value;
 
 /**
  * An easy way to manage the lifecycle of multiple sounds. A handle is created from a source sound
- * using newSound, and all handle playbacks will be stopped when the Mixer is disposed.
+ * using `createSound()`, and all handle playbacks will be stopped when the Mixer is disposed.
  */
 class Mixer
     extends Component
@@ -25,9 +25,9 @@ class Mixer
      * Creates a sound handle from a source sound. Playbacks created using the handle will be
      * stopped when this Mixer is disposed.
      *
-     * @param channels The maximum number of times this sound should play at once.
+     * @param channels The maximum number of times this sound should be able to play at once.
      */
-    public function newSound (source :Sound, channels :Int = FMath.INT_MAX) :Sound
+    public function createSound (source :Sound, channels :Int = FMath.INT_MAX) :Sound
     {
         var sound = new MixerSound(source, channels);
         _sounds.push(sound);
@@ -95,7 +95,7 @@ private class MixerSound
     {
         for (ii in 0..._channels) {
             var playback = _playbacks[ii];
-            if (playback == null || playback.ended) {
+            if (playback == null || playback.complete._) {
                 return ii;
             }
         }

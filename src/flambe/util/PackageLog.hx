@@ -15,9 +15,10 @@ import flambe.util.Logger;
 
 /**
  * Classes that extend PackageLog will have static logging methods generated for them. The methods
- * correspond to the methods in flambe.util.Logger. The package name is used as the log tag.
+ * correspond to the methods in `Logger`.
+ *
  * Creating a class that extends PackageLog at the base of your project is a convenient way to
- * include logging across a whole codebase.
+ * include logging across a whole codebase. The package name is used as the log tag.
  *
  * ```haxe
  * // In src/foobar/Log.hx

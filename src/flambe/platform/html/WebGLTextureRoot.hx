@@ -10,8 +10,7 @@ import js.html.webgl.*;
 
 import haxe.io.Bytes;
 
-import flambe.display.Graphics;
-import flambe.display.Texture;
+import flambe.math.FMath;
 
 class WebGLTextureRoot extends BasicAsset<WebGLTextureRoot>
     implements TextureRoot
@@ -27,8 +26,9 @@ class WebGLTextureRoot extends BasicAsset<WebGLTextureRoot>
     {
         super();
         _renderer = renderer;
-        this.width = MathUtil.nextPowerOfTwo(width);
-        this.height = MathUtil.nextPowerOfTwo(height);
+        // 1 px textures cause weird DrawPattern sampling on some drivers
+        this.width = FMath.max(2, MathUtil.nextPowerOfTwo(width));
+        this.height = FMath.max(2, MathUtil.nextPowerOfTwo(height));
 
         var gl = renderer.gl;
         nativeTexture = gl.createTexture();
@@ -111,7 +111,7 @@ class WebGLTextureRoot extends BasicAsset<WebGLTextureRoot>
             GL.RGBA, GL.UNSIGNED_BYTE, new Uint8Array(pixels.getData()));
     }
 
-    public function getGraphics () :Graphics
+    public function getGraphics () :WebGLGraphics
     {
         assertNotDisposed();
 

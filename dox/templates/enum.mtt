@@ -1,0 +1,24 @@
+::use 'main.mtt'::
+	<div class="page-header">
+        $$printPackage(::type::)
+		<h1><small>enum</small>
+            ::api.currentPageName::$$printTypeParams(::type.params::)
+        </h1>
+		$$printModule(::type.module::)
+	</div>
+	<div class="body">
+		<div class="doc doc-main" ::cond type.doc != null::>
+            <div class="indent">
+                ::raw type.doc::
+            </div>
+		</div>
+		::if type.constructors.length > 0::
+            <h3 class="section">Values</h3>
+            <div class="field">
+                ::foreach ctor type.constructors::
+                    ::use "enum_field.mtt"::::end::
+                ::end::
+            </div>
+		::end::
+	</div>
+::end::

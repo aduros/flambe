@@ -407,8 +407,8 @@ class EmitterSprite extends Sprite
         emitX = AnimatedFloat.put(emitX);
         emitY = AnimatedFloat.put(emitY);
         super.dispose();
-	}
-	
+    }
+
     private static function random (base :Float, variance :Float)
     {
         if (variance != 0) {

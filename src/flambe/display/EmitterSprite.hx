@@ -371,7 +371,7 @@ class EmitterSprite extends Sprite
         return maxParticles;
     }
 
-    override public function dispose()
+    override public function dispose ()
     {
         alphaEnd = AnimatedFloat.put(alphaEnd);
         alphaEndVariance = AnimatedFloat.put(alphaEndVariance);

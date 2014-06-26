@@ -89,41 +89,42 @@ class EmitterSprite extends Sprite
         blendMode = mold.blendMode;
         type = mold.type;
 
-        alphaEnd = new AnimatedFloat(mold.alphaEnd);
-        alphaEndVariance = new AnimatedFloat(mold.alphaEndVariance);
-        alphaStart = new AnimatedFloat(mold.alphaStart);
-        alphaStartVariance = new AnimatedFloat(mold.alphaStartVariance);
-        angle = new AnimatedFloat(mold.angle);
-        angleVariance = new AnimatedFloat(mold.angleVariance);
-        duration = mold.duration;
-        emitXVariance = new AnimatedFloat(mold.emitXVariance);
-        emitYVariance = new AnimatedFloat(mold.emitYVariance);
-        gravityX = new AnimatedFloat(mold.gravityX);
-        gravityY = new AnimatedFloat(mold.gravityY);
-        maxRadius = new AnimatedFloat(mold.maxRadius);
-        maxRadiusVariance = new AnimatedFloat(mold.maxRadiusVariance);
-        minRadius = new AnimatedFloat(mold.minRadius);
-        lifespan = new AnimatedFloat(mold.lifespan);
-        lifespanVariance = new AnimatedFloat(mold.lifespanVariance);
-        radialAccel = new AnimatedFloat(mold.radialAccel);
-        radialAccelVariance = new AnimatedFloat(mold.radialAccelVariance);
-        rotatePerSecond = new AnimatedFloat(mold.rotatePerSecond);
-        rotatePerSecondVariance = new AnimatedFloat(mold.rotatePerSecondVariance);
-        rotationEnd = new AnimatedFloat(mold.rotationEnd);
-        rotationEndVariance = new AnimatedFloat(mold.rotationEndVariance);
-        rotationStart = new AnimatedFloat(mold.rotationStart);
-        rotationStartVariance = new AnimatedFloat(mold.rotationStartVariance);
-        sizeEnd = new AnimatedFloat(mold.sizeEnd);
-        sizeEndVariance = new AnimatedFloat(mold.sizeEndVariance);
-        sizeStart = new AnimatedFloat(mold.sizeStart);
-        sizeStartVariance = new AnimatedFloat(mold.sizeStartVariance);
-        speed = new AnimatedFloat(mold.speed);
-        speedVariance = new AnimatedFloat(mold.speedVariance);
-        tangentialAccel = new AnimatedFloat(mold.tangentialAccel);
-        tangentialAccelVariance = new AnimatedFloat(mold.tangentialAccelVariance);
 
-        emitX = new AnimatedFloat(0);
-        emitY = new AnimatedFloat(0);
+        alphaEnd = AnimatedFloat.take(mold.alphaEnd);
+        alphaEndVariance = AnimatedFloat.take(mold.alphaEndVariance);
+        alphaStart = AnimatedFloat.take(mold.alphaStart);
+        alphaStartVariance = AnimatedFloat.take(mold.alphaStartVariance);
+        angle = AnimatedFloat.take(mold.angle);
+        angleVariance = AnimatedFloat.take(mold.angleVariance);
+        duration = mold.duration;
+        emitXVariance = AnimatedFloat.take(mold.emitXVariance);
+        emitYVariance = AnimatedFloat.take(mold.emitYVariance);
+        gravityX = AnimatedFloat.take(mold.gravityX);
+        gravityY = AnimatedFloat.take(mold.gravityY);
+        maxRadius = AnimatedFloat.take(mold.maxRadius);
+        maxRadiusVariance = AnimatedFloat.take(mold.maxRadiusVariance);
+        minRadius = AnimatedFloat.take(mold.minRadius);
+        lifespan = AnimatedFloat.take(mold.lifespan);
+        lifespanVariance = AnimatedFloat.take(mold.lifespanVariance);
+        radialAccel = AnimatedFloat.take(mold.radialAccel);
+        radialAccelVariance = AnimatedFloat.take(mold.radialAccelVariance);
+        rotatePerSecond = AnimatedFloat.take(mold.rotatePerSecond);
+        rotatePerSecondVariance = AnimatedFloat.take(mold.rotatePerSecondVariance);
+        rotationEnd = AnimatedFloat.take(mold.rotationEnd);
+        rotationEndVariance = AnimatedFloat.take(mold.rotationEndVariance);
+        rotationStart = AnimatedFloat.take(mold.rotationStart);
+        rotationStartVariance = AnimatedFloat.take(mold.rotationStartVariance);
+        sizeEnd = AnimatedFloat.take(mold.sizeEnd);
+        sizeEndVariance = AnimatedFloat.take(mold.sizeEndVariance);
+        sizeStart = AnimatedFloat.take(mold.sizeStart);
+        sizeStartVariance = AnimatedFloat.take(mold.sizeStartVariance);
+        speed = AnimatedFloat.take(mold.speed);
+        speedVariance = AnimatedFloat.take(mold.speedVariance);
+        tangentialAccel = AnimatedFloat.take(mold.tangentialAccel);
+        tangentialAccelVariance = AnimatedFloat.take(mold.tangentialAccelVariance);
+
+        emitX = AnimatedFloat.take(0);
+        emitY = AnimatedFloat.take(0);
 
         _particles = Arrays.create(mold.maxParticles);
         var ii = 0, ll = _particles.length;
@@ -368,6 +369,44 @@ class EmitterSprite extends Sprite
         }
 
         return maxParticles;
+    }
+
+    override public function dispose ()
+    {
+        alphaEnd = AnimatedFloat.put(alphaEnd);
+        alphaEndVariance = AnimatedFloat.put(alphaEndVariance);
+        alphaStart = AnimatedFloat.put(alphaStart);
+        alphaStartVariance = AnimatedFloat.put(alphaStartVariance);
+        angle = AnimatedFloat.put(angle);
+        angleVariance = AnimatedFloat.put(angleVariance);
+        emitXVariance = AnimatedFloat.put(emitXVariance);
+        emitYVariance = AnimatedFloat.put(emitYVariance);
+        gravityX = AnimatedFloat.put(gravityX);
+        gravityY = AnimatedFloat.put(gravityY);
+        maxRadius = AnimatedFloat.put(maxRadius);
+        maxRadiusVariance = AnimatedFloat.put(maxRadiusVariance);
+        minRadius = AnimatedFloat.put(minRadius);
+        lifespan = AnimatedFloat.put(lifespan);
+        lifespanVariance = AnimatedFloat.put(lifespanVariance);
+        radialAccel = AnimatedFloat.put(radialAccel);
+        radialAccelVariance = AnimatedFloat.put(radialAccelVariance);
+        rotatePerSecond = AnimatedFloat.put(rotatePerSecond);
+        rotatePerSecondVariance = AnimatedFloat.put(rotatePerSecondVariance);
+        rotationEnd = AnimatedFloat.put(rotationEnd);
+        rotationEndVariance = AnimatedFloat.put(rotationEndVariance);
+        rotationStart = AnimatedFloat.put(rotationStart);
+        rotationStartVariance = AnimatedFloat.put(rotationStartVariance);
+        sizeEnd = AnimatedFloat.put(sizeEnd);
+        sizeEndVariance = AnimatedFloat.put(sizeEndVariance);
+        sizeStart = AnimatedFloat.put(sizeStart);
+        sizeStartVariance = AnimatedFloat.put(sizeStartVariance);
+        speed = AnimatedFloat.put(speed);
+        speedVariance = AnimatedFloat.put(speedVariance);
+        tangentialAccel = AnimatedFloat.put(tangentialAccel);
+        tangentialAccelVariance = AnimatedFloat.put(tangentialAccelVariance);
+        emitX = AnimatedFloat.put(emitX);
+        emitY = AnimatedFloat.put(emitY);
+        super.dispose();
     }
 
     private static function random (base :Float, variance :Float)

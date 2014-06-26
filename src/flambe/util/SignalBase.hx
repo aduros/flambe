@@ -131,6 +131,13 @@ class SignalBase
 
     private var _head :SignalConnection;
     private var _deferredTasks :Task;
+
+    @:allow(flambe) function dispose () :Void
+    {
+        while (_head != null) {
+            _head.dispose();
+        }
+    }
 }
 
 private class Task

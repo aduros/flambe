@@ -20,8 +20,8 @@ class FillSprite extends Sprite
     {
         super();
         this.color = color;
-        this.width = new AnimatedFloat(width);
-        this.height = new AnimatedFloat(height);
+        this.width = AnimatedFloat.take(width);
+        this.height = AnimatedFloat.take(height);
     }
 
     override public function draw (g :Graphics)
@@ -55,5 +55,12 @@ class FillSprite extends Sprite
         super.onUpdate(dt);
         width.update(dt);
         height.update(dt);
+    }
+
+    override public function dispose ()
+    {
+        width = AnimatedFloat.put(width);
+        height = AnimatedFloat.put(height);
+        super.dispose();
     }
 }

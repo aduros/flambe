@@ -27,12 +27,12 @@ class PatternSprite extends Sprite
         if (width < 0) {
             width = (texture != null) ? texture.width : 0;
         }
-        this.width = new AnimatedFloat(width);
+        this.width = AnimatedFloat.take(width);
 
         if (height < 0) {
             height = (texture != null) ? texture.height : 0;
         }
-        this.height = new AnimatedFloat(height);
+        this.height = AnimatedFloat.take(height);
     }
 
     override public function draw (g :Graphics)
@@ -68,5 +68,12 @@ class PatternSprite extends Sprite
         super.onUpdate(dt);
         width.update(dt);
         height.update(dt);
+    }
+
+    override public function dispose ()
+    {
+        width = AnimatedFloat.put(width);
+        height = AnimatedFloat.put(height);
+        super.dispose();
     }
 }

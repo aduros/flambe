@@ -55,9 +55,9 @@ class TextSprite extends Sprite
         var dirtyText = function (_,_) {
             _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
         };
-        wrapWidth = new AnimatedFloat(0, dirtyText);
-        letterSpacing = new AnimatedFloat(0, dirtyText);
-        lineSpacing = new AnimatedFloat(0, dirtyText);
+        wrapWidth = AnimatedFloat.take(0, dirtyText);
+        letterSpacing = AnimatedFloat.take(0, dirtyText);
+        lineSpacing = AnimatedFloat.take(0, dirtyText);
     }
 
     override public function draw (g :Graphics)
@@ -198,6 +198,14 @@ class TextSprite extends Sprite
         wrapWidth.update(dt);
         letterSpacing.update(dt);
         lineSpacing.update(dt);
+    }
+
+    override public function dispose ()
+    {
+        wrapWidth = AnimatedFloat.put(wrapWidth);
+        letterSpacing = AnimatedFloat.put(letterSpacing);
+        lineSpacing = AnimatedFloat.put(lineSpacing);
+        super.dispose();
     }
 
     private var _font :Font;

@@ -229,7 +229,8 @@ exports.build = function (config, platforms, opts) {
 
     var swfFlags = function (air) {
         // Flags common to all swf-based targets (flash, android, ios)
-        var flags = ["--flash-strict", "-swf-header", "640:480:60:000000"];
+        var swfHeader = get(config, "width") + ":" + get(config, "height") + ":60:000000";
+        var flags = ["--flash-strict", "-swf-header", swfHeader];
         if (debug) flags.push("-D", "fdb", "-D", "advanced-telemetry");
         else flags.push("-D", "native_trace");
 

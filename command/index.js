@@ -192,6 +192,8 @@ exports.build = function (config, platforms, opts) {
 
     var prepareEmbeddedAssetLibrary = function () {
         var hxswfmlDoc = new xmldom.DOMParser().parseFromString("<lib></lib>");
+        hxswfmlDoc.documentElement.setAttribute("width", get(config, "width"));
+        hxswfmlDoc.documentElement.setAttribute("height", get(config, "height"));
         assetPaths.forEach(function (assetPath) {
             generateAssetXml(assetPath, hxswfmlDoc);
         });
@@ -207,13 +209,13 @@ exports.build = function (config, platforms, opts) {
         var assetFlags = ["--macro", "flambe.platform.ManifestBuilder.use(\""+dest+"\")"];
 
         wrench.rmdirSyncRecursive(dest, true);
-        if(fs.existsSync("libs/library.swf")) {
+        if (fs.existsSync("libs/library.swf")) {
             fs.unlinkSync("libs/library.swf");
         }
 
         // TODO(bruno): Filter out certain formats based on the platform
         var promise = copyDirs(assetPaths, dest);
-        if(platform == "flash" && get(config, "embed_assets")) {
+        if (platform == "flash" && get(config, "embed_assets")) {
             wrench.mkdirSyncRecursive(CACHE_DIR+"swf");
             assetFlags.push("-D", "embed_assets");
 
@@ -229,8 +231,13 @@ exports.build = function (config, platforms, opts) {
 
     var swfFlags = function (air) {
         // Flags common to all swf-based targets (flash, android, ios)
-        var swfHeader = get(config, "width") + ":" + get(config, "height") + ":60:000000";
-        var flags = ["--flash-strict", "-swf-header", swfHeader];
+        var flags = ["--flash-strict"];
+        if (!get(config, "embed_assets")) {
+            // when assets are embedded, we take the header from their swf library so that
+            // we can also absorb their timeline with -D flash-use-stage, which is incompatible with -swf-header
+            var swfHeader = get(config, "width") + ":" + get(config, "height") + ":60:000000";
+            flags.push("-swf-header", swfHeader);
+        }
         if (debug) flags.push("-D", "fdb", "-D", "advanced-telemetry");
         else flags.push("-D", "native_trace");
 

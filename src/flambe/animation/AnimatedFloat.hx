@@ -48,13 +48,12 @@ class AnimatedFloat extends Value<Float>
      * @param to The target value.
      * @param seconds The animation duration, in seconds.
      * @param easing The easing function to use, defaults to `Ease.linear`.
-     * @param onComplete The callback function when animation completed
      * @param delay The animation delay, in seconds.
      */
-    public function animate (from :Float, to :Float, seconds :Float, ?easing :EaseFunction, ?onComplete :Void->Void, delay :Float = 0)
+    public function animate (from :Float, to :Float, seconds :Float, ?easing :EaseFunction, delay :Float = 0)
     {
         set__(from);
-        animateTo(to, seconds, easing, onComplete, delay);
+        animateTo(to, seconds, easing, delay);
     }
 
     /**
@@ -63,12 +62,11 @@ class AnimatedFloat extends Value<Float>
      * @param to The target value.
      * @param seconds The animation duration, in seconds.
      * @param easing The easing function to use, defaults to `Ease.linear`.
-     * @param onComplete The callback function when animation completed
      * @param delay The animation delay, in seconds.
      */
-    public function animateTo (to :Float, seconds :Float, ?easing :EaseFunction, ?onComplete :Void->Void, delay :Float = 0)
+    public function animateTo (to :Float, seconds :Float, ?easing :EaseFunction, delay :Float = 0)
     {
-        behavior = new Tween(_value, to, seconds, easing, onComplete, delay);
+        behavior = new Tween(_value, to, seconds, easing, delay);
     }
 
     /**
@@ -77,12 +75,11 @@ class AnimatedFloat extends Value<Float>
      * @param by The delta added to the current value to get the target value.
      * @param seconds The animation duration, in seconds.
      * @param easing The easing function to use, defaults to `Ease.linear`.
-     * @param onComplete The callback function when animation completed
      * @param delay The animation delay, in seconds.
      */
-    public function animateBy (by :Float, seconds :Float, ?easing :EaseFunction, ?onComplete :Void->Void, delay :Float = 0)
+    public function animateBy (by :Float, seconds :Float, ?easing :EaseFunction, delay :Float = 0)
     {
-        behavior = new Tween(_value, _value + by, seconds, easing, onComplete, delay);
+        behavior = new Tween(_value, _value + by, seconds, easing, delay);
     }
 
     inline public function bindTo (to :Value<Float>, ?fn :BindingFunction)

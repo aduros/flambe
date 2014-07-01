@@ -168,6 +168,24 @@ using flambe.util.BitSets;
 #end
 
     /**
+     * Gets a component of a given type from this entity, or any of its parents. Searches upwards in
+     * the hierarchy until the component is found, or returns null if not found.
+     */
+#if (display || dox)
+    public function getFromParents<A:Component> (componentClass :Class<A>) :A return null;
+
+#else
+    macro public function getFromParents<A> (self :Expr, componentClass :ExprOf<Class<A>>) :ExprOf<A>
+    {
+        var type = requireComponentType(componentClass);
+        var name = macro $componentClass.NAME;
+        return needSafeCast(type)
+            ? macro $self._internal_getFromParents($name, $componentClass)
+            : macro $self._internal_unsafeCast($self._internal_getFromParents($name), $componentClass);
+    }
+#end
+
+    /**
      * Gets a component by name from this entity.
      */
     inline public function getComponent (name :String) :Component
@@ -296,6 +314,23 @@ using flambe.util.BitSets;
     inline public function _internal_unsafeCast<A:Component> (component :Component, cl :Class<A>) :A
     {
         return cast component;
+    }
+
+    public function _internal_getFromParents<A:Component> (name :String, ?safeCast :Class<A>) :A
+    {
+        var entity = this;
+        do {
+            var component = entity.getComponent(name);
+            if (safeCast != null) {
+                component = Std.instance(component, safeCast);
+            }
+            if (component != null) {
+                return cast component;
+            }
+            entity = entity.parent;
+        } while (entity != null);
+
+        return null; // Not found
     }
 #end
 

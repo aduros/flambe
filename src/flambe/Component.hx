@@ -18,11 +18,11 @@ class Component
 {
     /** The entity this component is attached to, or null. */
     @:allow(flambe)
-    public var owner (default, null) :Entity;
+    public var owner (default, null) :Entity = null;
 
     /** The owner's next component, for iteration. */
     @:allow(flambe)
-    public var next (default, null) :Component;
+    public var next (default, null) :Component = null;
 
     /**
      * The component's name, generated based on its class. Components with the same name replace
@@ -66,4 +66,10 @@ class Component
     {
         return null; // Subclasses will automagically implement this
     }
+
+    // Component flags
+    private static inline var STARTED = 1 << 0;
+    private static inline var NEXT_FLAG = 1 << 1; // Must be last!
+
+    private var _flags :Int = 0;
 }

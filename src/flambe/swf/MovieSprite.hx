@@ -101,7 +101,7 @@ class MovieSprite extends Sprite
 
         speed.update(dt);
 
-        switch (_flags & (Sprite.MOVIESPRITE_PAUSED | Sprite.MOVIESPRITE_SKIP_NEXT)) {
+        switch (_flags & (PAUSED | SKIP_NEXT)) {
         case 0:
             // Neither paused nor skipping set, advance time
             _position += speed._*dt;
@@ -112,9 +112,9 @@ class MovieSprite extends Sprite
                     _looped.emit();
                 }
             }
-        case Sprite.MOVIESPRITE_SKIP_NEXT:
+        case SKIP_NEXT:
             // Not paused, but skip this time step
-            _flags = _flags.remove(Sprite.MOVIESPRITE_SKIP_NEXT);
+            _flags = _flags.remove(SKIP_NEXT);
         }
 
         var newFrame = _position*symbol.frameRate;
@@ -153,12 +153,12 @@ class MovieSprite extends Sprite
 
     inline private function get_paused () :Bool
     {
-        return _flags.contains(Sprite.MOVIESPRITE_PAUSED);
+        return _flags.contains(PAUSED);
     }
 
     private function set_paused (paused :Bool)
     {
-        _flags = _flags.set(Sprite.MOVIESPRITE_PAUSED, paused);
+        _flags = _flags.set(PAUSED, paused);
         return paused;
     }
 
@@ -186,8 +186,13 @@ class MovieSprite extends Sprite
     @:allow(flambe) function rewind ()
     {
         _position = 0;
-        _flags = _flags.add(Sprite.MOVIESPRITE_SKIP_NEXT);
+        _flags = _flags.add(SKIP_NEXT);
     }
+
+    // Component flags
+    private static inline var PAUSED = Sprite.NEXT_FLAG << 0;
+    private static inline var SKIP_NEXT = Sprite.NEXT_FLAG << 1;
+    private static inline var NEXT_FLAG = Sprite.NEXT_FLAG << 2; // Must be last!
 
     private var _animators :Array<LayerAnimator>;
 

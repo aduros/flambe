@@ -122,7 +122,7 @@ class Sprite extends Component
 
     public function new ()
     {
-        _flags = VISIBLE | POINTER_ENABLED | VIEW_MATRIX_DIRTY | PIXEL_SNAPPING;
+        _flags = _flags.add(VISIBLE | POINTER_ENABLED | VIEW_MATRIX_DIRTY | PIXEL_SNAPPING);
         _localMatrix = new Matrix();
 
         var dirtyMatrix = function (_,_) {
@@ -720,18 +720,14 @@ class Sprite extends Component
 
     private static var _scratchPoint = new Point();
 
-    // Various flags used by Sprite and subclasses
-    private static inline var VISIBLE = 1 << 0;
-    private static inline var POINTER_ENABLED = 1 << 1;
-    private static inline var LOCAL_MATRIX_DIRTY = 1 << 2;
-    private static inline var VIEW_MATRIX_DIRTY = 1 << 3;
-    private static inline var MOVIESPRITE_PAUSED = 1 << 4;
-    private static inline var MOVIESPRITE_SKIP_NEXT = 1 << 5;
-    private static inline var TEXTSPRITE_DIRTY = 1 << 6;
-    private static inline var PIXEL_SNAPPING = 1 << 7;
-    private static inline var HOVERING = 1 << 8;
-
-    private var _flags :Int;
+    // Component flags
+    private static inline var VISIBLE = Component.NEXT_FLAG << 0;
+    private static inline var POINTER_ENABLED = Component.NEXT_FLAG << 1;
+    private static inline var LOCAL_MATRIX_DIRTY = Component.NEXT_FLAG << 2;
+    private static inline var VIEW_MATRIX_DIRTY = Component.NEXT_FLAG << 3;
+    private static inline var PIXEL_SNAPPING = Component.NEXT_FLAG << 4;
+    private static inline var HOVERING = Component.NEXT_FLAG << 5;
+    private static inline var NEXT_FLAG = Component.NEXT_FLAG << 6; // Must be last!
 
     private var _localMatrix :Matrix;
 

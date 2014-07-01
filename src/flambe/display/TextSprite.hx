@@ -50,10 +50,10 @@ class TextSprite extends Sprite
         _font = font;
         _text = text;
         _align = Left;
-        _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
+        _flags = _flags.add(TEXT_DIRTY);
 
         var dirtyText = function (_,_) {
-            _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
+            _flags = _flags.add(TEXT_DIRTY);
         };
         wrapWidth = new AnimatedFloat(0, dirtyText);
         letterSpacing = new AnimatedFloat(0, dirtyText);
@@ -142,7 +142,7 @@ class TextSprite extends Sprite
     {
         if (text != _text) {
             _text = text;
-            _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
+            _flags = _flags.add(TEXT_DIRTY);
         }
         return text;
     }
@@ -156,7 +156,7 @@ class TextSprite extends Sprite
     {
         if (font != _font) {
             _font = font;
-            _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
+            _flags = _flags.add(TEXT_DIRTY);
         }
         return font;
     }
@@ -170,7 +170,7 @@ class TextSprite extends Sprite
     {
         if (align != _align) {
             _align = align;
-            _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
+            _flags = _flags.add(TEXT_DIRTY);
         }
         return align;
     }
@@ -181,13 +181,13 @@ class TextSprite extends Sprite
         var reloadCount = _font.checkReload();
         if (reloadCount != _lastReloadCount) {
             _lastReloadCount = reloadCount;
-            _flags = _flags.add(Sprite.TEXTSPRITE_DIRTY);
+            _flags = _flags.add(TEXT_DIRTY);
         }
 #end
 
         // Recreate the layout if necessary
-        if (_flags.contains(Sprite.TEXTSPRITE_DIRTY)) {
-            _flags = _flags.remove(Sprite.TEXTSPRITE_DIRTY);
+        if (_flags.contains(TEXT_DIRTY)) {
+            _flags = _flags.remove(TEXT_DIRTY);
             _layout = font.layoutText(_text, _align, wrapWidth._, letterSpacing._, lineSpacing._);
         }
     }
@@ -199,6 +199,10 @@ class TextSprite extends Sprite
         letterSpacing.update(dt);
         lineSpacing.update(dt);
     }
+
+    // Component flags
+    private static inline var TEXT_DIRTY = Sprite.NEXT_FLAG << 0;
+    private static inline var NEXT_FLAG = Sprite.NEXT_FLAG << 1; // Must be last!
 
     private var _font :Font;
     private var _text :String;

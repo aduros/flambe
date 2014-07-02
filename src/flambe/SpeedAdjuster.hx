@@ -24,6 +24,7 @@ class SpeedAdjuster extends Component
         this.scale = new AnimatedFloat(scale);
     }
 
+    // Note that this may be called by MainLoop before onStarted!
     override public function onUpdate (dt :Float)
     {
         // Ensure this component is immune to its own time scaling

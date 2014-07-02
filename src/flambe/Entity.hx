@@ -14,6 +14,7 @@ using haxe.macro.ExprTools;
 import flambe.util.Disposable;
 
 using Lambda;
+using flambe.util.BitSets;
 
 /**
  * A node in the entity hierarchy, and a collection of components.
@@ -121,6 +122,10 @@ using Lambda;
 #end
 
                 // Notify the component it was removed
+                if (p._flags.contains(Component.STARTED)) {
+                    p.onStop();
+                    p._flags = p._flags.remove(Component.STARTED);
+                }
                 p.onRemoved();
                 p.owner = null;
                 p.next = null;

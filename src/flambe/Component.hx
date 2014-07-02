@@ -45,6 +45,26 @@ class Component
     }
 
     /**
+     * Called just before this component's first update after being added. This is the best place to
+     * put initialization logic that requires accessing other components/entities, since it waits
+     * until the rest of the entity hierarchy is accessible.
+     *
+     * Note that onStart may be delayed until the next frame after adding a component, depending on
+     * where in the update step it was added.
+     */
+    public function onStart ()
+    {
+    }
+
+    /**
+     * Called just before this component will be removed from its entity, if onStart was previously
+     * called.
+     */
+    public function onStop ()
+    {
+    }
+
+    /**
      * Called when this component receives a game update.
      * @param dt The time elapsed since the last frame, in seconds.
      */
@@ -68,8 +88,8 @@ class Component
     }
 
     // Component flags
-    private static inline var STARTED = 1 << 0;
+    @:allow(flambe) static inline var STARTED = 1 << 0;
     private static inline var NEXT_FLAG = 1 << 1; // Must be last!
 
-    private var _flags :Int = 0;
+    @:allow(flambe) var _flags :Int = 0;
 }

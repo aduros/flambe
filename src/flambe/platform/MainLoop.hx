@@ -13,6 +13,7 @@ import flambe.scene.Director;
 
 using Lambda;
 using flambe.util.Arrays;
+using flambe.util.BitSets;
 
 /**
  * Updates all components and renders.
@@ -99,6 +100,10 @@ class MainLoop
         var p = entity.firstComponent;
         while (p != null) {
             var next = p.next;
+            if (!p._flags.contains(Component.STARTED)) {
+                p._flags = p._flags.add(Component.STARTED);
+                p.onStart();
+            }
             p.onUpdate(dt);
             p = next;
         }

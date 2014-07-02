@@ -7,6 +7,7 @@ package flambe;
 #if macro
 import haxe.macro.Context;
 import haxe.macro.Expr;
+import haxe.macro.Type;
 using haxe.macro.ExprTools;
 #end
 
@@ -138,41 +139,14 @@ using Lambda;
     public function get<A:Component> (componentClass :Class<A>) :A return null;
 
 #else
-    macro public function get<A> (self :Expr, componentClass :ExprOf<Class<A>>) :ExprOf<A>
+    macro public function get<A:Component> (self :Expr, componentClass :ExprOf<Class<A>>) :ExprOf<A>
     {
-        var path = getClassPathFromExpr(componentClass);
-        if (path != null)
-        {
-            var type = Context.getType(path.join("."));
-
-            if (Context.unify(type, Context.getType("flambe.Component"))) {
-                // Delegate through getComponentTyped to avoid a (slow) typed cast
-                return macro $self._internal_getComponentTyped($componentClass.NAME, $componentClass);
-            }            
-        }
-
-        Context.error("Expected a class that extends Component, got " + componentClass.toString(),
-            Context.currentPos());
-        return null;
+        var type = requireComponentType(componentClass);
+        var name = macro $componentClass.NAME;
+        return needSafeCast(type)
+            ? macro Std.instance($self.getComponent($name), $componentClass)
+            : macro $self._internal_unsafeCast($self.getComponent($name), $componentClass);
     }
-
-#if macro
-    static function getClassPathFromExpr<A> (componentClass :ExprOf<Class<A>>) :Array<String>
-    {
-        switch (componentClass.expr) {
-        case EConst(CIdent(name)):
-            return [name];
-        case EField(e, name):
-            var path = getClassPathFromExpr(e);
-            if (path != null)
-                path.push(name);
-            return path;
-        default:
-            return null;
-        }
-    }
-#end
-
 #end
 
     /**
@@ -311,12 +285,57 @@ using Lambda;
         return output;
     }
 
-    // A semi-private helper method used by Entity.get()
+    // Semi-private helper methods
 #if !display
     @:extern // Inline even in debug builds
-    inline public function _internal_getComponentTyped<A:Component> (name :String, cl :Class<A>) :A
+    inline public function _internal_unsafeCast<A:Component> (component :Component, cl :Class<A>) :A
     {
-        return cast getComponent(name);
+        return cast component;
+    }
+#end
+
+#if macro
+    // Gets the ClassType from an expression, or aborts if it's not a component class
+    private static function requireComponentType (componentClass :Expr) :ClassType
+    {
+        var path = getClassName(componentClass);
+        if (path != null) {
+            var type = Context.getType(path.join("."));
+            switch (type) {
+            case TInst(ref,_):
+                var cl = ref.get();
+                if (Context.unify(type, Context.getType("flambe.Component")) && cl.superClass != null) {
+                    return cl;
+                }
+            default:
+            }
+        }
+
+        Context.error("Expected a class that extends Component, got " + componentClass.toString(),
+            componentClass.pos);
+        return null;
+    }
+
+    // Gets a class name from a given expression
+    private static function getClassName<A> (componentClass :Expr) :Array<String>
+    {
+        switch (componentClass.expr) {
+        case EConst(CIdent(name)):
+            return [name];
+        case EField(expr, name):
+            var path = getClassName(expr);
+            if (path != null) {
+                path.push(name);
+            }
+            return path;
+        default:
+            return null;
+        }
+    }
+
+    private static function needSafeCast (componentClass :ClassType) :Bool
+    {
+        return !componentClass.superClass.t.get().meta.has(":componentBase");
     }
 #end
 

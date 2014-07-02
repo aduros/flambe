@@ -17,9 +17,11 @@ class Component
     implements Disposable
 {
     /** The entity this component is attached to, or null. */
+    @:allow(flambe)
     public var owner (default, null) :Entity;
 
     /** The owner's next component, for iteration. */
+    @:allow(flambe)
     public var next (default, null) :Component;
 
     /**
@@ -63,16 +65,5 @@ class Component
     private function get_name () :String
     {
         return null; // Subclasses will automagically implement this
-    }
-
-    @:allow(flambe) function init (owner :Entity, next :Component)
-    {
-        this.owner = owner;
-        this.next = next;
-    }
-
-    @:allow(flambe) inline function setNext (next :Component)
-    {
-        this.next = next;
     }
 }

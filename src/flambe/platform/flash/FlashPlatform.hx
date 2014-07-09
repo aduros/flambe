@@ -101,7 +101,11 @@ class FlashPlatform
 
     public function loadAssetPack (manifest :Manifest) :Promise<AssetPack>
     {
-        return new FlashAssetPackLoader(this, manifest).promise;
+        #if embed_assets
+            return new FlashEmbeddedAssetPackLoader(this, manifest).promise;
+        #else
+            return new FlashAssetPackLoader(this, manifest).promise;
+        #end
     }
 
     public function getStage () :StageSystem

@@ -23,6 +23,12 @@ default_platform: flash
 orientation: portrait
 fullscreen: true
 
+# Whether to embed assets in to SWF's. If not, assets will be loaded over HTTP.
+embed_assets: false
+
+width: 640
+height: 480
+
 # Additional flags to pass to the Haxe compiler.
 # haxe_flags: -lib nape -D foobar
 

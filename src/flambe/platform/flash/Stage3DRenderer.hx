@@ -10,6 +10,7 @@ import flash.display.Stage3D;
 import flash.events.ErrorEvent;
 import flash.events.Event;
 import flash.Lib;
+import hxsl.Shader;
 
 import haxe.io.Bytes;
 
@@ -36,11 +37,19 @@ class Stage3DRenderer
     * Used to indicate whether a Context3D has been created yet, as this is the only asynchronous point of Flash init
     */
     public var promise : Promise<Bool>;
+	
+	#if stage3d_handle_context_loss
+	private var rootToData:Map<Stage3DTextureRoot, BitmapData>;
+	#end
 
     public function new ()
     {
         _hasGPU = new Value<Bool>(false);
         promise = new Promise<Bool>();
+		#if stage3d_handle_context_loss
+		rootToData = new Map();
+		_hasGPU.changed.connect(handleContextLoss, true);
+		#end
 
         // Use the first available Stage3D
         var stage = Lib.current.stage;
@@ -62,6 +71,23 @@ class Stage3DRenderer
         }
         Log.error("No free Stage3Ds available!");
     }
+	
+	public function canRender():Bool {
+		return _context3D != null && _context3D.driverInfo != "Disposed";
+	}
+	
+	#if stage3d_handle_context_loss
+	function handleContextLoss(has:Bool, didHave:Bool):Void {
+		trace("has: " + has + " hasresult: " + promise.hasResult);
+		if (has && promise.hasResult) {//context was created and it's not the first context
+			Log.info("Stage3D GPU context was lost, reuploading textures");
+			for (root in rootToData.keys()) {
+				root.init(_context3D, false);
+				root.uploadBitmapData(rootToData.get(root));
+			}
+		}
+	}
+	#end
 
     inline private function get_type () :RendererType
     {
@@ -83,9 +109,12 @@ class Stage3DRenderer
         if (_context3D == null) {
             return null; // No Stage3D context yet
         }
-
+		
         var bitmapData :BitmapData = cast bitmapData;
         var root = new Stage3DTextureRoot(this, bitmapData.width, bitmapData.height);
+		#if stage3d_handle_context_loss
+			rootToData.set(root, bitmapData.clone());
+		#end
         root.init(_context3D, false);
         root.uploadBitmapData(bitmapData);
         return root.createTexture(bitmapData.width, bitmapData.height);
@@ -149,6 +178,7 @@ class Stage3DRenderer
         onResize(null);
 
         // Signal that the GPU context was (re)created
+		ShaderGlobals.disposeAll(true);
         hasGPU._ = false;
         hasGPU._ = true;
 

@@ -130,6 +130,8 @@ class CanvasGraphics
         switch (blendMode) {
             case Normal: op = "source-over";
             case Add: op = "lighter";
+            case Multiply: op = "multiply";
+            case Screen: op = "screen";
             case Mask: op = "destination-in";
             case Copy: op = "copy";
         };

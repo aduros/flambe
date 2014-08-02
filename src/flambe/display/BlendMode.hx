@@ -26,6 +26,20 @@ enum BlendMode
     Add;
 
     /**
+     * Multiplies the source and destination colors, darkening the final image.
+     *
+     * <img src="https://aduros.com/flambe/images/BlendMode-Multiply.png">
+     */
+    Multiply;
+
+    /**
+     * Inverts and multiplies the source and destination colors, lightening the final image.
+     *
+     * <img src="https://aduros.com/flambe/images/BlendMode-Screen.png">
+     */
+    Screen;
+
+    /**
      * Masks the overlapping area by applying the source alpha to the destination image.
      *
      * __WARNING__: In HTML5 canvas, this blend mode is unbounded. It will clear the entire

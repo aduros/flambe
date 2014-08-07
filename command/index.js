@@ -346,15 +346,20 @@ exports.build = function (config, platforms, opts) {
         console.log("Building: " + apk);
 
         var swf = "main-android.swf";
-        var cert = CACHE_DIR+"air/certificate-android.p12";
         var xml = CACHE_DIR+"air/config-android.xml";
+
+        var cert = "certs/android.p12";
+        var password = get(config, "android password", "password");
 
         return buildAir(["-D", "android", "-swf", CACHE_DIR+"air/"+swf])
         .then(function () {
-            // Generate a dummy certificate if it doesn't exist
             if (!fs.existsSync(cert)) {
-                return adt(["-certificate", "-cn", "SelfSign", "-validityPeriod", "25", "2048-RSA",
-                    cert, "password"]);
+                // Generate a dummy certificate if it doesn't exist
+                cert = CACHE_DIR+"air/certificate-android.p12";
+                if (!fs.existsSync(cert)) {
+                    return adt(["-certificate", "-cn", "SelfSign", "-validityPeriod", "25",
+                        "2048-RSA", cert, password]);
+                }
             }
         })
         .then(function () {
@@ -367,8 +372,8 @@ exports.build = function (config, platforms, opts) {
             } else {
                 androidFlags.push("-target", "apk-captive-runtime");
             }
-            androidFlags.push("-storetype", "pkcs12", "-keystore", cert, "-storepass", "password",
-                apk, xml);
+            androidFlags.push("-storetype", "pkcs12", "-keystore", cert,
+                "-storepass", password, apk, xml);
             androidFlags = androidFlags.concat(pathOptions);
             androidFlags.push("-C", CACHE_DIR+"air", swf, "assets");
             if (fs.existsSync("android")) {
@@ -399,7 +404,8 @@ exports.build = function (config, platforms, opts) {
                 iosFlags.push("-target", "ipa-ad-hoc");
             }
             // TODO(bruno): Make these cert options configurable
-            iosFlags.push("-storetype", "pkcs12", "-keystore", cert, "-storepass", "password",
+            iosFlags.push("-storetype", "pkcs12", "-keystore", cert,
+                "-storepass", get(config, "ios password", "password"),
                 "-provisioning-profile", mobileProvision, ipa, xml);
             iosFlags = iosFlags.concat(pathOptions);
             iosFlags.push("-C", CACHE_DIR+"air", swf, "assets");

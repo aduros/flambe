@@ -88,6 +88,11 @@ private class MixerSound
 
         var playback = loop ? _source.loop(volume, offset, duration) : _source.play(volume, offset, duration);
 		_playbacks[channel] = playback;
+		
+		playback.complete.changed.connect(function(a, b) {
+			_playbacks[channel] = null;
+		}).once();
+		
         return playback;
     }
 

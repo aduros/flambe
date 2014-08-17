@@ -68,17 +68,17 @@ private class MixerSound
         _playbacks = [];
     }
 
-    public function play (volume :Float = 1.0) :Playback
+    public function play (volume :Float = 1.0, ?offset:Float=0, ?duration:Float=0) :Playback
     {
-        return playOrLoop(volume, false);
+        return playOrLoop(volume, false, offset, duration);
     }
 
-    public function loop (volume :Float = 1.0) :Playback
+    public function loop (volume :Float = 1.0, ?offset:Float=0, ?duration:Float=0) :Playback
     {
-        return playOrLoop(volume, true);
+        return playOrLoop(volume, true, offset, duration);
     }
 
-    private function playOrLoop (volume :Float, loop :Bool) :Playback
+    private function playOrLoop (volume :Float, loop :Bool, offset:Float, duration:Float) :Playback
     {
         var channel = findOpenChannel();
         if (channel < 0) {
@@ -86,8 +86,8 @@ private class MixerSound
             return new DummyPlayback(this);
         }
 
-        var playback = loop ? _source.loop(volume) : _source.play(volume);
-        _playbacks[channel] = playback;
+        var playback = loop ? _source.loop(volume, offset, duration) : _source.play(volume, offset, duration);
+		_playbacks[channel] = playback;
         return playback;
     }
 

@@ -24,7 +24,7 @@ interface Sound extends Asset
      * @param duration Duration (seconds) to play. Set to zero (default) to play up to the duration of the sound.
      * @returns A playback that can be used to control the sound.
      */
-    function play (volume :Float = 1.0, offset:Float=0, duration:Float=0) :Playback;
+    function play (volume :Float = 1.0, ?offset:Float=0, ?duration:Float=0) :Playback;
 	
     /**
      * Loops the sound forever, suitable for background music.
@@ -34,5 +34,5 @@ interface Sound extends Asset
      * @param duration Duration (seconds) of the loop. Set to zero (default) to play up to the duration of the sound.
      * @returns A playback that can be used to control the sound.
      */
-    function loop (volume :Float = 1.0, offset:Float=0, duration:Float=0) :Playback;
+    function loop (volume :Float = 1.0, ?offset:Float=0, ?duration:Float=0) :Playback;
 }

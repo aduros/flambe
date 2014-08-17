@@ -110,9 +110,8 @@ class WebAudioSound extends BasicAsset<WebAudioSound>
     public static function start (node:AudioBufferSourceNode, time :Float, offset:Float=0, duration:Float=0)
     {
         // Fall back to noteOn used in iOS Safari
-        if (node.start == null) untyped node.start = node.noteOn ;
-		node.start(time, offset, duration);
-       
+        if (node.start == null) (untyped node.noteOn(time, offset, duration));
+		else node.start(time, offset, duration);
     }
 
     private static var _detectSupport = true;

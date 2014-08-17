@@ -5,7 +5,10 @@
 package flambe.platform.html;
 
 import js.Browser;
+import js.html.AudioElement;
+import js.html.MediaElement;
 
+import flambe.math.FMath;
 import flambe.animation.AnimatedFloat;
 import flambe.platform.Tickable;
 import flambe.sound.Playback;
@@ -17,26 +20,26 @@ class HtmlSound extends BasicAsset<HtmlSound>
     implements Sound
 {
     public var duration (get, null) :Float;
-    public var audioElement :Dynamic; // TODO(bruno): Use typed audio element extern
-
-    public function new (audioElement :Dynamic)
+    public var audioElement :AudioElement; // TODO(bruno): Use typed audio element extern
+	
+    public function new (audioElement :AudioElement)
     {
         super();
         this.audioElement = audioElement;
     }
 
-    public function play (volume :Float = 1.0) :Playback
+    public function play (volume :Float = 1.0, offset:Float=0, duration:Float=0) :Playback
     {
         assertNotDisposed();
 
-        return new HtmlPlayback(this, volume, false);
+        return new HtmlPlayback(this, volume, false, offset, duration);
     }
 
-    public function loop (volume :Float = 1.0) :Playback
+    public function loop (volume :Float = 1.0, offset:Float=0, duration:Float=0) :Playback
     {
         assertNotDisposed();
 
-        return new HtmlPlayback(this, volume, true);
+        return new HtmlPlayback(this, volume, true, offset, duration);
     }
 
     public function get_duration () :Float
@@ -66,21 +69,29 @@ private class HtmlPlayback
     public var complete (get, null) :Value<Bool>;
     public var position (get, null) :Float;
     public var sound (get, null) :Sound;
-
-    public function new (sound :HtmlSound, volume :Float, loop :Bool)
+	
+    public function new (sound :HtmlSound, volume :Float, loop :Bool, offset:Float=0, duration:Float=0)
     {
         _sound = sound;
+		_loop = loop;		
+		
+		_playOffset 	= FMath.clamp(offset, .0, sound.duration);
+		_playDuration 	= FMath.max(.0, FMath.min(duration, sound.duration));
+		
+		if(_playDuration==.0 && !_loop) _playDuration = sound.duration - _playOffset;	
+		
+		_waitingToSeek = _playOffset > 0;
         _tickableAdded = false;
 
         // Create a copy of the original sound's element. Note that cloneNode() doesn't work in IE
         _clonedElement = Browser.document.createAudioElement();
-        _clonedElement.loop = loop;
+        _clonedElement.loop = _loop && (offset==0&&duration==0); // only use the .loop property for looping if offset + duration were not set.
         _clonedElement.src = sound.audioElement.src;
-
+		
         this.volume = new AnimatedFloat(volume, function (_,_) updateVolume());
         updateVolume();
         _complete = new Value<Bool>(false);
-
+		
         playAudio();
 
         // Don't start playing until visible
@@ -120,11 +131,22 @@ private class HtmlPlayback
     {
         return _clonedElement.currentTime;
     }
-
+	
     public function update (dt :Float) :Bool
     {
         volume.update(dt);
         _complete._ = _clonedElement.ended;
+		
+		
+		if (_waitingToSeek) {
+			if (canSeekToOffset()) {
+				_waitingToSeek = false;
+				_clonedElement.currentTime = _playOffset;
+				paused = false;
+			} else {
+				return false;
+			}
+		}
 
         if (_complete._ || paused) {
             // Allow complete or paused sounds to be garbage collected
@@ -133,18 +155,50 @@ private class HtmlPlayback
             // Release System references
             _volumeBinding.dispose();
             _hideBinding.dispose();
-
+			
             return true;
-        }
+			
+        } else {
+			
+			var now = _clonedElement.currentTime;
+			var end = _playOffset + _playDuration;
+			
+			 if (_loop && !_clonedElement.loop) {
+				// want to loop, but a custom start/end range is specified
+				if (now >= end) _clonedElement.currentTime = _playOffset;
+				
+			} else if(!_loop && _playDuration > 0) {
+				// no loop, but have duration option - and are at or past the end time?
+				if (now >= end) {
+					_complete._ = true;
+					dispose();	
+				}
+			}
+		}
+		
         return false;
     }
 
     public function dispose ()
     {
-        paused = true;
-        _complete._ = true;
+        HtmlPlatform.instance.mainLoop.removeTickable(this);
+        _tickableAdded = false;
+		paused = true;
+		_waitingToSeek = false;
+        _complete = null;
+		_clonedElement = null;
+		_sound = null;
+		// Release System references
+		if (_volumeBinding != null) {
+			_volumeBinding.dispose();
+			_volumeBinding = null;
+		}
+		if (_hideBinding != null) {
+			_hideBinding.dispose();
+			_hideBinding = null;
+		}
     }
-
+	
     private function playAudio ()
     {
         #if flambe_html_audio_fix
@@ -162,7 +216,17 @@ private class HtmlPlayback
         #end
 
         _clonedElement.play();
-
+		
+		if (_playOffset > 0) {
+			if (canSeekToOffset()) {
+				_waitingToSeek = false;
+				_clonedElement.currentTime = _playOffset;
+			} else {
+				_waitingToSeek = true;
+				if(!get_paused()) paused = true;
+			}
+		}		
+		
         if (!_tickableAdded) {
             HtmlPlatform.instance.mainLoop.addTickable(this);
             _tickableAdded = true;
@@ -179,6 +243,26 @@ private class HtmlPlayback
             });
         }
     }
+	
+	function canSeekToOffset():Bool {	
+			
+		//  Will throw a DOM Exception: INVALID_STATE_ERR if you try to set currentTime before it's 'ready'... so wait a bit. probably just a tick or two
+		// trace("canSeek ? " + _clonedElement.readyState);
+		
+		if (_clonedElement.readyState >= MediaElement.HAVE_METADATA) {
+			var n = _clonedElement.seekable.length;
+			var seekable = _clonedElement.seekable;
+			for (i in 0...n) {
+				var start 	= seekable.start(i);
+				var end 	= seekable.end(i);
+				if (start <= _playOffset && _playOffset < end) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 
     private function updateVolume ()
     {
@@ -186,11 +270,17 @@ private class HtmlPlayback
     }
 
     private var _sound :HtmlSound;
-    private var _clonedElement :Dynamic;
+    private var _clonedElement :AudioElement;
     private var _volumeBinding :Disposable;
     private var _tickableAdded :Bool;
     private var _hideBinding :Disposable;
     private var _wasPaused :Bool;
 
     private var _complete :Value<Bool>;
+	
+	var _loop:Bool = false;
+	var _playOffset:Float = 0;
+	var _playDuration:Float = 0;
+	var _waitingToSeek = false;
+	
 }

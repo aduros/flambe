@@ -6,6 +6,7 @@ package flambe.platform.html;
 
 import js.Browser;
 import js.html.*;
+import js.html.audio.*;
 
 import haxe.Http;
 
@@ -79,15 +80,18 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
             // If we made it this far, we definitely support audio and can play this asset
             if (WebAudioSound.supported) {
                 downloadArrayBuffer(url, entry, function (buffer) {
-                    WebAudioSound.ctx.decodeAudioData(buffer, function (decoded) {
+					//decodeAudioData(audioData:ArrayBuffer, successCallback:AudioBufferCallback, ?errorCallback:AudioBufferCallback)
+                    WebAudioSound.ctx.decodeAudioData(buffer, function(decoded:AudioBuffer) {
                         handleLoad(entry, new WebAudioSound(decoded));
-                    }, function () {
+						return true;
+                    }, function (error:AudioBuffer) {
                         // Happens in iOS 6 beta for some sounds that should be able to play. It
                         // seems that monochannel audio will always fail, try converting to stereo.
                         // Since this happens unpredictably, continue with a DummySound rather than
                         // rejecting the entire asset pack.
                         Log.warn("Couldn't decode Web Audio, ignoring this asset", ["url", url]);
                         handleLoad(entry, DummySound.getInstance());
+						return false;
                     });
                 });
 

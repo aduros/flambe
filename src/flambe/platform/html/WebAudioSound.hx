@@ -4,8 +4,6 @@
 
 package flambe.platform.html;
 
-import js.html.audio.*;
-
 import flambe.animation.AnimatedFloat;
 import flambe.platform.Tickable;
 import flambe.sound.Playback;
@@ -21,18 +19,18 @@ class WebAudioSound extends BasicAsset<WebAudioSound>
     /**
      * The shared AudioContext.
      */
-    public static var ctx :AudioContext = null;
+    public static var ctx :Dynamic = null;
 
     /**
      * The shared gain node for global system volume.
      */
-    public static var gain :GainNode;
+    public static var gain :Dynamic;
 
     public var duration (get, null) :Float;
 
-    public var buffer :AudioBuffer;
+    public var buffer :Dynamic;
 
-    public function new (buffer :AudioBuffer)
+    public function new (buffer :Dynamic)
     {
         super();
         this.buffer = buffer;
@@ -89,7 +87,7 @@ class WebAudioSound extends BasicAsset<WebAudioSound>
         return ctx != null;
     }
 
-    public static function createGain () :GainNode
+    public static function createGain () :Dynamic
     {
         // Fall back to createGainNode used in iOS Safari
         // https://developer.mozilla.org/en-US/docs/Web_Audio_API/Porting_webkitAudioContext_code_to_standards_based_AudioContext
@@ -107,7 +105,7 @@ class WebAudioSound extends BasicAsset<WebAudioSound>
 	}
 	
 
-    public static function start (node:AudioBufferSourceNode, time :Float, offset:Float=0, duration:Float=0)
+    public static function start (node:Dynamic, time :Float, offset:Float=0, duration:Float=0)
     {
         // Fall back to noteOn used in iOS Safari
         if (node.start == null) (untyped node.noteOn(time, offset, duration));
@@ -224,7 +222,7 @@ private class WebAudioPlayback
         }
 		
         // playbackState is used in old browsers that don't support onended (iOS)
-        if (_sourceNode.playbackState == AudioBufferSourceNode.FINISHED_STATE) {
+        if (_sourceNode.playbackState == 3) {
             _complete._ = true;
 			dispose();
         }
@@ -261,7 +259,7 @@ private class WebAudioPlayback
         _gainNode.gain.value = volume;
     }
 
-    private function insertNode (head : AudioNode)
+    private function insertNode (head : Dynamic)
     {
         if (!paused) {
             _sourceNode.disconnect();
@@ -299,11 +297,11 @@ private class WebAudioPlayback
     private var _startedAt :Float;
     private var _wasPaused :Bool;
 
-    private var _sourceNode :AudioBufferSourceNode;
-    private var _gainNode :GainNode;
+    private var _sourceNode :Dynamic;
+    private var _gainNode :Dynamic;
 
     // The first node of the output chain, not including the source node
-    private var _head :AudioNode;
+    private var _head :Dynamic;
 
     private var _hideBinding :Disposable;
     private var _tickableAdded :Bool;

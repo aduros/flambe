@@ -5,8 +5,6 @@
 package flambe.platform.html;
 
 import js.Browser;
-import js.html.AudioElement;
-import js.html.MediaElement;
 
 import flambe.math.FMath;
 import flambe.animation.AnimatedFloat;
@@ -20,9 +18,9 @@ class HtmlSound extends BasicAsset<HtmlSound>
     implements Sound
 {
     public var duration (get, null) :Float;
-    public var audioElement :AudioElement; // TODO(bruno): Use typed audio element extern
+    public var audioElement :Dynamic; // TODO(bruno): Use typed audio element extern
 	
-    public function new (audioElement :AudioElement)
+    public function new (audioElement :Dynamic)
     {
         super();
         this.audioElement = audioElement;
@@ -249,7 +247,7 @@ private class HtmlPlayback
 		//  Will throw a DOM Exception: INVALID_STATE_ERR if you try to set currentTime before it's 'ready'... so wait a bit. probably just a tick or two
 		// trace("canSeek ? " + _clonedElement.readyState);
 		
-		if (_clonedElement.readyState >= MediaElement.HAVE_METADATA) {
+		if (_clonedElement.readyState >= 1/*MediaElement.HAVE_METADATA*/) {
 			var n = _clonedElement.seekable.length;
 			var seekable = _clonedElement.seekable;
 			for (i in 0...n) {
@@ -270,7 +268,7 @@ private class HtmlPlayback
     }
 
     private var _sound :HtmlSound;
-    private var _clonedElement :AudioElement;
+    private var _clonedElement :Dynamic;
     private var _volumeBinding :Disposable;
     private var _tickableAdded :Bool;
     private var _hideBinding :Disposable;

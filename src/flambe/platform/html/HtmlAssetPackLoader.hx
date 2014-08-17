@@ -6,7 +6,6 @@ package flambe.platform.html;
 
 import js.Browser;
 import js.html.*;
-import js.html.audio.*;
 
 import haxe.Http;
 
@@ -81,10 +80,10 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
             if (WebAudioSound.supported) {
                 downloadArrayBuffer(url, entry, function (buffer) {
 					//decodeAudioData(audioData:ArrayBuffer, successCallback:AudioBufferCallback, ?errorCallback:AudioBufferCallback)
-                    WebAudioSound.ctx.decodeAudioData(buffer, function(decoded:AudioBuffer) {
+                    WebAudioSound.ctx.decodeAudioData(buffer, function(decoded:Dynamic) {
                         handleLoad(entry, new WebAudioSound(decoded));
 						return true;
-                    }, function (error:AudioBuffer) {
+                    }, function (error:Dynamic) {
                         // Happens in iOS 6 beta for some sounds that should be able to play. It
                         // seems that monochannel audio will always fail, try converting to stereo.
                         // Since this happens unpredictably, continue with a DummySound rather than

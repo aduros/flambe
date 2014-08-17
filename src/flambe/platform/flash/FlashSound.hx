@@ -28,7 +28,7 @@ class FlashSound extends BasicAsset<FlashSound>
         this.nativeSound = nativeSound;
     }
 
-    public function play (volume :Float = 1.0, offset:Float=0, duration:Float=0) :Playback
+    public function play (volume :Float = 1.0, ?offset:Float=0, ?duration:Float=0) :Playback
     {
         assertNotDisposed();
 
@@ -42,7 +42,7 @@ class FlashSound extends BasicAsset<FlashSound>
         return new FlashPlayback(this, volume, false, offset, duration);
     }
 
-    public function loop (volume :Float = 1.0, offset:Float=0, duration:Float=0) :Playback
+    public function loop (volume :Float = 1.0, ?offset:Float=0, ?duration:Float=0) :Playback
     {
         assertNotDisposed();
 

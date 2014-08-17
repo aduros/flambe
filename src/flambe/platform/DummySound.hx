@@ -23,12 +23,12 @@ class DummySound extends BasicAsset<DummySound>
         _playback = new DummyPlayback(this);
     }
 
-    public function play (volume :Float = 1.0, offset:Float=0, duration:Float=0) :Playback
+    public function play (volume :Float = 1.0, ?offset:Float=0, ?duration:Float=-1) :Playback
     {
         return _playback;
     }
 
-    public function loop (volume :Float = 1.0, offset:Float=0, duration:Float=0) :Playback
+    public function loop (volume :Float = 1.0, ?offset:Float=0, ?duration:Float=-1) :Playback
     {
         return _playback;
     }

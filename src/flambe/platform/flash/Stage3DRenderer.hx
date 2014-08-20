@@ -196,7 +196,7 @@ class Stage3DRenderer
 
     private function onResize (_)
     {
-        if (graphics != null) {
+        if (graphics != null && canRender()) {
             var stage = Lib.current.stage;
             batcher.resizeBackbuffer(stage.stageWidth, stage.stageHeight);
             graphics.onResize(stage.stageWidth, stage.stageHeight);

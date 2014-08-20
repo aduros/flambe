@@ -122,6 +122,9 @@ class FlashStage
 
     private function onResize (_)
     {
+		#if flash
+		if (!FlashPlatform.instance.getRenderer().canRender()) return;
+		#end
         resize.emit();
     }
 

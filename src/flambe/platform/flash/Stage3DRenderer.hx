@@ -38,18 +38,18 @@ class Stage3DRenderer
     */
     public var promise : Promise<Bool>;
 	
-	#if stage3d_handle_context_loss
+#if stage3d_handle_context_loss
 	private var rootToData:Map<Stage3DTextureRoot, BitmapData>;
-	#end
+#end
 
     public function new ()
     {
         _hasGPU = new Value<Bool>(false);
         promise = new Promise<Bool>();
-		#if stage3d_handle_context_loss
+#if stage3d_handle_context_loss
 		rootToData = new Map();
 		_hasGPU.changed.connect(handleContextLoss, true);
-		#end
+#end
 
         // Use the first available Stage3D
         var stage = Lib.current.stage;
@@ -76,9 +76,9 @@ class Stage3DRenderer
 		return _context3D != null && _context3D.driverInfo != "Disposed";
 	}
 	
-	#if stage3d_handle_context_loss
-	function handleContextLoss(has:Bool, didHave:Bool):Void {
-		trace("has: " + has + " hasresult: " + promise.hasResult);
+#if stage3d_handle_context_loss
+	function handleContextLoss(has:Bool, didHave:Bool) :Void
+	{
 		if (has && promise.hasResult) {//context was created and it's not the first context
 			Log.info("Stage3D GPU context was lost, reuploading textures");
 			for (root in rootToData.keys()) {
@@ -87,7 +87,7 @@ class Stage3DRenderer
 			}
 		}
 	}
-	#end
+#end
 
     inline private function get_type () :RendererType
     {
@@ -112,9 +112,9 @@ class Stage3DRenderer
 		
         var bitmapData :BitmapData = cast bitmapData;
         var root = new Stage3DTextureRoot(this, bitmapData.width, bitmapData.height);
-		#if stage3d_handle_context_loss
-			rootToData.set(root, bitmapData.clone());
-		#end
+#if stage3d_handle_context_loss
+		rootToData.set(root, bitmapData.clone());
+#end
         root.init(_context3D, false);
         root.uploadBitmapData(bitmapData);
         return root.createTexture(bitmapData.width, bitmapData.height);

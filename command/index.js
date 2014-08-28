@@ -403,10 +403,11 @@ exports.build = function (config, platforms, opts) {
             } else {
                 iosFlags.push("-target", "ipa-ad-hoc");
             }
-            // TODO(bruno): Make these cert options configurable
             iosFlags.push("-storetype", "pkcs12", "-keystore", cert,
                 "-storepass", get(config, "ios password", "password"),
-                "-provisioning-profile", mobileProvision, ipa, xml);
+                "-provisioning-profile", mobileProvision,
+                "-useLegacyAOT", "yes", // https://github.com/ncannasse/hxsl/issues/32
+                ipa, xml);
             iosFlags = iosFlags.concat(pathOptions);
             iosFlags.push("-C", CACHE_DIR+"air", swf, "assets");
             if (fs.existsSync("ios")) {

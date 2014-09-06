@@ -1,9 +1,17 @@
-#!/bin/bash -e
+#!/bin/sh
 #
 # Runs continuous integration tests, used by travis-ci.org
 
+set -e
+
 # Kill child processes on exit
-trap "kill 0" SIGINT SIGTERM EXIT
+cleanup() {
+    local status="$?"
+    local pids=$(jobs -p)
+    [ -n "$pids" ] && kill $pids
+    exit "$status"
+}
+trap "cleanup" INT TERM EXIT
 
 FLAMBE_ROOT=`readlink -f $(dirname $0)/..`
 FLAMBE_SPACE="/tmp/flambe space"
@@ -33,10 +41,10 @@ flambe-demos/bin/build-all --debug
 
 # Run the Selenium tests if the Sauce auth key is available (not in pull requests), and only run on
 # one of the build workers
-if [[ "$TRAVIS_REPO_SLUG" == "aduros/flambe" && "$TRAVIS_SECURE_ENV_VARS" == "true" && "$TRAVIS_JOB_NUMBER" == *.1 ]]; then
+if [ "$TRAVIS_REPO_SLUG" = "aduros/flambe" ] && [ "$TRAVIS_SECURE_ENV_VARS" == "true" ] && [ "$TRAVIS_JOB_NUMBER" != "${TRAVIS_JOB_NUMBER/\.1/}" ]; then
     # Download and start Sauce Connect
     mkdir -p /tmp/sauce
-    pushd /tmp/sauce
+    cd /tmp/sauce
     curl "http://saucelabs.com/downloads/Sauce-Connect-latest.zip" > connect.zip
     unzip connect.zip
 
@@ -49,22 +57,22 @@ if [[ "$TRAVIS_REPO_SLUG" == "aduros/flambe" && "$TRAVIS_SECURE_ENV_VARS" == "tr
     while [ ! -f "connect-ready" ]; do
         sleep 0.5
     done
-    popd
+    cd -
 
     echo "Building game to run on Sauce..."
-    pushd tests/selenium
+    cd tests/selenium
     flambe build html --debug
-    popd
+    cd -
 
     # Serve the integration test app to be proxied over Connect
     echo "Starting web server..."
-    pushd tests/selenium/build/web
+    cd tests/selenium/build/web
     python -m SimpleHTTPServer 5000 &> /dev/null &
-    popd
+    cd -
 
     echo "Running integration tests..."
-    pushd tests/selenium
+    cd tests/selenium
     sudo pip install selenium nose --use-mirrors
     nosetests --processes=3 --process-timeout=600 -v driver.py
-    popd
+    cd -
 fi

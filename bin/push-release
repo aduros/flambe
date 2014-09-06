@@ -9,7 +9,7 @@ fi
 
 if ! git diff-index --quiet HEAD --; then
     echo "You have uncommitted changes"
-    # exit 1
+    exit 1
 fi
 
 VERSION=$1
@@ -42,7 +42,7 @@ read -p "Submit Flambe $VERSION to haxelib [Y/n]? " CONFIRM
 case "$CONFIRM" in
     "Y" | "y" | "")
         # Upload the demos
-        # $DEMOS_ROOT/bin/upload-all
+        $DEMOS_ROOT/bin/upload-all
 
         # Upload the NPM module
         npm publish ./command --force

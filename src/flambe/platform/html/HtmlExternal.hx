@@ -29,7 +29,7 @@ class HtmlExternal
         }
 
         var object = Browser.window;
-        var method = object;
+        var method :Dynamic = object;
         for (fieldName in name.split(".")) {
             object = method;
             method = Reflect.field(object, fieldName);

@@ -40,6 +40,8 @@ android:
     <manifest android:installLocation="auto">
       <uses-permission android:name="android.permission.INTERNET" />
     </manifest>
+  # The signing password for certs/android.p12
+  password: password
 
 # iOS-specific configuration.
 ios:
@@ -52,6 +54,8 @@ ios:
     </array>
     <key>UIPrerenderedIcon</key>
     <true/>
+  # The signing password for certs/ios-development.p12
+  password: password
 
 # Firefox App-specific configuration.
 firefox:

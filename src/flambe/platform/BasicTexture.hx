@@ -86,7 +86,9 @@ class BasicTexture<R:(TextureRoot,BasicAsset<R>)> extends BasicAsset<BasicTextur
 
     override private function copyFrom (that :BasicTexture<R>)
     {
+        this.root._disposed = false;
         this.root.copyFrom(that.root);
+
         this._width = that._width;
         this._height = that._height;
 

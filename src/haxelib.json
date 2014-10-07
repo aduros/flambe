@@ -4,7 +4,7 @@
   ],
   "dependencies": {
     "air3": "",
-    "hxsl": "2.0.3"
+    "hxsl": "2.0.5"
   },
   "description": "Flambe is a fast, expressive, and cross-platform engine for HTML5 and Flash games.",
   "license": "MIT",
@@ -22,5 +22,5 @@
     "nodejs"
   ],
   "url": "https://github.com/aduros/flambe",
-  "version": "4.0.0"
+  "version": "4.1.0"
 }

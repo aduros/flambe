@@ -302,7 +302,7 @@ class Sprite extends Component
         if (_flags.contains(LOCAL_MATRIX_DIRTY)) {
             _flags = _flags.remove(LOCAL_MATRIX_DIRTY);
 
-            if(_flags.contains(ROTATION_DIRTY)) {            
+            if(_flags.contains(ROTATION_DIRTY)) {
                 _flags = _flags.remove(ROTATION_DIRTY);
                 var rotation :Float = FMath.toRadians(this.rotation._);
                 _sinCache = Math.sin(rotation);

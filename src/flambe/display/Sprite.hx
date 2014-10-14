@@ -301,19 +301,17 @@ class Sprite extends Component
     {
         if (_flags.contains(LOCAL_MATRIX_DIRTY)) {
             _flags = _flags.remove(LOCAL_MATRIX_DIRTY);
-            var rotation :Float = this.rotation._;
-            var x :Float = this.x._;
-            var y :Float = this.y._;
-            var scaleX :Float = this.scaleX._;
-            var scaleY :Float = this.scaleY._;
 
             if(_flags.contains(ROTATION_DIRTY)) {            
                 _flags = _flags.remove(ROTATION_DIRTY);
+                var rotation :Float = this.rotation._;
                 _sinCache = Math.sin(rotation);
                 _cosCache = Math.cos(rotation);
             }
 
-            _localMatrix.set(_cosCache*scaleX, _sinCache*scaleX, -_sinCache*scaleY, _cosCache*scaleY, x, y);
+            var scaleX :Float = this.scaleX._;
+            var scaleY :Float = this.scaleY._;
+            _localMatrix.set(_cosCache*scaleX, _sinCache*scaleX, -_sinCache*scaleY, _cosCache*scaleY, x._, y._);
             _localMatrix.translate(-anchorX._, -anchorY._);
         }
         return _localMatrix;

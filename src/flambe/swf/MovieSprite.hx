@@ -333,8 +333,10 @@ private class LayerAnimator
 
     public function setPixelSnapping (pixelSnapping :Bool) :Void
     {
-        for (sprite in _sprites) {
-            sprite.pixelSnapping = pixelSnapping;
+        if (_sprites != null) {        
+            for (sprite in _sprites) {
+                sprite.pixelSnapping = pixelSnapping;
+            }
         }
     }
 

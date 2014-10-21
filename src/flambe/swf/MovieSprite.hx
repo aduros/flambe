@@ -321,8 +321,16 @@ private class LayerAnimator
 
         // From an identity matrix, append the translation, skew, and scale
         var matrix = sprite.getLocalMatrix();
-        var sinX = Math.sin(skewX), cosX = Math.cos(skewX);
-        var sinY = Math.sin(skewY), cosY = Math.cos(skewY);
+        var sinX = 0.0, cosX = 1.0;
+        var sinY = 0.0, cosY = 1.0;
+        if (skewX != 0) {
+            sinX = Math.sin(skewX);
+            cosX = Math.cos(skewX);
+        }
+        if (skewY != 0) {
+            sinY = Math.sin(skewY);
+            cosY = Math.cos(skewY);
+        }
         matrix.set(cosY*scaleX, sinY*scaleX, -sinX*scaleY, cosX*scaleY, x, y);
 
         // Append the pivot

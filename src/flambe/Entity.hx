@@ -245,6 +245,71 @@ using flambe.util.BitSets;
         return this;
     }
 
+	public function insertChild(toInsert :Entity, pos:Int, after :Bool=true):Entity
+	{
+		//if this entity doesn't have any children just add like normal
+		if (this.firstChild == null)
+		{
+			return addChild(toInsert, false); 
+		}
+		
+		//if we are inserting into the beginning of the list and trying to 
+		//insert before just use the addChild function with append=false
+		if(!after) 
+		{
+			if (pos == 0) 
+			{ 
+				return addChild(toInsert, false); 
+			}
+		}
+		
+		var prev:Entity = null;
+		var cur:Entity = this.firstChild;
+		var next:Entity = this.firstChild.next;
+		
+		//find the position of the node in the list
+		var idx:Int = 0;
+		while (cur != null && idx != pos)
+		{
+			prev = cur;
+			cur = cur.next;
+			if (cur != null)
+			{
+				next = cur.next;
+			}
+			idx++;
+		}
+		
+		//now that we have the position we can decide where to insert it
+		if (cur != null)
+		{
+			//make sure we clean up this entities parent if it has one
+			if (toInsert.parent != null) 
+			{
+				toInsert.parent.removeChild(toInsert);
+			}
+			toInsert.parent = this;
+			
+			if (after)//inserting after the current node
+			{
+				cur.next = toInsert;
+				toInsert.next = next;
+			}
+			else //inserting before the current node
+			{
+				prev.next = toInsert;
+				toInsert.next = cur;
+			}
+		}
+		else 
+		{
+			//if the current node is null it means we found the end of the list
+			//and we'll just insert at the end
+			return addChild(toInsert);
+		}
+		return toInsert;
+	}
+	
     public function removeChild (entity :Entity)
     {
         var prev :Entity = null, p = firstChild;

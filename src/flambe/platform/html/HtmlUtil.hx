@@ -139,9 +139,17 @@ class HtmlUtil
     public static function createCanvas (source :CanvasElement) :CanvasElement
     {
         var canvas = createEmptyCanvas(source.width, source.height);
-
+		
         var ctx = canvas.getContext2d();
-        ctx.save();
+				
+		#if flambe_canvas_disable_smoothing
+			(untyped ctx).webkitImageSmoothingEnabled = false;
+			(untyped ctx).oImageSmoothingEnabled = false;
+			(untyped ctx).mozImageSmoothingEnabled = false;
+			ctx.imageSmoothingEnabled = false;
+		#end
+		
+        ctx.save();		
         ctx.globalCompositeOperation = "copy";
         ctx.drawImage(source, 0, 0);
         ctx.restore();

@@ -28,7 +28,11 @@ class DrawTexture extends Shader
         }
 
         function fragment (texture :Texture) {
-            out = texture.get(_uv, clamp) * _alpha;
+			#if flambe_stage3d_force_nearest
+				out = texture.get(_uv, clamp, nearest) * _alpha;
+			#else
+				out = texture.get(_uv, clamp) * _alpha;
+			#end
         }
     }
 }

@@ -36,14 +36,21 @@ class WebGLTextureRoot extends BasicAsset<WebGLTextureRoot>
         renderer.batcher.bindTexture(nativeTexture);
         gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
         gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
-        gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-    #if flambe_webgl_enable_mipmapping
-        gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
-    #elseif flambe_webgl_enable_linear
-        gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
-    #else
-        gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST);
-    #end
+		
+	#if flambe_webgl_force_nearest
+        gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.NEAREST);
+		gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST);
+	#else
+		#if flambe_webgl_enable_mipmapping
+			gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
+		#elseif flambe_webgl_enable_linear
+			gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
+		#else
+			gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST);
+		#end
+	#end
+		
+   
     }
 
     public function createTexture (width :Int, height :Int) :WebGLTexture
@@ -66,7 +73,7 @@ class WebGLTextureRoot extends BasicAsset<WebGLTextureRoot>
         _renderer.batcher.bindTexture(nativeTexture);
         var gl = _renderer.gl;
         gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, image);
-    #if flambe_webgl_enable_mipmapping
+    #if flambe_webgl_enable_mipmapping && !flambe_webgl_force_nearest
         gl.generateMipmap(GL.TEXTURE_2D);
     #end
     }
@@ -78,7 +85,7 @@ class WebGLTextureRoot extends BasicAsset<WebGLTextureRoot>
         _renderer.batcher.bindTexture(nativeTexture);
         var gl = _renderer.gl;
         gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, width, height, 0, GL.RGBA, GL.UNSIGNED_BYTE, null);
-    #if flambe_webgl_enable_mipmapping
+    #if flambe_webgl_enable_mipmapping && !flambe_webgl_force_nearest
         gl.generateMipmap(GL.TEXTURE_2D);
     #end
     }

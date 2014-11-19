@@ -268,7 +268,10 @@ using flambe.util.BitSets;
 	
 	public function setParent(entity:Entity):Entity
 	{
-		entity.addChild(this);
+		if (entity != null)
+			entity.addChild(this)
+		else if (this.parent != null)
+			this.parent.removeChild(this);
 		
 		return this;
 	}

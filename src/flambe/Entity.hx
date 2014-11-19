@@ -265,6 +265,13 @@ using flambe.util.BitSets;
             p = next;
         }
     }
+	
+	public function setParent(entity:Entity):Entity
+	{
+		entity.addChild(this);
+		
+		return this;
+	}
 
     /**
      * Dispose all of this entity's children, without touching its own components or removing itself

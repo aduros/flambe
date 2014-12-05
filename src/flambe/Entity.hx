@@ -282,7 +282,7 @@ using flambe.util.BitSets;
 
         return this;
     }
-
+	
     public function removeChild (entity :Entity)
     {
         var prev :Entity = null, p = firstChild;
@@ -304,10 +304,10 @@ using flambe.util.BitSets;
         }
     }
 	
-	public function setParent(entity:Entity):Entity
+	public function setParent(entity:Entity, append:Bool = true):Entity
 	{
 		if (entity != null)
-			entity.addChild(this)
+			entity.addChild(this, append)
 		else if (this.parent != null)
 			this.parent.removeChild(this);
 		

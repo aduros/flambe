@@ -35,7 +35,7 @@ class Script extends Component
     {
         _handles = [];
     }
-
+	
     override public function onUpdate (dt :Float)
     {
         var ii = 0;

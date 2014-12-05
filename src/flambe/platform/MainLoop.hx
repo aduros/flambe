@@ -52,7 +52,7 @@ class MainLoop
         }
 
         System.volume.update(dt);
-
+		
         updateEntity(System.root, dt);
     }
 
@@ -104,7 +104,7 @@ class MainLoop
                 p._flags = p._flags.add(Component.STARTED);
                 p.onStart();
             }
-            p.onUpdate(dt);
+            p.onUpdate(dt);			
             p = next;
         }
 
@@ -112,7 +112,7 @@ class MainLoop
         var p = entity.firstChild;
         while (p != null) {
             var next = p.next;
-            updateEntity(p, dt);
+            updateEntity(p, dt);						
             p = next;
         }
     }

@@ -95,6 +95,44 @@ using flambe.util.BitSets;
 
         return this;
     }
+	
+	 /**
+     * Add a component to this entity and make it first one to update. Any previous component of this type will be replaced.
+     * @returns This instance, for chaining.
+     */
+    public function addFirst (component :Component) :Entity
+	{
+		 // Remove the component from any previous owner. Don't just call dispose, which has
+        // additional behavior in some components (like Disposer).
+        if (component.owner != null) {
+            component.owner.remove(component);
+        }
+
+        var name = component.name;
+        var prev = getComponent(name);
+        if (prev != null) {
+            // Remove the previous component under this name
+            remove(prev);
+        }
+
+        untyped _compMap[name] = component;
+
+        
+		if (firstComponent == null)
+		{
+			firstComponent = component;
+			component.next = null;			
+		} else 
+		{			
+			component.next = firstComponent;
+			firstComponent = component;
+		}
+
+        component.owner = this;
+        component.onAdded();
+
+        return this;
+	}
 
     /**
      * Remove a component from this entity.

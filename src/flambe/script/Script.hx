@@ -36,6 +36,12 @@ class Script extends Component
         _handles = [];
     }
 	
+	public var empty(get, null):Bool;
+	inline function get_empty():Bool
+	{
+		return _handles.length == 0;
+	}
+	
     override public function onUpdate (dt :Float)
     {
         var ii = 0;

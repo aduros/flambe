@@ -39,7 +39,6 @@ class MainLoop
             // huge deltaTimes, but not all environments support detecting an unpause
             dt = 1;
         }
-
         // First update any tickables, folding away nulls
         var ii = 0;
         while (ii < _tickables.length) {
@@ -52,7 +51,7 @@ class MainLoop
         }
 
         System.volume.update(dt);
-		
+
         updateEntity(System.root, dt);
     }
 

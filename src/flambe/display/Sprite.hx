@@ -566,8 +566,10 @@ class Sprite extends Component
                 _pointerOut.emit(event);
             }
             _flags = _flags.remove(HOVERING);
-            _hoverConnection.dispose();
-            _hoverConnection = null;
+            if (_hoverConnection != null) {            
+                _hoverConnection.dispose();
+                _hoverConnection = null;
+            }
         });
     }
 

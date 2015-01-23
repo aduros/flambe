@@ -42,13 +42,16 @@ class Sine
 		_center = end + _distance;
 	}
 	
-	public function update(dt:Float):Float {
+	public function update(dt :Float):Float {
 		this.speed.update(dt);
-		_count += dt * (FMath.PI / speed._);		
+		_count += dt * (FMath.PI / speed._);
+		if (isComplete()) {
+			return _center + FMath.PI * _distance;
+		}
 		return _center + Math.sin(_count) * _distance;
 	}
 	
-	public function isComplete():Bool {
+	public function isComplete() :Bool {
 		return cycles > 0 && ((_count - HALF_PI) / FMath.PI) * .5 >= cycles;
 	}
 	

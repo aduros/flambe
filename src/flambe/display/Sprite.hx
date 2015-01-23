@@ -750,7 +750,6 @@ class Sprite extends Component
     private var _parentViewMatrixUpdateCount :Int = 0;
     private var _sinCache :Float = 0;
     private var _cosCache :Float = 0;
-#if debug private var _savedRotations :Int = 0; #end
     private var _pointerDown :Signal1<PointerEvent>;
     private var _pointerMove :Signal1<PointerEvent>;
     private var _pointerUp :Signal1<PointerEvent>;

@@ -122,7 +122,7 @@ class Sprite extends Component
 
     public function new ()
     {
-        _flags = _flags.add(VISIBLE | POINTER_ENABLED | VIEW_MATRIX_DIRTY | PIXEL_SNAPPING);
+        _flags = _flags.add(VISIBLE | POINTER_ENABLED | VIEW_MATRIX_DIRTY | PIXEL_SNAPPING | ROTATION_DIRTY);
         _localMatrix = new Matrix();
 
         var dirtyMatrix = function (_,_) {
@@ -130,7 +130,9 @@ class Sprite extends Component
         };
         x = new AnimatedFloat(0, dirtyMatrix);
         y = new AnimatedFloat(0, dirtyMatrix);
-        rotation = new AnimatedFloat(0, dirtyMatrix);
+        rotation = new AnimatedFloat(0, function(_,_) {
+            _flags = _flags.add(LOCAL_MATRIX_DIRTY | VIEW_MATRIX_DIRTY | ROTATION_DIRTY);
+        });
         scaleX = new AnimatedFloat(1, dirtyMatrix);
         scaleY = new AnimatedFloat(1, dirtyMatrix);
         anchorX = new AnimatedFloat(0, dirtyMatrix);
@@ -300,7 +302,16 @@ class Sprite extends Component
         if (_flags.contains(LOCAL_MATRIX_DIRTY)) {
             _flags = _flags.remove(LOCAL_MATRIX_DIRTY);
 
-            _localMatrix.compose(x._, y._, scaleX._, scaleY._, FMath.toRadians(rotation._));
+            if(_flags.contains(ROTATION_DIRTY)) {
+                _flags = _flags.remove(ROTATION_DIRTY);
+                var rotation :Float = FMath.toRadians(this.rotation._);
+                _sinCache = Math.sin(rotation);
+                _cosCache = Math.cos(rotation);
+            }
+
+            var scaleX :Float = this.scaleX._;
+            var scaleY :Float = this.scaleY._;
+            _localMatrix.set(_cosCache*scaleX, _sinCache*scaleX, -_sinCache*scaleY, _cosCache*scaleY, x._, y._);
             _localMatrix.translate(-anchorX._, -anchorY._);
         }
         return _localMatrix;
@@ -729,14 +740,16 @@ class Sprite extends Component
     private static inline var VIEW_MATRIX_DIRTY = Component.NEXT_FLAG << 3;
     private static inline var PIXEL_SNAPPING = Component.NEXT_FLAG << 4;
     private static inline var HOVERING = Component.NEXT_FLAG << 5;
-    private static inline var NEXT_FLAG = Component.NEXT_FLAG << 6; // Must be last!
+    private static inline var ROTATION_DIRTY = Component.NEXT_FLAG << 6;
+    private static inline var NEXT_FLAG = Component.NEXT_FLAG << 7; // Must be last!
 
     private var _localMatrix :Matrix;
 
     private var _viewMatrix :Matrix = null;
     private var _viewMatrixUpdateCount :Int = 0;
     private var _parentViewMatrixUpdateCount :Int = 0;
-
+    private var _sinCache :Float = 0;
+    private var _cosCache :Float = 0;
     private var _pointerDown :Signal1<PointerEvent>;
     private var _pointerMove :Signal1<PointerEvent>;
     private var _pointerUp :Signal1<PointerEvent>;

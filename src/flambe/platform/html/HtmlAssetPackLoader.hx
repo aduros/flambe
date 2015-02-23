@@ -366,7 +366,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
             }
 
             untyped xhr.responseType = "blob"; // Using untyped to prevent problems going between haxe 3.1 to haxe 3.2
-            if (xhr.responseType != "blob") {
+            if (untyped xhr.responseType != "blob") {
                 return false; // Blob responseType not supported
             }
 

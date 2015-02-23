@@ -202,7 +202,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
             }
             xhr = new XMLHttpRequest();
             xhr.open("GET", url, true);
-            xhr.responseType = responseType;
+            untyped xhr.responseType = responseType;
 
             var lastProgress = 0.0;
             xhr.onprogress = function (event :ProgressEvent) {
@@ -361,10 +361,11 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
             // request so it's all good.
             xhr.open("GET", ".", true);
 
-            if (xhr.responseType != "") {
+            if (untyped xhr.responseType != "") {
                 return false; // No responseType supported at all
             }
-            xhr.responseType = "blob";
+
+            untyped xhr.responseType = "blob"; // Using untyped to prevent problems going between haxe 3.1 to haxe 3.2
             if (xhr.responseType != "blob") {
                 return false; // Blob responseType not supported
             }

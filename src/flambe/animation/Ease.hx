@@ -49,6 +49,12 @@ class Ease
     {
         return t <= .5 ? t * t * 2 : 1 - (--t) * t * 2;
     }
+	
+    /** Quadratic out and in */
+    static public function quadOutIn(t:Float):Float 
+    {
+        return (t < 0.5) ? -0.5 * (t = (t * 2)) * (t - 2) : 0.5 * (t = (t * 2 - 1)) * t + 0.5;
+    }
 
     /** Cubic in. */
     public static function cubeIn (t :Float) :Float
@@ -68,6 +74,12 @@ class Ease
         return t <= .5 ? t * t * t * 4 : 1 + (--t) * t * t * 4;
     }
 
+    /** Cubic out and in. */
+    static public function cubeOutIn(t:Float):Float 
+    {
+        return 0.5 * ((t = t * 2 - 1) * t * t + 1);
+    }
+
     /** Quartic in. */
     public static function quartIn (t :Float) :Float
     {
@@ -84,6 +96,12 @@ class Ease
     public static function quartInOut (t :Float) :Float
     {
         return t <= .5 ? t * t * t * t * 8 : (1 - (t = t * 2 - 2) * t * t * t) / 2 + .5;
+    }
+	
+    /** Quartic out and in */
+    static public function quartOutIn(t:Float):Float 
+    {
+        return (t < 0.5) ? -0.5 * (t = t * 2 - 1) * t * t * t + 0.5	: 0.5 * (t = t * 2 - 1) * t * t * t + 0.5;
     }
 
     /** Quintic in. */
@@ -104,6 +122,12 @@ class Ease
         return ((t *= 2) < 1) ? (t * t * t * t * t) / 2 : ((t -= 2) * t * t * t * t + 2) / 2;
     }
 
+    /** Quintic out and in. */
+    static public function quintOutIn(t:Float):Float 
+    {
+        return 0.5 * ((t = t * 2 - 1) * t * t * t * t + 1);
+    }
+
     /** Sine in. */
     public static function sineIn (t :Float) :Float
     {
@@ -120,6 +144,13 @@ class Ease
     public static function sineInOut (t :Float) :Float
     {
         return .5 - Math.cos(PI * t) / 2;
+    }
+
+	/** Sine out and in. */
+    static public function sineOutIn(t:Float):Float {
+        if (t == 0) return 0
+        else if (t == 1) return 1
+        else return (t < 0.5) ? 0.5 * Math.sin((t * 2) * PIhalf) : -0.5 * Math.cos((t * 2 - 1) * PIhalf) + 1;
     }
 
     /** Bounce in. */
@@ -177,6 +208,12 @@ class Ease
         return t <= .5 ? (Math.sqrt(1 - t * t * 4) - 1) / -2 : (Math.sqrt(1 - (t * 2 - 2) * (t * 2 - 2)) + 1) / 2;
     }
 
+    /** Circle out and in. */
+    static public function circOutIn(t:Float):Float
+    {
+        return (t < 0.5) ? 0.5 * Math.sqrt(1 - (t = t * 2 - 1) * t) : -0.5 * ((Math.sqrt(1 - (t = t * 2 - 1) * t) - 1) - 1);
+    }
+
     /** Exponential in. */
     public static function expoIn (t :Float) :Float
     {
@@ -193,6 +230,12 @@ class Ease
     public static function expoInOut (t :Float) :Float
     {
         return t < .5 ? Math.pow(2, 10 * (t * 2 - 1)) / 2 : (-Math.pow(2, -10 * (t * 2 - 1)) + 2) / 2;
+    }
+
+    /** Exponential out and in. */
+    static public function expoOutIn(t:Float):Float 
+    {
+        return (t < 0.5) ? 0.5 * (1 - Math.pow(2, -20 * t)) : (t == 0.5) ?  0.5 :  0.5 * (Math.pow(2, 20 * (t - 1)) + 1);
     }
 
     /** Back in. */

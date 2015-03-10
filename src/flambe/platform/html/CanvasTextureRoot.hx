@@ -8,6 +8,7 @@ import js.Browser;
 import js.html.*;
 
 import haxe.io.Bytes;
+import haxe.io.BytesData;
 
 import flambe.display.Graphics;
 import flambe.display.Texture;
@@ -40,8 +41,7 @@ class CanvasTextureRoot extends BasicAsset<CanvasTextureRoot>
     {
         assertNotDisposed();
 
-        var data :Array<Int> = cast getContext2d().getImageData(x, y, width, height).data;
-        return Bytes.ofData(data);
+        return Bytes.ofData(cast getContext2d().getImageData(x, y, width, height).data);
     }
 
     public function writePixels (pixels :Bytes, x :Int, y :Int, sourceW :Int, sourceH :Int)

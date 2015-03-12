@@ -18,7 +18,15 @@ class CanvasGraphics
 {
     public function new (canvas :CanvasElement, alpha :Bool)
     {
-        _canvasCtx = (untyped canvas).getContext("2d", {alpha: alpha});
+        _canvasCtx = (untyped canvas).getContext("2d", { alpha: alpha } );
+		
+					
+		#if flambe_canvas_disable_smoothing
+			(untyped _canvasCtx).webkitImageSmoothingEnabled = false;
+			(untyped _canvasCtx).oImageSmoothingEnabled = false;
+			(untyped _canvasCtx).mozImageSmoothingEnabled = false;
+			_canvasCtx.imageSmoothingEnabled = false;
+		#end
     }
 
     public function save ()

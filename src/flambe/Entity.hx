@@ -95,6 +95,44 @@ using flambe.util.BitSets;
 
         return this;
     }
+	
+	 /**
+     * Add a component to this entity and make it first one to update. Any previous component of this type will be replaced.
+     * @returns This instance, for chaining.
+     */
+    public function addFirst (component :Component) :Entity
+	{
+		 // Remove the component from any previous owner. Don't just call dispose, which has
+        // additional behavior in some components (like Disposer).
+        if (component.owner != null) {
+            component.owner.remove(component);
+        }
+
+        var name = component.name;
+        var prev = getComponent(name);
+        if (prev != null) {
+            // Remove the previous component under this name
+            remove(prev);
+        }
+
+        untyped _compMap[name] = component;
+
+        
+		if (firstComponent == null)
+		{
+			firstComponent = component;
+			component.next = null;			
+		} else 
+		{			
+			component.next = firstComponent;
+			firstComponent = component;
+		}
+
+        component.owner = this;
+        component.onAdded();
+
+        return this;
+	}
 
     /**
      * Remove a component from this entity.
@@ -244,7 +282,7 @@ using flambe.util.BitSets;
 
         return this;
     }
-
+	
     public function removeChild (entity :Entity)
     {
         var prev :Entity = null, p = firstChild;
@@ -265,6 +303,16 @@ using flambe.util.BitSets;
             p = next;
         }
     }
+	
+	public function setParent(entity:Entity, append:Bool = true):Entity
+	{
+		if (entity != null)
+			entity.addChild(this, append)
+		else if (this.parent != null)
+			this.parent.removeChild(this);
+		
+		return this;
+	}
 
     /**
      * Dispose all of this entity's children, without touching its own components or removing itself

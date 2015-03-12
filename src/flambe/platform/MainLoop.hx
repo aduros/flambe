@@ -39,7 +39,6 @@ class MainLoop
             // huge deltaTimes, but not all environments support detecting an unpause
             dt = 1;
         }
-
         // First update any tickables, folding away nulls
         var ii = 0;
         while (ii < _tickables.length) {
@@ -104,7 +103,7 @@ class MainLoop
                 p._flags = p._flags.add(Component.STARTED);
                 p.onStart();
             }
-            p.onUpdate(dt);
+            p.onUpdate(dt);			
             p = next;
         }
 
@@ -112,7 +111,7 @@ class MainLoop
         var p = entity.firstChild;
         while (p != null) {
             var next = p.next;
-            updateEntity(p, dt);
+            updateEntity(p, dt);						
             p = next;
         }
     }

@@ -264,6 +264,7 @@ exports.build = function (config, platforms, opts) {
             "  <id>"+get(config, "id")+"</id>\n" +
             "  <versionNumber>"+get(config, "version")+"</versionNumber>\n" +
             "  <filename>"+get(config, "name")+"</filename>\n" +
+            "  <supportedLanguages>" + get(config, "supported_languages", "en") + "</supportedLanguages>\n" +
             "  <initialWindow>\n" +
             "    <content>"+swf+"</content>\n" +
             "    <aspectRatio>"+get(config, "orientation", "portrait")+"</aspectRatio>\n" +

@@ -41,7 +41,6 @@ class WebGLBatcher
         _quadIndexBuffer = gl.createBuffer();
         gl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, _quadIndexBuffer);
 
-        // ADDED
         _shaderManager = new WebGLShaderManager(gl);
 
         resize(16);

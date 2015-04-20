@@ -14,7 +14,6 @@ import flambe.platform.shader.FillRect;
  */
 class Stage3DShaderManager
 {
-    // New operator overload
     public function new()
     {
         _shaderMap = new Map<String, Shader>();

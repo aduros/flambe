@@ -34,8 +34,6 @@ class Stage3DBatcher
     {
         _context3D = context3D;
         _scratchScissor = new Rectangle();
-
-        // ADDED
         _shaderManager = new Stage3DShaderManager();
 
         resize(16);

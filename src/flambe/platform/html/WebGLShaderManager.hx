@@ -15,7 +15,6 @@ import flambe.platform.shader.FillRectGL;
  */
 class WebGLShaderManager
 {
-// New operator overload
     public function new(gl :RenderingContext)
     {
         _shaderMap = new Map<String, ShaderGL>();

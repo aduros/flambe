@@ -25,5 +25,4 @@ class Material extends Component
         this.effect = effect;
         return this; // Return this for chaining
     }
-
 }

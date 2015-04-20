@@ -68,13 +68,13 @@ class OverdrawGraphics
 
     public function drawMaterial(material :Material, destX :Float, destY :Float) :Void
     {
-        // Ignore
+        drawRegion(destX, destY, material.texture.width, material.texture.height);
     }
 
     public function drawSubMaterial (material :Material, destX :Float, destY :Float,
                                      sourceX :Float, sourceY :Float, sourceW :Float, sourceH :Float) :Void
     {
-        // Ignore
+        drawRegion(destX, destY, sourceW, sourceH);
     }
 
     public function drawTexture (texture :Texture, destX :Float, destY :Float)

@@ -106,6 +106,12 @@ class WebGLRenderer
         graphics.didRender();
     }
 
+    public function registerEffect(name :String, effect :Effect) :Void
+    {
+        effect.instansiate(gl);
+        batcher.registerShader(name, effect.shader);
+    }
+
     private function onResize ()
     {
         var width = gl.canvas.width, height = gl.canvas.height;

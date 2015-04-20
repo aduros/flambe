@@ -4,6 +4,7 @@
 
 package flambe.platform.html;
 
+import flambe.display.Material;
 import js.Browser;
 import js.html.*;
 
@@ -49,6 +50,17 @@ class CanvasGraphics
     public function restore ()
     {
         _canvasCtx.restore();
+    }
+
+    public function drawMaterial(material :Material, destX :Float, destY :Float)
+    {
+        // Doesn't work with Canvas
+    }
+
+    public function drawSubMaterial (material :Material, destX :Float, destY :Float,
+                                     sourceX :Float, sourceY :Float, sourceW :Float, sourceH :Float)
+    {
+        // Doesn't work with Canvas
     }
 
     public function drawTexture (texture :Texture, destX :Float, destY :Float)

@@ -45,6 +45,13 @@ interface Graphics
     /** Restores the graphics state back to the previous save(). */
     function restore () :Void;
 
+    /** Draws using a material at the given point. */
+    public function drawMaterial(material :Material, destX :Float, destY :Float) :Void;
+
+    /** Draws using a material sub-region at the given point. */
+    public function drawSubMaterial (material :Material, destX :Float, destY :Float,
+        sourceX :Float, sourceY :Float, sourceW :Float, sourceH :Float) :Void;
+
     /** Draws a texture at the given point. */
     function drawTexture (texture :Texture, destX :Float, destY :Float) :Void;
 

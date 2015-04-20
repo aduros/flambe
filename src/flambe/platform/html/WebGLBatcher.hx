@@ -9,11 +9,15 @@ import js.html.webgl.*;
 import js.html.webgl.RenderingContext;
 
 import flambe.display.BlendMode;
+import flambe.display.Material;
 import flambe.math.Rectangle;
-import flambe.platform.shader.DrawPatternGL;
-import flambe.platform.shader.DrawTextureGL;
-import flambe.platform.shader.FillRectGL;
 import flambe.platform.shader.ShaderGL;
+import flambe.platform.shader.DrawTextureGL;
+import flambe.platform.shader.DrawPatternGL;
+import flambe.platform.shader.FillRectGL;
+
+
+import flambe.platform.html.WebGLShaderManager;
 
 /**
  * Batches up geometry to glDrawElements and avoids redundant state changes. All GL state changes
@@ -37,9 +41,8 @@ class WebGLBatcher
         _quadIndexBuffer = gl.createBuffer();
         gl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, _quadIndexBuffer);
 
-        _drawTextureShader = new DrawTextureGL(gl);
-        _drawPatternShader = new DrawPatternGL(gl);
-        _fillRectShader = new FillRectGL(gl);
+        // ADDED
+        _shaderManager = new WebGLShaderManager(gl);
 
         resize(16);
     }
@@ -108,6 +111,23 @@ class WebGLBatcher
         _gl.deleteFramebuffer(texture.framebuffer);
     }
 
+    /** Register a new shader */
+    public function registerShader (key :String, shader :ShaderGL)
+    {
+        _shaderManager.addShader(key, shader);
+    }
+
+    /** Adds a quad to the batch, using a shader defined within the material. */
+    public function prepareDrawMaterial(renderTarget :WebGLTextureRoot,
+                                        blendMode :BlendMode, scissor :Rectangle, texture :WebGLTexture, shader :String) :Int
+    {
+        if (texture != _lastTexture) {
+            flush();
+            _lastTexture = texture;
+        }
+        return prepareQuad(5, renderTarget, blendMode, scissor, _shaderManager.getShader(shader));
+    }
+
     public function prepareDrawTexture (renderTarget :WebGLTextureRoot,
         blendMode :BlendMode, scissor :Rectangle, texture :WebGLTexture) :Int
     {
@@ -115,7 +135,7 @@ class WebGLBatcher
             flush();
             _lastTexture = texture;
         }
-        return prepareQuad(5, renderTarget, blendMode, scissor, _drawTextureShader);
+        return prepareQuad(5, renderTarget, blendMode, scissor, _shaderManager.getShader("drawTexture"));
     }
 
     public function prepareDrawPattern (renderTarget :WebGLTextureRoot,
@@ -125,13 +145,13 @@ class WebGLBatcher
             flush();
             _lastTexture = texture;
         }
-        return prepareQuad(5, renderTarget, blendMode, scissor, _drawPatternShader);
+        return prepareQuad(5, renderTarget, blendMode, scissor, _shaderManager.getShader("drawPattern"));
     }
 
     public function prepareFillRect (renderTarget :WebGLTextureRoot,
         blendMode :BlendMode, scissor :Rectangle) :Int
     {
-        return prepareQuad(6, renderTarget, blendMode, scissor, _fillRectShader);
+        return prepareQuad(6, renderTarget, blendMode, scissor, _shaderManager.getShader("fillRect"));
     }
 
     private function prepareQuad (elementsPerVertex :Int, renderTarget :WebGLTextureRoot,
@@ -207,16 +227,18 @@ class WebGLBatcher
             _currentTexture = _lastTexture;
         }
 
+        var drawPatternShader = cast(_shaderManager.getShader("drawPattern"), DrawPatternGL);
+
         if (_lastShader != _currentShader) {
             _lastShader.useProgram();
             _lastShader.prepare();
             _currentShader = _lastShader;
         }
 
-        if (_lastShader == _drawPatternShader) {
+        if (_lastShader == drawPatternShader) {
             var texture = _lastTexture;
             var root = texture.root;
-            _drawPatternShader.setRegion(
+            drawPatternShader.setRegion(
                 texture.rootX / root.width,
                 texture.rootY / root.height,
                 texture.width / root.width,
@@ -293,9 +315,7 @@ class WebGLBatcher
     private var _vertexBuffer :Buffer;
     private var _quadIndexBuffer :Buffer;
 
-    private var _drawTextureShader :DrawTextureGL;
-    private var _drawPatternShader :DrawPatternGL;
-    private var _fillRectShader :FillRectGL;
+    private var _shaderManager : WebGLShaderManager;
 
     private var _quads :Int = 0;
     private var _maxQuads :Int = 0;

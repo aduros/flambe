@@ -4,6 +4,7 @@
 
 package flambe.subsystem;
 
+import flambe.platform.Effect;
 import flambe.display.Texture;
 import flambe.util.Value;
 
@@ -54,6 +55,10 @@ interface RendererSystem<NativeImage>
      * @returns The new texture, or null if the GPU context is currently unavailable.
      */
     function createTextureFromImage (image :NativeImage) :Texture;
+
+
+    /** Called when adding a new shader */
+    function registerEffect(name :String, effect :Effect) :Void;
 
     // function createBuffer (size :Int) :Buffer;
     // function createShader (glsl :String) :Shader;

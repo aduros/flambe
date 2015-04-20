@@ -5,6 +5,7 @@
 package flambe.platform;
 
 import flambe.display.BlendMode;
+import flambe.display.Material;
 import flambe.display.Texture;
 
 class OverdrawGraphics
@@ -63,6 +64,17 @@ class OverdrawGraphics
     public function restore ()
     {
         _impl.restore();
+    }
+
+    public function drawMaterial(material :Material, destX :Float, destY :Float) :Void
+    {
+        // Ignore
+    }
+
+    public function drawSubMaterial (material :Material, destX :Float, destY :Float,
+                                     sourceX :Float, sourceY :Float, sourceW :Float, sourceH :Float) :Void
+    {
+        // Ignore
     }
 
     public function drawTexture (texture :Texture, destX :Float, destY :Float)

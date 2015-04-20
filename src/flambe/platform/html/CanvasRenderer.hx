@@ -58,6 +58,11 @@ class CanvasRenderer
         return root.createTexture(width, height);
     }
 
+    public function registerEffect(name :String, effect :Effect) :Void
+    {
+        Assert.fail(); // Unsupported
+    }
+
     public function getCompressedTextureFormats () :Array<AssetFormat>
     {
         return [];

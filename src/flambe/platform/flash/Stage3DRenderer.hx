@@ -127,6 +127,12 @@ class Stage3DRenderer
 #end
     }
 
+    public function registerEffect(name :String, effect :Effect) :Void
+    {
+        effect.instansiate();
+        batcher.registerShader(name, effect.shader);
+    }
+
     private function onContext3DCreate (event :Event)
     {
         var stage3D :Stage3D = event.target;

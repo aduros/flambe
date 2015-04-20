@@ -17,10 +17,14 @@ import flash.geom.Vector3D;
 import hxsl.Shader;
 
 import flambe.display.BlendMode;
+import flambe.display.Material;
+import flambe.platform.shader.ShaderHXSL;
 import flambe.platform.shader.DrawPattern;
 import flambe.platform.shader.DrawTexture;
 import flambe.platform.shader.FillRect;
 import flambe.util.Assert;
+
+import flambe.platform.flash.Stage3DShaderManager;
 
 class Stage3DBatcher
 {
@@ -29,11 +33,10 @@ class Stage3DBatcher
     public function new (context3D :Context3D)
     {
         _context3D = context3D;
-        _drawTextureShader = new DrawTexture();
-        _drawPatternShader = new DrawPattern();
-        _fillRectShader = new FillRect();
-
         _scratchScissor = new Rectangle();
+
+        // ADDED
+        _shaderManager = new Stage3DShaderManager();
 
         resize(16);
     }
@@ -178,6 +181,23 @@ class Stage3DBatcher
         return pixels;
     }
 
+    /** Register a new shader */
+    public function registerShader (key :String, shader :Shader)
+    {
+        _shaderManager.addShader(key, shader);
+    }
+
+    /** Adds a quad to the batch, using a shader defined within the material. */
+    public function prepareDrawMaterial (renderTarget :Stage3DTextureRoot,
+        blendMode :BlendMode, scissor :Rectangle, texture :Stage3DTexture, shader :String) :Int
+    {
+        if (texture != _lastTexture) {
+            flush();
+            _lastTexture = texture;
+        }
+        return prepareQuad(5, renderTarget, blendMode, scissor, _shaderManager.getShader(shader));
+    }
+
     /** Adds a quad to the batch, using the DrawTexture shader. */
     public function prepareDrawTexture (renderTarget :Stage3DTextureRoot,
         blendMode :BlendMode, scissor :Rectangle, texture :Stage3DTexture) :Int
@@ -186,7 +206,7 @@ class Stage3DBatcher
             flush();
             _lastTexture = texture;
         }
-        return prepareQuad(5, renderTarget, blendMode, scissor, _drawTextureShader);
+        return prepareQuad(5, renderTarget, blendMode, scissor, _shaderManager.getShader("drawTexture"));
     }
 
     /** Adds a quad to the batch, using the DrawPattern shader. */
@@ -197,14 +217,14 @@ class Stage3DBatcher
             flush();
             _lastTexture = texture;
         }
-        return prepareQuad(5, renderTarget, blendMode, scissor, _drawPatternShader);
+        return prepareQuad(5, renderTarget, blendMode, scissor, _shaderManager.getShader("drawPattern"));
     }
 
     /** Adds a quad to the batch, using the FillRect shader. */
     public function prepareFillRect (renderTarget :Stage3DTextureRoot,
         blendMode :BlendMode, scissor :Rectangle) :Int
     {
-        return prepareQuad(6, renderTarget, blendMode, scissor, _fillRectShader);
+        return prepareQuad(6, renderTarget, blendMode, scissor, _shaderManager.getShader("fillRect"));
     }
 
     private function prepareQuad (elementsPerVertex :Int, renderTarget :Stage3DTextureRoot,
@@ -285,13 +305,12 @@ class Stage3DBatcher
         }
 
         var vertexBuffer = null;
-        // TODO(bruno): Optimize with switch/case?
-        if (_lastShader == _drawTextureShader) {
-            _drawTextureShader.texture = _lastTexture.root.nativeTexture;
-            _drawTextureShader.rebuildVars();
-            vertexBuffer = _vertexBuffer5;
+        var drawPatternShader = cast(_shaderManager.getShader("drawPattern"), DrawPattern);
+        var fillRectShader = cast(_shaderManager.getShader("fillRect"), FillRect);
 
-        } else if (_lastShader == _drawPatternShader) {
+
+        // TODO(bruno): Optimize with switch/case?
+        if (_lastShader == drawPatternShader) {
             var region = _scratchVector3D;
             var texture = _lastTexture;
             var root = texture.root;
@@ -299,13 +318,24 @@ class Stage3DBatcher
             region.w = texture.rootY / root.height; // y
             region.x = texture.width / root.width; // width
             region.y = texture.height / root.height; // height
-            _drawPatternShader.texture = root.nativeTexture;
-            _drawPatternShader.region = region;
-            _drawPatternShader.rebuildVars();
+            drawPatternShader.texture = root.nativeTexture;
+            drawPatternShader.region = region;
+            drawPatternShader.rebuildVars();
             vertexBuffer = _vertexBuffer5;
 
-        } else if (_lastShader == _fillRectShader) {
+        } else if (_lastShader == fillRectShader) {
             vertexBuffer = _vertexBuffer6;
+        } else {
+            if (_lastShader != _currentShader) {
+                _lastShader.rebuildVars();
+                _currentShader = _lastShader;
+                vertexBuffer = _vertexBuffer5;
+            }
+
+            if (_lastTexture != _currentTexture) {
+                bindTexture(_lastTexture.root);
+                _currentTexture = _lastTexture;
+            }
         }
 
         // vertexBuffer.uploadFromVector(data, 0, _quads*4);
@@ -319,6 +349,19 @@ class Stage3DBatcher
 #end
         _quads = 0;
         _dataOffset = 0;
+    }
+
+    private function bindTexture(root :Stage3DTextureRoot)
+    {
+        var drawTextureShader = cast(_shaderManager.getShader("drawTexture"), DrawTexture);
+
+        if(_lastShader == drawTextureShader)
+            drawTextureShader.texture = root.nativeTexture;
+        else
+        {
+            var customShader = cast(_lastShader, ShaderHXSL);
+            customShader.bindTexture(root.nativeTexture);
+        }
     }
 
     private function resize (maxQuads :Int)
@@ -377,14 +420,14 @@ class Stage3DBatcher
     // Used to avoid redundant Context3D calls
     private var _currentBlendMode :BlendMode;
     private var _currentRenderTarget :Stage3DTextureRoot;
+    private var _currentTexture :Stage3DTexture = null; // ADDED
+    private var _currentShader :Shader = null; // ADDED
 
     // Extra stuff for scissor test tracking
     private var _scratchScissor :Rectangle;
     private var _pendingSetScissor :Bool;
 
-    private var _drawTextureShader :DrawTexture;
-    private var _drawPatternShader :DrawPattern;
-    private var _fillRectShader :FillRect;
+    private var _shaderManager : Stage3DShaderManager;
 
     private var _quadIndexBuffer :IndexBuffer3D;
     private var _vertexBuffer5 :VertexBuffer3D;

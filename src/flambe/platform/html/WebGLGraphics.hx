@@ -9,6 +9,7 @@ import js.html.webgl.*;
 
 import flambe.display.BlendMode;
 import flambe.display.Graphics;
+import flambe.display.Material;
 import flambe.display.Texture;
 import flambe.math.FMath;
 import flambe.math.Matrix;
@@ -93,6 +94,56 @@ class WebGLGraphics
     {
         Assert.that(_stateList.prev != null, "Can't restore without a previous save");
         _stateList = _stateList.prev;
+    }
+
+    public function drawMaterial(material :Material, destX :Float, destY :Float)
+    {
+        drawSubMaterial(material, destX, destY, 0, 0, material.texture.width, material.texture.height);
+    }
+
+    public function drawSubMaterial (material :Material, destX :Float, destY :Float,
+                                     sourceX :Float, sourceY :Float, sourceW :Float, sourceH :Float)
+    {
+        var state = getTopState();
+        var texture :WebGLTexture = cast material.texture;
+        var root = texture.root;
+        root.assertNotDisposed();
+
+        var pos = transformQuad(destX, destY, sourceW, sourceH);
+        var rootWidth = root.width;
+        var rootHeight = root.height;
+        var u1 = (texture.rootX+sourceX) / rootWidth;
+        var v1 = (texture.rootY+sourceY) / rootHeight;
+        var u2 = u1 + sourceW/rootWidth;
+        var v2 = v1 + sourceH/rootHeight;
+        var alpha = state.alpha;
+
+        var offset = _batcher.prepareDrawMaterial(_renderTarget, state.blendMode, state.scissor, texture, material.effect);
+        var data = _batcher.data;
+
+        data[  offset] = pos[0];
+        data[++offset] = pos[1];
+        data[++offset] = u1;
+        data[++offset] = v1;
+        data[++offset] = alpha;
+
+        data[++offset] = pos[2];
+        data[++offset] = pos[3];
+        data[++offset] = u2;
+        data[++offset] = v1;
+        data[++offset] = alpha;
+
+        data[++offset] = pos[4];
+        data[++offset] = pos[5];
+        data[++offset] = u2;
+        data[++offset] = v2;
+        data[++offset] = alpha;
+
+        data[++offset] = pos[6];
+        data[++offset] = pos[7];
+        data[++offset] = u1;
+        data[++offset] = v2;
+        data[++offset] = alpha;
     }
 
     public function drawTexture (texture :Texture, x :Float, y :Float)

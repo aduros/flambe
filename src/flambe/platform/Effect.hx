@@ -19,10 +19,10 @@ interface Effect
 #if flash
     public var shader:Shader;
 
-    public function instansiate() :Void;
+    public function instantiate() :Void;
 #else
     public var shader:ShaderGL;
 
-    public function instansiate(gl :RenderingContext) :Void;
+    public function instantiate(gl :RenderingContext) :Void;
 #end
 }

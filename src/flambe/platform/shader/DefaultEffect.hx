@@ -28,7 +28,7 @@ class DefaultEffect implements Effect
         shader = null;
     }
 
-    public function instansiate() :Void
+    public function instantiate() :Void
     {
         this.shader = new DrawTexture();
     }
@@ -41,7 +41,7 @@ class DefaultEffect implements Effect
         shader = null;
     }
 
-    public function instansiate(gl :RenderingContext) :Void
+    public function instantiate(gl :RenderingContext) :Void
     {
         this.shader = new DrawTextureGL(gl);
     }

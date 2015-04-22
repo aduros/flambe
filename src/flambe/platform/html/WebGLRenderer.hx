@@ -108,7 +108,7 @@ class WebGLRenderer
 
     public function registerEffect(name :String, effect :Effect) :Void
     {
-        effect.instansiate(gl);
+        effect.instantiate(gl);
         batcher.registerShader(name, effect.shader);
     }
 

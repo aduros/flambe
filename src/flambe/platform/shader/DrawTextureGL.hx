@@ -49,9 +49,9 @@ class DrawTextureGL extends ShaderGL
         setTexture(0);
     }
 
-    public function setTexture (unit :Int)
+    public function setTexture(uint :Int) :Void
     {
-        _gl.uniform1i(u_texture, unit);
+        _gl.uniform1i(u_texture, uint);
     }
 
     override public function prepare ()

@@ -63,6 +63,32 @@ class CanvasRenderer
         Assert.fail(); // Unsupported
     }
 
+    /** Unility functions used to set custom attributes */
+    public function assignInt(effect :String, name :String, value :Int) :Void
+    {
+        Assert.fail(); // Unsupported
+    }
+
+    public function assignFloat(effect :String, name :String, x :Float) :Void
+    {
+        Assert.fail(); // Unsupported
+    }
+
+    public function assignFloat2(effect :String, name :String, x :Float, y :Float) :Void
+    {
+        Assert.fail(); // Unsupported
+    }
+
+    public function assignFloat3(effect :String, name :String,  x :Float, y :Float, z :Float) :Void
+    {
+        Assert.fail(); // Unsupported
+    }
+
+    public function assignFloat4(effect :String, name :String,  x :Float, y :Float, z :Float, w :Float) :Void
+    {
+        Assert.fail(); // Unsupported
+    }
+
     public function getCompressedTextureFormats () :Array<AssetFormat>
     {
         return [];

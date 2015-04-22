@@ -358,7 +358,7 @@ class Stage3DBatcher
         else
         {
             var customShader = cast(_lastShader, ShaderHXSL);
-            customShader.bindTexture(root.nativeTexture);
+            customShader.setTexture(root.nativeTexture);
         }
     }
 

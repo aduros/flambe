@@ -133,6 +133,32 @@ class Stage3DRenderer
         batcher.registerShader(name, effect.shader);
     }
 
+    /** Unility functions used to set custom attributes */
+    public function assignInt(effect :String, name :String, value :Int) :Void
+    {
+
+    }
+
+    public function assignFloat(effect :String, name :String, x :Float) :Void
+    {
+
+    }
+
+    public function assignFloat2(effect :String, name :String, x :Float, y :Float) :Void
+    {
+
+    }
+
+    public function assignFloat3(effect :String, name :String,  x :Float, y :Float, z :Float) :Void
+    {
+
+    }
+
+    public function assignFloat4(effect :String, name :String,  x :Float, y :Float, z :Float, w :Float) :Void
+    {
+
+    }
+
     private function onContext3DCreate (event :Event)
     {
         var stage3D :Stage3D = event.target;

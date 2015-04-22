@@ -112,6 +112,32 @@ class WebGLRenderer
         batcher.registerShader(name, effect.shader);
     }
 
+    /** Unility functions used to set custom attributes */
+    public function assignInt(effect :String, name :String, value :Int) :Void
+    {
+        batcher.assignInt(effect, name, value);
+    }
+
+    public function assignFloat(effect :String, name :String, x :Float) :Void
+    {
+        batcher.assignFloat(effect, name, x);
+    }
+
+    public function assignFloat2(effect :String, name :String, x :Float, y :Float) :Void
+    {
+        batcher.assignFloat2(effect, name, x, y);
+    }
+
+    public function assignFloat3(effect :String, name :String,  x :Float, y :Float, z :Float) :Void
+    {
+        batcher.assignFloat3(effect, name, x, y, z);
+    }
+
+    public function assignFloat4(effect :String, name :String,  x :Float, y :Float, z :Float, w :Float) :Void
+    {
+        batcher.assignFloat4(effect, name, x, y, z, w);
+    }
+
     private function onResize ()
     {
         var width = gl.canvas.width, height = gl.canvas.height;

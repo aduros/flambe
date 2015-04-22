@@ -48,6 +48,32 @@ class ShaderGL
         Assert.fail("abstract");
     }
 
+    /** Unility functions used to set custom attributes (Uniform)*/
+    public function setInt(name :String, value :Int) :Void
+    {
+        _gl.uniform1i(getUniformLocation(name), value);
+    }
+
+    public function setFloat(name :String, x :Float) :Void
+    {
+        _gl.uniform1f(getUniformLocation(name), x);
+    }
+
+    public function setFloat2(name :String, x :Float, y :Float) :Void
+    {
+        _gl.uniform2f(getUniformLocation(name), x, y);
+    }
+
+    public function setFloat3(name :String,  x :Float, y :Float, z :Float) :Void
+    {
+        _gl.uniform3f(getUniformLocation(name), x, y, z);
+    }
+
+    public function setFloat4(name :String,  x :Float, y :Float, z :Float, w :Float) :Void
+    {
+        _gl.uniform4f(getUniformLocation(name), x, y, z, w);
+    }
+
     private function getAttribLocation (name :String) :Int
     {
         var loc = _gl.getAttribLocation(_program, name);

@@ -60,6 +60,17 @@ interface RendererSystem<NativeImage>
     /** Called when adding a new shader */
     function registerEffect(name :String, effect :Effect) :Void;
 
+    /** Unility functions used to set custom attributes */
+    public function assignInt(effect :String, name :String, value :Int) :Void;
+
+    public function assignFloat(effect :String, name :String, x :Float) :Void;
+
+    public function assignFloat2(effect :String, name :String, x :Float, y :Float) :Void;
+
+    public function assignFloat3(effect :String, name :String,  x :Float, y :Float, z :Float) :Void;
+
+    public function assignFloat4(effect :String, name :String,  x :Float, y :Float, z :Float, w :Float) :Void;
+
     // function createBuffer (size :Int) :Buffer;
     // function createShader (glsl :String) :Shader;
 }

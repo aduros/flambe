@@ -116,6 +116,32 @@ class WebGLBatcher
         _shaderManager.addShader(key, shader);
     }
 
+    /** Unility functions used to set custom attributes */
+    public function assignInt(effect :String, name :String, value :Int) :Void
+    {
+        _shaderManager.getShader(effect).setInt(name, value);
+    }
+
+    public function assignFloat(effect :String, name :String, x :Float) :Void
+    {
+        _shaderManager.getShader(effect).setFloat(name, x);
+    }
+
+    public function assignFloat2(effect :String, name :String, x :Float, y :Float) :Void
+    {
+        _shaderManager.getShader(effect).setFloat2(name, x, y);
+    }
+
+    public function assignFloat3(effect :String, name :String,  x :Float, y :Float, z :Float) :Void
+    {
+        _shaderManager.getShader(effect).setFloat3(name, x, y, z);
+    }
+
+    public function assignFloat4(effect :String, name :String,  x :Float, y :Float, z :Float, w :Float) :Void
+    {
+        _shaderManager.getShader(effect).setFloat4(name, x, y, z, w);
+    }
+
     /** Adds a quad to the batch, using a shader defined within the material. */
     public function prepareDrawMaterial(renderTarget :WebGLTextureRoot,
                                         blendMode :BlendMode, scissor :Rectangle, texture :WebGLTexture, shader :String) :Int

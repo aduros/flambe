@@ -51,9 +51,9 @@ class DrawPatternGL extends ShaderGL
         setTexture(0);
     }
 
-    public function setTexture (unit :Int)
+    public function setTexture (uint :Int) :Void
     {
-        _gl.uniform1i(u_texture, unit);
+        _gl.uniform1i(u_texture, uint);
     }
 
     public function setRegion (x :Float, y :Float, width :Float, height :Float)

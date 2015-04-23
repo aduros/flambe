@@ -14,7 +14,7 @@ import flambe.display.Material;
 
 import flambe.platform.Effect;
 import flambe.platform.shader.DefaultEffect;
-import customshader.TintEffect;
+import tintShaderExample.TintEffect;
 
 // Main Class
 // Description: Entry point
@@ -72,14 +72,14 @@ class Main
         titleSection.add(titleBG);
 
         demoText = new TextSprite(gameFont, "");
-        demoText.text = "Colour Tint";
+        demoText.text = "Color Tint";
         titleSection.addChild(new Entity().add(demoText));
 
         demoScreen.addChild(titleSection);
 
         // Create plane entity and image
         System.renderer.registerEffect("tintEffect", new TintEffect());
-        System.renderer.assignFloat4("tintEffect", "tintColour", 1, 0, 0, 1);
+        System.renderer.assignFloat4("tintEffect", "tintColor", 1, 0, 0, 1);
 
         // Create the plane and add it to the middle of the screen
         var plane:Entity = new Entity();

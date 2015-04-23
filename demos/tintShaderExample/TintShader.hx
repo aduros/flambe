@@ -25,10 +25,10 @@ package tintShaderExample;
                 out = input.pos.xyzw;
             }
 
-            function fragment (texture :Texture, tintColour :Float4)
+            function fragment (texture :Texture, tintColor :Float4)
             {
-                var colour = texture.get(_uv, clamp) * _alpha;
-                out = colour * tintColour;
+                var color = texture.get(_uv, clamp) * _alpha;
+                out = color * tintColor;
             }
         }
 
@@ -37,7 +37,7 @@ package tintShaderExample;
             super();
 
             shaderConst = new ShaderConst();
-            shaderConst.linkUniformf("tintColour", tintColour);
+            shaderConst.linkUniformf("tintColor", tintColor);
         }
 
         public function setTexture(texture :TextureBase) :Void
@@ -78,12 +78,12 @@ package tintShaderExample;
                 "varying mediump vec2 v_uv;",
                 "varying lowp float v_alpha;",
 
-                "uniform mediump vec4 tintColour;",
+                "uniform mediump vec4 tintColor;",
                 "uniform lowp sampler2D u_texture;",
 
                 "void main (void) {",
                     "gl_FragColor = texture2D(u_texture, v_uv) * v_alpha;",
-                    "gl_FragColor *= tintColour;",
+                    "gl_FragColor *= tintColor;",
                 "}",
             ].join("\n"));
 

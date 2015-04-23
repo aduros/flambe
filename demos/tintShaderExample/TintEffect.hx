@@ -9,7 +9,7 @@ import flambe.platform.Effect;
     import js.html.webgl.RenderingContext;
 #end
 
-import customshader.TintShader;
+import tintShaderExample.TintShader;
 
 /**
  * Red Tint Example Effect

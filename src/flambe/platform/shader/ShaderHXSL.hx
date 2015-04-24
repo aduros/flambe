@@ -23,7 +23,6 @@ class ShaderConst
         _floatMap = new Map<String, Float>();
         _intMap = new Map<String, Int>();
         _vectorMap = new Map<String, Vector3D>();
-        _textureMap = new Map<String, TextureBase>();
     }
 
     /** Unility functions used to set custom attributes */
@@ -111,5 +110,4 @@ class ShaderConst
     private var _floatMap   :Map<String, Float>;
     private var _intMap     :Map<String, Int>;
     private var _vectorMap  :Map<String, Vector3D>;
-    private var _textureMap :Map<String, TextureBase>;
 }

@@ -7,7 +7,6 @@ package flambe.platform.shader;
 import js.html.*;
 import js.html.webgl.*;
 import js.html.webgl.RenderingContext;
-
 import flambe.util.Assert;
 
 /**

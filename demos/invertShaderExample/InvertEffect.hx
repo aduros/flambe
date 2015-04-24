@@ -1,4 +1,4 @@
-package tintShaderExample;
+package invertShaderExample;
 
 import flambe.platform.Effect;
 
@@ -9,12 +9,12 @@ import flambe.platform.Effect;
     import js.html.webgl.RenderingContext;
 #end
 
-import tintShaderExample.TintShader;
+import invertShaderExample.InvertShader;
 
 /**
- * Tint Example Effect
+ * Invert Example Effect
  */
-class TintEffect implements Effect
+class InvertEffect implements Effect
 {
 #if flash
     /**This is the shader definition for the flash platform */
@@ -27,7 +27,7 @@ class TintEffect implements Effect
 
     public function instantiate() :Void
     {
-        this.shader = new TintShader();
+        this.shader = new InvertShader();
     }
 #else
     /**This is the shader definition for the html (WebGL) platform */
@@ -40,7 +40,7 @@ class TintEffect implements Effect
 
     public function instantiate(gl :RenderingContext) :Void
     {
-        this.shader = new TintShader(gl);
+        this.shader = new InvertShader(gl);
     }
 #end
 }

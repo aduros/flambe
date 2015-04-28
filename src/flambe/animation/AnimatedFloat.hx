@@ -79,6 +79,30 @@ class AnimatedFloat extends Value<Float>
         behavior = new Tween(_value, _value + by, seconds, easing);
     }
 
+    inline public function substract(v :Float) :AnimatedFloat
+    {
+        _ -= v;
+        return this;
+    }
+
+    inline public function add(v :Float) :AnimatedFloat
+    {
+        _ += v;
+        return this;
+    }
+    
+    inline public function multiplyBy(by :Float) :AnimatedFloat
+    {
+        _ *= by;
+        return this;
+    }
+
+    inline public function devideBy(by :Float) :AnimatedFloat
+    {
+        _ /= by;
+        return this;
+    }
+
     inline public function bindTo (to :Value<Float>, ?fn :BindingFunction)
     {
         behavior = new Binding(to, fn);

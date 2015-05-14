@@ -155,20 +155,20 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
 
     inline private function downloadArrayBuffer (url :String, entry :AssetEntry, onLoad :ArrayBuffer -> Void)
     {
-        download(url, entry, "arraybuffer", onLoad);
+        download(url, entry, ARRAYBUFFER, onLoad);
     }
 
     inline private function downloadBlob (url :String, entry :AssetEntry, onLoad :Blob -> Void)
     {
-        download(url, entry, "blob", onLoad);
+        download(url, entry, BLOB, onLoad);
     }
 
     inline private function downloadText (url :String, entry :AssetEntry, onLoad :String -> Void)
     {
-        download(url, entry, "text", onLoad);
+        download(url, entry, TEXT, onLoad);
     }
 
-    private function download (url :String, entry :AssetEntry, responseType :String, onLoad :Dynamic -> Void)
+    private function download (url :String, entry :AssetEntry, responseType :XMLHttpRequestResponseType, onLoad :Dynamic -> Void)
     {
         var xhr :XMLHttpRequest = null;
         var start = null;
@@ -202,7 +202,7 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
             }
             xhr = new XMLHttpRequest();
             xhr.open("GET", url, true);
-            untyped xhr.responseType = responseType;
+            xhr.responseType = responseType;
 
             var lastProgress = 0.0;
             xhr.onprogress = function (event :ProgressEvent) {
@@ -361,12 +361,11 @@ class HtmlAssetPackLoader extends BasicAssetPackLoader
             // request so it's all good.
             xhr.open("GET", ".", true);
 
-            if (untyped xhr.responseType != "") {
+            if (xhr.responseType != NONE) {
                 return false; // No responseType supported at all
             }
-
-            untyped xhr.responseType = "blob"; // Using untyped to prevent problems going between haxe 3.1 to haxe 3.2
-            if (untyped xhr.responseType != "blob") {
+            xhr.responseType = BLOB;
+            if (xhr.responseType != BLOB) {
                 return false; // Blob responseType not supported
             }
 

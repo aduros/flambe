@@ -482,7 +482,7 @@ exports.build = function (config, platforms, opts) {
         });
         commonFlags.push("-dce", "full");
         if (debug) {
-            commonFlags.push("-debug", "--no-opt", "--no-inline");
+            commonFlags.push("-debug");
         } else {
             commonFlags.push("--no-traces");
         }

@@ -135,19 +135,20 @@ exports.build = function (config, platforms, opts) {
     var libPaths = getAllPaths(config, "libs");
     var srcPaths = getAllPaths(config, "src");
     var webPaths = getAllPaths(config, "web");
+	var webOutput = "build/" + get(config, "output web", "web");
 
     var _preparedWeb = false;
     var prepareWeb = function () {
         if (!_preparedWeb) {
             _preparedWeb = true;
 
-            wrench.mkdirSyncRecursive("build/web/targets");
-            copyFileSync(DATA_DIR+"flambe.js", "build/web/flambe.js");
+            wrench.mkdirSyncRecursive(webOutput + "/targets");
+            copyFileSync(DATA_DIR+"flambe.js", webOutput + "/flambe.js");
 
-            return copyDirs(webPaths, "build/web", {includeHidden: true})
+            return copyDirs(webPaths, webOutput, {includeHidden: true})
             .then(function () {
                 if (fs.existsSync("icons")) {
-                    return copyDirs("icons", "build/web/icons");
+                    return copyDirs("icons", webOutput + "/icons");
                 }
             });
         }
@@ -220,27 +221,25 @@ exports.build = function (config, platforms, opts) {
     };
 
     var buildHtml = function () {
-        var outputDir = "build/web";
-
-        return prepareWeb(outputDir)
-        .then(function () { return prepareAssets(outputDir+"/assets") })
+        return prepareWeb(webOutput)
+        .then(function () { return prepareAssets(webOutput+"/assets") })
         .then(function (assetFlags) {
-            console.log("Building: " + outputDir);
+            console.log("Building: " + webOutput);
             return buildJS({
                 target: "html",
-                outputDir: outputDir,
+                outputDir: webOutput,
                 assetFlags: assetFlags,
             });
         });
     };
 
     var buildFlash = function () {
-        var swf = "build/web/targets/main-flash.swf";
+        var swf = webOutput + "/targets/main-flash.swf";
         var flashFlags = swfFlags(false).concat([
             "-swf-version", SWF_VERSION, "-swf", swf]);
 
         return prepareWeb()
-        .then(function () { return prepareAssets("build/web/assets") })
+        .then(function () { return prepareAssets(webOutput + "/assets") })
         .then(function (assetFlags) {
             console.log("Building: " + swf);
             return haxe(commonFlags.concat(assetFlags).concat(flashFlags));
@@ -718,7 +717,7 @@ Server.prototype.start = function () {
         })
         .use(connect.logger("tiny"))
         .use(connect.compress())
-        .use(connect.static("build/web"))
+        .use(connect.static(webOutput))
         .listen(HTTP_PORT, host);
     console.log("Serving on http://localhost:%s", HTTP_PORT);
 
@@ -764,7 +763,7 @@ Server.prototype.start = function () {
     watch.createMonitor("assets", {interval: 200}, function (monitor) {
         monitor.on("changed", function (file) {
             console.log("Asset changed: " + file);
-            var output = "build/web/"+file;
+            var output = webOutput + "/"+file;
             if (fs.existsSync(output)) {
                 var contents = fs.readFileSync(file);
                 fs.writeFileSync(output, contents);

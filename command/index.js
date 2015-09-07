@@ -677,12 +677,13 @@ var Server = function () {
 };
 exports.Server = Server;
 
-Server.prototype.start = function () {
+Server.prototype.start = function (config) {
     var self = this;
     var connect = require("connect");
     var url = require("url");
     var websocket = require("websocket");
 
+    var webOutput = "build/" + get(config, "output web", "web");
     // Fire up a Haxe compiler server, ignoring all output. It's fine if this command fails, the
     // build will fallback to not using a compiler server
     spawn("haxe", ["--wait", HAXE_COMPILER_PORT], {stdio: "ignore"});

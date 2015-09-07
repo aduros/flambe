@@ -112,7 +112,7 @@ cmd.setDefaults({action: function (args) {
         flambe.loadConfig(args.config)
         .then(function (config) {
             var server = new flambe.Server();
-            server.start();
+            server.start(config);
         }));
 }});
 

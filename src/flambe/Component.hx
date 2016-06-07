@@ -24,6 +24,9 @@ class Component
     @:allow(flambe)
     public var next (default, null) :Component = null;
 
+    /** Iterator for iteration using this syntax `for (component in entity.firstComponent)`. */
+    public inline function iterator() return new ComponentIterator(owner);
+
     /**
      * The component's name, generated based on its class. Components with the same name replace
      * eachother when added to an entity.
@@ -92,4 +95,17 @@ class Component
     private static inline var NEXT_FLAG = 1 << 1; // Must be last!
 
     @:allow(flambe) var _flags :Int = 0;
+}
+
+private class ComponentIterator
+{
+    public var component:Component;
+
+    public inline function new (entity :Entity) 
+    {
+        this.component = entity.firstComponent;
+  	}
+
+    public inline function hasNext () :Bool return component.next != null;
+    public inline function next () :Component return component = component.next;
 }

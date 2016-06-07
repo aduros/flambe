@@ -47,6 +47,9 @@ using flambe.util.BitSets;
     /** This entity's first component. */
     public var firstComponent (default, null) :Component = null;
 
+    /** Iterator for iteration using normal syntax `for (child in entity)`. */
+    public inline function iterator() return new EntityIterator(this);
+
     public function new ()
     {
 #if flash
@@ -425,4 +428,17 @@ using flambe.util.BitSets;
      * Object/Dictionary for the quickest possible lookups in this critical part of Flambe.
      */
     private var _compMap :Dynamic<Component>;
+}
+
+private class EntityIterator 
+{
+    public var current :Entity;
+
+    public inline function new (entity :Entity) 
+    {
+        current = entity.firstChild;
+    }
+
+    public inline function hasNext () :Bool return current.next != null;
+    public inline function next () :Entity return current = current.next;
 }

@@ -47,7 +47,7 @@ using flambe.util.BitSets;
     /** This entity's first component. */
     public var firstComponent (default, null) :Component = null;
 
-    /** Iterator for iteration using normal syntax `for (child in entity)`. */
+    /** Iterator for iteration using this syntax `for (child in entity)`. */
     public inline function iterator() return new EntityIterator(this);
 
     public function new ()

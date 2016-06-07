@@ -25,7 +25,7 @@ class Component
     public var next (default, null) :Component = null;
 
     /** Iterator for iteration using this syntax `for (component in entity.firstComponent)`. */
-    public inline function iterator() return new ComponentIterator(owner);
+    public inline function iterator() return new ComponentIterator(this);
 
     /**
      * The component's name, generated based on its class. Components with the same name replace
@@ -99,13 +99,13 @@ class Component
 
 private class ComponentIterator
 {
-    public var component:Component;
+    public var current:Component;
 
-    public inline function new (entity :Entity) 
+    public inline function new (firstComponent :Component) 
     {
-        this.component = entity.firstComponent;
+        this.current = firstComponent;
   	}
 
-    public inline function hasNext () :Bool return component.next != null;
-    public inline function next () :Component return component = component.next;
+    public inline function hasNext () :Bool return current.next != null;
+    public inline function next () :Component return current = current.next;
 }

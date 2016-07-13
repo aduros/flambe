@@ -75,7 +75,7 @@ class HtmlMotion
 
     private function get_accelerationSupported () :Bool
     {
-        return (untyped Browser.window).DeviceMotionEvent != null && Reflect.field(Browser.window, 'ondeviceorientation') != null;
+        return (untyped Browser.window).DeviceMotionEvent != null && Reflect.field(Browser.window, 'ondevicemotion') != null;
     }
 
     // http://dev.w3.org/geo/api/spec-source-orientation.html#devicemotion

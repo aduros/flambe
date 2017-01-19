@@ -42,7 +42,7 @@ class WebGLTextureRoot extends BasicAsset<WebGLTextureRoot>
     #elseif flambe_webgl_enable_linear
         gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
     #else
-        gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST);
+        gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
     #end
     }
 

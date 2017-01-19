@@ -42,4 +42,19 @@ class FlashExternal
         ExternalInterface.call("$flambe_expose", name,
             (fn != null) ? ExternalInterface.objectID : null);
     }
+
+    public function alert (message:String) :Void 
+    {
+        ExternalInterface.call("alert", message);
+    }
+
+    public function prompt (message:String, ?defaultValue:String) :String 
+    {
+        return ExternalInterface.call("prompt", message, defaultValue);
+    }
+
+    public function confirm (message:String) :Bool 
+    {
+        return ExternalInterface.call("confirm", message);
+    }
 }

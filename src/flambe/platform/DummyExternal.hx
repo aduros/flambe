@@ -28,4 +28,18 @@ class DummyExternal
     public function bind (name :String, fn :Dynamic)
     {
     }
+
+    public function alert(message:String):Void 
+    {
+    }
+
+    public function prompt(message:String, ?defaultValue:String):String 
+    {
+        return null;
+    }
+
+    public function confirm(message:String):Bool 
+    {
+        return false;
+    }
 }

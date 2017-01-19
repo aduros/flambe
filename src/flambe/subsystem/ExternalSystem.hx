@@ -31,4 +31,19 @@ interface ExternalSystem
      * @param fn The function, or null to unbind.
      */
     function bind (name :String, fn :Dynamic) :Void;
+
+    /**
+	 * Display an alert message box containing the given message
+     */
+    function alert (message :String) :Void;
+
+    /**
+     * Gets string by dispaying a prompt box containing the given message and optional default value.
+     */
+    function prompt (message :String, ?defaultValue :String) :String;
+
+    /**
+     * Gets bool by dispaying a confirmation box the given message, along with an OK/Cancel button.
+     */
+    function confirm (message :String) :Bool;
 }

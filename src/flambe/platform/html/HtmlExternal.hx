@@ -41,4 +41,19 @@ class HtmlExternal
     {
         Reflect.setField(Browser.window, name, fn);
     }
+
+    public function alert (message:String) :Void 
+    {
+        untyped __js__("alert")(message);
+    }
+
+    public function prompt (message:String, ?defaultValue:String) :String 
+    {
+        return untyped __js__("prompt")(message, defaultValue);
+    }
+
+    public function confirm (message:String) :Bool 
+    {
+        return untyped __js__("confirm")(message);
+    }
 }

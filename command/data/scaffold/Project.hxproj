@@ -46,14 +46,14 @@
     <hidden path="build" />
   </hiddenPaths>
   <!-- Executed before build -->
-  <preBuildCommand>cmd /c flambe build --$(BuildConfig)</preBuildCommand>
+  <preBuildCommand>cmd /c flambe build $(TargetBuild) --$(BuildConfig)</preBuildCommand>
   <!-- Executed after build -->
   <postBuildCommand alwaysRun="False" />
   <!-- Other project options -->
   <options>
     <option showHiddenPaths="False" />
     <option testMovie="Custom" />
-    <option testMovieCommand="flambe run --$(BuildConfig) --no-build --no-fdb || pause" />
+    <option testMovieCommand="flambe run $(TargetBuild) --$(BuildConfig) --no-build --no-fdb || pause" />
   </options>
   <!-- Plugin storage -->
   <storage />

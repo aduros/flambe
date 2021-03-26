@@ -18,7 +18,10 @@ var HAXE_COMPILER_PORT = 6000;
 var HTTP_PORT = 7000;
 var SOCKET_PORT = HTTP_PORT+1;
 
-exports.PLATFORMS = ["html", "flash", "android", "ios"];
+// The minimum SWF version for browser Flash. For AIR, we always use the latest
+var SWF_VERSION = "11.2";
+
+exports.PLATFORMS = ["html", "flash", "android", "ios", "firefox"];
 
 exports.VERSION = JSON.parse(fs.readFileSync(__dirname + "/package.json")).version;
 
@@ -30,7 +33,12 @@ exports.loadConfig = function (file) {
     })
     .then(function (text) {
         var yaml = require("js-yaml");
-        return yaml.safeLoad(text.toString());
+        // yaml barfs on tab indentation, replace with spaces. This can lead to problems with
+        // mixed tabs/spaces on multiline values though...
+        var converted = text.toString().replace(/^\t+/gm, function (tabs) {
+            return tabs.replace(/\t/g, "    ");
+        });
+        return yaml.safeLoad(converted);
     });
     return promise;
 };
@@ -99,6 +107,10 @@ exports.run = function (config, platform, opts) {
                 return p;
             })
             break;
+
+        case "firefox":
+            console.log("Open "+path.resolve("build/firefox")+" from about:app-manager in Firefox.");
+            return Q.resolve();
         }
     };
 
@@ -176,39 +188,56 @@ exports.build = function (config, platforms, opts) {
         return flags;
     };
 
-    var buildHtml = function () {
-        var htmlFlags = ["-D", "html", "-D", "js-flatten"];
-        var unminified = CACHE_DIR+"main-html.unminified.js";
-        var js = "build/web/targets/main-html.js";
+    var buildJS = function (opts) {
+        var target = opts.target;
+        var outputDir = opts.outputDir;
+        var assetFlags = opts.assetFlags;
 
-        return prepareWeb()
-        .then(function () { return prepareAssets("build/web/assets") })
-        .then(function (assetFlags) {
-            console.log("Building: " + js);
-            var flags = commonFlags.concat(assetFlags).concat(htmlFlags);
-            if (debug) {
-                return haxe(flags.concat(["-js", js]));
-            } else {
-                // Minify release builds
-                return haxe(flags.concat(["-js", unminified]))
-                .then(function () {
-                    return minify([unminified], js, {strict: true});
-                })
-                .then(function () {
-                    // Delete the source map file produced by debug builds
-                    return Q.nfcall(fs.unlink, js+".map")
-                    .catch(function () {
-                        // Ignore errors
-                    });
+        var assetDir = outputDir + "/assets";
+        var unminified = CACHE_DIR + target + ".unminified.js";
+        var js = outputDir + "/targets/main-" + target + ".js";
+
+        wrench.mkdirSyncRecursive(outputDir);
+
+        var jsFlags = ["-D", target, "-D", "js-es5", "-D", "js-flatten"];
+        var flags = commonFlags.concat(jsFlags).concat(assetFlags);
+        if (debug) {
+            return haxe(flags.concat(["-D", "source-map-content", "-js", js]));
+        } else {
+            // Minify release builds
+            return haxe(flags.concat(["-js", unminified]))
+            .then(function () {
+                return minify([unminified], js, {strict: true});
+            })
+            .then(function () {
+                // Delete the source map file produced by debug builds
+                return Q.nfcall(fs.unlink, js+".map")
+                .catch(function () {
+                    // Ignore errors
                 });
-            }
+            });
+        }
+    };
+
+    var buildHtml = function () {
+        var outputDir = "build/web";
+
+        return prepareWeb(outputDir)
+        .then(function () { return prepareAssets(outputDir+"/assets") })
+        .then(function (assetFlags) {
+            console.log("Building: " + outputDir);
+            return buildJS({
+                target: "html",
+                outputDir: outputDir,
+                assetFlags: assetFlags,
+            });
         });
     };
 
     var buildFlash = function () {
         var swf = "build/web/targets/main-flash.swf";
         var flashFlags = swfFlags(false).concat([
-            "-swf-version", "11", "-swf", swf]);
+            "-swf-version", SWF_VERSION, "-swf", swf]);
 
         return prepareWeb()
         .then(function () { return prepareAssets("build/web/assets") })
@@ -231,7 +260,7 @@ exports.build = function (config, platforms, opts) {
     var generateAirXml = function (swf, output) {
         var xmldom = require("xmldom");
         var xml =
-            "<application xmlns=\"http://ns.adobe.com/air/application/3.7\">\n" +
+            "<application xmlns=\"http://ns.adobe.com/air/application/4.0\">\n" +
             "  <id>"+get(config, "id")+"</id>\n" +
             "  <versionNumber>"+get(config, "version")+"</versionNumber>\n" +
             "  <filename>"+get(config, "name")+"</filename>\n" +
@@ -254,6 +283,7 @@ exports.build = function (config, platforms, opts) {
             "    <Entitlements><![CDATA[\n" +
                    get(config, "ios Entitlements.plist", "") +
             "    ]]></Entitlements>\n" +
+            "    <requestedDisplayResolution>high</requestedDisplayResolution>\n" +
             "  </iPhone>\n" +
             "</application>";
         var doc = new xmldom.DOMParser().parseFromString(xml);
@@ -316,15 +346,20 @@ exports.build = function (config, platforms, opts) {
         console.log("Building: " + apk);
 
         var swf = "main-android.swf";
-        var cert = CACHE_DIR+"air/certificate-android.p12";
         var xml = CACHE_DIR+"air/config-android.xml";
+
+        var cert = "certs/android.p12";
+        var password = get(config, "android password", "password");
 
         return buildAir(["-D", "android", "-swf", CACHE_DIR+"air/"+swf])
         .then(function () {
-            // Generate a dummy certificate if it doesn't exist
             if (!fs.existsSync(cert)) {
-                return adt(["-certificate", "-cn", "SelfSign", "-validityPeriod", "25", "2048-RSA",
-                    cert, "password"]);
+                // Generate a dummy certificate if it doesn't exist
+                cert = CACHE_DIR+"air/certificate-android.p12";
+                if (!fs.existsSync(cert)) {
+                    return adt(["-certificate", "-cn", "SelfSign", "-validityPeriod", "25",
+                        "2048-RSA", cert, password]);
+                }
             }
         })
         .then(function () {
@@ -337,10 +372,13 @@ exports.build = function (config, platforms, opts) {
             } else {
                 androidFlags.push("-target", "apk-captive-runtime");
             }
-            androidFlags.push("-storetype", "pkcs12", "-keystore", cert, "-storepass", "password",
-                apk, xml);
+            androidFlags.push("-storetype", "pkcs12", "-keystore", cert,
+                "-storepass", password, apk, xml);
             androidFlags = androidFlags.concat(pathOptions);
             androidFlags.push("-C", CACHE_DIR+"air", swf, "assets");
+            if (fs.existsSync("android")) {
+                androidFlags.push("-C", "android", ".");
+            }
             return adt(androidFlags);
         });
     };
@@ -365,26 +403,75 @@ exports.build = function (config, platforms, opts) {
             } else {
                 iosFlags.push("-target", "ipa-ad-hoc");
             }
-            // TODO(bruno): Make these cert options configurable
-            iosFlags.push("-storetype", "pkcs12", "-keystore", cert, "-storepass", "password",
-                "-provisioning-profile", mobileProvision, ipa, xml);
+            iosFlags.push("-storetype", "pkcs12", "-keystore", cert,
+                "-storepass", get(config, "ios password", "password"),
+                "-provisioning-profile", mobileProvision,
+                "-useLegacyAOT", "yes", // https://github.com/ncannasse/hxsl/issues/32
+                ipa, xml);
             iosFlags = iosFlags.concat(pathOptions);
             iosFlags.push("-C", CACHE_DIR+"air", swf, "assets");
+            if (fs.existsSync("ios")) {
+                iosFlags.push("-C", "ios", ".");
+            }
             return adt(iosFlags);
+        });
+    };
+
+    var buildFirefox = function () {
+        var outputDir = "build/firefox";
+        wrench.mkdirSyncRecursive(outputDir+"/targets");
+
+        return prepareAssets(outputDir+"/assets")
+        .then(function (assetFlags) {
+            console.log("Building: " + outputDir);
+            return buildJS({
+                target: "firefox",
+                outputDir: outputDir,
+                assetFlags: assetFlags,
+            });
+        })
+        .then(function () {
+            return copyDirs(DATA_DIR+"firefox", outputDir);
+        })
+        .then(function () {
+            if (fs.existsSync("icons")) {
+                return copyDirs("icons", outputDir+"/icons");
+            }
+        })
+        .then(function () {
+            var manifest = {
+                name: get(config, "name"),
+                description: get(config, "description"),
+                developer: {
+                    name: get(config, "developer name"),
+                    url: get(config, "developer url"),
+                },
+                version: get(config, "version"),
+                launch_path: "/index.html",
+                orientation: get(config, "orientation", "portrait").toLowerCase() == "portrait" ?
+                    ["portrait", "portrait-secondary"] : ["landscape", "landscape-secondary"],
+                fullscreen: ""+get(config, "fullscreen", true),
+                icons: {},
+            };
+            findIcons("icons").forEach(function (icon) {
+                manifest.icons[icon.size] = "/"+icon.image;
+            });
+
+            // Copy any additional fields into manifest from 2DKit.yaml
+            clone(get(config, "firefox manifest.webapp", {}), manifest);
+
+            fs.writeFileSync(outputDir+"/manifest.webapp", JSON.stringify(manifest));
         });
     };
 
     wrench.mkdirSyncRecursive(CACHE_DIR);
 
-    var connectFlags = ["--connect", HAXE_COMPILER_PORT];
+    var connectFlags = ["--connect", opts.haxeServer || HAXE_COMPILER_PORT];
     return haxe(connectFlags, {check: false, verbose: false, output: false})
     .then(function (code) {
-        // Hide the compilation server behind an environment variable for now until stable
-        if ("FLAMBE_HAXE_SERVER" in process.env) {
-            // Use a Haxe compilation server if available
-            if (code == 0) {
-                commonFlags = commonFlags.concat(connectFlags);
-            }
+        // Use a Haxe compilation server if available
+        if (code == 0) {
+            commonFlags = commonFlags.concat(connectFlags);
         }
 
         commonFlags.push("-main", get(config, "main"));
@@ -406,6 +493,7 @@ exports.build = function (config, platforms, opts) {
             flash: buildFlash,
             android: buildAndroid,
             ios: buildIos,
+            firefox: buildFirefox,
         };
         var promise = Q();
         platforms.forEach(function (platform, idx) {
@@ -544,6 +632,48 @@ var fdb = function (commands) {
 };
 exports.fdb = fdb;
 
+var getHaxeFlags = function (config, platform) {
+    if (platform == null) {
+        platform = get(config, "default_platform", "flash");
+    }
+    checkPlatforms([platform]);
+
+    var flags = [
+        "-main", get(config, "main"),
+        "-lib", "flambe",
+        "-swf-version", SWF_VERSION,
+        "-D", "flash-strict",
+        "--no-output",
+    ];
+
+    switch (platform) {
+    case "android": case "ios":
+        flags.push("-D", "air");
+        // Fall through
+    case "flash":
+        flags.push("-swf", "no-output.swf");
+        break;
+    default:
+        flags.push("-js", "no-output.js");
+        break;
+    }
+    if (platform != "flash") {
+        flags.push("-D", platform);
+    }
+
+    flags = flags.concat(toArray(get(config, "haxe_flags", [])));
+    getAllPaths(config, "src").forEach(function (srcPath) {
+        flags.push("-cp", srcPath);
+    });
+    getAllPaths(config, "libs").forEach(function (libPath) {
+        forEachFileIn(libPath, function (file) {
+            flags.push("-swf-lib-extern", libPath+"/"+file);
+        });
+    });
+    return flags;
+}
+exports.getHaxeFlags = getHaxeFlags;
+
 var Server = function () {
 };
 exports.Server = Server;
@@ -551,15 +681,17 @@ exports.Server = Server;
 Server.prototype.start = function () {
     var self = this;
     var connect = require("connect");
+	var bodyParser = require("body-parser");
+	var logger = require("morgan");
+	var compression = require("compression");
+	var serveStatic = require("serve-static");
+	var http = require("http");
     var url = require("url");
     var websocket = require("websocket");
 
-    // Hide the compilation server behind an environment variable for now until stable
-    if ("FLAMBE_HAXE_SERVER" in process.env) {
-        // Fire up a Haxe compiler server, ignoring all output. It's fine if this command fails, the
-        // build will fallback to not using a compiler server
-        spawn("haxe", ["--wait", HAXE_COMPILER_PORT], {stdio: "ignore"});
-    }
+    // Fire up a Haxe compiler server, ignoring all output. It's fine if this command fails, the
+    // build will fallback to not using a compiler server
+    spawn("haxe", ["--wait", HAXE_COMPILER_PORT], {stdio: "ignore"});
 
     // Start a static HTTP server
     var host = "0.0.0.0";
@@ -589,9 +721,9 @@ Server.prototype.start = function () {
                 next();
             }
         })
-        .use(connect.logger("tiny"))
-        .use(connect.compress())
-        .use(connect.static("build/web"))
+        .use(logger("tiny"))
+        .use(compression())
+        .use(serveStatic("build/web"))
         .listen(HTTP_PORT, host);
     console.log("Serving on http://localhost:%s", HTTP_PORT);
 
@@ -783,4 +915,28 @@ var getIP = function () {
         });
     }
     return ip;
+};
+
+var clone = function (from, into) {
+    into = into || {};
+    for (var key in from) {
+        into[key] = from[key];
+    }
+    return into;
+};
+
+var findIcons = function (dir) {
+    var icons = [];
+    fs.readdirSync(dir).forEach(function (file) {
+        // Only include properly named square icons
+        var match = file.match(/^(\d+)x\1\.png$/);
+        if (match) {
+            icons.push({
+                size: match[1],
+                image: dir+"/"+file,
+            });
+        }
+        // TODO(bruno): Warn if not matched?
+    });
+    return icons;
 };

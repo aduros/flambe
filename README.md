@@ -1,3 +1,11 @@
+---
+
+# Deprecated
+
+Flambe has been replaced by [2DKit](http://2dkit.com), a commercial-quality game engine built with many years of improvements on top of Flambe.
+
+---
+
 <img src="https://raw.github.com/aduros/flambe/master/command/data/scaffold/icons/72x72.png" width="72" height="72" align="absmiddle"> Flambe
 ======
 

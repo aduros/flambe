@@ -10,6 +10,7 @@ import flambe.animation.AnimatedFloat;
 import flambe.platform.Tickable;
 import flambe.sound.Playback;
 import flambe.sound.Sound;
+import flambe.math.FMath;
 import flambe.util.Disposable;
 import flambe.util.Value;
 
@@ -182,7 +183,7 @@ private class HtmlPlayback
 
     private function updateVolume ()
     {
-        _clonedElement.volume = System.volume._ * volume._;
+        _clonedElement.volume = FMath.clamp(System.volume._ * volume._, 0, 1);
     }
 
     private var _sound :HtmlSound;

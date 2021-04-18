@@ -75,7 +75,7 @@ class HtmlMotion
 
     private function get_accelerationSupported () :Bool
     {
-        return (untyped Browser.window).DeviceMotionEvent != null;
+        return (untyped Browser.window).DeviceMotionEvent != null && Reflect.field(Browser.window, 'ondevicemotion') != null;
     }
 
     // http://dev.w3.org/geo/api/spec-source-orientation.html#devicemotion
@@ -95,7 +95,7 @@ class HtmlMotion
 
     private function get_attitudeSupported () :Bool
     {
-        return (untyped Browser.window).DeviceOrientationEvent != null;
+        return (untyped Browser.window).DeviceOrientationEvent != null && Reflect.field(Browser.window, 'ondeviceorientation') != null;
     }
 
     // http://dev.w3.org/geo/api/spec-source-orientation.html#deviceorientation

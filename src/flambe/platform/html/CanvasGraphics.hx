@@ -114,6 +114,23 @@ class CanvasGraphics
         _canvasCtx.fillRect(Std.int(x), Std.int(y), Std.int(width), Std.int(height));
     }
 
+    public function drawLine (color :Int, xStart :Float, yStart :Float, xEnd :Float, yEnd :Float, width :Float, roundedCap :Bool)
+    {
+        _canvasCtx.beginPath();
+        _canvasCtx.moveTo(xStart, yStart);
+        _canvasCtx.lineTo(xEnd, yEnd);
+        _canvasCtx.lineWidth = width;
+        _canvasCtx.lineCap = roundedCap ? "round" : "butt";
+
+        // Convert color into a hex string in the form of #RRGGBB
+        var hex = untyped (0xffffff & color).toString(16);
+        while (hex.length < 6) {
+            hex = "0"+hex;
+        }
+        _canvasCtx.strokeStyle = hex;
+        _canvasCtx.stroke();
+    }
+
     public function multiplyAlpha (factor :Float)
     {
         _canvasCtx.globalAlpha *= factor;

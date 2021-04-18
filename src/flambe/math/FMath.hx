@@ -69,4 +69,9 @@ class FMath
             else if (value > 0) 1
             else 0;
     }
+    
+    public static function lerp (n1 :Float, n2 :Float, percent :Float) :Float
+    {
+        return n1 + ((n2 - n1) * percent);
+    }
 }

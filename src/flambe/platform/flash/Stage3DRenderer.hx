@@ -18,6 +18,7 @@ import flambe.display.Graphics;
 import flambe.display.Texture;
 import flambe.subsystem.RendererSystem;
 import flambe.util.Assert;
+import flambe.util.Promise;
 import flambe.util.Value;
 
 class Stage3DRenderer
@@ -31,9 +32,15 @@ class Stage3DRenderer
 
     public var batcher (default, null) :Stage3DBatcher;
 
+    /**
+    * Used to indicate whether a Context3D has been created yet, as this is the only asynchronous point of Flash init
+    */
+    public var promise : Promise<Bool>;
+
     public function new ()
     {
         _hasGPU = new Value<Bool>(false);
+        promise = new Promise<Bool>();
 
         // Use the first available Stage3D
         var stage = Lib.current.stage;
@@ -144,6 +151,12 @@ class Stage3DRenderer
         // Signal that the GPU context was (re)created
         hasGPU._ = false;
         hasGPU._ = true;
+
+        // initialization of the Renderer has completed if a Context3D has been created
+        if (!promise.hasResult)
+        {
+            promise.result = true;
+        }
     }
 
     private function onError (event :ErrorEvent)

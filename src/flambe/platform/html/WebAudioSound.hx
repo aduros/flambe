@@ -36,18 +36,18 @@ class WebAudioSound extends BasicAsset<WebAudioSound>
         this.buffer = buffer;
     }
 
-    public function play (volume :Float = 1.0) :Playback
+    public function play (volume :Float = 1.0, offset:Float=0, duration:Float=0) :Playback
     {
         assertNotDisposed();
 
-        return new WebAudioPlayback(this, volume, false);
+        return new WebAudioPlayback(this, volume, false, offset, duration);
     }
 
-    public function loop (volume :Float = 1.0) :Playback
+    public function loop (volume :Float = 1.0, offset:Float=0, duration:Float=0) :Playback
     {
         assertNotDisposed();
 
-        return new WebAudioPlayback(this, volume, true);
+        return new WebAudioPlayback(this, volume, true, offset, duration);
     }
 
     public function get_duration () :Float
@@ -75,9 +75,9 @@ class WebAudioSound extends BasicAsset<WebAudioSound>
             var AudioContext = HtmlUtil.loadExtension("AudioContext").value;
             if (AudioContext != null) {
                 ctx = untyped __new__(AudioContext);
-                gain = createGain();
-                gain.connect(ctx.destination);
-
+				gain = createGain();
+				gain.connect(ctx.destination);
+				
                 System.volume.watch(function(volume, _) {
                     gain.gain.value = volume;
                 });
@@ -91,17 +91,25 @@ class WebAudioSound extends BasicAsset<WebAudioSound>
     {
         // Fall back to createGainNode used in iOS Safari
         // https://developer.mozilla.org/en-US/docs/Web_Audio_API/Porting_webkitAudioContext_code_to_standards_based_AudioContext
-        return (ctx.createGain != null) ? ctx.createGain() : ctx.createGainNode();
-    }
+        //return (ctx.createGain != null) ? ctx.createGain() : untyped ctx.createGainNode();
+		
+		//this appears to create/cause a runtime error in firefox.... something goes wrong in the bind function..?
+		
+		var gain = try {
+			ctx.createGain();
+		} catch (err:Dynamic) {
+			Reflect.callMethod(ctx, 'createGainNode', []);
+		}
+		
+		return gain;
+	}
+	
 
-    public static function start (node :Dynamic, time :Float)
+    public static function start (node:Dynamic, time :Float, offset:Float=0, duration:Float=0)
     {
         // Fall back to noteOn used in iOS Safari
-        if (node.start != null) {
-            node.start(time);
-        } else {
-            node.noteOn(time);
-        }
+        if (node.start == null) (untyped node.noteOn(time, offset, duration));
+		else node.start(time, offset, duration);
     }
 
     private static var _detectSupport = true;
@@ -117,17 +125,29 @@ private class WebAudioPlayback
     public var position (get, null) :Float;
     public var sound (get, null) :Sound;
 
-    public function new (sound :WebAudioSound, volume :Float, loop :Bool)
+    public function new (sound :WebAudioSound, volume :Float, loop :Bool, offset:Float=0, duration:Float=0)
     {
         _sound = sound;
         _head = WebAudioSound.gain;
         _complete = new Value<Bool>(false);
-
+		
         _sourceNode = WebAudioSound.ctx.createBufferSource();
         _sourceNode.buffer = sound.buffer;
-        _sourceNode.loop = loop;
-        _sourceNode.onended = function () _complete._ = true; // Not supported on iOS!
-        WebAudioSound.start(_sourceNode, 0);
+        
+		if (offset <= 0) offset = 0;
+		if (duration <= 0) duration = _sourceNode.buffer.duration;
+		
+		if (_sourceNode.loop = loop) {
+			_sourceNode.loopStart = offset;
+			_sourceNode.loopEnd = Math.min(offset + duration, _sourceNode.buffer.duration);
+		}
+		
+        untyped _sourceNode.onended = function () {
+			_complete._ = true; // Not supported on iOS!
+			dispose();
+		}
+		
+        WebAudioSound.start(_sourceNode, 0, offset, duration);
         playAudio();
 
         this.volume = new AnimatedFloat(volume, function (v, _) {
@@ -185,32 +205,49 @@ private class WebAudioPlayback
             return elapsed % _sound.duration;
         }
     }
-
+	
+	
     public function update (dt :Float) :Bool
     {
         volume.update(dt);
 
-        // playbackState is used in old browsers that don't support onended (iOS)
-        if (_sourceNode.playbackState == 3 /* FINISHED_STATE */) {
-            _complete._ = true;
-        }
-
         if (_complete._ || paused) {
             // Allow complete or paused sounds to be garbage collected
             _tickableAdded = false;
-
+			
             // Release System references
             _hideBinding.dispose();
-
+			
             return true;
         }
+		
+        // playbackState is used in old browsers that don't support onended (iOS)
+        if (_sourceNode.playbackState == 3) {
+            _complete._ = true;
+			dispose();
+        }
+		
         return false;
     }
 
     public function dispose ()
     {
-        paused = true;
-        _complete._ = true;
+		paused = true;
+		
+		if (_tickableAdded) {
+			_tickableAdded = false;
+			HtmlPlatform.instance.mainLoop.removeTickable(this);
+		}
+		
+		if (_hideBinding != null) _hideBinding.dispose();
+		if (_gainNode != null) _gainNode.disconnect();
+		
+		_hideBinding = null;
+		_sourceNode = null;
+		_gainNode = null;
+		_complete = null;
+		
+		volume = null;
     }
 
     private function setVolume (volume :Float)
@@ -222,7 +259,7 @@ private class WebAudioPlayback
         _gainNode.gain.value = volume;
     }
 
-    private function insertNode (head :Dynamic)
+    private function insertNode (head : Dynamic)
     {
         if (!paused) {
             _sourceNode.disconnect();

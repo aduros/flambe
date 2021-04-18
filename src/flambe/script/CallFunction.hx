@@ -22,7 +22,7 @@ class CallFunction
 
     public function update (dt :Float, actor :Entity)
     {
-        _fn();
+        if (_fn != null) _fn();
         return 0;
     }
 

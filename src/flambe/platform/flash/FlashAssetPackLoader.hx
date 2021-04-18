@@ -23,6 +23,14 @@ import flambe.asset.AssetEntry;
 import flambe.asset.Manifest;
 import flambe.util.Assert;
 
+import format.tar.Data;
+
+import haxe.io.BytesInput;
+import haxe.io.Bytes;
+
+using flambe.util.Strings;
+using StringTools;
+
 class FlashAssetPackLoader extends BasicAssetPackLoader
 {
     public function new (platform :FlashPlatform, manifest :Manifest)
@@ -66,6 +74,146 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
             var urlLoader = new URLLoader(req);
             dispatcher = urlLoader;
             create = function () return new BasicFile(urlLoader.data);
+			
+        case ZIP:
+            var urlLoader = new URLLoader(req);
+            urlLoader.dataFormat = flash.net.URLLoaderDataFormat.BINARY;
+            dispatcher = urlLoader;
+            var events = new EventGroup();
+            events.addDisposingListener(dispatcher, Event.COMPLETE, function (_) {
+                var bytes = Bytes.ofData(urlLoader.data);
+                var zip = new haxe.zip.Reader(new BytesInput(bytes));
+                var entries:List<haxe.zip.Entry> = zip.read();
+
+                for (entry in entries) {					
+                    var extension = entry.fileName.getUrlExtension();  
+                    if(entry.fileName.charAt(0)=="." || entry.fileName.indexOf("/.")>=0) {
+                        extension="";
+                    }
+                    if(extension=="" || extension==null) {
+                        Log.warn("No extension or weird format for zipped entry, ignoring this asset", ["url", entry.fileName]);
+                        continue; 
+                    }						
+
+                    _assetsRemaining += 1;	
+                    promise.total += entry.dataSize;	
+
+                    var format = Manifest.inferFormat(entry.fileName);
+                    var name = entry.fileName.removeFileExtension();
+                    if(format == Data) { 
+                        name = entry.fileName;
+                    }					
+                    var entryFlambe = manifest.add(name, entry.fileName, entry.dataSize, format);
+                    var asset;	
+                    var canAdd = false;				
+                    switch(format) {
+                        case JXR, PNG, JPG, GIF:
+                            var loader = new Loader();
+                            loader.loadBytes(entry.data.getData());
+                            var dispatcher:IEventDispatcher = loader.contentLoaderInfo;
+                            var events = new EventGroup();
+                            events.addDisposingListener(dispatcher, Event.COMPLETE, function (_) {
+                                create = function () {
+                                    var bitmap :Bitmap = cast loader.content;
+                                    var texture = _platform.getRenderer().createTexture(bitmap.bitmapData);
+                                    bitmap.bitmapData.dispose();
+                                    return texture;
+                                };
+                                asset = create();
+                                handleLoad(entryFlambe, asset);		
+                            });
+                        case MP3:
+                            var sound = new Sound();
+                            sound.loadCompressedDataFromByteArray(entry.data.getData(), entry.dataSize);
+                            create = function () return new FlashSound(sound);
+                            canAdd = true;
+                        case Data:
+                            create = function () return new BasicFile(entry.data.toString());
+                            canAdd = true;
+                        default:
+                            Log.warn("Format not supported for zipped entry, ignoring this asset", ["url", entry.fileName]);						
+                            continue;
+                    }					
+		
+                    if (canAdd) {
+                        asset = create();
+                        handleLoad(entryFlambe, asset);						
+                    }
+                }
+            });
+            handleLoad(entry, {});
+            return;
+
+        case TAR:
+            var urlLoader = new URLLoader(req);
+            urlLoader.dataFormat = flash.net.URLLoaderDataFormat.BINARY;
+            dispatcher = urlLoader;
+            var events = new EventGroup();
+            events.addDisposingListener(dispatcher, Event.COMPLETE, function (_) {
+                var bytes = Bytes.ofData(urlLoader.data);
+                var tar = new format.tar.Reader(new BytesInput(bytes));
+                var entries:List<format.tar.Entry> = tar.read();
+
+                for (entry in entries) {					
+                    var extension = entry.fileName.getUrlExtension();  
+                    if(entry.fileName.charAt(0)=="." || entry.fileName.indexOf("/.")>=0) {
+                        extension="";
+                    }
+                    if(extension=="" || extension==null) {
+                        Log.warn("No extension or weird format for tar entry, ignoring this asset", ["url", entry.fileName]);
+                        continue; 
+                    }						
+
+                    _assetsRemaining += 1;	
+                    promise.total += entry.fileSize;	
+
+                    var format = Manifest.inferFormat(entry.fileName);
+                    var name = entry.fileName.removeFileExtension();
+                    if(format == Data) { 
+                        name = entry.fileName;
+                    }					
+                    var entryFlambe = manifest.add(name, entry.fileName, entry.fileSize, format);
+                    var asset;	
+                    var canAdd = false;				
+                    switch(format) {
+                        case JXR, PNG, JPG, GIF:
+                            var loader = new Loader();
+                            loader.loadBytes(entry.data.getData());
+                            var dispatcher:IEventDispatcher = loader.contentLoaderInfo;
+                            var events = new EventGroup();
+                            events.addDisposingListener(dispatcher, Event.COMPLETE, function (_) {
+                                create = function () {
+                                    var bitmap :Bitmap = cast loader.content;
+                                    var texture = _platform.getRenderer().createTexture(bitmap.bitmapData);
+                                    bitmap.bitmapData.dispose();
+                                    return texture;
+                                };
+                                asset = create();
+                                handleLoad(entryFlambe, asset);		
+                            });
+                        case MP3:
+                            var sound = new Sound();
+                            sound.loadCompressedDataFromByteArray(entry.data.getData(), entry.fileSize);
+                            create = function () return new FlashSound(sound);
+                            canAdd = true;
+                        case Data:
+                            create = function () return new BasicFile(entry.data.toString());
+                            canAdd = true;
+                        default:
+							_assetsRemaining -= 1;
+                   			promise.total -= entry.fileSize;
+                            Log.warn("Format not supported for tar entry, ignoring this asset", ["url", entry.fileName]);						
+                            continue;
+                    }					
+		
+                    if (canAdd) {
+                        asset = create();
+                        handleLoad(entryFlambe, asset);						
+                    }
+                }
+            });
+            handleLoad(entry, {});
+            return;
 
         default:
             // Should never happen
@@ -102,6 +250,6 @@ class FlashAssetPackLoader extends BasicAssetPackLoader
 
     override private function getAssetFormats (fn :Array<AssetFormat> -> Void)
     {
-        fn([JXR, PNG, JPG, GIF, MP3, Data]);
+        fn([JXR, PNG, JPG, GIF, MP3, Data, ZIP, TAR]);
     }
 }

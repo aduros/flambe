@@ -185,7 +185,7 @@ class Manifest
         return _remoteBase = remoteBase;
     }
 
-    private static function inferFormat (url :String) :AssetFormat
+    public static function inferFormat (url :String) :AssetFormat
     {
         var extension = url.getUrlExtension();
         if (extension != null) {
@@ -205,6 +205,8 @@ class Manifest
                 case "ogg": return OGG;
                 case "opus": return OPUS;
                 case "wav": return WAV;
+                case "zip": return ZIP;
+                case "tar": return TAR;
             }
         } else {
             Log.warn("No file extension for asset, it will be loaded as data", ["url", url]);

@@ -20,6 +20,9 @@ enum AssetFormat
 
     // Raw text/data
     Data;
+	
+    // Archived file format
+    ZIP; TAR;
 }
 
 /**

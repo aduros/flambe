@@ -78,6 +78,10 @@ class CanvasRenderer
     {
         graphics.didRender();
     }
+	
+	public function canRender() {
+		return true;
+	}
 
     public function getName () :String
     {

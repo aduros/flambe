@@ -105,6 +105,10 @@ class WebGLRenderer
     {
         graphics.didRender();
     }
+	
+	public function canRender() {
+		return !gl.isContextLost();
+	}
 
     private function onResize ()
     {

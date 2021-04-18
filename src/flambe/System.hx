@@ -122,14 +122,20 @@ class System
     public static var volume (default, null) :AnimatedFloat = new AnimatedFloat(1);
 
     /**
+    * Used to indicate whether asynchronous platform initialization has finished
+    */
+    public static var promise (default, null) :Promise<Bool>;
+
+    /**
      * Starts up Flambe, this should usually be the first thing a game does.
      */
     public static function init ()
     {
         if (!_calledInit) {
-            _platform.init();
+            promise = _platform.init();
             _calledInit = true;
         }
+        return promise;
     }
 
     /**

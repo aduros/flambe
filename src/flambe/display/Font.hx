@@ -461,6 +461,8 @@ class TextLayout
             var glyph = _glyphs[ii];
             if (glyph.charCode == "\n".code) {
                 y += _lineOffset;
+            } else if (glyph.charCode == " ".code) {
+                // skip spaces
             } else {
                 var x = _offsets[ii];
                 glyph.draw(g, x, y);
